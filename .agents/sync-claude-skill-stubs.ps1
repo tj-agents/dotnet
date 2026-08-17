@@ -11,11 +11,20 @@ $canonical  = Join-Path $repoRoot '.agents/skills'
 $stubRoot   = Join-Path $repoRoot '.claude/skills'
 $utf8NoBom  = New-Object System.Text.UTF8Encoding($false)
 
-function Stub-Body([string]$name) {
+# A stub must carry the canonical skill's own `description`: that field is what decides whether Claude
+# loads the skill at all, so boilerplate here means a standards skill silently never fires.
+function Canonical-Description([string]$path, [string]$name) {
+    $text = [System.IO.File]::ReadAllText($path) -replace "`r`n", "`n"
+    $match = [regex]::Match($text, "(?s)\A---\n.*?^description:[ \t]*(.+?)\n(?:[a-zA-Z-]+:|---)", 'Multiline')
+    if ($match.Success) { return ($match.Groups[1].Value.Trim() -replace "\s*\n\s*", " ") }
+    return "Compatibility stub for Claude Code. The canonical skill lives in .agents/skills/$name/SKILL.md."
+}
+
+function Stub-Body([string]$name, [string]$description) {
 @"
 ---
 name: $name
-description: Compatibility stub for Claude Code. The canonical skill lives in .agents/skills/$name/SKILL.md.
+description: $description
 ---
 
 # $name
@@ -36,7 +45,7 @@ $written = @(); $unchanged = @(); $pruned = @()
 foreach ($name in $names) {
     $dir  = Join-Path $stubRoot $name
     $file = Join-Path $dir 'SKILL.md'
-    $body = Stub-Body $name
+    $body = Stub-Body $name (Canonical-Description (Join-Path $canonical "$name/SKILL.md") $name)
     $current = if (Test-Path $file) { [System.IO.File]::ReadAllText($file) -replace "`r`n", "`n" } else { $null }
     if ($current -ne $body) {
         New-Item -ItemType Directory -Force -Path $dir | Out-Null
