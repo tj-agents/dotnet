@@ -1,0 +1,10 @@
+---
+name: result-terminals
+description: Turning a Result or Option into a response at the edge of a .NET service — the `Reunion.AspNetCore` terminals (`ToOkOrProblem`, `ToNoContentOrProblem`, `ToCreatedOrProblem`, `ToCreatedAtActionOrProblem`, `ToActionResult`, `ToResults`, `ToOkOr`, `ToOkOrNotFound`, `ToOkOrNoContent`), importing exactly one adapter namespace per file, automatic semantic-kind-to-status mapping for `IError`, projected overloads instead of a `Map` immediately before a terminal, normalizing only known dependency faults into 503/504, never normalizing cancellation, worker and RPC-server terminal policy, and the test matrix a Result-based change owes. Use when writing or reviewing a controller action, a minimal-API endpoint, a worker loop, or an RPC server method that returns a Result, or when deciding what an unexpected exception should become.
+---
+
+# result-terminals
+
+This is a Claude Code compatibility stub. Do not edit skill instructions here.
+
+Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/result-terminals/SKILL.md.

@@ -1,0 +1,10 @@
+---
+name: proto
+description: gRPC and Protobuf standard for .NET services — proto message naming vs the C# payload type, XMappers extension methods for proto-to-domain conversion, what may cross the wire (open string code, published message, semantic kind — never a union type or Result), total client error mapping via a FrozenDictionary of reconstructible cases, contract-mismatch handling for unknown codes, and cancellation precedence. Use when adding or changing a .proto file, writing or reviewing a gRPC client or server implementation, mapping proto messages to domain types, mapping RpcException to a typed error, or deciding whether a failure case can cross a service boundary.
+---
+
+# proto
+
+This is a Claude Code compatibility stub. Do not edit skill instructions here.
+
+Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/proto/SKILL.md.

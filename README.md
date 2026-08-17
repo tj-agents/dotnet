@@ -12,13 +12,19 @@ AGENTS.md                          -> ~/AGENTS.md
 
 .agents/skills/                    -> ~/.agents/skills/
                                        Canonical, agent-agnostic skills. Source of truth —
-                                       edit here, not in ~/.claude/skills.
+                                       edit here, not in ~/.claude/skills. Two kinds: the
+                                       command skills invoked by name (commit-push, worktree,
+                                       sync, …) and the load-on-demand engineering standards
+                                       (csharp-*, result-*, typescript-*, testing, …), which
+                                       fire when a task matches their description.
 
 .agents/sync-claude-skill-stubs.ps1 -> ~/.agents/sync-claude-skill-stubs.ps1
                                        Regenerates ~/.claude/skills/*/SKILL.md as one-line
                                        stubs pointing back at the canonical skill. Claude
                                        Code only discovers skills under .claude/skills, so
                                        this bridges it to the shared .agents/skills source.
+                                       Each stub mirrors the canonical `description`, which
+                                       is what decides whether a skill loads at all.
 
 .claude/CLAUDE.md                  -> ~/.claude/CLAUDE.md
                                        Claude Code specific global instructions.
