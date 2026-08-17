@@ -16,8 +16,16 @@ $utf8NoBom  = New-Object System.Text.UTF8Encoding($false)
 function Canonical-Description([string]$path, [string]$name) {
     $text = [System.IO.File]::ReadAllText($path) -replace "`r`n", "`n"
     $match = [regex]::Match($text, "(?s)\A---\n.*?^description:[ \t]*(.+?)\n(?:[a-zA-Z-]+:|---)", 'Multiline')
-    if ($match.Success) { return ($match.Groups[1].Value.Trim() -replace "\s*\n\s*", " ") }
-    return "Compatibility stub for Claude Code. The canonical skill lives in .agents/skills/$name/SKILL.md."
+    if (-not $match.Success) {
+        throw "$name/SKILL.md has no parsable ``description:`` in its front matter."
+    }
+    $description = $match.Groups[1].Value.Trim() -replace "\s*\n\s*", " "
+    # A bare colon-space anywhere in an unquoted YAML scalar silently truncates the value, and the
+    # description is the router — a truncated one means the skill never loads. Reword, don't quote.
+    if ($description -match ':\s') {
+        throw "$name/SKILL.md description contains a colon-space, which breaks the YAML scalar: $description"
+    }
+    return $description
 }
 
 function Stub-Body([string]$name, [string]$description) {
@@ -66,6 +74,27 @@ if (Test-Path $stubRoot) {
                 $pruned += $d.Name
             }
         }
+    }
+}
+
+# A repo that is also a plugin marketplace needs the same stubs inside the plugin, because Claude Code
+# loads a plugin's skills from <plugin>/skills/. No-op in a repo with no plugins/ directory.
+$pluginRoot = Join-Path $repoRoot 'plugins'
+if (Test-Path $pluginRoot) {
+    $plugins = @(Get-ChildItem -Path $pluginRoot -Directory)
+    if ($plugins.Count -gt 1) {
+        throw "More than one plugin found; add an explicit skill-to-plugin map before syncing plugin stubs."
+    }
+    foreach ($plugin in $plugins) {
+        foreach ($name in $names) {
+            $dir  = Join-Path $plugin.FullName "skills/$name"
+            $file = Join-Path $dir 'SKILL.md'
+            $body = (Stub-Body $name (Canonical-Description (Join-Path $canonical "$name/SKILL.md") $name)) `
+                -replace '\.\./\.\./\.\./\.agents/', '../../../../.agents/'
+            New-Item -ItemType Directory -Force -Path $dir | Out-Null
+            [System.IO.File]::WriteAllText($file, ($body -replace "`n", "`r`n"), $utf8NoBom)
+        }
+        Write-Host "plugin stubs: $($names.Count) written into plugins/$($plugin.Name)/skills"
     }
 }
 
