@@ -1,6 +1,6 @@
 ---
 name: prune-worktrees
-description: Sweep ALL git worktrees at once and delete the dead ones — the bulk counterpart to the per-branch `worktree remove`. Classifies every worktree by content (merged / squash-ghost / genuinely unmerged), refuses anything dirty, detached-unsafe, or still carrying work, then tears down the provably-dead ones properly — unlinking .Codex junctions first so deletion can't recurse into the main checkout's real skill files, handling Windows MAX_PATH, pruning admin state, and dropping the orphaned branch. Use when Tommy says "prune worktrees", "/prune-worktrees", "delete unused worktrees", "clean up my worktrees", "why do I have so many worktrees", "get rid of these worktrees", or "remove all the dead worktrees". Works in any repo; personal git/gh only. For ONE named worktree use `worktree remove`; for branch-ref clutter use `unmerged`.
+description: Sweep ALL git worktrees at once and delete the dead ones — the bulk counterpart to the per-branch `worktree remove`. Classifies every worktree by content (merged / squash-ghost / genuinely unmerged), refuses anything dirty, detached-unsafe, or still carrying work, then tears down the provably-dead ones properly — unlinking .Codex junctions first so deletion can't recurse into the main checkout's real skill files, handling Windows MAX_PATH, pruning admin state, sweeping orphaned leftover folders a removed worktree left behind, and dropping the orphaned branch. Use when Tommy says "prune worktrees", "/prune-worktrees", "delete unused worktrees", "clean up my worktrees", "why do I have so many worktrees", "get rid of these worktrees", or "remove all the dead worktrees". Works in any repo; personal git/gh only. For ONE named worktree use `worktree remove`; for branch-ref clutter use `unmerged`.
 ---
 
 # prune-worktrees
@@ -119,6 +119,37 @@ for a branch proven GHOST by `git cherry` in step 2. Never blanket-`-D`.
 > delete a branch any *surviving* worktree holds, matched **case-insensitively** — deleting the twin
 > drops that worktree to detached HEAD. If two branches differ only by case, delete neither; name it.
 
+## 6. Sweep orphaned leftover folders (the actual pile-up)
+
+`git worktree list` only shows *registered* worktrees, so steps 1–5 are **structurally blind** to the
+folders that actually pile up: a removed worktree whose **directory was left behind** — admin entry
+pruned, tree still on disk. That is the Windows "can't delete a directory a process is cwd'd in" failure,
+and nothing above can see it. Catch it by diffing on-disk folders against the registered set:
+
+```bash
+root=$(git worktree list --porcelain | awk '/^worktree /{print $2; exit}')   # main checkout
+reg=$(git worktree list --porcelain | awk '/^worktree /{print $2}')
+for base in "$root/.worktrees" "$(dirname "$root")/$(basename "$root").worktrees"; do
+  [ -d "$base" ] || continue
+  for d in "$base"/*/; do d="${d%/}"; [ -e "$d" ] || continue
+    printf '%s\n' "$reg" | grep -qxF "$d" && continue           # still registered → not an orphan
+    br=$(basename "$d" | sed 's#-#/#')                          # slug -> branch (Type/Name)
+    if git show-ref --verify --quiet "refs/heads/$br" && ! git merge-base --is-ancestor "$br" "origin/$main" 2>/dev/null; then
+      echo "  ✋ ORPHAN KEPT — branch '$br' not merged; verify no uncommitted work, then delete by hand: $d"
+    else
+      cd "$root"                                                # never delete a tree you're standing in
+      rm -rf "$d" 2>/dev/null || MSYS_NO_PATHCONV=1 cmd /c rmdir /s /q "$(cygpath -w "$d")" >/dev/null 2>&1
+      [ -d "$d" ] && echo "  ⚠️ ORPHAN LOCKED (a live process holds it): $d" || echo "  🗑 orphan folder removed: $d"
+    fi
+  done
+done
+```
+
+A true orphan has no valid worktree admin, so step 2's classifier never sees it — this folder-vs-registered
+diff is the only thing that catches it. Auto-remove **only** when its branch is merged or already gone
+(committed work is then safe in refs). An unmerged orphan is **kept and reported**: a leftover tree with a
+dead `.git` can't be checked for uncommitted work, so it needs a human's eye before deletion.
+
 ## Report
 
 **🗑 Pruned** — one line each: path · branch · why it was dead (merged / ghost / stale agent tree).
@@ -151,5 +182,8 @@ Keep it tight — the pruned list is a count plus names, the kept list is where 
   and always reported as a separate group so it's obvious what was touched.
 - Local-only. This never deletes remote branches, never closes PRs, never pushes. Read-only until the
   classification is done; destructive strictly on the proven-dead set.
+- **Orphan folders are the real pile-up.** A removed worktree whose directory was left behind is
+  invisible to `git worktree list`; step 6 catches it by diffing on-disk folders against the registered
+  set, and auto-deletes only when the branch is merged/gone (keeps + reports an unmerged one).
 - `gh` may be missing or the repo non-GitHub — degrade quietly, carry on git-only, and say PR state was
   unavailable rather than inventing it.
