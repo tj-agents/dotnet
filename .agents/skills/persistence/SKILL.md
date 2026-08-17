@@ -70,12 +70,20 @@ return (await reportRepository.GetQueueAsync(pageParams)).Map(r => r.ToDto());
 ```
 
 `Map` carries `TotalCount`/`PageNumber`/`PageSize` across, so hand-writing `new Pagination<T>(...)` restates
-four arguments that have exactly one correct value. Two cases are **not** `Map`:
+four arguments that have exactly one correct value. One case is **not** `Map`: **only the item type widens** —
+`IPagination<out T>` is covariant, so an `IPagination<ArtistHeader>` already *is* an `IPagination<IHeader>`.
+Return it; don't re-wrap, and don't `Map(x => x)`.
 
-- **Only the item type widens** — `IPagination<out T>` is covariant, so an `IPagination<ArtistHeader>`
-  already *is* an `IPagination<IHeader>`. Return it; don't re-wrap, and don't `Map(x => x)`.
-- **The projection is asynchronous** — `Map` takes a synchronous selector, so an awaiting projection still
-  constructs its page by hand.
+**An `async` mapper is not an exception.** A mapper is normally `async` because it prefetches a dependency in
+one batch, not because projecting a row is asynchronous. Await the batch first, then `Map` synchronously over
+the result:
+
+```csharp
+var deals = await DealsByIdAsync(page.Data);
+return page.Map(item => ToDto(item, deals));
+```
+
+Awaiting *inside* the selector is the real defect anyway — that is a per-row round trip.
 
 ## Unit of work — choose by the number of flushes and contexts
 
