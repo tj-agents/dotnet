@@ -129,14 +129,31 @@ if [ "$MERGED" != 1 ] && [ "$FORCE" != "force" ]; then
   echo "Merge the PR first (the convention), or re-run: worktree remove '$BRANCH' force"; exit 1
 fi
 
+# Stand in the MAIN checkout before deleting — NEVER inside the tree being removed. Windows refuses to
+# delete a directory that is a process's current directory; that is the #1 cause of orphaned worktree
+# folders (git drops the admin entry, the folder can't be deleted, and it lingers forever).
+main_co=$(git worktree list --porcelain | awk '/^worktree /{print $2; exit}')
+cd "$main_co" 2>/dev/null || cd /
+
 # Unlink our junctions (Git Bash sees them as -type l) BEFORE removing — rmdir drops the link only.
 find "$WT/.agents" -type l 2>/dev/null | while read -r j; do
   MSYS_NO_PATHCONV=1 cmd /c rmdir "$(cygpath -w "$j")" >/dev/null 2>&1 && echo "unlinked: ${j#$WT/}"
 done
-git worktree remove --force "$WT" && git worktree prune
+
+git worktree remove --force "$WT" 2>/dev/null
+git worktree prune
+# Removal can drop the admin entry yet leave the folder (Windows lock / a shell cwd'd inside). Finish
+# the delete, then VERIFY — never report success while the folder survives, or it becomes an orphan.
+if [ -d "$WT" ]; then
+  rm -rf "$WT" 2>/dev/null || MSYS_NO_PATHCONV=1 cmd /c rmdir /s /q "$(cygpath -w "$WT")" >/dev/null 2>&1
+fi
+if [ -d "$WT" ]; then
+  echo "!! STILL PRESENT: $WT — a live process holds a handle. Close that session/editor, then re-run."
+else
+  echo "=== removed worktree + folder gone: $WT ==="
+fi
 git branch -d "$BRANCH" 2>/dev/null && echo "deleted merged local branch: $BRANCH" \
   || echo "kept local branch '$BRANCH' (not fully merged into current HEAD, or already gone)"
-echo "=== removed worktree: $WT ==="
 git worktree list
 ```
 
@@ -147,9 +164,6 @@ git worktree list
 - **Match existing branch casing.** If a branch of the same name exists in any casing, reuse that exact
   ref — never create a second casing (Windows can't hold both; it breaks `fetch`/`pull` for everyone).
   Only when creating a genuinely new branch, enforce the Capitalized `<Type>/` prefix.
-- **Plan work names the branch `<Type>/<epic>_<name>`** — matching the plan's `plans/<epic>/<NAME>_PLAN.md`
-  and `<NAME>_PROGRESS.md` stem, so branch, worktree, plan, and ledger share one identity (see
-  `plans/agents/PLAN.md`). Non-plan work keeps a free-form `<Name>`.
 - **Branch off fresh `origin` default**, not stale local — `create` fetches first. Keeps new worktrees
   from starting already-drifted.
 - **Only link the local-only `.agents` skills.** Tracked skills come with the checkout; this junctions
@@ -159,6 +173,9 @@ git worktree list
   point of the merge-as-you-go convention.
 - **Unlink junctions before deleting.** Belt-and-braces even though `rm`/`rmdir` are junction-safe here
   — a stray follow-through would delete the main checkout's real skill files.
+- **Delete from the main checkout, then verify the folder is gone.** Never run removal with a shell
+  cwd'd inside the worktree — Windows then can't delete it and orphans the folder (the pile-up). Always
+  force-delete any leftover tree and confirm it's gone rather than trusting `git worktree remove`'s exit.
 - Report the final branch/path/base on create; the surviving `git worktree list` on remove.
 ```
 
