@@ -38,6 +38,55 @@ AGENTS.md                          -> ~/AGENTS.md
                                        session transcripts.
 ```
 
+## The standards map
+
+Two kinds of skill live in `.agents/skills/`: **command** skills you invoke by name, and **standards**
+skills that fire when a task matches their description. The map below is the index for the standards half —
+**look a topic up here before writing a rule down**, so it lands in the one file that owns it.
+
+**Frontend (TypeScript/React)**
+
+| Topic | Skill |
+|---|---|
+| Which library for which job, and what is deliberately not used | `stack-defaults` |
+| `interface` vs `type`, casing against the wire, optional vs nullable, discriminated unions | `typescript-style` |
+| Naming the client's half of a contract — domain-noun reads, `XRequest` writes | `contract-naming` |
+| Feature slices, hooks orchestrate and components render, Effect traps, closed-key dispatch | `react-structure` |
+| Queries, mutations, query keys, invalidation, buffer vs variables | `server-state` |
+| Store privacy, facade hooks, derived values, the one imperative session | `client-state` |
+| `xApi` modules, one client per backend, errors resolved once | `http-layer` |
+| Forms — parse the buffer, map the parsed result | `write-boundary` |
+| Sharing across apps — intersection, slots over role checks, composed identity | `tiered-shared-code` |
+
+**Backend (C#/.NET)**
+
+| Topic | Skill |
+|---|---|
+| Style, naming, comments and XML doc | `csharp-style`, `csharp-naming`, `comments` |
+| DI and dependency-holders, logging, validation | `dependency-injection`, `logging`, `validation` |
+| Result and Option carriers, typed errors, transport terminals | `result-carriers`, `result-errors`, `result-terminals` |
+| Persistence, multitenancy, keyed strategies | `persistence`, `multitenancy`, `keyed-strategies` |
+| Module layering, service boundaries, gRPC/proto, HTTP contracts | `module-structure`, `microservice-boundaries`, `proto`, `http-api` |
+| Seeding, and the three test tiers | `seeding`, `unit-testing`, `integration-testing`, `e2e-scenarios` |
+
+### Named gaps — create the folder, write the skill
+
+These slots are deliberately empty rather than silently missing. Adding one is a new
+`.agents/skills/<name>/SKILL.md` plus a stub sync; nothing else moves.
+
+Frontend: `routing` (typed routes, search-param validation, guards, loader vs query) ·
+`component-design` (props typing, composition over configuration, when to split) ·
+`styling` (beyond the choice in `stack-defaults` — tokens, variant taxonomy, primitive ownership) ·
+`loading-and-errors` (skeleton vs spinner, suspense and error boundaries, where pending renders) ·
+`accessibility` · `formatting` (dates, money, numbers behind one module) ·
+`realtime` (connection lifecycle, subscription in an Effect, payload naming) ·
+`frontend-testing` (what to test at which level) · `performance` (memo policy, keys, code splitting) ·
+`type-safety` (no `any`, `unknown` at boundaries, no non-null assertion, `satisfies`) ·
+`cross-platform` (shared versus platform code, navigation versus router, secure storage).
+
+Backend: `messaging` (outbox and inbox, idempotent handlers) · `configuration` (options binding, secrets) ·
+`caching` · `observability` (tracing, metrics, health) · `authorization` · `background-jobs`.
+
 ## Setup on a new machine
 
 1. Clone this repo somewhere, or clone it directly as `~/.agents-src` — whatever's convenient.
