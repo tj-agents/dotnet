@@ -1,5 +1,8 @@
 # Global instructions (Tommy)
 
+Engineering standards are load-on-demand skills in `~/.agents/skills/`, indexed by topic in
+`dotagents/README.md` — look a topic up there before writing a rule down, and never restate one here.
+
 ## Work vs personal repos — the Azure-DevOps / PR skills are WORK-ONLY
 
 The skills **`create-devops-item`**, **`create-gh-pr`**, **`ship`**, and **`implement`** are

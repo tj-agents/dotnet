@@ -12,6 +12,12 @@ variation is injected from the owning app, never resolved inside shared code wit
 **The boundary gate is mechanical:** every app's typecheck compiles the shared trees against its own tree, so
 a leak into a shared tier fails a *different* app's build. Keep all of them green.
 
+A dependency-boundary linter states the rule directly — no import from one workspace into a sibling
+workspace — and catches the leak the typecheck cannot, where the import compiles but crosses a tier it had
+no business crossing. **A linter that is configured but wired into no script and no CI job enforces
+nothing**, and its `severity: error` reads as protection that isn't there; check that something actually
+runs it before trusting the boundary to it.
+
 ## Shared is the intersection — vary it with slots, never a role check
 
 When a shared surface must differ by product or audience, the shared code declares a **slot** and the owning
