@@ -5,6 +5,4 @@ description: The client's HTTP layer — one `xApi` object per resource under th
 
 # http-layer
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/http-layer/SKILL.md.
+The standard is `standards/react/HTTP.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/HTTP.md`. Read it and follow it; this skill only routes to it.

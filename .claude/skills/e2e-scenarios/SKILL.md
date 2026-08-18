@@ -5,6 +5,4 @@ description: Authoring rules for browser E2E scenarios (Gherkin plus a browser d
 
 # e2e-scenarios
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/e2e-scenarios/SKILL.md.
+The standard is `standards/dotnet/testing/E2E.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/testing/E2E.md`. Read it and follow it; this skill only routes to it.

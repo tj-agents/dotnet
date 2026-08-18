@@ -5,6 +5,4 @@ description: Sharing code across several apps built from one repo — code belon
 
 # tiered-shared-code
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/tiered-shared-code/SKILL.md.
+The standard is `standards/react/SHARED_CODE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/SHARED_CODE.md`. Read it and follow it; this skill only routes to it.

@@ -5,6 +5,4 @@ description: Validation standard for .NET services — FluentValidation for inpu
 
 # validation
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/validation/SKILL.md.
+The standard is `standards/dotnet/VALIDATION.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/VALIDATION.md`. Read it and follow it; this skill only routes to it.

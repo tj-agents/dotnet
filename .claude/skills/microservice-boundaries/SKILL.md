@@ -5,6 +5,4 @@ description: What one .NET service may depend on and how services talk — adapt
 
 # microservice-boundaries
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/microservice-boundaries/SKILL.md.
+The standard is `standards/dotnet/structure/SERVICE_BOUNDARIES.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/structure/SERVICE_BOUNDARIES.md`. Read it and follow it; this skill only routes to it.

@@ -5,6 +5,4 @@ description: Generic C# style standard — private fields without an underscore 
 
 # csharp-style
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/csharp-style/SKILL.md.
+The standard is `standards/dotnet/STYLE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/STYLE.md`. Read it and follow it; this skill only routes to it.

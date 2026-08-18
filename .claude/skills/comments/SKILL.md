@@ -5,6 +5,4 @@ description: The C# mechanics of comments and XML documentation — `//` for a o
 
 # comments
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/comments/SKILL.md.
+The standard is `standards/dotnet/COMMENTS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/COMMENTS.md`. Read it and follow it; this skill only routes to it.

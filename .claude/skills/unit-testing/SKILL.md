@@ -5,6 +5,4 @@ description: Unit-test standard for .NET — what makes a test a unit test at al
 
 # unit-testing
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/unit-testing/SKILL.md.
+The standard is `standards/dotnet/testing/UNIT.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/testing/UNIT.md`. Read it and follow it; this skill only routes to it.

@@ -5,6 +5,4 @@ description: Client state ownership — a store is a private implementation deta
 
 # client-state
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/client-state/SKILL.md.
+The standard is `standards/react/CLIENT_STATE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/CLIENT_STATE.md`. Read it and follow it; this skill only routes to it.
