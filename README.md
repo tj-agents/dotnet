@@ -19,7 +19,7 @@ AGENTS.md                          -> ~/AGENTS.md
 
 standards/<domain>/                -> ~/.agents/standards/<domain>/
                                        The engineering standards themselves, as plain markdown
-                                       organized by domain (dotnet, communication).
+                                       organized by domain (dotnet).
                                        Source of truth — edit here. Each domain carries a
                                        generated INDEX.md answering "did I document this?".
 
@@ -68,7 +68,6 @@ that owns it:
 | Domain | Index | Covers |
 |---|---|---|
 | `dotnet` | [`standards/dotnet/INDEX.md`](standards/dotnet/INDEX.md) | style, naming, comments, DI, logging, validation, `data/`, `results/`, `structure/`, `testing/` |
-| `communication` | [`standards/communication/INDEX.md`](standards/communication/INDEX.md) | drafting review comments, explaining code — personal cross-project conventions, which is why they sit beside the machine config rather than in a stack repo |
 
 React/TS standards are not here — look them up in
 [`react-agents`](https://github.com/tomjseery/react-agents).
