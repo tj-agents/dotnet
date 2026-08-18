@@ -146,7 +146,6 @@ Claude Code:
 /plugin install agent-process@agent-standards          # process + the write-time hook
 /plugin marketplace add tomjseery/dotagents
 /plugin install dotnet-standards@dotagents             # per stack - install what applies
-/plugin install communication-standards@dotagents
 /plugin marketplace add tomjseery/react-agents
 /plugin install react-standards@react-agents
 ```

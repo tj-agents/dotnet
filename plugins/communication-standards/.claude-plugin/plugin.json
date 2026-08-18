@@ -1,9 +1,0 @@
-{
-  "name": "communication-standards",
-  "description": "How to write about code so a reader can verify it rather than trust it. Language-agnostic.",
-  "author": {
-    "name": "Tommy Seery"
-  },
-  "repository": "https://github.com/tomjseery/dotagents",
-  "keywords": ["standards", "communication", "code-review", "writing"]
-}
