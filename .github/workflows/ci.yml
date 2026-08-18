@@ -1,0 +1,18 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Also proves the generator runs on Linux and on PowerShell 7. It is written to work under
+      # Windows PowerShell 5.1 too, because that is all some machines carrying this clone have.
+      - name: generated files are current
+        shell: pwsh
+        run: ./.agents/sync-generated.ps1 -Check
