@@ -1,7 +1,8 @@
 # dotagents
 
-Personal config for AI coding agents (Claude Code, Codex, etc.), synced across machines, plus the
-generic engineering standards.
+`dot` is **dotNET**. Personal config for AI coding agents (Claude Code, Codex, etc.), synced across
+machines, plus the generic .NET engineering standards. The TypeScript/React half is
+`tomjseery/react-agents`; anything Concertable-specific is `Concertable/agent-standards`.
 
 **How this is authored and delivered — read [`ARCHITECTURE.md`](ARCHITECTURE.md) before changing the
 shape of any of it.** It carries the repo map and why the repos stay separate, the
@@ -18,8 +19,7 @@ AGENTS.md                          -> ~/AGENTS.md
 
 standards/<domain>/                -> ~/.agents/standards/<domain>/
                                        The engineering standards themselves, as plain markdown
-                                       organized by domain (dotnet, communication; react
-                                       pending its move to react-agents).
+                                       organized by domain (dotnet, communication).
                                        Source of truth — edit here. Each domain carries a
                                        generated INDEX.md answering "did I document this?".
 
@@ -70,9 +70,8 @@ that owns it:
 | `dotnet` | [`standards/dotnet/INDEX.md`](standards/dotnet/INDEX.md) | style, naming, comments, DI, logging, validation, `data/`, `results/`, `structure/`, `testing/` |
 | `communication` | [`standards/communication/INDEX.md`](standards/communication/INDEX.md) | drafting review comments, explaining code — personal cross-project conventions, which is why they sit beside the machine config rather than in a stack repo |
 
-**`standards/react/` is leaving this repo.** It belongs in `react-agents`; see
-[`ARCHITECTURE.md`](ARCHITECTURE.md) for the four tiers and why. It is still here only because the split
-has not been executed yet.
+React/TS standards are not here — look them up in
+[`react-agents`](https://github.com/tomjseery/react-agents).
 
 Each index is generated from the tree, so it cannot drift from it — which the hand-maintained table it
 replaced could and did. Process standards (branching, committing, merging, plans) are not here; they are
@@ -88,25 +87,18 @@ stack.
 These slots are deliberately empty rather than silently missing. Adding one is a new doc in the tree plus
 its router; nothing else moves.
 
-`dotnet/STACK.md` is the first of them: `react/STACK.md` exists, but nothing yet says which .NET library
-to reach for which job.
+`dotnet/STACK.md` is the first of them: `react-agents` has a `STACK.md`, but nothing here yet says which
+.NET library to reach for which job.
 
-Frontend: `routing` (typed routes, search-param validation, guards, loader vs query) ·
-`component-design` (props typing, composition over configuration, when to split) ·
-`styling` (beyond the choice in `stack-defaults` — tokens, variant taxonomy, primitive ownership) ·
-`loading-and-errors` (skeleton vs spinner, suspense and error boundaries, where pending renders) ·
-`accessibility` · `formatting` (dates, money, numbers behind one module) ·
-`realtime` (connection lifecycle, subscription in an Effect, payload naming) ·
-`frontend-testing` (what to test at which level) · `performance` (memo policy, keys, code splitting) ·
-`type-safety` (no `any`, `unknown` at boundaries, no non-null assertion, `satisfies`) ·
-`cross-platform` (shared versus platform code, navigation versus router, secure storage).
-
-Backend: `messaging` (outbox and inbox, idempotent handlers) · `configuration` (options binding, secrets) ·
+`messaging` (outbox and inbox, idempotent handlers) · `configuration` (options binding, secrets) ·
 `caching` · `observability` (tracing, metrics, health) · `authorization` · `background-jobs`.
+
+The frontend gaps moved out with the corpus; they are listed in `react-agents`' README.
 
 ## Setup on a new machine
 
-1. Clone this repo to `~/source/repos/dotagents`, and `Concertable/agent-standards` beside it.
+1. Clone this repo to `~/source/repos/dotagents`, and `tomjseery/react-agents` and
+   `Concertable/agent-standards` beside it.
 2. Copy `AGENTS.md` and `.claude/` into `%USERPROFILE%`, merging with anything already there.
 3. Junction the skills and the standards trees into place:
    ```

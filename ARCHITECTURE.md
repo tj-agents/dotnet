@@ -125,6 +125,14 @@ description it cannot parse, a bare colon-space that truncates a YAML scalar, or
 pointing at a plugin with no manifest. Two structures that can drift is exactly how 754 lines of
 frontend law once ended up with zero inbound links.
 
+**`sync-generated.ps1` exists three times, and that is the open cost of this design.** Each standards repo
+carries its own copy, because each one's CI has to verify itself without reaching a private sibling and a
+plugin cannot reference outside its root. The copies are structurally parallel but not identical — this one
+also handles utility stubs, `agent-standards` also copies a hook, `react-agents` does neither — so they are
+kept diffable rather than merged: only the header paragraph of the `react-agents` copy differs from this
+one. Sharing them properly needs a published PowerShell module or a submodule; a fourth repo is the point
+at which that stops being the more expensive option.
+
 ## Per-machine setup — one time, both harnesses
 
 **Neither harness auto-installs from a repo's settings.** Both need a one-time marketplace add plus
@@ -138,8 +146,9 @@ Claude Code:
 /plugin install agent-process@agent-standards          # process + the write-time hook
 /plugin marketplace add tomjseery/dotagents
 /plugin install dotnet-standards@dotagents             # per stack - install what applies
-/plugin install react-standards@dotagents
 /plugin install communication-standards@dotagents
+/plugin marketplace add tomjseery/react-agents
+/plugin install react-standards@react-agents
 ```
 
 Codex — same plugins, and its skills appear namespaced (`agent-process:committing`):
@@ -151,7 +160,8 @@ codex plugin marketplace add https://github.com/tomjseery/dotagents
 codex plugin add dotnet-standards@dotagents
 ```
 
-`dotagents` is private, so the marketplace add needs git credentials that can read it.
+`dotagents` and `react-agents` are private, so those marketplace adds need git credentials that can read
+them.
 
 Installed plugins land at `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/` and
 `~/.codex/plugins/cache/<marketplace>/<plugin>/<version>/` — same shape, different home. Uninstalling

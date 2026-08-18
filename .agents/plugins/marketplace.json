@@ -1,6 +1,6 @@
 {
   "name": "dotagents",
-  "description": "Generic engineering standards - .NET, TypeScript/React, and how to communicate about code - distributed as versioned, load-on-demand skills routing to a browsable standards tree. Install per stack: a TypeScript project has no use for the C# corpus.",
+  "description": "Generic .NET engineering standards, and how to communicate about code, distributed as versioned, load-on-demand skills routing to a browsable standards tree. The TypeScript/React half is its own marketplace, tomjseery/react-agents.",
   "owner": {
     "name": "Tommy Seery"
   },
@@ -11,13 +11,6 @@
       "description": "The generic C# and .NET standard: style and naming, comments and XML doc, dependency injection, logging, validation, EF Core persistence and multitenancy, seeding, the Result/Option carriers with their typed errors and transport terminals, module and service-boundary structure, gRPC contracts, keyed strategies, and the unit/integration/E2E test tiers. Names no product.",
       "category": "standards",
       "keywords": ["standards", "dotnet", "csharp", "ef-core", "testing", "architecture"]
-    },
-    {
-      "name": "react-standards",
-      "source": "./plugins/react-standards",
-      "description": "The generic TypeScript and React standard: which library for which job, type style against the wire, feature structure, server state and client state ownership, the zod write boundary, the HTTP layer, contract naming, and sharing code across apps built from one repo. Names no product.",
-      "category": "standards",
-      "keywords": ["standards", "typescript", "react", "tanstack-query", "zustand", "zod"]
     },
     {
       "name": "communication-standards",
