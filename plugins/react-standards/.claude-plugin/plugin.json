@@ -1,0 +1,9 @@
+{
+  "name": "react-standards",
+  "description": "The generic TypeScript and React standard, as load-on-demand skills routing to a browsable standards tree. Each skill loads only when the task reaches its concern. Names no product.",
+  "author": {
+    "name": "Tommy Seery"
+  },
+  "repository": "https://github.com/tomjseery/dotagents",
+  "keywords": ["standards", "typescript", "react", "state", "zod"]
+}

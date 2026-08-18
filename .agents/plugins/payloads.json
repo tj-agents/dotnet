@@ -1,0 +1,8 @@
+{
+  "$comment": "Which standards domains each plugin ships. Generator input only - neither harness reads this file. It is not derivable from anything else: a plugin's name does not imply its domains, and a consumer installs per stack, so the split is a deliberate authored decision. The generator cross-checks it against marketplace.json both ways, so a plugin cannot be declared here and missing there, or the reverse. The 10 utility skills own no doc and ship in no plugin - they are Tommy's machine tooling, delivered by deploy-skills.ps1 from this clone.",
+  "payloads": {
+    "dotnet-standards": ["dotnet"],
+    "react-standards": ["react"],
+    "communication-standards": ["communication"]
+  }
+}

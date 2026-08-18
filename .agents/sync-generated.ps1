@@ -19,6 +19,19 @@ Generated:
                                    duplicated.
   standards/<domain>/INDEX.md      the tree answers "where is it"; this answers "did I document this"
                                    without opening anything.
+  plugins/<p>/skills/…             router copy with its doc path rewritten relative to the SKILL.md,
+                                   and plugins/<p>/standards/… a full copy of the domains that plugin
+                                   claims. An installed plugin is only its own subtree and cwd is the
+                                   consuming project, so a root-relative path would dangle and a
+                                   reference outside the plugin root is never copied at all.
+  .claude-plugin/marketplace.json  copy of .agents/plugins/marketplace.json, the path Codex reads
+                                   natively.
+
+Plugins are split per stack from `.agents/plugins/payloads.json`: a TypeScript project installs
+`react-standards` and must not also receive the .NET corpus. The 10 utility skills ship in no plugin -
+they are machine tooling, delivered by deploy-skills.ps1 from this clone. The write-time router hook
+lives in `Concertable/agent-standards` and ships in its `agent-process` plugin, so a project wanting
+enforcement installs that too.
 
 Refuses to write when the two structures disagree: a router naming a doc that does not exist, a doc no
 router points at, or two routers claiming one doc. A tree and a skill namespace that can drift is
@@ -36,6 +49,8 @@ $ErrorActionPreference = 'Stop'
 $repoRoot     = Split-Path -Parent $PSScriptRoot
 $canonical    = Join-Path $repoRoot '.agents/skills'
 $standardsDir = Join-Path $repoRoot 'standards'
+$manifest     = Join-Path $repoRoot '.agents/plugins/marketplace.json'
+$payloadsFile = Join-Path $repoRoot '.agents/plugins/payloads.json'
 $utf8NoBom    = New-Object System.Text.UTF8Encoding($false)
 
 $INDEX_NAME  = 'INDEX.md'
@@ -148,6 +163,58 @@ if ($problems) {
     exit 1
 }
 
+$pluginRoot = Join-Path $repoRoot 'plugins'
+$plugins = @()
+if (Test-Path $pluginRoot) { $plugins = @(Get-ChildItem -Path $pluginRoot -Directory) }
+
+# Refuse to generate against a marketplace pointing at a plugin that is not there, or a plugin with no
+# manifest of its own - an unroutable package installs and delivers nothing.
+if (-not (Test-Path $manifest)) { throw "Missing canonical manifest .agents/plugins/marketplace.json." }
+$manifestBody = Read-Lf $manifest
+$declared = @()
+foreach ($entry in (ConvertFrom-Json $manifestBody).plugins) {
+    $declared += $entry.name
+    $source = Join-Path $repoRoot ($entry.source -replace '^\./', '')
+    if (-not (Test-Path $source)) {
+        throw "marketplace.json declares '$($entry.name)' at $($entry.source), which does not exist."
+    }
+    if (-not (Test-Path (Join-Path $source '.claude-plugin/plugin.json'))) {
+        throw "Plugin '$($entry.name)' has no .claude-plugin/plugin.json, so neither harness can load it."
+    }
+}
+
+# Which plugin ships which domains. Authored rather than inferred from a plugin's name, and cross-checked
+# both ways against the marketplace so the two cannot drift about what exists.
+if (-not (Test-Path $payloadsFile)) { throw "Missing .agents/plugins/payloads.json." }
+$payloads = (ConvertFrom-Json (Read-Lf $payloadsFile)).payloads
+$pluginDomains = @{}
+foreach ($property in $payloads.PSObject.Properties) {
+    if ($declared -notcontains $property.Name) {
+        throw "payloads.json declares plugin '$($property.Name)', which marketplace.json does not."
+    }
+    $pluginDomains[$property.Name] = @($property.Value)
+}
+foreach ($name in $declared) {
+    if (-not $pluginDomains.ContainsKey($name)) {
+        throw "marketplace.json declares plugin '$name', which payloads.json assigns no domains."
+    }
+}
+foreach ($plugin in $plugins) {
+    if (-not $pluginDomains.ContainsKey($plugin.Name)) {
+        throw "plugins/$($plugin.Name) exists but is declared nowhere; add it to marketplace.json and payloads.json."
+    }
+    foreach ($domain in $pluginDomains[$plugin.Name]) {
+        if (-not (Test-Path (Join-Path $standardsDir $domain))) {
+            throw "plugin '$($plugin.Name)' claims domain '$domain', which is not in standards/."
+        }
+    }
+}
+$unshipped = @($docs | ForEach-Object { ($_ -split '/')[1] } | Sort-Object -Unique |
+    Where-Object { $domain = $_; -not (@($pluginDomains.Values | ForEach-Object { $_ }) -contains $domain) })
+if ($unshipped) {
+    throw "standards domain(s) '$($unshipped -join ', ')' are in no plugin, so a clone cannot install them."
+}
+
 # relative path -> LF-normalized content
 $generated = [ordered]@{}
 
@@ -155,6 +222,21 @@ foreach ($skill in $skills.Values) {
     $generated[".claude/skills/$($skill.Name)/SKILL.md"] =
         if ($skill.Doc) { $skill.Body } else { Get-StubBody $skill.Name $skill.Description }
 }
+
+foreach ($plugin in $plugins) {
+    $mine = @($docs | Where-Object {
+        $pluginDomains[$plugin.Name] -contains (($_ -split '/')[1])
+    })
+    foreach ($doc in $mine) {
+        $generated["plugins/$($plugin.Name)/$doc"] = Read-Lf (Join-Path $repoRoot $doc)
+        $owner = @($skills.Values | Where-Object { $_.Doc -eq $doc })[0]
+        # skills/<name>/SKILL.md -> the plugin's own copy of the tree, two levels up.
+        $generated["plugins/$($plugin.Name)/skills/$($owner.Name)/SKILL.md"] =
+            $owner.Body -replace '`standards/', '`../../standards/'
+    }
+}
+
+$generated['.claude-plugin/marketplace.json'] = $manifestBody
 
 # One index per domain, generated from the tree so it cannot drift from it.
 $domains = @($docs | ForEach-Object { ($_ -split '/')[1] } | Sort-Object -Unique)
@@ -198,14 +280,31 @@ foreach ($relative in $generated.Keys) {
     $written += $relative
 }
 
-# Prune generated skill directories whose canonical skill is gone.
+# Prune every generated artefact this run did not just author. Membership of $generated is the test, not
+# "is there still a skill by this name" - a doc moving between plugins leaves a stale copy a name check
+# would happily keep, and a consumer would then install two conflicting copies of one rule.
 $pruned = @()
-$stubRoot = Join-Path $repoRoot '.claude/skills'
-if (Test-Path $stubRoot) {
-    foreach ($dir in Get-ChildItem -Path $stubRoot -Directory) {
-        if ($skills.Contains($dir.Name)) { continue }
-        $pruned += (To-RepoRelative $dir.FullName $repoRoot)
-        if (-not $Check) { Remove-Item -Recurse -Force $dir.FullName }
+$generatedRoots = @(Join-Path $repoRoot '.claude/skills')
+foreach ($plugin in $plugins) {
+    $generatedRoots += (Join-Path $plugin.FullName 'skills')
+    $generatedRoots += (Join-Path $plugin.FullName 'standards')
+}
+foreach ($root in $generatedRoots) {
+    if (-not (Test-Path $root)) { continue }
+    foreach ($file in Get-ChildItem -Path $root -Recurse -File) {
+        $relative = To-RepoRelative $file.FullName $repoRoot
+        if ($generated.Contains($relative)) { continue }
+        $pruned += $relative
+        if (-not $Check) { Remove-Item -Force $file.FullName }
+    }
+}
+if (-not $Check) {
+    foreach ($root in $generatedRoots) {
+        if (-not (Test-Path $root)) { continue }
+        Get-ChildItem -Path $root -Recurse -Directory |
+            Sort-Object { $_.FullName.Length } -Descending |
+            Where-Object { -not (Get-ChildItem -Path $_.FullName -Recurse -File) } |
+            ForEach-Object { Remove-Item -Recurse -Force $_.FullName }
     }
 }
 

@@ -1,6 +1,12 @@
 # dotagents
 
-Personal config for AI coding agents (Claude Code, Codex, etc.), synced across machines.
+Personal config for AI coding agents (Claude Code, Codex, etc.), synced across machines, plus the
+generic engineering standards.
+
+**How this is authored and delivered — read [`ARCHITECTURE.md`](ARCHITECTURE.md) before changing the
+shape of any of it.** It carries the repo map and why the repos stay separate, the
+authoring → generate → install chain, the per-machine setup for both harnesses, and what a new project
+needs (almost nothing).
 
 ## Layout
 
