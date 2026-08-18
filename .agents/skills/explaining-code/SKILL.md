@@ -44,6 +44,10 @@ collapse lines, and don't let a cut make the code look like something it isn't.
 Pull it with a real read of the real ref and say which one — `git show origin/main:path`,
 `git show <branch>:path`, or Read. Line numbers come from that read, never typed by hand.
 
+**Never paste minified, bundled or generated code.** A `dist` one-liner with single-letter names is
+unreadable, so it proves nothing to the reader. Quote the readable source, or state the behaviour in a
+sentence and prove it by running it and showing the output.
+
 ## Gloss the jargon
 
 Any term, syntax or convention that isn't self-evident gets a one-line explanation the first time it
@@ -84,4 +88,5 @@ answer depends on it, show it again.
 The mechanism a change touches is context too. Explain what the thing is and what it's for before
 saying whether the change is right, otherwise the verdict has to be taken on trust. The reader is
 checking the reasoning, not accepting the conclusion, so a point they can't independently judge isn't
-finished. Brevity is never the goal; their ability to verify is.
+finished — but a point they can't *follow* isn't finished either. Cut every snippet, aside and
+qualifier that wouldn't change the conclusion; volume the reader gives up on verifies nothing.
