@@ -20,7 +20,7 @@
           },
           {
             "type": "command",
-            "command": "b=$(git branch --show-current 2>/dev/null); [ -z \"$b\" ] && exit 0; printf '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"Current git branch: %s\"}}' \"$b\"",
+            "command": "b=$(git branch --show-current 2>/dev/null); [ -z \"$b\" ] && exit 0; ctx=\"Current git branch: $b\"; u=$(git diff --name-only --diff-filter=U 2>/dev/null | head -5 | paste -sd, -); [ -n \"$u\" ] && ctx=\"$ctx | UNRESOLVED CONFLICT (merge or stash pop) in: $u -- resolve before trusting any build or hook\"; m=$(grep -rl \"^<<<<<<< \" .agents/hooks .claude/hooks .codex 2>/dev/null | head -3 | paste -sd, -); [ -n \"$m\" ] && ctx=\"$ctx | CONFLICT MARKERS IN HOOK FILES: $m -- every session fails here until fixed\"; printf '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"%s\"}}' \"$ctx\"",
             "shell": "bash",
             "timeout": 15
           }
