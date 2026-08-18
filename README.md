@@ -18,7 +18,8 @@ AGENTS.md                          -> ~/AGENTS.md
 
 standards/<domain>/                -> ~/.agents/standards/<domain>/
                                        The engineering standards themselves, as plain markdown
-                                       organized by domain (dotnet, react, communication).
+                                       organized by domain (dotnet, communication; react
+                                       pending its move to react-agents).
                                        Source of truth — edit here. Each domain carries a
                                        generated INDEX.md answering "did I document this?".
 
@@ -67,8 +68,11 @@ that owns it:
 | Domain | Index | Covers |
 |---|---|---|
 | `dotnet` | [`standards/dotnet/INDEX.md`](standards/dotnet/INDEX.md) | style, naming, comments, DI, logging, validation, `data/`, `results/`, `structure/`, `testing/` |
-| `react` | [`standards/react/INDEX.md`](standards/react/INDEX.md) | stack choices, TypeScript, structure, contracts, server/client state, forms, HTTP, shared code |
-| `communication` | [`standards/communication/INDEX.md`](standards/communication/INDEX.md) | drafting review comments, explaining code |
+| `communication` | [`standards/communication/INDEX.md`](standards/communication/INDEX.md) | drafting review comments, explaining code — personal cross-project conventions, which is why they sit beside the machine config rather than in a stack repo |
+
+**`standards/react/` is leaving this repo.** It belongs in `react-agents`; see
+[`ARCHITECTURE.md`](ARCHITECTURE.md) for the four tiers and why. It is still here only because the split
+has not been executed yet.
 
 Each index is generated from the tree, so it cannot drift from it — which the hand-maintained table it
 replaced could and did. Process standards (branching, committing, merging, plans) are not here; they are

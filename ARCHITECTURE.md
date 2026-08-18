@@ -5,30 +5,53 @@ least one part of it wrong. It lives here because `dotagents` is the repo that i
 codebase and the one opened when starting a new project. `Concertable/agent-standards` links it rather
 than restating it.
 
-## The repos are separate on purpose — do not merge them
+## The four tiers — settled; do not redesign this
 
-The metric is **audience**, not repo count. Plugins make count nearly free, because a project installs
-only the ones it wants.
+**Several sessions have re-derived this wrongly, each time confidently.** It is split by **who a rule
+applies to**, and the repo boundary carries the scope — so a folder never repeats what its repo already
+says.
 
-| Repo | What it actually is | Audience |
-|---|---|---|
-| `tomjseery/dotagents` | Personal **machine config** — mirrors `%USERPROFILE%` (`~/AGENTS.md`, `~/.agents/`, `~/.claude/`), synced across machines — plus the generic engineering standards | Every codebase Tommy owns, personal or work |
-| `Concertable/agent-standards` | Concertable **org process** standards, plus the `skill_router` hook | Concertable service repos |
-| `Infonetica/standards-docs` | Infonetica engineering standards | Work repos |
-| `tomjseery/agent-utilities` | Session/machine tooling (no skills) | Personal |
+| Tier | Repo | Scope | Sections |
+|---|---|---|---|
+| Generic .NET | `tomjseery/dotagents` | every .NET repo Tommy owns | the .NET concerns, plus his personal machine config |
+| Generic React/TS | `tomjseery/react-agents` | every React/TS repo Tommy owns | the React concerns |
+| Concertable | `Concertable/agent-standards` | everything Concertable-specific | `dotnet/`, `react/`, `process/` |
+| One microservice | that service's own repo | only what is true of that service alone | `AGENTS.md` plus sibling docs it names |
 
-A previous revision proposed folding `dotagents` into one product-scoped `standards` repo. **That is
-wrong**: `dotagents` is personal, cross-project machine config, and scoping it to one product would
-break every other codebase that depends on it.
+### The three mistakes this table exists to stop
 
-What *is* shared is the **convention**, applied inside each repo: `standards/<domain>/`, with domain
-names globally unique across repos so every domain lands in one deployed namespace without either repo
-owning the parent.
+1. **`dotagents` is *dot-NET* agents — not "dotfiles for agents".** It holds the generic **.NET** standards.
+   React standards live in `react-agents`. Any proposal that puts both stacks in one generic repo is wrong,
+   and has been made more than once.
+2. **`agent-standards` gets no `platform/` or `concertable/` section.** Concertable **is** the platform, and
+   the repo already carries that scope; such a folder states it twice. An earlier revision proposed
+   `concertable/` because it assumed one merged repo holding generic *and* product rules, where a folder was
+   the only separator. Once the repos split by audience that folder became redundant.
+3. **A microservice's `AGENTS.md` is not a dumping ground.** Where a service or module has conventions of its
+   own, it points at sibling docs in its own repo — `CODE_CONVENTIONS.md`, `ARCHITECTURE.md`,
+   `TECH_DEBT.md`. Roster and pointers in `AGENTS.md`; the detail in the doc it names.
 
-| Repo | Domains |
+### Placement test — one question per rule
+
+| Does the rule… | Home |
 |---|---|
-| `dotagents` | `dotnet/`, `react/`, `communication/` |
-| `agent-standards` | `process/` |
+| name no product at all | the generic repo for its stack — `dotagents` (.NET) or `react-agents` (React/TS) |
+| name a Concertable type every service shares | `agent-standards`, in the section for its stack |
+| name one service's own type | that service's repo, in `AGENTS.md` or a sibling doc |
+
+Naming a **framework or third-party** type (`WebApplicationFactory`, `Testcontainers`, `axios`, `Reqnroll`)
+does **not** make a rule product-specific. Only the *product's own* identifiers do. Stripping library names
+out of a generic doc is how rules become ungreppable and unenforceable — see `DOCS_AND_DEBT.md`.
+
+### Why they stay separate
+
+Audience, not repo count. A TypeScript project has no use for the C# corpus, and a work repo has no use for
+Concertable's merge queue. Plugins make count nearly free, because a project installs only what applies to
+it. `dotagents` additionally mirrors `%USERPROFILE%` (`~/AGENTS.md`, `~/.agents/`, `~/.claude/`), which is
+why the personal machine config sits alongside its .NET standards rather than in an org repo.
+
+Also present: `Infonetica/standards-docs` (work standards, separate audience), `agent-utilities` (session
+tooling, no standards), `agent-starter-kit` (archived — strict subset of `dotagents`).
 
 ## The doc is the payload; the skill is a router
 
@@ -183,18 +206,3 @@ git diff --name-only <range> | python <hook> --skills-for   # add --json for a m
 Because a skill can be delivered three ways, the hook resolves a skill's description from its own plugin
 first, then `~/.agents/skills` and `~/.claude/skills`, then every other installed plugin's cache. Missing
 any of those makes it report a correctly-installed skill as `NOT INSTALLED`.
-
-## Where a rule belongs
-
-Sort by the **cost of missing it**, not by topic. A skill is load-on-demand, so it applies only when it is
-invoked — that is the whole token win and the whole risk.
-
-| Rule | Home |
-|---|---|
-| Cross-project and always applicable (comment policy, questions-before-actions) | `~/AGENTS.md`, `~/.claude/CLAUDE.md` |
-| Generic, consulted while doing the work (C# naming, Result carriers, testing shape) | `dotagents` → `standards/dotnet\|react/` |
-| Org process, consulted at a stage of the work (merging, plans, validation) | `agent-standards` → `standards/process/` |
-| Product-specific and expensive to miss silently (what may not be seeded, service topology) | that repo's own `AGENTS.md` |
-
-The last row is the one to respect. **A rule whose violation is silent and costly must not depend on a
-skill being invoked.**
