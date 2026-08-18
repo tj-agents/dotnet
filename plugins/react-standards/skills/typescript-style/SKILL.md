@@ -5,4 +5,4 @@ description: Generic TypeScript style for a hand-written client — `interface` 
 
 # typescript-style
 
-The standard is `../../standards/react/TYPESCRIPT.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/TYPESCRIPT.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/react/TYPESCRIPT.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

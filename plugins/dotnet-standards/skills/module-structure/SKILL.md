@@ -5,4 +5,4 @@ description: How a module or shared library inside a .NET service is laid out â€
 
 # module-structure
 
-The standard is `../../standards/dotnet/structure/MODULES.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/structure/MODULES.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/dotnet/structure/MODULES.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

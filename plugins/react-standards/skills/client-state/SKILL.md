@@ -5,4 +5,4 @@ description: Client state ownership — a store is a private implementation deta
 
 # client-state
 
-The standard is `../../standards/react/CLIENT_STATE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/CLIENT_STATE.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/react/CLIENT_STATE.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

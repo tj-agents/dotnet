@@ -5,4 +5,4 @@ description: gRPC and Protobuf standard for .NET services — proto message nami
 
 # proto
 
-The standard is `../../standards/dotnet/structure/PROTO.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/structure/PROTO.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/dotnet/structure/PROTO.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

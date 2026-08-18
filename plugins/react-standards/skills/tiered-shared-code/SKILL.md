@@ -5,4 +5,4 @@ description: Sharing code across several apps built from one repo — code belon
 
 # tiered-shared-code
 
-The standard is `../../standards/react/SHARED_CODE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/SHARED_CODE.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/react/SHARED_CODE.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

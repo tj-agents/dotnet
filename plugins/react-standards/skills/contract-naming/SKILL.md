@@ -5,4 +5,4 @@ description: Naming the client's half of an HTTP contract — reads take the pla
 
 # contract-naming
 
-The standard is `../../standards/react/CONTRACTS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/CONTRACTS.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/react/CONTRACTS.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

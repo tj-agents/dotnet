@@ -5,4 +5,4 @@ description: Logging standard for .NET services — every message is a source-ge
 
 # logging
 
-The standard is `../../standards/dotnet/LOGGING.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/LOGGING.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/dotnet/LOGGING.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

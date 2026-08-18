@@ -100,6 +100,20 @@ function Get-RoutedDoc([string]$text, [string]$name) {
     return $paths[0]
 }
 
+# The plugin copy must name only what ships beside it. The authored router also cites the deployed
+# ~/.agents/standards path, which need not exist on a machine that installed the plugin and never cloned
+# the repo - a reader who tries it first finds nothing.
+function Rewrite-ForPlugin([string]$body) {
+    $rewritten = [regex]::Replace(
+        $body,
+        'The standard is `standards/(?<doc>[^`]+)` in `[^`]+`, deployed to `~/\.agents/standards/[^`]+`\.',
+        'The standard is `../../standards/${doc}`, shipped in this plugin.')
+    if ($rewritten -eq $body) {
+        throw "plugin rewrite matched nothing; the router sentence changed shape and the copy would keep a path that dangles on install."
+    }
+    return $rewritten
+}
+
 function Get-StubBody([string]$name, [string]$description) {
 @"
 ---
@@ -232,7 +246,7 @@ foreach ($plugin in $plugins) {
         $owner = @($skills.Values | Where-Object { $_.Doc -eq $doc })[0]
         # skills/<name>/SKILL.md -> the plugin's own copy of the tree, two levels up.
         $generated["plugins/$($plugin.Name)/skills/$($owner.Name)/SKILL.md"] =
-            $owner.Body -replace '`standards/', '`../../standards/'
+            (Rewrite-ForPlugin $owner.Body)
     }
 }
 

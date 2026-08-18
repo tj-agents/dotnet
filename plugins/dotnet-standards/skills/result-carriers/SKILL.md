@@ -5,4 +5,4 @@ description: Choosing and using the Reunion Result/Option carriers in a .NET ser
 
 # result-carriers
 
-The standard is `../../standards/dotnet/results/CARRIERS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/results/CARRIERS.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/dotnet/results/CARRIERS.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

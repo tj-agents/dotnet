@@ -5,4 +5,4 @@ description: The client's HTTP layer — one `xApi` object per resource under th
 
 # http-layer
 
-The standard is `../../standards/react/HTTP.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/HTTP.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/react/HTTP.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

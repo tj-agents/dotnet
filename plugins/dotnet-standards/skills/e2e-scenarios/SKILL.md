@@ -5,4 +5,4 @@ description: Authoring rules for browser E2E scenarios (Gherkin plus a browser d
 
 # e2e-scenarios
 
-The standard is `../../standards/dotnet/testing/E2E.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/testing/E2E.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/dotnet/testing/E2E.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

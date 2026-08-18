@@ -5,4 +5,4 @@ description: How to explain how code works so the reader can verify the reasonin
 
 # explaining-code
 
-The standard is `../../standards/communication/EXPLAINING_CODE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/communication/EXPLAINING_CODE.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/communication/EXPLAINING_CODE.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

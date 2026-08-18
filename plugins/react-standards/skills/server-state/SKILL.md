@@ -5,4 +5,4 @@ description: Server state belongs to the query library — every read is a query
 
 # server-state
 
-The standard is `../../standards/react/SERVER_STATE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/SERVER_STATE.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/react/SERVER_STATE.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

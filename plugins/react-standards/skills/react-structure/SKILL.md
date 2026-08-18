@@ -5,4 +5,4 @@ description: How React code is organized — the feature slice (`types`/`api`/`h
 
 # react-structure
 
-The standard is `../../standards/react/STRUCTURE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/STRUCTURE.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/react/STRUCTURE.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.
