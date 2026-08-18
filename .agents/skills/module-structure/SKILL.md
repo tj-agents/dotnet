@@ -19,7 +19,7 @@ Pick the layers the component needs — not every module has all five.
 | `X.Domain` | Entities, value objects, domain events. Pure types, no infrastructure dependencies. | `internal` |
 | `X.Application` | Service and repository interfaces, validators, internal DTOs, mappers. | `internal` |
 | `X.Infrastructure` | EF configurations, `DbContext`, concrete implementations, event handlers, DI registration. | `internal` |
-| `X.Api` | Controllers and HTTP-specific extensions. **Modules only** — a shared library exposes no HTTP. | `public` controllers, `internal` rest |
+| `X.Api` | Controllers and HTTP-specific extensions. **Modules only** — a shared library exposes no HTTP. | `internal` |
 
 ```text
 Contracts       → Kernel (and other Contracts when sharing base types)
@@ -49,6 +49,10 @@ When each layer is warranted:
 - `*.Application` interfaces stay `internal`, with `InternalsVisibleTo` for the module's own Infrastructure and
   Api assemblies.
 - `*.Infrastructure` implementations stay `internal`.
+- `*.Api` controllers stay `internal` too. ASP.NET's default `ControllerFeatureProvider.IsController`
+  requires a public type, so this needs a custom provider overriding `IsController` — without one the
+  routes silently do not exist. Make a controller `public` only where something outside the assembly
+  genuinely resolves the type.
 - Tests reach internals through `InternalsVisibleTo` for the unit and integration test assemblies, declared on
   the owning project.
 
