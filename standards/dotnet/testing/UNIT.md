@@ -1,8 +1,11 @@
 # Unit tests
 
-A unit test is a pure in-memory test of domain or service logic with **no** database, host factory,
-containers, fixtures, or HTTP. If a test needs any of those, it is an integration test — see the
-`integration-testing` skill.
+A unit test is a pure in-memory test of domain or service logic with **no** database, HTTP, fixtures, or
+`WebApplicationFactory`/`TestServer` host, and no `Testcontainers` container. If a test needs any of those,
+it is an integration test — see the `integration-testing` skill.
+
+Those type names are the point, not decoration: they are what a reader greps for and what a build gate can
+match on. "A host factory" cannot be enforced by anything.
 
 General C# style — field naming, `this.` qualification, no primary-constructor captures — applies here
 exactly as in production code.
@@ -55,6 +58,14 @@ choose from.
 
 Pick **one** assertion library per test tier and use it consistently. Mixing two inside a tier means two failure
 message formats and two idioms for the same assertion, for no benefit.
+
+The current per-tier assignment: **unit tests use xUnit's built-in `Assert.*`** (`Assert.Equal`, `Assert.True`,
+…), **integration tests use Shouldly `ShouldBe`**, whose failure message carries the URL, status and response
+body — which is worth far more at that tier than at this one.
+
+**Open call, not yet decided:** whether unit tests should adopt Shouldly too. Recorded here rather than
+dropped, because an unresolved decision nobody can see is one nobody will ever resolve. Settle it and replace
+this paragraph.
 
 ## Grouping a large test class
 

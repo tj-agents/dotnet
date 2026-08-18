@@ -1,19 +1,24 @@
 # Integration tests
 
-An integration test boots the service's **real `Program`** and exercises it over HTTP against a real database.
-For pure in-memory tests see `unit-testing`; for browser scenarios see `e2e-scenarios`.
+An integration test boots the service's **real `Program`** through `WebApplicationFactory<Program>`
+(`Microsoft.AspNetCore.Mvc.Testing`) and exercises it over HTTP against a real database. For pure in-memory
+tests see `unit-testing`; for browser scenarios see `e2e-scenarios`.
+
+`WebApplicationFactory<Program>` is also the mechanical line between the two tiers: a project that references
+it is an integration test project, whatever its name says.
 
 ## Structure
 
-Each service owns an `<Service>.IntegrationTests.Fixtures` project holding its `ApiFixture`, which boots that
-service's real `Program`. The fixtures are named identically per service but live in their own namespaces, so a
-test project imports only its own.
+Each service owns an `<Service>.IntegrationTests.Fixtures` project holding its `ApiFixture`, which derives from
+`WebApplicationFactory<Program>` to boot that service's real `Program`. The fixtures are named identically per
+service but live in their own namespaces, so a test project imports only its own.
 
 The service-agnostic pieces live in a shared testing library referenced by every fixture: the SQL container plus
 database-reset fixture, the test auth handler, the shared mocks, and the setup extensions.
 
-- **Containerized database.** A fresh database container starts per test run; a reset tool clears data between
-  tests without re-running migrations.
+- **Containerized database.** A fresh SQL container starts per test run via **Testcontainers**, and **Respawn**
+  clears data between tests without re-running migrations. Naming the libraries is deliberate: "a container and
+  a reset tool" is not something a reader can act on, and neither library is product-specific.
 - **Authentication** through a test scheme registered as the default, driven by request headers carrying the
   subject and optional email. No token, and no role claim unless the test says so.
 - **Webhook simulation** dispatches provider events directly to the registered handlers in a new scope, bypassing
