@@ -60,6 +60,19 @@ install. So there is one authored place and a **generate** step — never a refe
 *"The harness just reads the canonical skill"* is **false**, and believing it is the root of both the
 stub mechanism and an earlier triple-copy generator.
 
+**So be precise about what "defined once, referenced everywhere" means here**, because the loose version of
+it causes real damage in both directions:
+
+- **Authoring: one home, always.** A rule lives in exactly one file. Every other mention links to it and
+  never restates it. A hand-written second copy is a bug, not emphasis.
+- **Delivery: a copy, generated and checked.** A plugin cannot reference outside its root, so its payload is
+  a full copy. That is fine *only* because it is generated from the one authored source and
+  `sync-generated.ps1 -Check` fails when it drifts. An artifact that cannot be regenerated and diffed has no
+  single home, whatever the intent was.
+
+The failure this distinction prevents: reasoning "it's referenced, so I don't need to copy it" and shipping a
+plugin whose skills point at a path present only on the author's machine.
+
 ```text
 AUTHORED                                  GENERATED (never edit)
 standards/<domain>/<TOPIC>.md   ───────►  plugins/<p>/standards/<domain>/<TOPIC>.md   full copy
