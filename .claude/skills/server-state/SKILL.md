@@ -5,6 +5,4 @@ description: Server state belongs to the query library — every read is a query
 
 # server-state
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/server-state/SKILL.md.
+The standard is `standards/react/SERVER_STATE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/SERVER_STATE.md`. Read it and follow it; this skill only routes to it.

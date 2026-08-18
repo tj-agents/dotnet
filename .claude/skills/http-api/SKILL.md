@@ -5,6 +5,4 @@ description: HTTP contract standard for a .NET service — services return appli
 
 # http-api
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/http-api/SKILL.md.
+The standard is `standards/dotnet/structure/HTTP_API.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/structure/HTTP_API.md`. Read it and follow it; this skill only routes to it.

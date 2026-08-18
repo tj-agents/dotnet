@@ -1,7 +1,8 @@
 # Global instructions (Tommy)
 
-Engineering standards are load-on-demand skills in `~/.agents/skills/`, indexed by topic in
-`dotagents/README.md` — look a topic up there before writing a rule down, and never restate one here.
+Engineering standards live as docs under `~/.agents/standards/<domain>/`, each routed to by a
+load-on-demand skill in `~/.agents/skills/`. Every domain has a generated `INDEX.md` — look a topic up
+there before writing a rule down, and never restate one here.
 
 ## Work vs personal repos — the Azure-DevOps / PR skills are WORK-ONLY
 

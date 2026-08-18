@@ -5,6 +5,4 @@ description: The standard shape for behaviour that varies by a closed key in a .
 
 # keyed-strategies
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/keyed-strategies/SKILL.md.
+The standard is `standards/dotnet/structure/KEYED_STRATEGIES.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/structure/KEYED_STRATEGIES.md`. Read it and follow it; this skill only routes to it.

@@ -5,6 +5,4 @@ description: Turning a Result or Option into a response at the edge of a .NET se
 
 # result-terminals
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/result-terminals/SKILL.md.
+The standard is `standards/dotnet/results/TERMINALS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/results/TERMINALS.md`. Read it and follow it; this skill only routes to it.

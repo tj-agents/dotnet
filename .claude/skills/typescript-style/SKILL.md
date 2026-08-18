@@ -5,6 +5,4 @@ description: Generic TypeScript style for a hand-written client — `interface` 
 
 # typescript-style
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/typescript-style/SKILL.md.
+The standard is `standards/react/TYPESCRIPT.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/TYPESCRIPT.md`. Read it and follow it; this skill only routes to it.

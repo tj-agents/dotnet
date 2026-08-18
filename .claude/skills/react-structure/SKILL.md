@@ -5,6 +5,4 @@ description: How React code is organized — the feature slice (`types`/`api`/`h
 
 # react-structure
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/react-structure/SKILL.md.
+The standard is `standards/react/STRUCTURE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/STRUCTURE.md`. Read it and follow it; this skill only routes to it.

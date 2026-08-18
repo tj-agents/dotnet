@@ -5,6 +5,4 @@ description: Choosing and using the Reunion Result/Option carriers in a .NET ser
 
 # result-carriers
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/result-carriers/SKILL.md.
+The standard is `standards/dotnet/results/CARRIERS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/results/CARRIERS.md`. Read it and follow it; this skill only routes to it.

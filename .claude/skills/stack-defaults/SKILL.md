@@ -5,6 +5,4 @@ description: Which library to reach for in a TypeScript/React app and when — R
 
 # stack-defaults
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/stack-defaults/SKILL.md.
+The standard is `standards/react/STACK.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/STACK.md`. Read it and follow it; this skill only routes to it.

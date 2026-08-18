@@ -5,6 +5,4 @@ description: The client write boundary — every user-editable form validates it
 
 # write-boundary
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/write-boundary/SKILL.md.
+The standard is `standards/react/FORMS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/react/FORMS.md`. Read it and follow it; this skill only routes to it.

@@ -10,21 +10,31 @@ Mirrors `%USERPROFILE%` — copy or symlink each piece into place at the matchin
 AGENTS.md                          -> ~/AGENTS.md
                                        Agent-agnostic global instructions.
 
-.agents/skills/                    -> ~/.agents/skills/
-                                       Canonical, agent-agnostic skills. Source of truth —
-                                       edit here, not in ~/.claude/skills. Two kinds: the
-                                       command skills invoked by name (commit-push, worktree,
-                                       sync, …) and the load-on-demand engineering standards
-                                       (csharp-*, result-*, typescript-*, testing, …), which
-                                       fire when a task matches their description.
+standards/<domain>/                -> ~/.agents/standards/<domain>/
+                                       The engineering standards themselves, as plain markdown
+                                       organized by domain (dotnet, react, communication).
+                                       Source of truth — edit here. Each domain carries a
+                                       generated INDEX.md answering "did I document this?".
 
-.agents/sync-claude-skill-stubs.ps1 -> ~/.agents/sync-claude-skill-stubs.ps1
-                                       Regenerates ~/.claude/skills/*/SKILL.md as one-line
-                                       stubs pointing back at the canonical skill. Claude
-                                       Code only discovers skills under .claude/skills, so
-                                       this bridges it to the shared .agents/skills source.
-                                       Each stub mirrors the canonical `description`, which
-                                       is what decides whether a skill loads at all.
+.agents/skills/                    -> ~/.agents/skills/
+                                       Skills, flat, because discovery is skills/*/SKILL.md and
+                                       does not recurse. Two kinds: a UTILITY invoked by name
+                                       (commit-push, worktree, sync, …) whose body is the
+                                       procedure, and a ROUTER for a standard, which is front
+                                       matter plus the path of the one doc it owns.
+
+.agents/sync-generated.ps1         -> ~/.agents/sync-generated.ps1
+                                       Regenerates .claude/skills/*/SKILL.md and every
+                                       INDEX.md. Claude Code only discovers skills under
+                                       .claude/skills, so this bridges it to the shared
+                                       .agents/skills source. Refuses to write when a router
+                                       and the tree disagree.
+
+.agents/deploy-skills.ps1          -> ~/.agents/deploy-skills.ps1
+                                       Junctions every skill and every standards domain into
+                                       ~/.agents and ~/.claude, so a `git pull` IS the
+                                       deployment. Skills and domains share one namespace
+                                       across repos, so a duplicate name is refused.
 
 .claude/CLAUDE.md                  -> ~/.claude/CLAUDE.md
                                        Claude Code specific global instructions.
@@ -40,39 +50,36 @@ AGENTS.md                          -> ~/AGENTS.md
 
 ## The standards map
 
-Two kinds of skill live in `.agents/skills/`: **command** skills you invoke by name, and **standards**
-skills that fire when a task matches their description. The map below is the index for the standards half —
-**look a topic up here before writing a rule down**, so it lands in the one file that owns it.
+**The doc is the payload and the skill is a router.** A standard is a plain markdown file under
+`standards/<domain>/`, and its skill is eight lines naming that file. That buys a doc a second delivery
+mode it could never have while the text lived inside a `SKILL.md`: a repo can `@`-import it to make it
+always-on, or route to it by skill everywhere else.
 
-**Frontend (TypeScript/React)**
+**Look a topic up in its domain's `INDEX.md` before writing a rule down**, so it lands in the one file
+that owns it:
 
-| Topic | Skill |
-|---|---|
-| Which library for which job, and what is deliberately not used | `stack-defaults` |
-| `interface` vs `type`, casing against the wire, optional vs nullable, discriminated unions | `typescript-style` |
-| Naming the client's half of a contract — domain-noun reads, `XRequest` writes | `contract-naming` |
-| Feature slices, hooks orchestrate and components render, Effect traps, closed-key dispatch | `react-structure` |
-| Queries, mutations, query keys, invalidation, buffer vs variables | `server-state` |
-| Store privacy, facade hooks, derived values, the one imperative session | `client-state` |
-| `xApi` modules, one client per backend, errors resolved once | `http-layer` |
-| Forms — parse the buffer, map the parsed result | `write-boundary` |
-| Sharing across apps — intersection, slots over role checks, composed identity | `tiered-shared-code` |
+| Domain | Index | Covers |
+|---|---|---|
+| `dotnet` | [`standards/dotnet/INDEX.md`](standards/dotnet/INDEX.md) | style, naming, comments, DI, logging, validation, `data/`, `results/`, `structure/`, `testing/` |
+| `react` | [`standards/react/INDEX.md`](standards/react/INDEX.md) | stack choices, TypeScript, structure, contracts, server/client state, forms, HTTP, shared code |
+| `communication` | [`standards/communication/INDEX.md`](standards/communication/INDEX.md) | drafting review comments, explaining code |
 
-**Backend (C#/.NET)**
+Each index is generated from the tree, so it cannot drift from it — which the hand-maintained table it
+replaced could and did. Process standards (branching, committing, merging, plans) are not here; they are
+Concertable-org and live in `Concertable/agent-standards`, deployed into the same
+`~/.agents/standards/process/`.
 
-| Topic | Skill |
-|---|---|
-| Style, naming, comments and XML doc | `csharp-style`, `csharp-naming`, `comments` |
-| DI and dependency-holders, logging, validation | `dependency-injection`, `logging`, `validation` |
-| Result and Option carriers, typed errors, transport terminals | `result-carriers`, `result-errors`, `result-terminals` |
-| Persistence, multitenancy, keyed strategies | `persistence`, `multitenancy`, `keyed-strategies` |
-| Module layering, service boundaries, gRPC/proto, HTTP contracts | `module-structure`, `microservice-boundaries`, `proto`, `http-api` |
-| Seeding, and the three test tiers | `seeding`, `unit-testing`, `integration-testing`, `e2e-scenarios` |
+Doc names never repeat their folder (`dotnet/STYLE.md`, not `dotnet/CSHARP_STYLE.md`) while skill names
+stay globally unique (`csharp-style`), because the deployed skill namespace is flat and spans every
+stack.
 
-### Named gaps — create the folder, write the skill
+### Named gaps — create the node, write the standard
 
-These slots are deliberately empty rather than silently missing. Adding one is a new
-`.agents/skills/<name>/SKILL.md` plus a stub sync; nothing else moves.
+These slots are deliberately empty rather than silently missing. Adding one is a new doc in the tree plus
+its router; nothing else moves.
+
+`dotnet/STACK.md` is the first of them: `react/STACK.md` exists, but nothing yet says which .NET library
+to reach for which job.
 
 Frontend: `routing` (typed routes, search-param validation, guards, loader vs query) ·
 `component-design` (props typing, composition over configuration, when to split) ·
@@ -89,13 +96,16 @@ Backend: `messaging` (outbox and inbox, idempotent handlers) · `configuration` 
 
 ## Setup on a new machine
 
-1. Clone this repo somewhere, or clone it directly as `~/.agents-src` — whatever's convenient.
-2. Copy `AGENTS.md`, `.agents/`, and `.claude/` into `%USERPROFILE%`, merging with anything
-   already there.
-3. From `~/.agents`, run the stub sync so Claude Code can see the skills:
+1. Clone this repo to `~/source/repos/dotagents`, and `Concertable/agent-standards` beside it.
+2. Copy `AGENTS.md` and `.claude/` into `%USERPROFILE%`, merging with anything already there.
+3. Junction the skills and the standards trees into place:
    ```
-   pwsh sync-claude-skill-stubs.ps1
+   pwsh .agents/deploy-skills.ps1 -WhatIf   # inspect first
+   pwsh .agents/deploy-skills.ps1
    ```
+   A skill is a router, so deploying skills without their trees leaves every standard pointing at a file
+   the session cannot open. The script does both, and refuses to clobber a real directory it has no
+   source for.
 
 ## What's deliberately excluded
 

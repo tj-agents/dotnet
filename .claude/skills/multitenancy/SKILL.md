@@ -5,6 +5,4 @@ description: Multi-tenant EF Core standard — visibility comes from what a cont
 
 # multitenancy
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/multitenancy/SKILL.md.
+The standard is `standards/dotnet/data/MULTITENANCY.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/data/MULTITENANCY.md`. Read it and follow it; this skill only routes to it.

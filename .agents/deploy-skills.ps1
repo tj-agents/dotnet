@@ -1,11 +1,20 @@
 <#
 .SYNOPSIS
-Deploy canonical agent skills to ~/.agents/skills and ~/.claude/skills as directory junctions.
+Deploy canonical agent skills to ~/.agents/skills and ~/.claude/skills, and the standards trees they
+route to under ~/.agents/standards, all as directory junctions.
 
 .DESCRIPTION
 Replaces copy-deployment with links so a `git pull` IS the deployment and drift is structurally
 impossible. Junctions are per-skill because skill discovery is <root>/skills/*/SKILL.md and does not
 recurse, and because several source repos must land in one namespace.
+
+The standards trees are junctioned per DOMAIN for the same reason the skills are per skill: several
+repos share one deployed namespace, so `standards/process` (agent-standards) and `standards/dotnet`
+(here) must both land under ~/.agents/standards without either repo owning the parent. A domain
+declared by two repos is a collision and is refused, exactly as a duplicate skill name is.
+
+Deploying the trees is not optional. A skill is now a router whose body names its doc's path, so a
+skill junctioned without its tree points at a file the reading session cannot open.
 
 Refuses to replace a target directory holding content that is neither identical to canonical nor a
 generated stub - that is an edit made against the installed copy and never committed, and deleting it
@@ -21,6 +30,11 @@ param(
         (Join-Path $HOME 'source/repos/dotagents/.agents/skills'),
         (Join-Path $HOME 'source/repos/agent-standards/.agents/skills')
     ),
+    [string[]]$StandardsRoot = @(
+        (Join-Path $HOME 'source/repos/dotagents/standards'),
+        (Join-Path $HOME 'source/repos/agent-standards/standards')
+    ),
+    [string]$StandardsTarget = (Join-Path $HOME '.agents/standards'),
     [string[]]$Target = @(
         (Join-Path $HOME '.agents/skills'),
         (Join-Path $HOME '.claude/skills')
@@ -108,6 +122,53 @@ foreach ($targetRoot in $Target) {
     }
     Write-Host "$targetRoot : linked=$linked replaced=$replaced already-correct=$kept" -ForegroundColor Green
     if ($orphans) { Write-Warning "orphaned (no canonical source, left in place): $($orphans -join ', ')" }
+}
+
+$domains = @{}
+foreach ($root in $StandardsRoot) {
+    if (-not (Test-Path -LiteralPath $root)) { Write-Warning "standards root missing: $root"; continue }
+    foreach ($dir in Get-ChildItem -LiteralPath $root -Directory) {
+        if ($domains.ContainsKey($dir.Name)) {
+            throw "standards domain '$($dir.Name)' is declared by two source roots: $($domains[$dir.Name]) and $($dir.FullName)"
+        }
+        $domains[$dir.Name] = $dir.FullName
+    }
+}
+
+if ($domains.Count) {
+    if (-not (Test-Path -LiteralPath $StandardsTarget)) {
+        if ($PSCmdlet.ShouldProcess($StandardsTarget, 'create standards root')) {
+            New-Item -ItemType Directory -Path $StandardsTarget -Force | Out-Null
+        }
+    }
+    $linked = $replaced = $kept = 0
+    foreach ($name in $domains.Keys | Sort-Object) {
+        $src = $domains[$name]
+        $dst = Join-Path $StandardsTarget $name
+        $existing = Get-Item -LiteralPath $dst -ErrorAction SilentlyContinue
+
+        if ($existing -and $existing.LinkType -eq 'Junction') {
+            if ($existing.Target -contains $src) { $kept++; continue }
+            if ($PSCmdlet.ShouldProcess($dst, "repoint junction -> $src")) {
+                Remove-Item -LiteralPath $dst -Force -Recurse -Confirm:$false
+                New-Item -ItemType Junction -Path $dst -Target $src | Out-Null
+            }
+            $replaced++; continue
+        }
+
+        # A real directory here is not a stale link but authored content with no source repo, so it is
+        # never silently replaced.
+        if ($existing) {
+            $refused += "$dst - a real directory, not a junction; move its content into a standards repo first"
+            continue
+        }
+
+        if ($PSCmdlet.ShouldProcess($dst, "link -> $src")) {
+            New-Item -ItemType Junction -Path $dst -Target $src | Out-Null
+        }
+        $linked++
+    }
+    Write-Host "$StandardsTarget : linked=$linked replaced=$replaced already-correct=$kept ($($domains.Count) domains)" -ForegroundColor Green
 }
 
 if ($refused) {
