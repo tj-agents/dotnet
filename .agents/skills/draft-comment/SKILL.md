@@ -20,10 +20,12 @@ He is the one posting it. Fill the gap and stop.
 text, never inside it, so he can find the spot in the diff without hunting.
 
 **Name every location the comment mentions.** The label covers the anchor line only. Any *other* code
-the comment refers to carries its own `file:line` inline, and the snippet under the sentence whenever
-the point turns on what those lines say. "over in OrganisationsService" is unreadable on its own;
-`OrganisationsService.cs:169` plus the one line it names is not. A comment must stand alone without the
-analysis under it, because the author only ever sees the comment.
+the comment refers to carries its own `file:line` inline, plus the snippet whenever the point turns on
+what those lines say. A file named without a line, or a method named without either, is unreadable on
+its own. Trace every identifier in a pasted snippet back to the line that binds it: a parameter, a
+local, a lambda handed in by a caller. Two identifiers differing only in case or prefix are
+indistinguishable until both origins are on screen. A comment must stand alone without the analysis
+under it, because the author only ever sees the comment.
 
 **Shape.** Point, then one option, then stop. No preamble, no menu of alternatives, no closing
 sentence justifying the point or saying what it buys, no "want me to post it?".
