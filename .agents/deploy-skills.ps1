@@ -9,9 +9,10 @@ impossible. Junctions are per-skill because skill discovery is <root>/skills/*/S
 recurse, and because several source repos must land in one namespace.
 
 The standards trees are junctioned per DOMAIN for the same reason the skills are per skill: several
-repos share one deployed namespace, so `standards/process` (agent-standards) and `standards/dotnet`
-(here) must both land under ~/.agents/standards without either repo owning the parent. A domain
-declared by two repos is a collision and is refused, exactly as a duplicate skill name is.
+repos share one deployed namespace, so `standards/process` (agent-standards), `standards/react`
+(react-agents) and `standards/dotnet` (here) must all land under ~/.agents/standards without any one repo
+owning the parent. A domain declared by two repos is a collision and is refused, exactly as a duplicate
+skill name is.
 
 Deploying the trees is not optional. A skill is now a router whose body names its doc's path, so a
 skill junctioned without its tree points at a file the reading session cannot open.
@@ -28,10 +29,12 @@ destroys the only copy. Two such edits were found and recovered on 2026-08-17 (d
 param(
     [string[]]$SourceRoot = @(
         (Join-Path $HOME 'source/repos/dotagents/.agents/skills'),
+        (Join-Path $HOME 'source/repos/react-agents/.agents/skills'),
         (Join-Path $HOME 'source/repos/agent-standards/.agents/skills')
     ),
     [string[]]$StandardsRoot = @(
         (Join-Path $HOME 'source/repos/dotagents/standards'),
+        (Join-Path $HOME 'source/repos/react-agents/standards'),
         (Join-Path $HOME 'source/repos/agent-standards/standards')
     ),
     [string]$StandardsTarget = (Join-Path $HOME '.agents/standards'),

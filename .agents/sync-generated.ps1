@@ -27,9 +27,9 @@ Generated:
   .claude-plugin/marketplace.json  copy of .agents/plugins/marketplace.json, the path Codex reads
                                    natively.
 
-Plugins are split per stack from `.agents/plugins/payloads.json`: a TypeScript project installs
-`react-standards` and must not also receive the .NET corpus. The 10 utility skills ship in no plugin -
-they are machine tooling, delivered by deploy-skills.ps1 from this clone. The write-time router hook
+Plugins carry the domains `.agents/plugins/payloads.json` assigns them, so a consumer installs per
+stack rather than receiving every corpus. The 10 utility skills ship in no plugin - they are machine
+tooling, delivered by deploy-skills.ps1 from this clone. The write-time router hook
 lives in `Concertable/agent-standards` and ships in its `agent-process` plugin, so a project wanting
 enforcement installs that too.
 
