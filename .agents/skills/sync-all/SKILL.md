@@ -23,7 +23,9 @@ preamble — do it and report the per-worktree outcome.
 3. **Dirty tree** — stash tracked + untracked first, so the update runs on a clean tree; restore after.
 4. **Update** — if the worktree IS on the default branch, `pull --ff-only`; otherwise `merge origin/main`.
 5. **Conflict is never left on disk** — a merge conflict is `merge --abort`ed back to the pre-merge state
-   and reported; a stash-pop conflict leaves the WIP safe as the newest stash entry and is reported.
+   and reported; a stash-pop conflict restores the tracked tree and reports the WIP as unapplied but safe
+   in the newest stash entry. A pop conflict otherwise writes markers into files and keeps the stash, so
+   "the WIP is safe" and "the tree is clean" are two different claims - only the first was ever true.
 
 ## Run this
 
@@ -48,7 +50,12 @@ git worktree list --porcelain | awk '/^worktree /{print $2}' | while read -r wt;
     git -C "$wt" merge --abort; res="⚠  MERGE CONFLICT (aborted, unchanged) — manual"
   fi
   if [ "$stashed" = 1 ]; then
-    git -C "$wt" stash pop --quiet 2>/dev/null || res="$res + POP CONFLICT (WIP safe in newest stash)"
+    if ! git -C "$wt" stash pop --quiet 2>/dev/null; then
+      # A pop conflict writes markers into the tree and keeps the stash, so restoring loses nothing -
+      # and it is the only way this loop's "no tree is ever left half-merged" claim is actually true.
+      git -C "$wt" checkout --force HEAD -- . 2>/dev/null; git -C "$wt" reset --quiet
+      res="$res + POP CONFLICT (restored clean; WIP UNAPPLIED, safe in newest stash)"
+    fi
   fi
   echo "$res    $br"
 done
@@ -60,8 +67,9 @@ done
   resets, or discards. If a tree can't be updated cleanly, report it and leave it exactly as found.
 - **Only pop the stash this skill created** — it's the newest entry, made seconds earlier in that same
   worktree. Never blind-pop a tree this run didn't stash.
-- **A conflict is a report, not a fight.** `merge --abort` on merge conflict; leave WIP in the stash on
-  pop conflict. Do not attempt to resolve — hand it back by name.
+- **A conflict is a report, not a fight.** `merge --abort` on merge conflict; on pop conflict restore the
+  tree and leave the WIP in the stash. Do not attempt to resolve — hand it back by name. Never leave
+  markers on disk: in a file something later executes, they break every subsequent session, far from here.
 - **Local + fetch only.** Never pushes, never deletes a branch, never touches a PR. Bringing branches
   current is the whole job; publishing that is a separate, explicit step.
 - Report one line per worktree — `current` / `merged N` / `pulled N` / the conflict state — then the

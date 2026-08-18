@@ -30,7 +30,16 @@ git switch "$DEF" 2>/dev/null || git switch -c "$DEF" "origin/$DEF"
 git fetch origin --prune
 git pull --ff-only
 if [ "$STASHED" = 1 ]; then
-  git stash pop || echo "POP CONFLICT: your changes are safe as the newest entry in 'git stash list' — resolve manually."
+  if ! git stash pop; then
+    # A pop conflict WRITES conflict markers into the tree and KEEPS the stash. Leaving them is how a
+    # half-merged main silently poisoned every later session: the markers landed in a hook file, and
+    # python then died on `<<<<<<<` before running a line. The stash still holds the work, so restoring
+    # tracked files loses nothing and is the only way to honour "never leave a tree half-merged".
+    git checkout --force HEAD -- . 2>/dev/null
+    git reset --quiet
+    echo "POP CONFLICT: tree restored to $(git rev-parse --short HEAD); your changes are UNAPPLIED but"
+    echo "safe as the newest entry in 'git stash list'. Re-apply with 'git stash pop' when ready to resolve."
+  fi
 fi
 # Delete local branches whose remote was deleted on merge (upstream gone), never the default branch.
 git branch -vv | awk '/: gone]/ {print $1}' | grep -vx "$DEF" | while read -r b; do
@@ -43,7 +52,8 @@ git status --short
 ## Rules
 
 - **Only pop the stash this skill created** — it's the newest entry, made seconds earlier. Never blind-pop when you didn't stash.
-- **Never discard work.** If `pull --ff-only` fails (local default diverged) or the pop conflicts, stop and report — do not force, reset, or merge over it.
+- **Never discard work.** If `pull --ff-only` fails (local default diverged) or the pop conflicts, stop and report. Never force, reset over, or hand-resolve it.
+- **A pop conflict must not leave markers on disk.** The stash is retained on conflict, so the work is safe; restore the tracked tree and report it unapplied. Conflict markers left in a file that something later *executes* — a hook, a script — break every subsequent session, and the failure surfaces nowhere near this command.
 - **Branch deletion is `-d` only.** If git refuses because a branch isn't fully merged, leave it and report — never `-D`.
 - Report the final branch, short HEAD sha, whether changes were restored, and any branches deleted.
 
