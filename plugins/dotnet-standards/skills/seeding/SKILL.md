@@ -5,4 +5,4 @@ description: The seeding standard for a .NET service — a seeder may only write
 
 # seeding
 
-The standard is `../../standards/dotnet/data/SEEDING.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/data/SEEDING.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/dotnet/data/SEEDING.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

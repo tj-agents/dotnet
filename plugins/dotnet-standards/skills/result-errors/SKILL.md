@@ -5,4 +5,4 @@ description: Typed application errors for .NET services — one closed, operatio
 
 # result-errors
 
-The standard is `../../standards/dotnet/results/ERRORS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/results/ERRORS.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/dotnet/results/ERRORS.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

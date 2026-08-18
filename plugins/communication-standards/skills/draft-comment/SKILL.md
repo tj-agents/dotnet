@@ -5,4 +5,4 @@ description: Draft a PR review comment, a reply to a reviewer, or a Teams/Slack 
 
 # draft-comment
 
-The standard is `../../standards/communication/REVIEW_COMMENTS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/communication/REVIEW_COMMENTS.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/communication/REVIEW_COMMENTS.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

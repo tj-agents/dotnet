@@ -5,4 +5,4 @@ description: HTTP contract standard for a .NET service — services return appli
 
 # http-api
 
-The standard is `../../standards/dotnet/structure/HTTP_API.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/structure/HTTP_API.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/dotnet/structure/HTTP_API.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

@@ -5,4 +5,4 @@ description: Turning a Result or Option into a response at the edge of a .NET se
 
 # result-terminals
 
-The standard is `../../standards/dotnet/results/TERMINALS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/results/TERMINALS.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/dotnet/results/TERMINALS.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.

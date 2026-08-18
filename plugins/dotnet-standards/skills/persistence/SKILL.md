@@ -5,4 +5,4 @@ description: EF Core persistence standard for a .NET service — the per-module 
 
 # persistence
 
-The standard is `../../standards/dotnet/data/PERSISTENCE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/data/PERSISTENCE.md`. Read it and follow it; this skill only routes to it.
+The standard is `../../standards/dotnet/data/PERSISTENCE.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.
