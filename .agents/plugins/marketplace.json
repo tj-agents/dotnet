@@ -1,0 +1,16 @@
+{
+  "name": "dotagents",
+  "description": "Generic .NET engineering standards, distributed as versioned, load-on-demand skills routing to a browsable standards tree. The TypeScript/React half is its own marketplace, tomjseery/react-agents.",
+  "owner": {
+    "name": "Tommy Seery"
+  },
+  "plugins": [
+    {
+      "name": "dotnet-standards",
+      "source": "./plugins/dotnet-standards",
+      "description": "The generic C# and .NET standard: style and naming, comments and XML doc, dependency injection, logging, validation, EF Core persistence and multitenancy, seeding, the Result/Option carriers with their typed errors and transport terminals, module and service-boundary structure, gRPC contracts, keyed strategies, and the unit/integration/E2E test tiers. Names no product.",
+      "category": "standards",
+      "keywords": ["standards", "dotnet", "csharp", "ef-core", "testing", "architecture"]
+    }
+  ]
+}

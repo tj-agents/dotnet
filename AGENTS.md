@@ -1,7 +1,36 @@
 # Global instructions (Tommy)
 
-Engineering standards are load-on-demand skills in `~/.agents/skills/`, indexed by topic in
-`dotagents/README.md` — look a topic up there before writing a rule down, and never restate one here.
+## Where agent knowledge lives — READ THIS BEFORE PROPOSING ANY CHANGE TO IT
+
+**This has been re-derived wrongly by several sessions. It is settled. Do not redesign it.**
+
+Four tiers, split by **who the rule applies to**. The repo boundary carries the scope, so a folder never
+repeats what its repo already says.
+
+| Tier | Repo | Scope |
+|---|---|---|
+| Generic .NET | `tomjseery/dotagents` | every .NET repo Tommy owns. Names no product. |
+| Generic React/TS | `tomjseery/react-agents` | every React/TS repo Tommy owns. Names no product. |
+| Concertable | `Concertable/agent-standards` | everything specific to Concertable, in a `dotnet/` section and a `react/` section (plus `process/`) |
+| One microservice | that service's own repo | only what is true of that service alone |
+
+**Rules that follow from it, and the mistakes they exist to stop:**
+
+- **`dotagents` is *dot-NET* agents, not "dotfiles".** It holds the generic .NET standards. React standards
+  do **not** live in it; they live in `react-agents`. Anything proposing one repo for both stacks is wrong.
+- **`agent-standards` gets no `platform/` or `concertable/` folder.** Concertable **is** the platform, and
+  the repo is already Concertable-scoped — such a folder states it twice. Its sections are `dotnet/`,
+  `react/`, `process/`.
+- **A microservice's `AGENTS.md` need not hold everything.** It may point at sibling docs in its own
+  repo — `CODE_CONVENTIONS.md`, `ARCHITECTURE.md`, `TECH_DEBT.md` — when that service or module has
+  conventions of its own. Roster and pointers in `AGENTS.md`; detail in the sibling it names.
+- **A rule has exactly one home, and everywhere else links to it.** Placement test: names no product →
+  the generic repo for its stack. Names a Concertable type every service shares → `agent-standards`, under
+  the section for its stack. Names one service's type → that service's repo.
+
+Standards are delivered as docs under `~/.agents/standards/<domain>/`, each routed to by a load-on-demand
+skill in `~/.agents/skills/`. Every domain carries a generated `INDEX.md` — **look a topic up there before
+writing a rule down**, and never restate one here.
 
 ## Work vs personal repos — the Azure-DevOps / PR skills are WORK-ONLY
 
