@@ -126,6 +126,24 @@ Awaiting *inside* the selector is the real defect anyway — that is a per-row r
 **Never share a transaction across services.** A separate service owns its own database — coordinate those
 with messages through an outbox, never a unit of work.
 
+## Exactly one context migrates a table — everyone else maps it with `ExcludeFromMigrations`
+
+A module often needs to read a table another module owns: a rating projection to join against, the outbox
+and inbox rows a shared base maps into every context. Map it in the borrowing context, and exclude it from
+that context's migrations, so the schema has exactly one author:
+
+```csharp
+// in the BORROWING module's configuration - read-only, never migrated from here
+builder.ToTable("ArtistRatingProjections", "artist", t => t.ExcludeFromMigrations());
+```
+
+The owning module maps the same table with **no** exclusion; its migration is the one that creates it.
+Omitting the exclusion in the borrower is not a duplicate mapping you get away with — it is two
+migrations both claiming the table, one of which will fail against a database the other already built.
+
+**Borrowed means read-only.** Map it, key it, query it; do not write through it or add a foreign key to
+it — the owning module's writes are the only ones the projection's invariants know about.
+
 ## Write models never carry an FK to a read model
 
 A navigation property from a write entity to a read-model projection creates a database foreign key from the

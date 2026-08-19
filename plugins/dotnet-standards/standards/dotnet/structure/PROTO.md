@@ -68,6 +68,30 @@ A payload-bearing case needs structured wire detail plus an explicit mapper that
 If the transport does not carry that data, **the case stays in-process** — never discard a payload to
 force a case through code-only lookup.
 
+## A gRPC client carries its credentials in `AddCallCredentials`, not at the call site
+
+Register each generated client with `AddGrpcClient<T>` and attach the token in an `AddCallCredentials`
+callback. The callback runs **per call** and resolves from the container at that moment, so a token that
+expires mid-process is refreshed by the token service rather than frozen into the channel:
+
+```csharp
+services.AddGrpcClient<Proto.Escrow.EscrowClient>(o => o.Address = new Uri(address))
+    .AddCallCredentials(async (_, metadata, sp) =>
+    {
+        var token = await sp.GetRequiredService<ITokenService>().GetTokenAsync("payments:write");
+        metadata.Add("Authorization", $"Bearer {token}");
+    });
+```
+
+The scope string belongs to the *client registration*, because it is a property of what that stub is
+allowed to do — not of the individual call.
+
+**The anti-patterns:** building the `Metadata` in the calling code and passing it to every stub method,
+which puts an auth concern in every call site and lets one forget; and capturing a token when the client
+is registered, which pins the process to the first token it ever got. When several stubs point at the same
+service with the same scope, factor the callback into one extension rather than pasting the lambda per
+client — a scope typo in one copy is a runtime 403 in one code path only.
+
 ## Cancellation takes precedence over error mapping
 
 Catch caller cancellation *before* application errors and rethrow `OperationCanceledException` with the
