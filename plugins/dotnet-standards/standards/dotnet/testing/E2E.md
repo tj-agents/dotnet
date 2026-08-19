@@ -1,5 +1,9 @@
 # E2E scenario authoring
 
+Gherkin feature files bound to step definitions with **Reqnroll**, driving the browser through
+**Playwright**. These rules are the same for every UI suite in a solution, so they live in one place; a
+suite adds only its own fast-forward mechanics (the shape of its seed state).
+
 ## One behaviour, starting at the nearest already-verified state
 
 **A scenario never re-drives earlier stages through the browser to reach its starting line.** If a happy path
@@ -39,6 +43,7 @@ Where the suite trusts a checked-in baseline of passing and failing scenarios, t
 
 ## Headless by default
 
-Headed mode changes nothing that is asserted; use it only when a human is watching. Before rerunning a suite that
+Playwright runs headless; headed mode changes nothing that is asserted, so use it only when a human is
+watching. Before rerunning a suite that
 died at fixture startup, treat it as an environment problem — see the container-health rule in the
 `agent-process` standards rather than debugging application code.

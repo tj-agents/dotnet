@@ -41,8 +41,8 @@ your control dictates the wire format.
 - **One `.proto` per service is the single source of truth.** Codegen client and server from it — no
   hand-written contract on either side, no drift. Message and mapping conventions are in the `proto` skill.
 - A service's RPC surface mirrors its in-process facade: the same command and query operations.
-- Register clients against a **logical service name** through service discovery, never a hard-coded URL, and
-  apply telemetry, health checks, and a standard resilience handler uniformly to every client.
+- Register clients with `AddGrpcClient<T>()` against a **logical service name** resolved by Aspire's
+  `AddServiceDiscovery()`, never a hard-coded URL.
 - Service-to-service auth is a `client_credentials` bearer token on the call metadata, from the same token
   service the rest of the platform uses.
 - **Do not use gRPC-Web to reach a service from a browser.** Frontends go through that service's HTTP edge.
@@ -74,4 +74,20 @@ app; the traps are operational:
   speak HTTP/2 all the way through or the calls never reach the service.
 - **Load balancing.** gRPC multiplexes over one long-lived connection, so a naive L4 balancer pins all traffic
   to one backend. Real per-call balancing needs a gRPC-aware L7 proxy.
-- **Two cross-cutting surfaces.** Auth, error mapping, and logging are configured once *per protocol*.
+- **Two cross-cutting surfaces.** Auth, error mapping, and logging are configured once *per protocol*;
+  `AddServiceDefaults()` covers most of it for both.
+
+## What Aspire does and does not give you
+
+Aspire removes the *plumbing*, not the protocol decision:
+
+- **`AddServiceDiscovery()`** — logical names resolve from injected configuration, so both `HttpClient` and
+  gRPC channels target `http://payments` rather than an environment-specific URL.
+- **`AddServiceDefaults()`** — one call applies OpenTelemetry, health checks, *and*
+  `AddStandardResilienceHandler()` uniformly to gRPC and HTTP clients alike. That is the point of it: three
+  cross-cutting concerns from one registration, not three separate opt-ins per client.
+- **Typed clients** — `AddRefitClient<T>()` and `AddGrpcClient<T>()` both point at the logical service name;
+  Aspire wires the rest.
+
+Aspire does **not** generate `.proto`, share contracts, version anything, or handle auth — those stay yours.
+That negative is here because it is the assumption people make.

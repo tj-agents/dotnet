@@ -27,8 +27,15 @@ the client and server sides each owning their own mappers rather than sharing on
 ```csharp
 internal static class ShipmentMappers
 {
-    public static Shipment ToShipment(this Proto.ShipmentResponse r) => ...;
-    public static ShipmentStatus ToShipmentStatus(this Proto.ShipmentStatusType s) => ...;
+    extension(Proto.ShipmentResponse response)
+    {
+        public Shipment ToShipment() => ...;
+    }
+
+    extension(Proto.ShipmentStatusType status)
+    {
+        public ShipmentStatus ToShipmentStatus() => ...;
+    }
 }
 ```
 
