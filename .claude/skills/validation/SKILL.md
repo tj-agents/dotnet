@@ -5,4 +5,4 @@ description: Validation standard for .NET services — FluentValidation for inpu
 
 # validation
 
-The standard is `standards/dotnet/VALIDATION.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/VALIDATION.md`. Read it and follow it; this skill only routes to it.
+The standard is `standards/dotnet/VALIDATION.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/VALIDATION.md`. Read it and follow it; this skill only routes to it.

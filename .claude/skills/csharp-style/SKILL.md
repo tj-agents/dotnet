@@ -5,4 +5,4 @@ description: Generic C# style standard — private fields without an underscore 
 
 # csharp-style
 
-The standard is `standards/dotnet/STYLE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/STYLE.md`. Read it and follow it; this skill only routes to it.
+The standard is `standards/dotnet/STYLE.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/STYLE.md`. Read it and follow it; this skill only routes to it.

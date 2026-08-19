@@ -5,4 +5,4 @@ description: The C# mechanics of comments and XML documentation — `//` for a o
 
 # comments
 
-The standard is `standards/dotnet/COMMENTS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/COMMENTS.md`. Read it and follow it; this skill only routes to it.
+The standard is `standards/dotnet/COMMENTS.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/COMMENTS.md`. Read it and follow it; this skill only routes to it.

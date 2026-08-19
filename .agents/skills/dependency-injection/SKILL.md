@@ -5,4 +5,4 @@ description: Dependency-injection standard for .NET services — interface-typed
 
 # dependency-injection
 
-The standard is `standards/dotnet/DEPENDENCY_INJECTION.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/DEPENDENCY_INJECTION.md`. Read it and follow it; this skill only routes to it.
+The standard is `standards/dotnet/DEPENDENCY_INJECTION.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/DEPENDENCY_INJECTION.md`. Read it and follow it; this skill only routes to it.

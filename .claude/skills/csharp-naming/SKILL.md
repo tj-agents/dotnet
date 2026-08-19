@@ -5,4 +5,4 @@ description: Generic C# naming standard — the collaborator-suffix table (`Serv
 
 # csharp-naming
 
-The standard is `standards/dotnet/NAMING.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/NAMING.md`. Read it and follow it; this skill only routes to it.
+The standard is `standards/dotnet/NAMING.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/NAMING.md`. Read it and follow it; this skill only routes to it.
