@@ -5,4 +5,4 @@ description: Multi-tenant EF Core standard — visibility comes from what a cont
 
 # multitenancy
 
-The standard is `standards/dotnet/data/MULTITENANCY.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/data/MULTITENANCY.md`. Read it and follow it; this skill only routes to it.
+The standard is `standards/dotnet/data/MULTITENANCY.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/data/MULTITENANCY.md`. Read it and follow it; this skill only routes to it.

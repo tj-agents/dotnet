@@ -5,4 +5,4 @@ description: The standard shape for behaviour that varies by a closed key in a .
 
 # keyed-strategies
 
-The standard is `standards/dotnet/structure/KEYED_STRATEGIES.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/structure/KEYED_STRATEGIES.md`. Read it and follow it; this skill only routes to it.
+The standard is `standards/dotnet/structure/KEYED_STRATEGIES.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/structure/KEYED_STRATEGIES.md`. Read it and follow it; this skill only routes to it.

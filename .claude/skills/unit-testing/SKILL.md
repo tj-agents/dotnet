@@ -5,4 +5,4 @@ description: Unit-test standard for .NET — what makes a test a unit test at al
 
 # unit-testing
 
-The standard is `standards/dotnet/testing/UNIT.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/testing/UNIT.md`. Read it and follow it; this skill only routes to it.
+The standard is `standards/dotnet/testing/UNIT.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/testing/UNIT.md`. Read it and follow it; this skill only routes to it.

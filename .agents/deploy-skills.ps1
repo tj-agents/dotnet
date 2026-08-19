@@ -8,11 +8,14 @@ Replaces copy-deployment with links so a `git pull` IS the deployment and drift 
 impossible. Junctions are per-skill because skill discovery is <root>/skills/*/SKILL.md and does not
 recurse, and because several source repos must land in one namespace.
 
-The standards trees are junctioned per DOMAIN for the same reason the skills are per skill: several
-repos share one deployed namespace, so `standards/process` (agent-standards), `standards/react`
-(react-agents) and `standards/dotnet` (here) must all land under ~/.agents/standards without any one repo
-owning the parent. A domain declared by two repos is a collision and is refused, exactly as a duplicate
-skill name is.
+Skills are junctioned per SKILL. Standards are junctioned per SOURCE REPO, at
+~/.agents/standards/<repo>/<domain>. Those are different rules because the two namespaces have different
+constraints: skill discovery is <root>/skills/*/SKILL.md and does not recurse, so skill names must be
+globally unique and land flat. Standards are only ever opened by path, so they do not need to be flat -
+and they must not be. A generic domain and its product-specific counterpart share a name deliberately
+(dotagents `dotnet/data/PERSISTENCE.md` pairs with agent-standards `dotnet/data/PERSISTENCE.md`), so
+flattening them onto one junction point makes one repo's tree shadow the other's silently. That happened:
+concertable-persistence resolved to dotagents' generic doc.
 
 Deploying the trees is not optional. A skill is now a router whose body names its doc's path, so a
 skill junctioned without its tree points at a file the reading session cannot open.
@@ -127,14 +130,18 @@ foreach ($targetRoot in $Target) {
     if ($orphans) { Write-Warning "orphaned (no canonical source, left in place): $($orphans -join ', ')" }
 }
 
-$domains = @{}
+# repo-scoped key -> source tree. The repo name comes from the folder holding `standards`, so the deployed
+# path states which repo a doc came from and two repos owning the same domain name cannot shadow each other.
+$domains = [ordered]@{}
 foreach ($root in $StandardsRoot) {
     if (-not (Test-Path -LiteralPath $root)) { Write-Warning "standards root missing: $root"; continue }
+    $repo = Split-Path -Leaf (Split-Path -Parent (Resolve-Path -LiteralPath $root).ProviderPath)
     foreach ($dir in Get-ChildItem -LiteralPath $root -Directory) {
-        if ($domains.ContainsKey($dir.Name)) {
-            throw "standards domain '$($dir.Name)' is declared by two source roots: $($domains[$dir.Name]) and $($dir.FullName)"
+        $key = "$repo/$($dir.Name)"
+        if ($domains.Contains($key)) {
+            throw "standards path '$key' is declared twice: $($domains[$key]) and $($dir.FullName)"
         }
-        $domains[$dir.Name] = $dir.FullName
+        $domains[$key] = $dir.FullName
     }
 }
 
@@ -145,9 +152,10 @@ if ($domains.Count) {
         }
     }
     $linked = $replaced = $kept = 0
-    foreach ($name in $domains.Keys | Sort-Object) {
+    foreach ($name in @($domains.Keys) | Sort-Object) {
         $src = $domains[$name]
         $dst = Join-Path $StandardsTarget $name
+        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dst) | Out-Null
         $existing = Get-Item -LiteralPath $dst -ErrorAction SilentlyContinue
 
         if ($existing -and $existing.LinkType -eq 'Junction') {

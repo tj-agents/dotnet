@@ -5,4 +5,4 @@ description: Integration-test standard for .NET services — each service owns a
 
 # integration-testing
 
-The standard is `standards/dotnet/testing/INTEGRATION.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/testing/INTEGRATION.md`. Read it and follow it; this skill only routes to it.
+The standard is `standards/dotnet/testing/INTEGRATION.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/testing/INTEGRATION.md`. Read it and follow it; this skill only routes to it.

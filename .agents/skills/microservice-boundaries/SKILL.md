@@ -5,4 +5,4 @@ description: What one .NET service may depend on and how services talk — adapt
 
 # microservice-boundaries
 
-The standard is `standards/dotnet/structure/SERVICE_BOUNDARIES.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotnet/structure/SERVICE_BOUNDARIES.md`. Read it and follow it; this skill only routes to it.
+The standard is `standards/dotnet/structure/SERVICE_BOUNDARIES.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/structure/SERVICE_BOUNDARIES.md`. Read it and follow it; this skill only routes to it.
