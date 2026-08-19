@@ -86,9 +86,6 @@ stack.
 These slots are deliberately empty rather than silently missing. Adding one is a new doc in the tree plus
 its router; nothing else moves.
 
-`dotnet/STACK.md` is the first of them: `react-agents` has a `STACK.md`, but nothing here yet says which
-.NET library to reach for which job.
-
 `messaging` (outbox and inbox, idempotent handlers) · `configuration` (options binding, secrets) ·
 `caching` · `observability` (tracing, metrics, health) · `authorization` · `background-jobs`.
 
