@@ -65,14 +65,20 @@ The inversion buys two things that text living inside a `SKILL.md` can never hav
 - **A browsable corpus.** A tree answers *"did I document this, and where?"*. A flat list of skill names
   answered that only for someone who already knew the answer.
 
-Two naming rules that pull in opposite directions, deliberately:
+Two naming rules, and one that was retired:
 
 - **A doc name never repeats its folder.** `dotnet/STYLE.md`, not `dotnet/CSHARP_STYLE.md`.
-- **A skill name is globally unique**, because the deployed skill namespace is flat and spans every
-  stack. So the skill is `csharp-style` while its doc is `dotnet/STYLE.md`; a skill called `style` would
-  collide the moment a second stack wanted one.
+- **A skill name is unique within its plugin**, not globally. So the skill is `csharp-style` while its
+  doc is `dotnet/STYLE.md` — a skill called `style` would still be a bad name, because it says nothing,
+  but it would not *collide*.
+- **Retired: globally-unique skill names.** It held while every skill was junctioned flat into one
+  `~/.claude/skills`, and it cost a product prefix on one side of every mirrored pair — `persistence`
+  and `concertable-persistence` for the generic rule and the product's roster of one topic. Plugins
+  namespace them properly (`dotnet-standards:persistence`, `dotnet:persistence`), so routers stopped
+  being junctioned and the prefix went with the constraint that produced it.
 
-**Skills stay flat.** Discovery is `<root>/skills/*/SKILL.md` and does not recurse. Only content nests.
+**Skills stay flat within a plugin.** Discovery is `<root>/skills/*/SKILL.md` and does not recurse. Only
+content nests.
 
 ## Authoring → generate → install
 
@@ -175,8 +181,14 @@ pwsh .agents/deploy-skills.ps1 -WhatIf   # inspect first
 pwsh .agents/deploy-skills.ps1
 ```
 
-That is also what delivers the 10 **utility** skills (`sync`, `worktree`, `recents`, …). They ship in no
-plugin: they are procedures for working this machine, not standards any project consults.
+That delivers the 10 **utility** skills (`sync`, `worktree`, `recents`, …) and every repo's standards
+tree for reading and grepping. Utilities ship in no plugin: they are procedures for working this machine,
+not standards any project consults.
+
+**It does not deliver routers, and it prunes any it previously junctioned.** Those come from plugins now,
+so a junction left behind under the same name would keep answering from a stale clone — an answer the
+reader cannot tell apart from the plugin's. Install the plugins *before* running this, or the machine has
+no standards between the two steps.
 
 ## What a new project needs
 
