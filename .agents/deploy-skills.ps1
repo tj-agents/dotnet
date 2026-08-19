@@ -1,24 +1,29 @@
 <#
 .SYNOPSIS
-Deploy canonical agent skills to ~/.agents/skills and ~/.claude/skills, and the standards trees they
-route to under ~/.agents/standards, all as directory junctions.
+Deploy the canonical UTILITY skills to ~/.agents/skills and ~/.claude/skills, and every repo's standards
+tree to ~/.agents/standards, as directory junctions. Standards ROUTERS are not deployed here — plugins
+deliver those, and the plugin name is what keeps two repos' mirrored pairs apart.
 
 .DESCRIPTION
 Replaces copy-deployment with links so a `git pull` IS the deployment and drift is structurally
 impossible. Junctions are per-skill because skill discovery is <root>/skills/*/SKILL.md and does not
 recurse, and because several source repos must land in one namespace.
 
-Skills are junctioned per SKILL. Standards are junctioned per SOURCE REPO, at
-~/.agents/standards/<repo>/<domain>. Those are different rules because the two namespaces have different
-constraints: skill discovery is <root>/skills/*/SKILL.md and does not recurse, so skill names must be
-globally unique and land flat. Standards are only ever opened by path, so they do not need to be flat -
-and they must not be. A generic domain and its product-specific counterpart share a name deliberately
-(dotagents `dotnet/data/PERSISTENCE.md` pairs with agent-standards `dotnet/data/PERSISTENCE.md`), so
-flattening them onto one junction point makes one repo's tree shadow the other's silently. That happened:
-concertable-persistence resolved to dotagents' generic doc.
+Utility skills are junctioned per SKILL, flat, because discovery is <root>/skills/*/SKILL.md and does not
+recurse. They own no doc, ship in no plugin, and their names are unique across the source repos.
 
-Deploying the trees is not optional. A skill is now a router whose body names its doc's path, so a
-skill junctioned without its tree points at a file the reading session cannot open.
+Routers are NOT junctioned. Flat delivery demands globally unique names, but a router and its
+counterpart in another repo share a name deliberately - `persistence` here and `persistence` in
+agent-standards are the generic rule and the product's roster of the same topic. Forcing them apart used
+to mean prefixing one of them; plugins do it properly, since `dotnet-standards:persistence` and
+`dotnet:persistence` are already distinct. So the prefix is gone and this script stops competing with
+the plugin for the same folder name.
+
+Standards trees ARE still junctioned, per SOURCE REPO, at ~/.agents/standards/<repo>/<domain>. That
+namespace never had the problem: it is repo-scoped, so two repos owning the same domain name cannot
+shadow each other - and it must stay that way. Flattening it once made agent-standards' persistence doc
+resolve to dotagents' generic one, right path, wrong repo, no error. A plugin carries its own copy of
+the domains it ships, so this deployment is for reading and grepping from a clone, not for resolution.
 
 Refuses to replace a target directory holding content that is neither identical to canonical nor a
 generated stub - that is an edit made against the installed copy and never committed, and deleting it
@@ -67,17 +72,31 @@ function Test-SafeToReplace([string]$TargetDir, [string]$SourceDir) {
     @{ Safe = $false; Why = 'DIVERGED from canonical - commit it to its source repo first' }
 }
 
+# A ROUTER owns a doc under `standards/` and is delivered by its plugin, which namespaces it -
+# `dotnet:persistence` and `dotnet-standards:persistence` coexist. Junctioning routers into one flat
+# root cannot: the two repos' mirrored pairs share a name on purpose, and 16 of them collide. That
+# collision is the only reason the local names ever carried a `concertable-` prefix, so the prefix went
+# with this. A UTILITY owns no doc, ships in no plugin, and is still delivered from this clone.
+# The discriminator is the same one sync-generated.ps1 uses: a backticked `standards/....md` path.
+function Test-IsRouter([string]$SkillDir) {
+    $skill = Join-Path $SkillDir 'SKILL.md'
+    if (-not (Test-Path -LiteralPath $skill)) { return $false }
+    return (Get-Content -LiteralPath $skill -Raw -Encoding utf8) -match '`standards/[^`]+\.md`'
+}
+
 $sources = @{}
+$routers = 0
 foreach ($root in $SourceRoot) {
     if (-not (Test-Path -LiteralPath $root)) { Write-Warning "source root missing: $root"; continue }
     foreach ($dir in Get-ChildItem -LiteralPath $root -Directory) {
+        if (Test-IsRouter $dir.FullName) { $routers++; continue }
         if ($sources.ContainsKey($dir.Name)) {
-            throw "skill '$($dir.Name)' is declared by two source roots: $($sources[$dir.Name]) and $($dir.FullName)"
+            throw "utility skill '$($dir.Name)' is declared by two source roots: $($sources[$dir.Name]) and $($dir.FullName)"
         }
         $sources[$dir.Name] = $dir.FullName
     }
 }
-Write-Host "canonical skills discovered: $($sources.Count)" -ForegroundColor Cyan
+Write-Host "utility skills to deploy: $($sources.Count) (skipped $routers router(s) - plugins deliver those)" -ForegroundColor Cyan
 
 $refused = @()
 foreach ($targetRoot in $Target) {
@@ -120,14 +139,27 @@ foreach ($targetRoot in $Target) {
         $linked++
     }
 
+    # A junction we no longer own is a skill this script deployed and has stopped deploying - every
+    # router, after the cut to plugin delivery. Left in place it keeps resolving to a stale clone under
+    # its old name, which is worse than absent: the reader gets an answer and cannot tell it is the one
+    # the plugin was meant to replace. A real directory is never touched; it is content with no source.
+    $pruned = 0
     $orphans = @()
     if (Test-Path -LiteralPath $targetRoot) {
-        $orphans = Get-ChildItem -LiteralPath $targetRoot -Directory |
-            Where-Object { -not $sources.ContainsKey($_.Name) } |
-            Select-Object -ExpandProperty Name
+        foreach ($dir in Get-ChildItem -LiteralPath $targetRoot -Directory) {
+            if ($sources.ContainsKey($dir.Name)) { continue }
+            if ($dir.LinkType -eq 'Junction') {
+                if ($PSCmdlet.ShouldProcess($dir.FullName, 'remove junction we no longer deploy')) {
+                    Remove-Item -LiteralPath $dir.FullName -Force -Recurse -Confirm:$false
+                }
+                $pruned++
+                continue
+            }
+            $orphans += $dir.Name
+        }
     }
-    Write-Host "$targetRoot : linked=$linked replaced=$replaced already-correct=$kept" -ForegroundColor Green
-    if ($orphans) { Write-Warning "orphaned (no canonical source, left in place): $($orphans -join ', ')" }
+    Write-Host "$targetRoot : linked=$linked replaced=$replaced already-correct=$kept pruned=$pruned" -ForegroundColor Green
+    if ($orphans) { Write-Warning "orphaned real directories (no canonical source, left in place): $($orphans -join ', ')" }
 }
 
 # repo-scoped key -> source tree. The repo name comes from the folder holding `standards`, so the deployed
