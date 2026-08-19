@@ -31,8 +31,8 @@ in the shared testing library and is composed through extension methods and cons
 fixture. **When you catch yourself copying a setup step into a second fixture, lift it instead.** Typical
 members of that library:
 
-- environment names and checks as **extension members** hung onto the framework's own environment types — never
-  a raw environment string literal;
+- environment names and checks as **extension members** hung onto `Environments` and `IHostEnvironment` —
+  never a raw environment string literal;
 - an `AddTestAuthentication()` that makes the test handler the default scheme;
 - a logging extension that routes host logs to the current test's output;
 - an extension that removes the real bus transport and swaps in a no-op, omitted in a service with no bus;
@@ -48,8 +48,10 @@ to test seeders too.
 ## Adding a test
 
 1. Create the class in the relevant module's integration-test project.
-2. Annotate it with the shared test collection and inject the fixture through the constructor.
-3. Reset the database in the test's initialization step.
+2. Annotate it with the shared `[Collection]` and inject the fixture through the constructor.
+3. Reset the database in `InitializeAsync()`, not in the constructor — xUnit runs the constructor before the
+   async lifetime hook, so a reset written there runs at the wrong time and silently leaves prior data in
+   place.
 4. Get an authenticated client from the fixture rather than building one.
 
 Derive expectations from the canonical seed catalog the fixture exposes, never from invented literals.

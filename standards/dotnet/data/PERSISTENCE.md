@@ -1,19 +1,31 @@
 # Persistence
 
-## A repository inherits its module's `Repository<T>` base
+## A repository binds to a context capability, not to a concrete context type
 
-Every module owns a `Repositories/Repository.cs` binding the shared data-access bases to that module's
-`DbContext` and key type:
+The shared data-access layer mirrors the context capability hierarchy in its repository hierarchy, one row
+per capability:
+
+```text
+IReadDbContext  -> IReadRepository<TEntity, TKey>  -> ReadRepository<TEntity, TKey>
+IWriteDbContext -> IWriteRepository<TEntity>       -> WriteRepository<TEntity>
+IDbContext      -> IRepository<TEntity, TKey>      -> Repository<TEntity, TKey>
+```
+
+The row decides which base a repository inherits: a read-stance repository takes the read triple, not the
+full one. The shared bases deliberately take **no concrete `TContext` generic parameter** — their protected
+`Context` property exposes the capability alone, so a repository cannot reach past its own stance.
+
+Every module owns a `Repositories/Repository.cs` holding the local alias that binds its concrete context and
+key type, and concrete repositories in that module derive from the alias:
 
 ```csharp
-internal abstract class WriteRepository<TEntity>(OrderDbContext context)
-    : WriteRepository<TEntity, OrderDbContext>(context)
-    where TEntity : class;
-
 internal abstract class Repository<TEntity>(OrderDbContext context)
-    : Repository<TEntity, OrderDbContext, Guid>(context)
+    : Repository<TEntity, Guid>(context)
     where TEntity : class, IGuidEntity;
 ```
+
+Add a module-local `ReadRepository<TEntity>` / `WriteRepository<TEntity>` alias only when concrete
+repositories actually derive from it.
 
 A concrete repository inherits that base and implements the module's `IXRepository`, which extends
 `IRepository<XEntity, TKey>` and **needs no members of its own** unless the module has extra queries.
@@ -32,7 +44,28 @@ internal sealed class OrderRepository : Repository<OrderEntity>, IOrderRepositor
 ```
 
 The injected context field is always named `context`, never `dbContext`. Do not hand-roll a bare
-`IXRepository` that re-implements CRUD.
+`IXRepository` that re-implements CRUD. Keep the concrete context in a `private readonly` field only when
+the repository genuinely needs typed `DbSet`s or `Entry`/`Database`/`ChangeTracker`/bulk operations.
+
+## Adding one entity with nothing else staged — `InsertAsync`, not `AddAsync` + `SaveChangesAsync`
+
+`IWriteRepository<TEntity>` gives both. `AddAsync` stages only, for a unit of work that stages several
+writes before one shared save; `InsertAsync` stages *and* saves. Reach for the two-call form only when
+something else is already staged in the same method and the save commits all of it together.
+
+## One repository per entity — never fold a satellite entity into another entity's repository
+
+A repository's generic base binds it to exactly one entity. Give every entity its own repository even when
+several share a module and a `DbContext`, and even when one is queried far more often than another.
+Repository counts therefore run *ahead* of entity counts rather than tracking them, because stance and
+projection shape are independent dimensions — a separate read stance, an admin stance and a read-model
+repository each earn their own.
+
+The tell that a repository has drifted: its interface mixes queries for two or more unrelated entity types,
+or it hand-writes a `GetXByIdAsync`/`AddX` pair that re-implements what the generic base already gives the
+*wrong* entity bound as `TEntity`. Split it — one interface, one repository, one entity — even if a single
+service then injects two repositories. That is the service's job, not a reason to merge the persistence
+contracts.
 
 Naming — a repository method says what it fetches and by what key, a service method says the intent — is in
 the `csharp-naming` skill, along with the `Projection` suffix rule.

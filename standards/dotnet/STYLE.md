@@ -119,6 +119,16 @@ Test classes have the analogous rule — region per method under test — in the
 
 ## New extension members go in `extension()` blocks
 
-One `XExtensions` static class per receiver type, using the C# 14 unified form, which also covers
-properties, indexers, and static members and groups them by receiver. Do not add a new legacy
-`public static … (this X x)` method.
+All ordinary extension members use `extension(Receiver)` blocks — the C# 14 unified form, which also
+covers properties, indexers, and static members and groups them by receiver. Keep receiver-owned members
+in one `XExtensions` static class; an `XMappers` mapping family may hold one block per related receiver.
+Do not add a new legacy `public static … (this X x)` method.
+
+When you edit an existing extension container, migrate every ordinary member in it, so that no class ever
+mixes `extension()` blocks with legacy `this` parameters. A container left untouched stays legacy until
+its own sweep — track that as tech debt rather than half-migrating a class.
+
+The one exception is a declaration contract that genuinely requires the receiver in the method signature.
+A source-generated `[LoggerMessage]` partial method is declared
+`internal static partial void PublishedOrderEvents(this ILogger logger, int count)` and stays in that
+form; see the `logging` skill.

@@ -7,19 +7,23 @@ value-producer is also a `Service`, the genuinely useful smell — *a service ca
 stops being visible, because every collaborator looks the same at the injection site. Almost everything
 is DI-registered; that fact carries no naming information.
 
-| Suffix | The shape it claims |
-|---|---|
-| `Service` | Orchestrates domain logic **over a repository**. Stateful collaborator, owns a unit of work. |
-| `Repository` | Domain-entity persistence via a `DbContext`. |
-| `Store` | Bytes/blobs in and out of a backing store, no domain logic. |
-| `Client` | A remote or third-party API. |
-| `Factory` | Creates **instances/components**, usually of a type family. |
-| `Generator` | Produces a **value/artifact** from inputs. |
-| `Builder` | **Mutable, stepwise** accumulation terminated by `Build()` or a final property. |
-| `Provider` | Supplies a value or a pluggable strategy, often one of several. |
-| `Accessor` | Exposes an ambient/current value. |
-| `Handler` | Reacts to a message or event. |
-| `Helper` / `Utility` | **`static class` of pure functions.** No DI, no state, no config. |
+| Suffix | The shape it claims | Framework precedent |
+|---|---|---|
+| `Service` | Orchestrates domain logic **over a repository**. Stateful collaborator, owns a unit of work. | — |
+| `Repository` | Domain-entity persistence via a `DbContext`. | — |
+| `Store` | Bytes/blobs in and out of a backing store, no domain logic. | `IUserStore` |
+| `Client` | A remote or third-party API. | `HttpClient`, `BlobServiceClient` |
+| `Factory` | Creates **instances/components**, usually of a type family. | `IHttpClientFactory`, `ILoggerFactory` |
+| `Generator` | Produces a **value/artifact** from inputs. | `LinkGenerator`, `RandomNumberGenerator` |
+| `Builder` | **Mutable, stepwise** accumulation terminated by `Build()` or a final property. | `StringBuilder`, `UriBuilder`, `WebApplicationBuilder` |
+| `Provider` | Supplies a value or a pluggable strategy, often one of several. | `IServiceProvider`, `IFileProvider`, `TimeProvider` |
+| `Accessor` | Exposes an ambient/current value. | `IHttpContextAccessor` |
+| `Handler` | Reacts to a message or event. | — |
+| `Helper` / `Utility` | **`static class` of pure functions.** No DI, no state, no config. | `WebUtility`, `HttpUtility` |
+
+The precedent column is the calibration: `StringBuilder` accumulates then finalizes, `RandomNumberGenerator`
+returns a value from inputs, `IHttpClientFactory` hands back a component. A dash means the framework offers
+no anchor and the definition above is the whole rule.
 
 Two rules follow from the table:
 
@@ -92,8 +96,15 @@ Mapping goes in a static `XMappers` class as extension methods named for the tar
 ```csharp
 internal static class ShipmentMappers
 {
-    public static Shipment ToShipment(this ShipmentEntity entity) => ...;
-    public static ShipmentStatus ToShipmentStatus(this ShipmentStatusCode code) => ...;
+    extension(ShipmentEntity entity)
+    {
+        public Shipment ToShipment() => ...;
+    }
+
+    extension(ShipmentStatusCode code)
+    {
+        public ShipmentStatus ToShipmentStatus() => ...;
+    }
 }
 ```
 
