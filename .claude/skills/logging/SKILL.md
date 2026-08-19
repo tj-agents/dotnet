@@ -5,6 +5,4 @@ description: Logging standard for .NET services — every message is a source-ge
 
 # logging
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/logging/SKILL.md.
+The standard is `standards/dotnet/LOGGING.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/LOGGING.md`. Read it and follow it; this skill only routes to it.

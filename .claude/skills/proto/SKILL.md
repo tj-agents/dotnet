@@ -5,6 +5,4 @@ description: gRPC and Protobuf standard for .NET services — proto message nami
 
 # proto
 
-This is a Claude Code compatibility stub. Do not edit skill instructions here.
-
-Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/proto/SKILL.md.
+The standard is `standards/dotnet/structure/PROTO.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/structure/PROTO.md`. Read it and follow it; this skill only routes to it.

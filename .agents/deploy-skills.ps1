@@ -1,11 +1,24 @@
 <#
 .SYNOPSIS
-Deploy canonical agent skills to ~/.agents/skills and ~/.claude/skills as directory junctions.
+Deploy canonical agent skills to ~/.agents/skills and ~/.claude/skills, and the standards trees they
+route to under ~/.agents/standards, all as directory junctions.
 
 .DESCRIPTION
 Replaces copy-deployment with links so a `git pull` IS the deployment and drift is structurally
 impossible. Junctions are per-skill because skill discovery is <root>/skills/*/SKILL.md and does not
 recurse, and because several source repos must land in one namespace.
+
+Skills are junctioned per SKILL. Standards are junctioned per SOURCE REPO, at
+~/.agents/standards/<repo>/<domain>. Those are different rules because the two namespaces have different
+constraints: skill discovery is <root>/skills/*/SKILL.md and does not recurse, so skill names must be
+globally unique and land flat. Standards are only ever opened by path, so they do not need to be flat -
+and they must not be. A generic domain and its product-specific counterpart share a name deliberately
+(dotagents `dotnet/data/PERSISTENCE.md` pairs with agent-standards `dotnet/data/PERSISTENCE.md`), so
+flattening them onto one junction point makes one repo's tree shadow the other's silently. That happened:
+concertable-persistence resolved to dotagents' generic doc.
+
+Deploying the trees is not optional. A skill is now a router whose body names its doc's path, so a
+skill junctioned without its tree points at a file the reading session cannot open.
 
 Refuses to replace a target directory holding content that is neither identical to canonical nor a
 generated stub - that is an edit made against the installed copy and never committed, and deleting it
@@ -19,8 +32,15 @@ destroys the only copy. Two such edits were found and recovered on 2026-08-17 (d
 param(
     [string[]]$SourceRoot = @(
         (Join-Path $HOME 'source/repos/dotagents/.agents/skills'),
+        (Join-Path $HOME 'source/repos/react-agents/.agents/skills'),
         (Join-Path $HOME 'source/repos/agent-standards/.agents/skills')
     ),
+    [string[]]$StandardsRoot = @(
+        (Join-Path $HOME 'source/repos/dotagents/standards'),
+        (Join-Path $HOME 'source/repos/react-agents/standards'),
+        (Join-Path $HOME 'source/repos/agent-standards/standards')
+    ),
+    [string]$StandardsTarget = (Join-Path $HOME '.agents/standards'),
     [string[]]$Target = @(
         (Join-Path $HOME '.agents/skills'),
         (Join-Path $HOME '.claude/skills')
@@ -108,6 +128,58 @@ foreach ($targetRoot in $Target) {
     }
     Write-Host "$targetRoot : linked=$linked replaced=$replaced already-correct=$kept" -ForegroundColor Green
     if ($orphans) { Write-Warning "orphaned (no canonical source, left in place): $($orphans -join ', ')" }
+}
+
+# repo-scoped key -> source tree. The repo name comes from the folder holding `standards`, so the deployed
+# path states which repo a doc came from and two repos owning the same domain name cannot shadow each other.
+$domains = [ordered]@{}
+foreach ($root in $StandardsRoot) {
+    if (-not (Test-Path -LiteralPath $root)) { Write-Warning "standards root missing: $root"; continue }
+    $repo = Split-Path -Leaf (Split-Path -Parent (Resolve-Path -LiteralPath $root).ProviderPath)
+    foreach ($dir in Get-ChildItem -LiteralPath $root -Directory) {
+        $key = "$repo/$($dir.Name)"
+        if ($domains.Contains($key)) {
+            throw "standards path '$key' is declared twice: $($domains[$key]) and $($dir.FullName)"
+        }
+        $domains[$key] = $dir.FullName
+    }
+}
+
+if ($domains.Count) {
+    if (-not (Test-Path -LiteralPath $StandardsTarget)) {
+        if ($PSCmdlet.ShouldProcess($StandardsTarget, 'create standards root')) {
+            New-Item -ItemType Directory -Path $StandardsTarget -Force | Out-Null
+        }
+    }
+    $linked = $replaced = $kept = 0
+    foreach ($name in @($domains.Keys) | Sort-Object) {
+        $src = $domains[$name]
+        $dst = Join-Path $StandardsTarget $name
+        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dst) | Out-Null
+        $existing = Get-Item -LiteralPath $dst -ErrorAction SilentlyContinue
+
+        if ($existing -and $existing.LinkType -eq 'Junction') {
+            if ($existing.Target -contains $src) { $kept++; continue }
+            if ($PSCmdlet.ShouldProcess($dst, "repoint junction -> $src")) {
+                Remove-Item -LiteralPath $dst -Force -Recurse -Confirm:$false
+                New-Item -ItemType Junction -Path $dst -Target $src | Out-Null
+            }
+            $replaced++; continue
+        }
+
+        # A real directory here is not a stale link but authored content with no source repo, so it is
+        # never silently replaced.
+        if ($existing) {
+            $refused += "$dst - a real directory, not a junction; move its content into a standards repo first"
+            continue
+        }
+
+        if ($PSCmdlet.ShouldProcess($dst, "link -> $src")) {
+            New-Item -ItemType Junction -Path $dst -Target $src | Out-Null
+        }
+        $linked++
+    }
+    Write-Host "$StandardsTarget : linked=$linked replaced=$replaced already-correct=$kept ($($domains.Count) domains)" -ForegroundColor Green
 }
 
 if ($refused) {
