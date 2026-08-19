@@ -59,13 +59,13 @@ choose from.
 Pick **one** assertion library per test tier and use it consistently. Mixing two inside a tier means two failure
 message formats and two idioms for the same assertion, for no benefit.
 
-The current per-tier assignment: **unit tests use xUnit's built-in `Assert.*`** (`Assert.Equal`, `Assert.True`,
+The usual assignment: **unit tests use xUnit's built-in `Assert.*`** (`Assert.Equal`, `Assert.True`,
 …), **integration tests use Shouldly `ShouldBe`**, whose failure message carries the URL, status and response
 body — which is worth far more at that tier than at this one.
 
-**Open call, not yet decided:** whether unit tests should adopt Shouldly too. Recorded here rather than
-dropped, because an unresolved decision nobody can see is one nobody will ever resolve. Settle it and replace
-this paragraph.
+**Whichever assignment a repo picks, enforce it in the build rather than at review.** A per-tier assertion
+library is exactly the kind of rule a reviewer stops noticing: gate it from the test project's tier so a
+reference to the wrong library fails compilation, and the choice stops being re-litigated per PR.
 
 ## Grouping a large test class
 
