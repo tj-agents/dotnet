@@ -99,7 +99,7 @@ return (await reportRepository.GetQueueAsync(pageParams)).Map(r => r.ToDto());
 
 `Map` carries `TotalCount`/`PageNumber`/`PageSize` across, so hand-writing `new Pagination<T>(...)` restates
 four arguments that have exactly one correct value. One case is **not** `Map`: **only the item type widens** —
-`IPagination<out T>` is covariant, so an `IPagination<ArtistHeader>` already *is* an `IPagination<IHeader>`.
+`IPagination<out T>` is covariant, so an `IPagination<SellerHeader>` already *is* an `IPagination<IHeader>`.
 Return it; don't re-wrap, and don't `Map(x => x)`.
 
 **An `async` mapper is not an exception.** A mapper is normally `async` because it prefetches a dependency in
@@ -134,7 +134,7 @@ that context's migrations, so the schema has exactly one author:
 
 ```csharp
 // in the BORROWING module's configuration - read-only, never migrated from here
-builder.ToTable("ArtistRatingProjections", "artist", t => t.ExcludeFromMigrations());
+builder.ToTable("SellerRatingProjections", "seller", t => t.ExcludeFromMigrations());
 ```
 
 The owning module maps the same table with **no** exclusion; its migration is the one that creates it.
