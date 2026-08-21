@@ -51,6 +51,14 @@ returns a graded or structured result, not a `bool`. Prefer a `bool` method on t
 that owns the data — reach for a standalone `XChecker` only when it fans in across sources, needs a test seam,
 or the composition root swaps it.
 
+**A bare-verb method is self-describing only when its type already names the subject.** The agent-noun types
+above earn a bare verb precisely because the type carries the noun — `Exporter.Export`, `Mapper.Map`,
+`Checker.HasLive`. On a **broad, multi-method surface** — a module facade (`IXModule`), a wide service — the
+type names no single subject, so a bare verb reads "do what?": `IConcertModule.ExportAsync` is ambiguous where
+`ExportRecordsAsync` is not, and `IUserModule.ExportUserAsync` beats `ExportAsync`. The rule is the
+contrapositive of the agent-noun one: narrow single-purpose type → bare verb; broad surface → the method
+carries the subject.
+
 **A qualifier only exists to contrast with a sibling.** `PublicXRepository` with no `AdminXRepository`
 to disambiguate from is noise — name it `XRepository` and rename the day the second stance is born.
 
