@@ -35,8 +35,12 @@ Two rules follow from the table:
   is a `Builder`, a one-shot value from inputs is a `Generator`, a one-shot *component* is a `Factory`.
 
 **A type whose whole job is one operation is named for the agent-noun of that method** —
-`Mapper.Map`, `Resolver.Resolve`, `Calculator.Calculate`, `Renderer.Render`, `Serializer.Serialize`.
-The table above is the same rule widened to collaborator shapes.
+`Mapper.Map`, `Resolver.Resolve`, `Calculator.Calculate`, `Renderer.Render`, `Serializer.Serialize`,
+`Exporter.Export`. The table above is the same rule widened to collaborator shapes. Such a type is
+**not** a `Service` (which orchestrates over a repository and owns a unit of work) and **not** a `Factory`
+(whose `Create` builds a valid instance and guards its invariants); a type-to-type transform in particular
+is an `XMappers` extension (below), never a `Create` on the target contract — a pure data payload has no
+invariant to guard, and a `Create` aware of the source type leaks mapping into the contract.
 
 **A qualifier only exists to contrast with a sibling.** `PublicXRepository` with no `AdminXRepository`
 to disambiguate from is noise — name it `XRepository` and rename the day the second stance is born.
