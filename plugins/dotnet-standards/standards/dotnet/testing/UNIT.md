@@ -32,7 +32,7 @@ public sealed class VatPolicyTests
     [InlineData("")]
     public void Apply_UnregisteredSupplier_ReturnsNone(string? supplierVatNumber)
     {
-        var result = policy.Apply(120m, supplierVatNumber);
+        var result = this.policy.Apply(120m, supplierVatNumber);
 
         Assert.Equal(120m, result.Net);
     }
@@ -48,9 +48,26 @@ choose from.
 
 ## SUT construction
 
-- A SUT with dependencies is built **in the test-class constructor** and held as a `this.`-qualified
-  `private readonly` field, exactly like every other dependency the constructor builds — there is no
-  separate rule for the SUT.
+### Test constructor
+
+xUnit creates a fresh test-class instance for every test, so the constructor is the per-test reset boundary.
+Declare mocks, collaborators, and the SUT as `private readonly` fields without initializers. Construct each
+dependency explicitly in the constructor, then construct the SUT from those fields:
+
+```csharp
+public sealed class ServiceTests
+{
+    private readonly Mock<IDependency> dependency;
+    private readonly Service service;
+
+    public ServiceTests()
+    {
+        this.dependency = new Mock<IDependency>();
+        this.service = new Service(this.dependency.Object);
+    }
+}
+```
+
 - **Never a per-test `CreateSut()`/`CreateService()` factory method.** A private method rebuilt on every
   call is the constructor's job wearing a disguise — it buys nothing the constructor doesn't already give
   every test, and it's the tell that mocks are being re-declared as local variables per test instead of
