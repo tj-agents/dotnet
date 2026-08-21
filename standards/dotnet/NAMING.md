@@ -42,6 +42,15 @@ Two rules follow from the table:
 is an `XMappers` extension (below), never a `Create` on the target contract — a pure data payload has no
 invariant to guard, and a `Create` aware of the source type leaks mapping into the contract.
 
+**An injected type whose whole job is one boolean question is an `XChecker`** — often reading I/O — with an
+affirmative `HasXAsync`/`IsXAsync`/`CanXAsync` method that returns `bool` and does **not** throw. Keep it
+distinct from its four look-alikes: a `Guard`/`Require` *throws* on a failed precondition (`Guard.Against`,
+`Contract.Requires`); a `Validator` returns a field-keyed `ValidationResult` for a boundary; a `Specification`
+is the pure in-memory `IsSatisfiedBy` predicate over a candidate already in hand; a `Policy`/`Evaluator`
+returns a graded or structured result, not a `bool`. Prefer a `bool` method on the read model or repository
+that owns the data — reach for a standalone `XChecker` only when it fans in across sources, needs a test seam,
+or the composition root swaps it.
+
 **A qualifier only exists to contrast with a sibling.** `PublicXRepository` with no `AdminXRepository`
 to disambiguate from is noise — name it `XRepository` and rename the day the second stance is born.
 
