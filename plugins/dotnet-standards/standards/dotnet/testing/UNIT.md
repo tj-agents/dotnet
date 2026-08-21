@@ -49,7 +49,13 @@ choose from.
 ## SUT construction
 
 - A SUT with dependencies is built **in the test-class constructor** and held as a `this.`-qualified
-  `private readonly` field.
+  `private readonly` field, exactly like every other dependency the constructor builds — there is no
+  separate rule for the SUT.
+- **Never a per-test `CreateSut()`/`CreateService()` factory method.** A private method rebuilt on every
+  call is the constructor's job wearing a disguise — it buys nothing the constructor doesn't already give
+  every test, and it's the tell that mocks are being re-declared as local variables per test instead of
+  living as constructor-built `this.`-qualified fields. If you're about to write one, put its body in the
+  constructor instead and reference the fields directly.
 - **Prefer real collaborators over mocks** where they are cheap and deterministic — `new VatPolicy(new
   UkVatCalculator())`, not a mocked calculator. Reach for a test double only at a genuine boundary: I/O, time,
   randomness, or an expensive/nondeterministic dependency.
