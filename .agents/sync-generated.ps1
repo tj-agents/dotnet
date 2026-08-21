@@ -24,8 +24,9 @@ Generated:
                                    claims. An installed plugin is only its own subtree and cwd is the
                                    consuming project, so a root-relative path would dangle and a
                                    reference outside the plugin root is never copied at all.
-  .claude-plugin/marketplace.json  copy of .agents/plugins/marketplace.json, the path Codex reads
-                                   natively.
+  .agents/plugins/marketplace.json and .claude-plugin/marketplace.json are authored separately because
+                                   the two harnesses require different schemas. Each plugin carries both
+                                   .claude-plugin/plugin.json and .codex-plugin/plugin.json.
 
 Plugins carry the domains `.agents/plugins/payloads.json` assigns them, so a consumer installs per
 stack rather than receiving every corpus. The 10 utility skills ship in no plugin - they are machine
@@ -50,6 +51,7 @@ $repoRoot     = Split-Path -Parent $PSScriptRoot
 $canonical    = Join-Path $repoRoot '.agents/skills'
 $standardsDir = Join-Path $repoRoot 'standards'
 $manifest     = Join-Path $repoRoot '.agents/plugins/marketplace.json'
+$claudeManifest = Join-Path $repoRoot '.claude-plugin/marketplace.json'
 $payloadsFile = Join-Path $repoRoot '.agents/plugins/payloads.json'
 $utf8NoBom    = New-Object System.Text.UTF8Encoding($false)
 
@@ -185,16 +187,32 @@ if (Test-Path $pluginRoot) { $plugins = @(Get-ChildItem -Path $pluginRoot -Direc
 # manifest of its own - an unroutable package installs and delivers nothing.
 if (-not (Test-Path $manifest)) { throw "Missing canonical manifest .agents/plugins/marketplace.json." }
 $manifestBody = Read-Lf $manifest
+$manifestJson = ConvertFrom-Json $manifestBody
 $declared = @()
-foreach ($entry in (ConvertFrom-Json $manifestBody).plugins) {
+foreach ($entry in $manifestJson.plugins) {
     $declared += $entry.name
-    $source = Join-Path $repoRoot ($entry.source -replace '^\./', '')
+    if ($entry.source.source -ne 'local' -or -not $entry.source.path) {
+        throw "marketplace.json plugin '$($entry.name)' must use a local source object with a path."
+    }
+    if (-not $entry.policy.installation -or -not $entry.policy.authentication -or -not $entry.category) {
+        throw "marketplace.json plugin '$($entry.name)' must declare installation, authentication, and category."
+    }
+    $source = Join-Path $repoRoot ($entry.source.path -replace '^\./', '')
     if (-not (Test-Path $source)) {
-        throw "marketplace.json declares '$($entry.name)' at $($entry.source), which does not exist."
+        throw "marketplace.json declares '$($entry.name)' at $($entry.source.path), which does not exist."
     }
     if (-not (Test-Path (Join-Path $source '.claude-plugin/plugin.json'))) {
-        throw "Plugin '$($entry.name)' has no .claude-plugin/plugin.json, so neither harness can load it."
+        throw "Plugin '$($entry.name)' has no .claude-plugin/plugin.json, so Claude cannot load it."
     }
+    if (-not (Test-Path (Join-Path $source '.codex-plugin/plugin.json'))) {
+        throw "Plugin '$($entry.name)' has no .codex-plugin/plugin.json, so Codex cannot load it."
+    }
+}
+if (-not (Test-Path $claudeManifest)) { throw "Missing Claude manifest .claude-plugin/marketplace.json." }
+$claudeDeclared = @((ConvertFrom-Json (Read-Lf $claudeManifest)).plugins | ForEach-Object { $_.name } | Sort-Object)
+$codexDeclared = @($declared | Sort-Object)
+if (($claudeDeclared -join "`n") -ne ($codexDeclared -join "`n")) {
+    throw "Claude and Codex marketplaces declare different plugins."
 }
 
 # Which plugin ships which domains. Authored rather than inferred from a plugin's name, and cross-checked
@@ -249,8 +267,6 @@ foreach ($plugin in $plugins) {
             (Rewrite-ForPlugin $owner.Body)
     }
 }
-
-$generated['.claude-plugin/marketplace.json'] = $manifestBody
 
 # One index per domain, generated from the tree so it cannot drift from it.
 $domains = @($docs | ForEach-Object { ($_ -split '/')[1] } | Sort-Object -Unique)

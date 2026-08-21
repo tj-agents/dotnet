@@ -108,7 +108,9 @@ standards/<domain>/<TOPIC>.md   ───────►  plugins/<p>/standards/
 .agents/skills/<name>/SKILL.md  ───────►  plugins/<p>/skills/<name>/SKILL.md          doc path rewritten
                                           .claude/skills/<name>/SKILL.md              repo-local
                                           standards/<domain>/INDEX.md                 from the tree
-.agents/plugins/marketplace.json ──────►  .claude-plugin/marketplace.json             Codex reads both
+.agents/plugins/marketplace.json         authored Codex marketplace
+.claude-plugin/marketplace.json          authored Claude marketplace
+plugins/<p>/.codex-plugin/plugin.json    authored Codex plugin manifest
 .agents/plugins/payloads.json             which plugin ships which domains
 .agents/hooks/*                 ───────►  plugins/<p>/hooks/*                         hook + its wiring
 ```
@@ -141,32 +143,16 @@ at which that stops being the more expensive option.
 
 ## Per-machine setup — one time, both harnesses
 
-**Neither harness auto-installs from a repo's settings.** Both need a one-time marketplace add plus
-install, **per machine, not per repo** — so the cost does not grow with the number of repos. `--scope
-user` makes one install cover every repo, present and future.
-
-Claude Code:
+**Neither harness auto-installs from a repo's settings.** Provision both once per machine from a clone of
+`Concertable/agent-standards`:
 
 ```
-/plugin marketplace add Concertable/agent-standards
-/plugin install agent-process@agent-standards          # process + the write-time hook
-/plugin marketplace add tomjseery/dotagents
-/plugin install dotnet-standards@dotagents             # per stack - install what applies
-/plugin marketplace add tomjseery/react-agents
-/plugin install react-standards@react-agents
+powershell -ExecutionPolicy Bypass -File scripts/provision-agent-standards.ps1
 ```
 
-Codex — same plugins, and its skills appear namespaced (`agent-process:committing`):
-
-```
-codex plugin marketplace add https://github.com/Concertable/agent-standards
-codex plugin add agent-process@agent-standards
-codex plugin marketplace add https://github.com/tomjseery/dotagents
-codex plugin add dotnet-standards@dotagents
-```
-
-`dotagents` and `react-agents` are private, so those marketplace adds need git credentials that can read
-them.
+It installs or refreshes all five plugins at user scope in Claude Code and Codex, then verifies they are
+enabled. `-VerifyOnly` makes the same check without changing state. Start a new session afterward.
+`dotagents` and `react-agents` are private, so provisioning needs git credentials that can read them.
 
 Installed plugins land at `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/` and
 `~/.codex/plugins/cache/<marketplace>/<plugin>/<version>/` — same shape, different home. Uninstalling
