@@ -1,11 +1,29 @@
 # Unit tests
 
-A unit test is a pure in-memory test of domain or service logic with **no** database, HTTP, fixtures, or
-`WebApplicationFactory`/`TestServer` host, and no `Testcontainers` container. If a test needs any of those,
-it is an integration test — see the `integration-testing` skill.
+A unit test is a pure in-memory test of substantial, deterministic core logic with **no** database, HTTP,
+fixtures, or `WebApplicationFactory`/`TestServer` host, and no `Testcontainers` container. Good candidates
+are calculations, transformations, validators, decision tables, value objects, and domain state transitions
+whose cases are clearer when exercised directly. If a test needs infrastructure, it is an integration test
+— see the `integration-testing` skill.
 
 Those type names are the point, not decoration: they are what a reader greps for and what a build gate can
 match on. "A host factory" cannot be enforced by anything.
+
+## Integration is the default
+
+Default to an integration test for application services, handlers, controllers, repositories, dependency
+injection, adapters, and behaviour that coordinates collaborators. Those types exist to connect real
+boundaries; replacing every boundary with a mock proves the test's setup rather than the application.
+
+Do not add a unit test merely to cover a guard clause, a delegation path, or whether a collaborator was or
+was not called. A test whose main assertion is mock interaction is normally an integration test expressed
+at the nearest real application boundary. Use a unit test only when the isolated logic itself has enough
+meaningful cases to justify direct coverage and an integration test would obscure that logic. If in doubt,
+write the integration test.
+
+Code being private, internal, or inconvenient to reach is not by itself a reason for a unit test. Test
+through the public behaviour unless direct coverage materially improves the clarity or completeness of the
+core logic's cases.
 
 General C# style — field naming, `this.` qualification, no primary-constructor captures — applies here
 exactly as in production code.
@@ -20,7 +38,7 @@ exactly as in production code.
 ```csharp
 public sealed class VatPolicyTests
 {
-    private readonly IVatPolicy policy;
+    private readonly VatPolicy policy;
 
     public VatPolicyTests()
     {
@@ -51,22 +69,9 @@ choose from.
 ### Test constructor
 
 xUnit creates a fresh test-class instance for every test, so the constructor is the per-test reset boundary.
-Declare mocks, collaborators, and the SUT as `private readonly` fields without initializers. Construct each
-dependency explicitly in the constructor, then construct the SUT from those fields:
-
-```csharp
-public sealed class ServiceTests
-{
-    private readonly Mock<IDependency> dependency;
-    private readonly Service service;
-
-    public ServiceTests()
-    {
-        this.dependency = new Mock<IDependency>();
-        this.service = new Service(this.dependency.Object);
-    }
-}
-```
+As in the `VatPolicyTests` example above, declare mocks, collaborators, and the SUT as `private readonly`
+fields without initializers. Construct each dependency explicitly in the constructor, then construct the SUT
+from those fields.
 
 - **Never a per-test `CreateSut()`/`CreateService()` factory method.** A private method rebuilt on every
   call is the constructor's job wearing a disguise — it buys nothing the constructor doesn't already give
@@ -75,7 +80,9 @@ public sealed class ServiceTests
   constructor instead and reference the fields directly.
 - **Prefer real collaborators over mocks** where they are cheap and deterministic — `new VatPolicy(new
   UkVatCalculator())`, not a mocked calculator. Reach for a test double only at a genuine boundary: I/O, time,
-  randomness, or an expensive/nondeterministic dependency.
+  randomness, or an expensive/nondeterministic dependency, and only when the SUT still owns substantial
+  isolated logic. Several mocked collaborators are a strong signal that the test belongs in the integration
+  tier.
 
 ## Assertions
 
