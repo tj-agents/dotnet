@@ -6,6 +6,9 @@ are calculations, transformations, validators, decision tables, value objects, a
 whose cases are clearer when exercised directly. If a test needs infrastructure, it is an integration test
 — see the `integration-testing` skill.
 
+Those type names are the point, not decoration: they are what a reader greps for and what a build gate can
+match on. "A host factory" cannot be enforced by anything.
+
 ## Integration is the default
 
 Default to an integration test for application services, handlers, controllers, repositories, dependency
@@ -22,9 +25,6 @@ Code being private, internal, or inconvenient to reach is not by itself a reason
 through the public behaviour unless direct coverage materially improves the clarity or completeness of the
 core logic's cases.
 
-Those type names are the point, not decoration: they are what a reader greps for and what a build gate can
-match on. "A host factory" cannot be enforced by anything.
-
 General C# style — field naming, `this.` qualification, no primary-constructor captures — applies here
 exactly as in production code.
 
@@ -38,7 +38,7 @@ exactly as in production code.
 ```csharp
 public sealed class VatPolicyTests
 {
-    private readonly IVatPolicy policy;
+    private readonly VatPolicy policy;
 
     public VatPolicyTests()
     {
@@ -69,20 +69,9 @@ choose from.
 ### Test constructor
 
 xUnit creates a fresh test-class instance for every test, so the constructor is the per-test reset boundary.
-Declare mocks, collaborators, and the SUT as `private readonly` fields without initializers. Construct each
-dependency explicitly in the constructor, then construct the SUT from those fields:
-
-```csharp
-public sealed class VatPolicyTests
-{
-    private readonly VatPolicy policy;
-
-    public VatPolicyTests()
-    {
-        this.policy = new VatPolicy(new UkVatCalculator());
-    }
-}
-```
+As in the `VatPolicyTests` example above, declare mocks, collaborators, and the SUT as `private readonly`
+fields without initializers. Construct each dependency explicitly in the constructor, then construct the SUT
+from those fields.
 
 - **Never a per-test `CreateSut()`/`CreateService()` factory method.** A private method rebuilt on every
   call is the constructor's job wearing a disguise — it buys nothing the constructor doesn't already give
