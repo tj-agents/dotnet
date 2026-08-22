@@ -28,6 +28,12 @@ use `Option<T>` when `Some(T)` and `None` are the complete, intentional outcomes
 absence is a named failure, needs an explanation, or must coexist with other failure cases, use
 `Result<TValue, TError>`.
 
+**A collection already represents absence with an empty collection.** Never return
+`Option<IReadOnlyList<T>>` (or wrap another zero-or-more collection in `Option`) unless `None` is a
+genuine, intentional outcome that requires different caller behaviour from `Some(empty)`. If a missing
+owner, profile, scope, or filter merely means there are no values to return, use `IReadOnlyList<T>` and
+return `[]`. Do not create two representations of “no items” that every caller immediately collapses.
+
 The layer is a strong heuristic, not the decision by itself. Repository and provider lookups normally
 return `T?`. Domain, application, module-facade, service, and published client query contracts normally
 promote ordinary absence to `Option<T>` so callers cannot reach `T` without observing the case. Commands
@@ -250,6 +256,7 @@ EF, serialization, and nullable framework APIs still use `T?`, and `??` still do
   `CSharpFunctionalExtensions`, `FluentResults`, `OneOf`, `ErrorOr`, or `LanguageExt`;
 - a Result or Option in a wire, event, persistence, or serialized DTO;
 - a nullable repository contract changed to Option;
+- a zero-or-more collection wrapped in Option when None has no caller-visible meaning beyond empty;
 - a bool or enum that collapses caller-actionable outcomes;
 - a throwing payload accessor, or a default Result treated as a branch;
 - broad exception-to-domain-error conversion;
