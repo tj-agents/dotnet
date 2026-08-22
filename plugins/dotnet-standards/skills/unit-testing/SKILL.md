@@ -1,6 +1,6 @@
 ---
 name: unit-testing
-description: Unit-test standard for .NET — what makes a test a unit test at all (no database, host factory, containers, fixtures, or HTTP), xUnit `[Fact]`/`[Theory]` shape with the expected value last, sealed public test classes in the project's root namespace, Arrange/Act/Assert separated by blank lines rather than comments, `Method_Scenario_ExpectedBehaviour` naming, building the SUT in the test constructor as a `this.`-qualified readonly field, preferring real collaborators over mocks except at genuine boundaries, one assertion library per tier, regions named for the method under test, and expressing an architecture-guard allowlist as a self-verifying `TheoryData`. Use when adding or reviewing a unit test, deciding whether a test belongs in the unit or integration suite, or adding a temporary exclusion to a repo-wide guard test.
+description: Unit-test standard for .NET — integration is the default for application services, handlers, controllers, repositories, DI, adapters and collaborator orchestration; unit tests are reserved for substantial deterministic core logic such as calculations, validators, decision tables, value objects and domain transitions, never mock-interaction coverage of guard clauses or delegation. Also owns xUnit shape and naming, constructor-built SUTs, real collaborators, assertion-library consistency and self-verifying architecture allowlists. Use when adding or reviewing a test or deciding between the unit and integration tiers.
 ---
 
 # unit-testing
