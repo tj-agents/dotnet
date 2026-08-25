@@ -56,17 +56,6 @@ to test seeders too.
 
 Derive expectations from the canonical seed catalog the fixture exposes, never from invented literals.
 
-## One canonical seed-state model
-
-Producer and consumer share **one** seed-state type: the seeder builds it, the fixture exposes it, the test
-reads it, so "the confirmed booking" means the same thing at every hop.
-
-Where that type and a domain type would otherwise collide on a name, **namespace separation is the answer** —
-they live in different namespaces and a `using` alias disambiguates the one file needing both. Never introduce
-a `Snapshot`, `Source`, mirror, adapter or wrapper type to dodge a collision. A parallel hierarchy has to be
-updated in lockstep with the real one, silently drifts when it is not, and the test's expectation then no
-longer describes what was actually seeded.
-
 ## Scoped services and event handlers
 
 An integration test is a scope root. Resolve an `IScoped<T>` abstraction from the fixture's services and use its
@@ -101,6 +90,7 @@ status, per request shape — scatters one resource's contract across a director
 covered at all.
 
 ```csharp
+[Collection(IntegrationCollection.Name)]
 public sealed class ShipmentApiTests(ShipmentApiFixture fixture)
 {
     #region Get
