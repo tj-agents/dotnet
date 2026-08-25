@@ -103,6 +103,17 @@ public async Task SeedAsync(CancellationToken ct)
 }
 ```
 
+## One canonical seed-state model
+
+Producer and consumer share **one** seed-state type: the seeder builds it, the fixture exposes it, the test
+reads it, so "the confirmed booking" means the same thing at every hop.
+
+Where that type and a domain type would otherwise collide on a name, **namespace separation is the answer** —
+they live in different namespaces and a `using` alias disambiguates the one file needing both. Never introduce
+a `Snapshot`, `Source`, mirror, adapter or wrapper type to dodge a collision. A parallel hierarchy has to be
+updated in lockstep with the real one, silently drifts when it is not, and the test's expectation then no
+longer describes what was actually seeded.
+
 ## Idempotency and sentinel guards
 
 Every dev seeder must be safe to run repeatedly against a database that already holds seed data — use a
