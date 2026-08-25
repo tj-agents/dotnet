@@ -1,42 +1,43 @@
 #!/usr/bin/env pwsh
 <#
-Regenerates everything in this repo that is derived from `.agents/` and `standards/`.
+Regenerates everything in this repo that is derived from `.agents/`.
 
-Two kinds of skill live here, and the difference is what gets generated:
+Two kinds of skill live here, told apart by ONE authored fact - a `domain:` field in front matter:
 
-  a STANDARD   the rule text is a doc under `standards/<domain>/`, and `.agents/skills/<name>/SKILL.md`
-               is a router: front matter plus the doc's root-relative path in backticks. A doc is a
-               plain markdown file, so it can be `@`-imported by a repo that wants it always-on or
-               routed to by its skill everywhere else. Text inside a SKILL.md gets one delivery mode.
+  a STANDARD   declares `domain:`, and its SKILL.md body IS the standard. There is no separate doc:
+               `@`-import only expands inside CLAUDE.md/AGENTS.md, never inside a SKILL.md, so a skill
+               pointing at a doc could only ever be a pointer - costing a guaranteed Read tool call for
+               content the invocation was always going to need. The domain decides which plugin ships it.
 
-  a UTILITY    a procedure the agent runs (`sync`, `worktree`, `recents`). There is no corpus to
-               consult, so the body stays in its SKILL.md and no doc exists.
+  a UTILITY    declares no `domain:` - a procedure the agent runs (`sync`, `worktree`, `recents`). It is
+               machine tooling, not a standard, so it ships in no plugin and no domain claims it.
+
+A generic standard and its Concertable counterpart pair by SKILL NAME and are told apart by PLUGIN
+NAMESPACE - `dotnet-standards:persistence` here, `dotnet:persistence` in Concertable/agent-standards.
+Nothing pairs by file path any more; the skill name already carried that fact.
 
 Generated:
-  .claude/skills/<name>/SKILL.md   for a harness opened on THIS repo. A router is copied verbatim -
-                                   its root-relative doc path resolves because cwd is this repo. A
+  .claude/skills/<name>/SKILL.md   for a harness opened on THIS repo. A standard is copied verbatim; a
                                    utility gets a stub pointing at canonical, so its body is not
                                    duplicated.
-  standards/<domain>/INDEX.md      the tree answers "where is it"; this answers "did I document this"
-                                   without opening anything.
-  plugins/<p>/skills/…             router copy with its doc path rewritten relative to the SKILL.md,
-                                   and plugins/<p>/standards/… a full copy of the domains that plugin
-                                   claims. An installed plugin is only its own subtree and cwd is the
-                                   consuming project, so a root-relative path would dangle and a
-                                   reference outside the plugin root is never copied at all.
+  SKILLS.md                        the catalogue: skill -> what it covers -> owning plugin. Answers "did
+                                   I write this rule down, and which skill owns it" without opening
+                                   anything, which is what the per-domain standards INDEX used to answer.
+  plugins/<p>/skills/...             verbatim copy of each standard whose domain that plugin claims. An
+                                   installed plugin is only its own subtree, and a plugin cannot
+                                   reference anything outside its root, so the payload is a full copy.
   .agents/plugins/marketplace.json and .claude-plugin/marketplace.json are authored separately because
                                    the two harnesses require different schemas. Each plugin carries both
                                    .claude-plugin/plugin.json and .codex-plugin/plugin.json.
 
 Plugins carry the domains `.agents/plugins/payloads.json` assigns them, so a consumer installs per
-stack rather than receiving every corpus. The 10 utility skills ship in no plugin - they are machine
-tooling, delivered by deploy-skills.ps1 from this clone. The write-time router hook
-lives in `Concertable/agent-standards` and ships in its `agent-process` plugin, so a project wanting
-enforcement installs that too.
+stack rather than receiving every corpus. The write-time router hook lives in
+`Concertable/agent-standards` and ships in its `agent-process` plugin, so a project wanting enforcement
+installs that too.
 
-Refuses to write when the two structures disagree: a router naming a doc that does not exist, a doc no
-router points at, or two routers claiming one doc. A tree and a skill namespace that can drift is
-exactly how 754 lines of frontend law ended up with zero inbound links.
+Refuses to write when the skill namespace and the payload split disagree: a skill whose domain no plugin
+ships, or a plugin claiming a domain no skill declares. Two structures that can drift is exactly how 754
+lines of frontend law ended up with zero inbound links.
 
   pwsh .agents/sync-generated.ps1
   pwsh .agents/sync-generated.ps1 -Check   # verify only; non-zero exit if anything is stale
@@ -47,15 +48,24 @@ param([switch]$Check)
 
 $ErrorActionPreference = 'Stop'
 
+# Windows PowerShell 5.1 reads a BOM-less .ps1 as the system ANSI codepage rather than UTF-8, so a
+# non-ASCII literal in THIS file arrives already mojibake and is written straight into the generated
+# output - where it is indistinguishable from content that was always meant to look that way. Text read
+# from other files is safe (ReadAllText decodes UTF-8); only the script's own literals are exposed, so
+# the script keeps them ASCII and proves it here rather than relying on nobody typing an em-dash.
+$ownBytes = [System.IO.File]::ReadAllBytes($PSCommandPath)
+if (@($ownBytes | Where-Object { $_ -gt 127 }).Count) {
+    throw "sync-generated.ps1 contains a non-ASCII byte; PowerShell 5.1 reads this file as ANSI and would emit mojibake. Keep the script's own literals ASCII."
+}
+
 $repoRoot     = Split-Path -Parent $PSScriptRoot
 $canonical    = Join-Path $repoRoot '.agents/skills'
-$standardsDir = Join-Path $repoRoot 'standards'
 $manifest     = Join-Path $repoRoot '.agents/plugins/marketplace.json'
 $claudeManifest = Join-Path $repoRoot '.claude-plugin/marketplace.json'
 $payloadsFile = Join-Path $repoRoot '.agents/plugins/payloads.json'
 $utf8NoBom    = New-Object System.Text.UTF8Encoding($false)
 
-$INDEX_NAME  = 'INDEX.md'
+$CATALOGUE   = 'SKILLS.md'
 $STUB_MARKER = 'compatibility stub'
 
 function Read-Lf([string]$path) {
@@ -89,31 +99,21 @@ function Get-CanonicalDescription([string]$text, [string]$name) {
     return $description
 }
 
-# A router's single authored fact about its payload: the doc's root-relative path, in backticks. Parsed
-# rather than held in a side table, because a second structure is a second thing that drifts. No match
-# means a utility, which owns no doc.
-function Get-RoutedDoc([string]$text, [string]$name) {
-    $found = [regex]::Matches($text, '`(standards/[^`]+\.md)`')
-    $paths = @($found | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
-    if ($paths.Count -eq 0) { return $null }
-    if ($paths.Count -gt 1) {
-        throw "$name/SKILL.md names $($paths.Count) docs ($($paths -join ', ')); a router owns exactly one."
-    }
-    return $paths[0]
+# The one authored fact that classifies a skill. Absent means a utility, which ships in no plugin.
+function Get-OptionalFrontMatterField([string]$text, [string]$field) {
+    $match = [regex]::Match($text, "(?s)\A---\n.*?^${field}:[ \t]*(.+?)\n(?:[a-zA-Z-]+:|---)", 'Multiline')
+    if (-not $match.Success) { return $null }
+    return $match.Groups[1].Value.Trim()
 }
 
-# The plugin copy must name only what ships beside it. The authored router also cites the deployed
-# ~/.agents/standards path, which need not exist on a machine that installed the plugin and never cloned
-# the repo - a reader who tries it first finds nothing.
-function Rewrite-ForPlugin([string]$body) {
-    $rewritten = [regex]::Replace(
-        $body,
-        'The standard is `standards/(?<doc>[^`]+)` in `[^`]+`, deployed to `~/\.agents/standards/[^`]+`\.',
-        'The standard is `../../standards/${doc}`, shipped in this plugin.')
-    if ($rewritten -eq $body) {
-        throw "plugin rewrite matched nothing; the router sentence changed shape and the copy would keep a path that dangles on install."
-    }
-    return $rewritten
+# The catalogue row's "Covers" column. A standard's body opens with its own title, which says what the
+# rule is about in far fewer words than the trigger-carrying description. Only a standard is catalogued,
+# so only a standard needs one; a utility may go straight into its procedure.
+function Get-Title([string]$text) {
+    $heading = @(($text -replace "(?s)\A---\n.*?\n---\n", '') -split "`n" |
+        Where-Object { $_ -match '^#\s+' } | Select-Object -First 1)
+    if (-not $heading) { return $null }
+    return ($heading[0] -replace '^#\s+', '')
 }
 
 function Get-StubBody([string]$name, [string]$description) {
@@ -132,7 +132,14 @@ Read and follow the canonical agent-agnostic skill at ../../../.agents/skills/$n
 "@ -replace "`r`n", "`n"
 }
 
-# Skills stay flat: discovery is <root>/skills/*/SKILL.md and does not recurse. Only content nests.
+function Sort-Ordinal([string[]]$values) {
+    $list = [System.Collections.Generic.List[string]]::new()
+    foreach ($value in $values) { $list.Add($value) }
+    $list.Sort([System.StringComparer]::Ordinal)
+    return $list.ToArray()
+}
+
+# Skills stay flat: discovery is <root>/skills/*/SKILL.md and does not recurse.
 $skillDirs = @(Get-ChildItem -Path $canonical -Directory |
     Where-Object { Test-Path (Join-Path $_.FullName 'SKILL.md') } | Sort-Object Name)
 if (-not $skillDirs) { throw "No canonical skills found under .agents/skills." }
@@ -140,43 +147,18 @@ if (-not $skillDirs) { throw "No canonical skills found under .agents/skills." }
 $skills = [ordered]@{}
 foreach ($dir in $skillDirs) {
     $text = Read-Lf (Join-Path $dir.FullName 'SKILL.md')
+    $domain = Get-OptionalFrontMatterField $text 'domain'
+    $title = Get-Title $text
+    if ($domain -and -not $title) {
+        throw "$($dir.Name)/SKILL.md declares a domain but has no ``# `` heading, so the catalogue has nothing to show."
+    }
     $skills[$dir.Name] = [pscustomobject]@{
         Name        = $dir.Name
         Body        = $text
         Description = Get-CanonicalDescription $text $dir.Name
-        Doc         = Get-RoutedDoc $text $dir.Name
+        Domain      = $domain
+        Title       = $title
     }
-}
-
-# The standards tree is walked recursively - nesting is the whole point of the tree.
-$docs = @()
-if (Test-Path $standardsDir) {
-    $docs = @(Get-ChildItem -Path $standardsDir -Recurse -File -Filter '*.md' |
-        Where-Object { $_.Name -ne $INDEX_NAME } |
-        ForEach-Object { To-RepoRelative $_.FullName $repoRoot } |
-        Sort-Object)
-}
-
-# Neither structure may grow an orphan.
-$problems = @()
-foreach ($skill in $skills.Values) {
-    if ($skill.Doc -and ($docs -notcontains $skill.Doc)) {
-        $problems += "skill '$($skill.Name)' routes to '$($skill.Doc)', which does not exist."
-    }
-}
-foreach ($doc in $docs) {
-    $owners = @($skills.Values | Where-Object { $_.Doc -eq $doc } | Select-Object -ExpandProperty Name)
-    if ($owners.Count -eq 0) {
-        $problems += "doc '$doc' has no routing skill, so nothing loads it."
-    }
-    if ($owners.Count -gt 1) {
-        $problems += "doc '$doc' is routed by $($owners.Count) skills ($($owners -join ', ')); it needs exactly one owner."
-    }
-}
-if ($problems) {
-    Write-Host "The standards tree and the skill namespace disagree:"
-    foreach ($problem in $problems) { Write-Host "  $problem" }
-    exit 1
 }
 
 $pluginRoot = Join-Path $repoRoot 'plugins'
@@ -235,16 +217,29 @@ foreach ($plugin in $plugins) {
     if (-not $pluginDomains.ContainsKey($plugin.Name)) {
         throw "plugins/$($plugin.Name) exists but is declared nowhere; add it to marketplace.json and payloads.json."
     }
-    foreach ($domain in $pluginDomains[$plugin.Name]) {
-        if (-not (Test-Path (Join-Path $standardsDir $domain))) {
-            throw "plugin '$($plugin.Name)' claims domain '$domain', which is not in standards/."
-        }
+}
+
+# The skill namespace and the payload split are the only two structures now, so they reconcile directly
+# against each other - there is no doc tree in between for either to drift from.
+$claimed = @($pluginDomains.Values | ForEach-Object { $_ } | Sort-Object -Unique)
+$declaredDomains = @($skills.Values | Where-Object { $_.Domain } |
+    Select-Object -ExpandProperty Domain | Sort-Object -Unique)
+$problems = @()
+foreach ($domain in $declaredDomains) {
+    if ($claimed -notcontains $domain) {
+        $owners = @($skills.Values | Where-Object { $_.Domain -eq $domain } | Select-Object -ExpandProperty Name)
+        $problems += "domain '$domain' (declared by $($owners -join ', ')) is in no plugin, so a clone cannot install it."
     }
 }
-$unshipped = @($docs | ForEach-Object { ($_ -split '/')[1] } | Sort-Object -Unique |
-    Where-Object { $domain = $_; -not (@($pluginDomains.Values | ForEach-Object { $_ }) -contains $domain) })
-if ($unshipped) {
-    throw "standards domain(s) '$($unshipped -join ', ')' are in no plugin, so a clone cannot install them."
+foreach ($domain in $claimed) {
+    if ($declaredDomains -notcontains $domain) {
+        $problems += "a plugin claims domain '$domain', which no skill declares, so it would ship empty."
+    }
+}
+if ($problems) {
+    Write-Host "The skill namespace and the plugin payloads disagree:"
+    foreach ($problem in $problems) { Write-Host "  $problem" }
+    exit 1
 }
 
 # relative path -> LF-normalized content
@@ -252,48 +247,48 @@ $generated = [ordered]@{}
 
 foreach ($skill in $skills.Values) {
     $generated[".claude/skills/$($skill.Name)/SKILL.md"] =
-        if ($skill.Doc) { $skill.Body } else { Get-StubBody $skill.Name $skill.Description }
+        if ($skill.Domain) { $skill.Body } else { Get-StubBody $skill.Name $skill.Description }
 }
 
 foreach ($plugin in $plugins) {
-    $mine = @($docs | Where-Object {
-        $pluginDomains[$plugin.Name] -contains (($_ -split '/')[1])
-    })
-    foreach ($doc in $mine) {
-        $generated["plugins/$($plugin.Name)/$doc"] = Read-Lf (Join-Path $repoRoot $doc)
-        $owner = @($skills.Values | Where-Object { $_.Doc -eq $doc })[0]
-        # skills/<name>/SKILL.md -> the plugin's own copy of the tree, two levels up.
-        $generated["plugins/$($plugin.Name)/skills/$($owner.Name)/SKILL.md"] =
-            (Rewrite-ForPlugin $owner.Body)
+    $mine = @($skills.Values | Where-Object { $_.Domain -and $pluginDomains[$plugin.Name] -contains $_.Domain })
+    foreach ($skill in $mine) {
+        $generated["plugins/$($plugin.Name)/skills/$($skill.Name)/SKILL.md"] = $skill.Body
     }
 }
 
-# One index per domain, generated from the tree so it cannot drift from it.
-$domains = @($docs | ForEach-Object { ($_ -split '/')[1] } | Sort-Object -Unique)
-foreach ($domain in $domains) {
-    $rows = @()
-    # Domain-root docs first, then each subfolder as a block. A plain path sort interleaves them.
-    $inDomain = @($docs | Where-Object { $_ -like "standards/$domain/*" } | Sort-Object `
-        @{ Expression = { $withinDomain = $_ -replace "^standards/$domain/", ''; if ($withinDomain -match '/') { $withinDomain.Substring(0, $withinDomain.LastIndexOf('/')) } else { '' } } },
-        @{ Expression = { $_ } })
-    foreach ($doc in $inDomain) {
-        $owner = @($skills.Values | Where-Object { $_.Doc -eq $doc })[0]
-        $heading = @((Read-Lf (Join-Path $repoRoot $doc)) -split "`n" |
-            Where-Object { $_ -match '^#\s+' } | Select-Object -First 1)
-        $title = ($heading[0] -replace '^#\s+', '')
-        $relative = ($doc -replace "^standards/$domain/", '')
-        $rows += "| [``$relative``]($relative) | $title | ``$($owner.Name)`` |"
-    }
-    $lines = @(
-        "# $domain standards",
-        '',
-        'Generated by `.agents/sync-generated.ps1` from the tree. Do not edit.',
-        '',
-        '| Doc | Covers | Skill |',
-        '|---|---|---|'
-    ) + $rows + @('')
-    $generated["standards/$domain/$INDEX_NAME"] = ($lines -join "`n")
+# The catalogue, generated from the skill tree so it cannot drift from it - which the hand-maintained
+# table its predecessor replaced could and did.
+#
+# Sorted ORDINALLY, not with Sort-Object: its comparison is culture-aware, and cultures disagree about
+# punctuation, so a generated file would otherwise differ by platform and CI would call a locally current
+# tree stale. A generated file that depends on the generating machine's culture is not generated.
+$pluginFor = @{}
+foreach ($plugin in $plugins) {
+    foreach ($domain in $pluginDomains[$plugin.Name]) { $pluginFor[$domain] = $plugin.Name }
 }
+
+$lines = [System.Collections.Generic.List[string]]::new()
+$lines.Add('# Skill catalogue')
+$lines.Add('')
+$lines.Add('Generated by `.agents/sync-generated.ps1` from `.agents/skills/`. Do not edit.')
+$lines.Add('')
+$lines.Add('Each standard is authored once, in its own `SKILL.md`. A counterpart of the same name in another')
+$lines.Add('standards repo is a different plugin, not a different path. Utility skills are not standards and')
+$lines.Add('are not catalogued here; `deploy-skills.ps1` is their roster.')
+foreach ($domain in (Sort-Ordinal $declaredDomains)) {
+    $lines.Add('')
+    $lines.Add("## $domain")
+    $lines.Add('')
+    $lines.Add('| Skill | Covers | Plugin |')
+    $lines.Add('|---|---|---|')
+    foreach ($name in (Sort-Ordinal @($skills.Values | Where-Object { $_.Domain -eq $domain } |
+            Select-Object -ExpandProperty Name))) {
+        $lines.Add("| ``$name`` | $($skills[$name].Title) | ``$($pluginFor[$domain])`` |")
+    }
+}
+$lines.Add('')
+$generated[$CATALOGUE] = ($lines -join "`n")
 
 $stale = @(); $written = @(); $unchanged = @()
 
@@ -311,8 +306,9 @@ foreach ($relative in $generated.Keys) {
 }
 
 # Prune every generated artefact this run did not just author. Membership of $generated is the test, not
-# "is there still a skill by this name" - a doc moving between plugins leaves a stale copy a name check
-# would happily keep, and a consumer would then install two conflicting copies of one rule.
+# "is there still a skill by this name" - a skill moving between plugins leaves a stale copy a name check
+# would happily keep, and a consumer would then install two conflicting copies of one rule. `standards`
+# stays in the pruned roots so the payload copies of the retired doc tree are actually removed.
 $pruned = @()
 $generatedRoots = @(Join-Path $repoRoot '.claude/skills')
 foreach ($plugin in $plugins) {
@@ -335,11 +331,12 @@ if (-not $Check) {
             Sort-Object { $_.FullName.Length } -Descending |
             Where-Object { -not (Get-ChildItem -Path $_.FullName -Recurse -File) } |
             ForEach-Object { Remove-Item -Recurse -Force $_.FullName }
+        if (-not (Get-ChildItem -Path $root -Recurse -File)) { Remove-Item -Recurse -Force $root }
     }
 }
 
-$routed = @($skills.Values | Where-Object { $_.Doc }).Count
-$utilities = $skills.Count - $routed
+$standards = @($skills.Values | Where-Object { $_.Domain }).Count
+$utilityCount = $skills.Count - $standards
 
 if ($Check) {
     if ($stale.Count -or $pruned.Count) {
@@ -347,10 +344,10 @@ if ($Check) {
         foreach ($item in ($stale + $pruned)) { Write-Host "  $item" }
         exit 1
     }
-    Write-Host "generated files are current: $($unchanged.Count) checked ($routed standards, $utilities utilities, $($docs.Count) docs)"
+    Write-Host "generated files are current: $($unchanged.Count) checked ($standards standards, $utilityCount utilities)"
     exit 0
 }
 
-Write-Host "generated: $($generated.Count) file(s) from $routed standards, $utilities utilities and $($docs.Count) docs | $($written.Count) written | $($unchanged.Count) unchanged | $($pruned.Count) pruned"
+Write-Host "generated: $($generated.Count) file(s) from $standards standards and $utilityCount utilities | $($written.Count) written | $($unchanged.Count) unchanged | $($pruned.Count) pruned"
 foreach ($item in $written) { Write-Host "  written: $item" }
 foreach ($item in $pruned)  { Write-Host "  pruned:  $item" }

@@ -53,32 +53,40 @@ why the personal machine config sits alongside its .NET standards rather than in
 Also present: `Infonetica/standards-docs` (work standards, separate audience), `agent-utilities` (session
 tooling, no standards), `agent-starter-kit` (archived — strict subset of `dotagents`).
 
-## The doc is the payload; the skill is a router
+## The skill is the payload
 
-A standard is a plain markdown file at `standards/<domain>/<TOPIC>.md`. Its skill is ~8 lines: front
-matter plus that doc's path in backticks.
+A standard is authored in exactly one file: `.agents/skills/<name>/SKILL.md`, front matter followed by
+the standard itself. There is no separate doc and no `standards/` tree.
 
-The inversion buys two things that text living inside a `SKILL.md` can never have:
+**This reverses an earlier design, deliberately** — the doc used to be the payload and the skill a ~8-line
+router naming its path. That inversion was argued to buy two things, and neither survived contact:
 
-- **Two delivery modes.** A repo can `@`-import the doc to make it always-on, or route to it by skill
-  everywhere else. Content inside a `SKILL.md` is only ever delivered one way.
-- **A browsable corpus.** A tree answers *"did I document this, and where?"*. A flat list of skill names
-  answered that only for someone who already knew the answer.
+- **"Two delivery modes."** A repo could `@`-import the doc to make it always-on, or route to it by skill
+  everywhere else. But `@`-import only expands inside `CLAUDE.md`/`AGENTS.md` — **never inside a
+  `SKILL.md`**. So the second mode was only ever available to a repo willing to always-on the doc, while
+  every skill invocation paid a guaranteed extra Read tool call for content it was always going to need.
+- **"A browsable corpus."** A tree answered *"did I document this, and where?"*. A generated catalogue
+  answers it better, because it is derived from the skills themselves and cannot drift from them — see
+  `SKILLS.md`, generated per repo.
 
-Two naming rules, and one that was retired:
+Two naming rules, and two that were retired:
 
-- **A doc name never repeats its folder.** `dotnet/STYLE.md`, not `dotnet/CSHARP_STYLE.md`.
-- **A skill name is unique within its plugin**, not globally. So the skill is `csharp-style` while its
-  doc is `dotnet/STYLE.md` — a skill called `style` would still be a bad name, because it says nothing,
-  but it would not *collide*.
+- **A skill name says what it covers.** `csharp-style`, not `style` — the latter says nothing. Names are
+  unique within a plugin, not globally.
+- **A standard declares its `domain:`** in front matter. That is the single authored fact deciding which
+  plugin ships it, and it is what tells a standard apart from a utility skill.
 - **Retired: globally-unique skill names.** It held while every skill was junctioned flat into one
-  `~/.claude/skills`, and it cost a product prefix on one side of every mirrored pair — `persistence`
-  and `concertable-persistence` for the generic rule and the product's roster of one topic. Plugins
-  namespace them properly (`dotnet-standards:persistence`, `dotnet:persistence`), so routers stopped
-  being junctioned and the prefix went with the constraint that produced it.
+  `~/.claude/skills`, and it cost a product prefix on one side of every pair — `persistence` and
+  `concertable-persistence` for the generic rule and the product's roster of one topic. Plugins namespace
+  them properly, so the prefix went with the constraint that produced it.
+- **Retired: mirrored doc paths.** A local standard and its generic counterpart used to pair by sitting
+  at the *same path* in two repos. **They now pair by SKILL NAME, told apart by PLUGIN NAMESPACE** —
+  `dotnet-standards:persistence` here, `dotnet:persistence` in `agent-standards`. The path mirror was a
+  second structure encoding a fact the skill name already carried, it only ever held for the subset of
+  topics both repos happened to cover, and it was the sole reason `dotnet`/`react` kept the routed shape
+  after `process` had left it.
 
-**Skills stay flat within a plugin.** Discovery is `<root>/skills/*/SKILL.md` and does not recurse. Only
-content nests.
+**Skills stay flat within a plugin.** Discovery is `<root>/skills/*/SKILL.md` and does not recurse.
 
 ## Authoring → generate → install
 
@@ -104,10 +112,9 @@ plugin whose skills point at a path present only on the author's machine.
 
 ```text
 AUTHORED                                  GENERATED (never edit)
-standards/<domain>/<TOPIC>.md   ───────►  plugins/<p>/standards/<domain>/<TOPIC>.md   full copy
-.agents/skills/<name>/SKILL.md  ───────►  plugins/<p>/skills/<name>/SKILL.md          doc path rewritten
+.agents/skills/<name>/SKILL.md  ───────►  plugins/<p>/skills/<name>/SKILL.md          verbatim copy
                                           .claude/skills/<name>/SKILL.md              repo-local
-                                          standards/<domain>/INDEX.md                 from the tree
+                                          SKILLS.md                                   from the skills
 .agents/plugins/marketplace.json         authored Codex marketplace
 .claude-plugin/marketplace.json          authored Claude marketplace
 plugins/<p>/.codex-plugin/plugin.json    authored Codex plugin manifest
@@ -122,13 +129,14 @@ pwsh .agents/sync-generated.ps1          # write
 pwsh .agents/sync-generated.ps1 -Check   # verify only; what CI runs
 ```
 
-**Why the paths differ per target.** In the repo, cwd *is* the repo, so a root-relative
-`standards/dotnet/STYLE.md` resolves. Inside an installed plugin, cwd is the **consuming project**, so
-the same path would dangle — the plugin copy therefore carries a path relative to its own `SKILL.md`
-(`../../standards/...`). The generator owns that rewrite; nobody hand-maintains it.
+**Every copy is now verbatim**, which is the practical dividend of retiring the routed shape. A router
+carried a root-relative doc path that resolved in the repo (cwd *is* the repo) but dangled inside an
+installed plugin (cwd is the **consuming project**), so the generator had to rewrite that path per target
+and refuse to build if the router's sentence ever changed shape. A self-contained skill names no path, so
+there is nothing to rewrite and nothing to keep in sync.
 
-**The generator refuses to write** rather than emit something unroutable: a router naming a doc that does
-not exist, a doc no router points at, two routers claiming one doc, a domain no plugin ships, a
+**The generator refuses to write** rather than emit something unroutable: a skill whose domain no plugin
+ships, a plugin claiming a domain no skill declares, a standard with no heading for the catalogue, a
 description it cannot parse, a bare colon-space that truncates a YAML scalar, or a marketplace entry
 pointing at a plugin with no manifest. Two structures that can drift is exactly how 754 lines of
 frontend law once ended up with zero inbound links.
@@ -136,10 +144,11 @@ frontend law once ended up with zero inbound links.
 **`sync-generated.ps1` exists three times, and that is the open cost of this design.** Each standards repo
 carries its own copy, because each one's CI has to verify itself without reaching a private sibling and a
 plugin cannot reference outside its root. The copies are structurally parallel but not identical — this one
-also handles utility stubs, `agent-standards` also copies a hook, `react-agents` does neither — so they are
-kept diffable rather than merged: only the header paragraph of the `react-agents` copy differs from this
-one. Sharing them properly needs a published PowerShell module or a submodule; a fourth repo is the point
-at which that stops being the more expensive option.
+also handles utility stubs, `agent-standards` also copies a hook and generates the SessionStart floor
+document from the skill that owns it, `react-agents` does neither — so they are kept diffable rather than
+merged: only the header paragraph of the `react-agents` copy differs from this one. Sharing them properly
+needs a published PowerShell module or a submodule; a fourth repo is the point at which that stops being
+the more expensive option.
 
 ## Per-machine setup — one time, both harnesses
 
@@ -160,21 +169,21 @@ leaves the directory behind carrying an `.orphaned_at` marker, so a cache direct
 evidence a plugin is installed.
 
 **Plus, on Tommy's own machine only:** the personal half of `dotagents` is not a plugin. Copy `AGENTS.md`
-and `.claude/` into `%USERPROFILE%`, then junction the skills and standards trees into place:
+and `.claude/` into `%USERPROFILE%`, then junction the utility skills into place:
 
 ```
 pwsh .agents/deploy-skills.ps1 -WhatIf   # inspect first
 pwsh .agents/deploy-skills.ps1
 ```
 
-That delivers the 10 **utility** skills (`sync`, `worktree`, `recents`, …) and every repo's standards
-tree for reading and grepping. Utilities ship in no plugin: they are procedures for working this machine,
-not standards any project consults.
+That delivers the 10 **utility** skills (`sync`, `worktree`, `recents`, …). Utilities ship in no plugin:
+they are procedures for working this machine, not standards any project consults.
 
-**It does not deliver routers, and it prunes any it previously junctioned.** Those come from plugins now,
-so a junction left behind under the same name would keep answering from a stale clone — an answer the
-reader cannot tell apart from the plugin's. Install the plugins *before* running this, or the machine has
-no standards between the two steps.
+**It does not deliver standards, and it prunes anything it previously junctioned** — both the skills it
+stopped owning and the whole retired `~/.agents/standards` tree. Standards come from plugins now, so a
+junction left behind would keep answering from a stale clone, an answer the reader cannot tell apart from
+the plugin's. Install the plugins *before* running this, or the machine has no standards between the two
+steps.
 
 ## What a new project needs
 
