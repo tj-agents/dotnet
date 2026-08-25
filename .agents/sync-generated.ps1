@@ -23,7 +23,7 @@ Generated:
   SKILLS.md                        the catalogue: skill -> what it covers -> owning plugin. Answers "did
                                    I write this rule down, and which skill owns it" without opening
                                    anything, which is what the per-domain standards INDEX used to answer.
-  plugins/<p>/skills/…             verbatim copy of each standard whose domain that plugin claims. An
+  plugins/<p>/skills/...             verbatim copy of each standard whose domain that plugin claims. An
                                    installed plugin is only its own subtree, and a plugin cannot
                                    reference anything outside its root, so the payload is a full copy.
   .agents/plugins/marketplace.json and .claude-plugin/marketplace.json are authored separately because
@@ -47,6 +47,16 @@ lines of frontend law ended up with zero inbound links.
 param([switch]$Check)
 
 $ErrorActionPreference = 'Stop'
+
+# Windows PowerShell 5.1 reads a BOM-less .ps1 as the system ANSI codepage rather than UTF-8, so a
+# non-ASCII literal in THIS file arrives already mojibake and is written straight into the generated
+# output - where it is indistinguishable from content that was always meant to look that way. Text read
+# from other files is safe (ReadAllText decodes UTF-8); only the script's own literals are exposed, so
+# the script keeps them ASCII and proves it here rather than relying on nobody typing an em-dash.
+$ownBytes = [System.IO.File]::ReadAllBytes($PSCommandPath)
+if (@($ownBytes | Where-Object { $_ -gt 127 }).Count) {
+    throw "sync-generated.ps1 contains a non-ASCII byte; PowerShell 5.1 reads this file as ANSI and would emit mojibake. Keep the script's own literals ASCII."
+}
 
 $repoRoot     = Split-Path -Parent $PSScriptRoot
 $canonical    = Join-Path $repoRoot '.agents/skills'
