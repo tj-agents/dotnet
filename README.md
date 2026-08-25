@@ -17,31 +17,31 @@ Mirrors `%USERPROFILE%` — copy or symlink each piece into place at the matchin
 AGENTS.md                          -> ~/AGENTS.md
                                        Agent-agnostic global instructions.
 
-standards/<domain>/                -> ~/.agents/standards/<domain>/
-                                       The engineering standards themselves, as plain markdown
-                                       organized by domain (dotnet).
-                                       Source of truth — edit here. Each domain carries a
-                                       generated INDEX.md answering "did I document this?".
-
-.agents/skills/                    -> ~/.agents/skills/
+.agents/skills/                    -> ~/.agents/skills/ (utilities only)
                                        Skills, flat, because discovery is skills/*/SKILL.md and
-                                       does not recurse. Two kinds: a UTILITY invoked by name
+                                       does not recurse. Source of truth — edit here. Two kinds:
+                                       a STANDARD, which declares `domain:` and whose body IS
+                                       the standard itself, and a UTILITY invoked by name
                                        (commit-push, worktree, sync, …) whose body is the
-                                       procedure, and a ROUTER for a standard, which is front
-                                       matter plus the path of the one doc it owns.
+                                       procedure.
+
+SKILLS.md                              Generated catalogue: skill -> what it covers -> owning
+                                       plugin. Answers "did I write this rule down?" without
+                                       opening anything.
 
 .agents/sync-generated.ps1         -> ~/.agents/sync-generated.ps1
-                                       Regenerates .claude/skills/*/SKILL.md and every
-                                       INDEX.md. Claude Code only discovers skills under
-                                       .claude/skills, so this bridges it to the shared
-                                       .agents/skills source. Refuses to write when a router
-                                       and the tree disagree.
+                                       Regenerates .claude/skills/*/SKILL.md, the plugin
+                                       payloads and SKILLS.md. Claude Code only discovers skills
+                                       under .claude/skills, so this bridges it to the shared
+                                       .agents/skills source. Refuses to write when the skills
+                                       and the plugin payloads disagree.
 
 .agents/deploy-skills.ps1          -> ~/.agents/deploy-skills.ps1
-                                       Junctions every skill and every standards domain into
-                                       ~/.agents and ~/.claude, so a `git pull` IS the
-                                       deployment. Skills and domains share one namespace
-                                       across repos, so a duplicate name is refused.
+                                       Junctions the UTILITY skills into ~/.agents and ~/.claude,
+                                       so a `git pull` IS the deployment, and prunes the retired
+                                       ~/.agents/standards tree. Standards are not junctioned:
+                                       plugins deliver those, and the plugin namespace is what
+                                       keeps two repos' same-named skills apart.
 
 .claude/CLAUDE.md                  -> ~/.claude/CLAUDE.md
                                        Claude Code specific global instructions.
@@ -57,34 +57,30 @@ standards/<domain>/                -> ~/.agents/standards/<domain>/
 
 ## The standards map
 
-**The doc is the payload and the skill is a router.** A standard is a plain markdown file under
-`standards/<domain>/`, and its skill is eight lines naming that file. That buys a doc a second delivery
-mode it could never have while the text lived inside a `SKILL.md`: a repo can `@`-import it to make it
-always-on, or route to it by skill everywhere else.
+**The skill is the payload.** A standard is authored in exactly one file,
+`.agents/skills/<name>/SKILL.md` — front matter declaring `domain: dotnet`, then the standard itself.
+There is no separate doc: `@`-import expands only inside `CLAUDE.md`/`AGENTS.md`, never inside a
+`SKILL.md`, so a skill naming a doc could only ever be a pointer that cost an extra Read for content the
+invocation always needed.
 
-**Look a topic up in its domain's `INDEX.md` before writing a rule down**, so it lands in the one file
-that owns it:
-
-| Domain | Index | Covers |
-|---|---|---|
-| `dotnet` | [`standards/dotnet/INDEX.md`](standards/dotnet/INDEX.md) | style, naming, comments, DI, logging, validation, `data/`, `results/`, `structure/`, `testing/` |
+**Look a topic up in [`SKILLS.md`](SKILLS.md) before writing a rule down**, so it lands in the one skill
+that owns it. It is generated from the skill tree, so it cannot drift from it — which the
+hand-maintained table its predecessor replaced could and did.
 
 React/TS standards are not here — look them up in
-[`react-agents`](https://github.com/tomjseery/react-agents).
+[`react-agents`](https://github.com/tomjseery/react-agents). Process standards (branching, committing,
+merging, plans) are not here either; they are Concertable-org and live in
+`Concertable/agent-standards`.
 
-Each index is generated from the tree, so it cannot drift from it — which the hand-maintained table it
-replaced could and did. Process standards (branching, committing, merging, plans) are not here; they are
-Concertable-org and live in `Concertable/agent-standards`, deployed into the same
-`~/.agents/standards/process/`.
-
-Doc names never repeat their folder (`dotnet/STYLE.md`, not `dotnet/CSHARP_STYLE.md`) while skill names
-stay globally unique (`csharp-style`), because the deployed skill namespace is flat and spans every
-stack.
+**A generic standard and its Concertable counterpart share a skill name on purpose** — `persistence`
+here and `persistence` in `agent-standards` — and the plugin namespace tells them apart:
+`dotnet-standards:persistence` against `dotnet:persistence`. Install whichever pair a repo needs and
+invoke the one you mean.
 
 ### Named gaps — create the node, write the standard
 
-These slots are deliberately empty rather than silently missing. Adding one is a new doc in the tree plus
-its router; nothing else moves.
+These slots are deliberately empty rather than silently missing. Adding one is a new skill; nothing else
+moves.
 
 `messaging` (outbox and inbox, idempotent handlers) · `configuration` (options binding, secrets) ·
 `caching` · `observability` (tracing, metrics, health) · `authorization` · `background-jobs`.
@@ -96,14 +92,13 @@ The frontend gaps moved out with the corpus; they are listed in `react-agents`' 
 1. Clone this repo to `~/source/repos/dotagents`, and `tomjseery/react-agents` and
    `Concertable/agent-standards` beside it.
 2. Copy `AGENTS.md` and `.claude/` into `%USERPROFILE%`, merging with anything already there.
-3. Junction the skills and the standards trees into place:
+3. Junction the utility skills into place:
    ```
    pwsh .agents/deploy-skills.ps1 -WhatIf   # inspect first
    pwsh .agents/deploy-skills.ps1
    ```
-   A skill is a router, so deploying skills without their trees leaves every standard pointing at a file
-   the session cannot open. The script does both, and refuses to clobber a real directory it has no
-   source for.
+   Standards arrive from plugins, so install those first — see `ARCHITECTURE.md`. The script refuses to
+   clobber a real directory it has no source for.
 
 ## What's deliberately excluded
 

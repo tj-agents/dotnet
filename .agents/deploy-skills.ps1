@@ -1,29 +1,29 @@
 <#
 .SYNOPSIS
-Deploy the canonical UTILITY skills to ~/.agents/skills and ~/.claude/skills, and every repo's standards
-tree to ~/.agents/standards, as directory junctions. Standards ROUTERS are not deployed here — plugins
-deliver those, and the plugin name is what keeps two repos' mirrored pairs apart.
+Deploy the canonical UTILITY skills to ~/.agents/skills and ~/.claude/skills as directory junctions, and
+unlink the retired ~/.agents/standards tree. STANDARDS are not deployed here — plugins deliver those, and
+the plugin name is what keeps two repos' same-named pairs apart.
 
 .DESCRIPTION
 Replaces copy-deployment with links so a `git pull` IS the deployment and drift is structurally
 impossible. Junctions are per-skill because skill discovery is <root>/skills/*/SKILL.md and does not
 recurse, and because several source repos must land in one namespace.
 
-Utility skills are junctioned per SKILL, flat, because discovery is <root>/skills/*/SKILL.md and does not
-recurse. They own no doc, ship in no plugin, and their names are unique across the source repos.
+Utility skills are junctioned per SKILL, flat, for that same reason. They declare no domain, ship in no
+plugin, and their names are unique across the source repos.
 
-Routers are NOT junctioned. Flat delivery demands globally unique names, but a router and its
+Standards are NOT junctioned. Flat delivery demands globally unique names, but a standard and its
 counterpart in another repo share a name deliberately - `persistence` here and `persistence` in
 agent-standards are the generic rule and the product's roster of the same topic. Forcing them apart used
 to mean prefixing one of them; plugins do it properly, since `dotnet-standards:persistence` and
 `dotnet:persistence` are already distinct. So the prefix is gone and this script stops competing with
 the plugin for the same folder name.
 
-Standards trees ARE still junctioned, per SOURCE REPO, at ~/.agents/standards/<repo>/<domain>. That
-namespace never had the problem: it is repo-scoped, so two repos owning the same domain name cannot
-shadow each other - and it must stay that way. Flattening it once made agent-standards' persistence doc
-resolve to dotagents' generic one, right path, wrong repo, no error. A plugin carries its own copy of
-the domains it ships, so this deployment is for reading and grepping from a clone, not for resolution.
+~/.agents/standards is now PRUNED rather than populated. Each standard is authored inside its own
+SKILL.md, so no repo has a standards tree left to junction, and a junction left behind would dangle into
+a clone whose tree is gone - or worse, keep resolving against one that has not pulled yet, which is an
+answer the reader cannot tell apart from a current one. A real directory there is authored content with
+no source repo and is never touched.
 
 Refuses to replace a target directory holding content that is neither identical to canonical nor a
 generated stub - that is an edit made against the installed copy and never committed, and deleting it
@@ -39,11 +39,6 @@ param(
         (Join-Path $HOME 'source/repos/dotagents/.agents/skills'),
         (Join-Path $HOME 'source/repos/react-agents/.agents/skills'),
         (Join-Path $HOME 'source/repos/agent-standards/.agents/skills')
-    ),
-    [string[]]$StandardsRoot = @(
-        (Join-Path $HOME 'source/repos/dotagents/standards'),
-        (Join-Path $HOME 'source/repos/react-agents/standards'),
-        (Join-Path $HOME 'source/repos/agent-standards/standards')
     ),
     [string]$StandardsTarget = (Join-Path $HOME '.agents/standards'),
     [string[]]$Target = @(
@@ -72,31 +67,36 @@ function Test-SafeToReplace([string]$TargetDir, [string]$SourceDir) {
     @{ Safe = $false; Why = 'DIVERGED from canonical - commit it to its source repo first' }
 }
 
-# A ROUTER owns a doc under `standards/` and is delivered by its plugin, which namespaces it -
-# `dotnet:persistence` and `dotnet-standards:persistence` coexist. Junctioning routers into one flat
-# root cannot: the two repos' mirrored pairs share a name on purpose, and 16 of them collide. That
-# collision is the only reason the local names ever carried a `concertable-` prefix, so the prefix went
-# with this. A UTILITY owns no doc, ships in no plugin, and is still delivered from this clone.
-# The discriminator is the same one sync-generated.ps1 uses: a backticked `standards/....md` path.
-function Test-IsRouter([string]$SkillDir) {
+# A STANDARD declares a domain and is delivered by its plugin, which namespaces it - `dotnet:persistence`
+# and `dotnet-standards:persistence` coexist. Junctioning standards into one flat root cannot: the two
+# repos' pairs share a name on purpose, and 16 of them collide. That collision is the only reason the
+# local names ever carried a `concertable-` prefix, so the prefix went with this. A UTILITY declares no
+# domain, ships in no plugin, and is still delivered from this clone. The discriminator is the same one
+# sync-generated.ps1 uses: a `domain:` field in front matter.
+function Test-IsStandard([string]$SkillDir) {
     $skill = Join-Path $SkillDir 'SKILL.md'
     if (-not (Test-Path -LiteralPath $skill)) { return $false }
-    return (Get-Content -LiteralPath $skill -Raw -Encoding utf8) -match '`standards/[^`]+\.md`'
+    $text = (Get-Content -LiteralPath $skill -Raw -Encoding utf8) -replace "`r`n", "`n"
+    # Matched against the front matter alone, not the whole file - a body line opening `domain:` would
+    # otherwise classify a utility as a standard and silently stop deploying it.
+    $front = [regex]::Match($text, "(?s)\A---\n(.*?)\n---\n")
+    if (-not $front.Success) { return $false }
+    return [regex]::IsMatch($front.Groups[1].Value, "^domain:[ \t]*\S", 'Multiline')
 }
 
 $sources = @{}
-$routers = 0
+$standards = 0
 foreach ($root in $SourceRoot) {
     if (-not (Test-Path -LiteralPath $root)) { Write-Warning "source root missing: $root"; continue }
     foreach ($dir in Get-ChildItem -LiteralPath $root -Directory) {
-        if (Test-IsRouter $dir.FullName) { $routers++; continue }
+        if (Test-IsStandard $dir.FullName) { $standards++; continue }
         if ($sources.ContainsKey($dir.Name)) {
             throw "utility skill '$($dir.Name)' is declared by two source roots: $($sources[$dir.Name]) and $($dir.FullName)"
         }
         $sources[$dir.Name] = $dir.FullName
     }
 }
-Write-Host "utility skills to deploy: $($sources.Count) (skipped $routers router(s) - plugins deliver those)" -ForegroundColor Cyan
+Write-Host "utility skills to deploy: $($sources.Count) (skipped $standards standard(s) - plugins deliver those)" -ForegroundColor Cyan
 
 $refused = @()
 foreach ($targetRoot in $Target) {
@@ -140,7 +140,7 @@ foreach ($targetRoot in $Target) {
     }
 
     # A junction we no longer own is a skill this script deployed and has stopped deploying - every
-    # router, after the cut to plugin delivery. Left in place it keeps resolving to a stale clone under
+    # standard, after the cut to plugin delivery. Left in place it keeps resolving to a stale clone under
     # its old name, which is worse than absent: the reader gets an answer and cannot tell it is the one
     # the plugin was meant to replace. A real directory is never touched; it is content with no source.
     $pruned = 0
@@ -162,56 +162,46 @@ foreach ($targetRoot in $Target) {
     if ($orphans) { Write-Warning "orphaned real directories (no canonical source, left in place): $($orphans -join ', ')" }
 }
 
-# repo-scoped key -> source tree. The repo name comes from the folder holding `standards`, so the deployed
-# path states which repo a doc came from and two repos owning the same domain name cannot shadow each other.
-$domains = [ordered]@{}
-foreach ($root in $StandardsRoot) {
-    if (-not (Test-Path -LiteralPath $root)) { Write-Warning "standards root missing: $root"; continue }
-    $repo = Split-Path -Leaf (Split-Path -Parent (Resolve-Path -LiteralPath $root).ProviderPath)
-    foreach ($dir in Get-ChildItem -LiteralPath $root -Directory) {
-        $key = "$repo/$($dir.Name)"
-        if ($domains.Contains($key)) {
-            throw "standards path '$key' is declared twice: $($domains[$key]) and $($dir.FullName)"
-        }
-        $domains[$key] = $dir.FullName
-    }
-}
-
-if ($domains.Count) {
-    if (-not (Test-Path -LiteralPath $StandardsTarget)) {
-        if ($PSCmdlet.ShouldProcess($StandardsTarget, 'create standards root')) {
-            New-Item -ItemType Directory -Path $StandardsTarget -Force | Out-Null
-        }
-    }
-    $linked = $replaced = $kept = 0
-    foreach ($name in @($domains.Keys) | Sort-Object) {
-        $src = $domains[$name]
-        $dst = Join-Path $StandardsTarget $name
-        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dst) | Out-Null
-        $existing = Get-Item -LiteralPath $dst -ErrorAction SilentlyContinue
-
-        if ($existing -and $existing.LinkType -eq 'Junction') {
-            if ($existing.Target -contains $src) { $kept++; continue }
-            if ($PSCmdlet.ShouldProcess($dst, "repoint junction -> $src")) {
-                Remove-Item -LiteralPath $dst -Force -Recurse -Confirm:$false
-                New-Item -ItemType Junction -Path $dst -Target $src | Out-Null
+# The retired standards tree. Nothing junctions into it any more - each standard is authored inside its
+# own SKILL.md and shipped by its plugin - so every junction this script previously created here now
+# points at a tree that is gone, or at one that is merely stale until that clone pulls. Both answer a
+# reader who cannot tell the difference, so they are removed rather than left. A real directory is
+# authored content with no source repo and is left alone.
+#
+# Walked as the exact two levels it was deployed as, <repo>/<domain>, rather than with -Recurse: recursion
+# descends THROUGH a junction into the tree it points at, so a single stale link would enumerate - and
+# report on - a whole source clone.
+if (Test-Path -LiteralPath $StandardsTarget) {
+    $unlinked = 0
+    $leftovers = @()
+    foreach ($repoDir in Get-ChildItem -LiteralPath $StandardsTarget -Directory -Force) {
+        if ($repoDir.LinkType -eq 'Junction') {
+            if ($PSCmdlet.ShouldProcess($repoDir.FullName, 'remove junction into the retired standards tree')) {
+                Remove-Item -LiteralPath $repoDir.FullName -Force -Recurse -Confirm:$false
             }
-            $replaced++; continue
-        }
-
-        # A real directory here is not a stale link but authored content with no source repo, so it is
-        # never silently replaced.
-        if ($existing) {
-            $refused += "$dst - a real directory, not a junction; move its content into a standards repo first"
+            $unlinked++
             continue
         }
-
-        if ($PSCmdlet.ShouldProcess($dst, "link -> $src")) {
-            New-Item -ItemType Junction -Path $dst -Target $src | Out-Null
+        foreach ($domainDir in Get-ChildItem -LiteralPath $repoDir.FullName -Directory -Force) {
+            if ($domainDir.LinkType -ne 'Junction') { $leftovers += "$($repoDir.Name)/$($domainDir.Name)"; continue }
+            if ($PSCmdlet.ShouldProcess($domainDir.FullName, 'remove junction into the retired standards tree')) {
+                Remove-Item -LiteralPath $domainDir.FullName -Force -Recurse -Confirm:$false
+            }
+            $unlinked++
         }
-        $linked++
+        if (-not (Get-ChildItem -LiteralPath $repoDir.FullName -Force)) {
+            if ($PSCmdlet.ShouldProcess($repoDir.FullName, 'remove emptied standards folder')) {
+                Remove-Item -LiteralPath $repoDir.FullName -Force -Confirm:$false
+            }
+        }
     }
-    Write-Host "$StandardsTarget : linked=$linked replaced=$replaced already-correct=$kept ($($domains.Count) domains)" -ForegroundColor Green
+    if (-not (Get-ChildItem -LiteralPath $StandardsTarget -Force)) {
+        if ($PSCmdlet.ShouldProcess($StandardsTarget, 'remove the emptied standards root')) {
+            Remove-Item -LiteralPath $StandardsTarget -Force -Confirm:$false
+        }
+    }
+    Write-Host "$StandardsTarget : unlinked=$unlinked (retired - standards ship in plugins)" -ForegroundColor Green
+    if ($leftovers) { Write-Warning "real directories left in place under the retired standards tree: $($leftovers -join ', ')" }
 }
 
 if ($refused) {
