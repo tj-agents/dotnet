@@ -34,6 +34,46 @@ Where create and update accept the identical writable shape, share **one** `XReq
 Which validator shape a request gets, and whether it is auto-validated or injected, is the `validation`
 skill's subject.
 
+**A `Request` may carry a framework type for binding/validation; a service never receives that type.** An
+upload's `IFormFile`, or any other ASP.NET Core type on a `Request`, is extracted into a plain
+application-layer shape (a stream plus the metadata the operation needs) before the service is called. A
+service signature that takes `IFormFile` (or any `Microsoft.AspNetCore.*` type) can only be called from
+inside an HTTP request — the one thing "service" is supposed not to mean.
+
+```csharp
+// WRONG — the service now requires an HTTP multipart pipeline to be reachable at all
+Task<Result<Order, PlaceOrderError>> PlaceAsync(PlaceOrderRequest request); // request.Attachment is IFormFile
+
+// CORRECT — the controller extracts what the operation actually needs
+Task<Result<Order, PlaceOrderError>> PlaceAsync(IReadOnlyList<Attachment> attachments);
+public sealed record Attachment(Stream Content, string FileExtension);
+```
+
+## Name a controller's single query action `Get`; disambiguate only past one
+
+A controller with exactly one query action names it `Get` — the route and controller already say what it
+returns. The moment a controller has more than one, name each for what it returns; `Get` stops being legal
+on any of them, since none is *the* query anymore.
+
+```csharp
+// CORRECT — one query action, no name needed beyond "Get"
+internal sealed class WarehouseController : ControllerBase
+{
+    [HttpGet]
+    public Task<ActionResult<WarehouseDetails>> Get(CancellationToken ct) => ...;
+}
+
+// CORRECT — more than one query action, each named for its result
+internal sealed class OrderController : ControllerBase
+{
+    [HttpGet("{id}")]
+    public Task<ActionResult<OrderDetails>> GetById(int id, CancellationToken ct) => ...;
+
+    [HttpGet("pending")]
+    public Task<ActionResult<IPagination<OrderSummary>>> GetPending([FromQuery] PageParams page) => ...;
+}
+```
+
 ## Translate domain vocabulary into product vocabulary once, at the boundary
 
 Where the product's public term differs from the domain's term, perform the translation **exactly once in the
