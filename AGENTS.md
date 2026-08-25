@@ -28,8 +28,8 @@ repeats what its repo already says.
   the generic repo for its stack. Names a Concertable type every service shares → `agent-standards`, under
   the section for its stack. Names one service's type → that service's repo.
 
-Standards are delivered as docs under `~/.agents/standards/<domain>/`, each routed to by a load-on-demand
-skill in `~/.agents/skills/`. Every domain carries a generated `INDEX.md` — **look a topic up there before
+Each standard is a load-on-demand skill delivered by plugin, and the `SKILL.md` body **is** the standard.
+Every repo carries a generated `SKILLS.md` mapping topic to owning skill — **look a topic up there before
 writing a rule down**, and never restate one here.
 
 ## Work vs personal repos — the Azure-DevOps / PR skills are WORK-ONLY
