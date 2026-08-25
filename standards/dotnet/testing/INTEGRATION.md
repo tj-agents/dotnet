@@ -56,6 +56,17 @@ to test seeders too.
 
 Derive expectations from the canonical seed catalog the fixture exposes, never from invented literals.
 
+## One canonical seed-state model
+
+Producer and consumer share **one** seed-state type: the seeder builds it, the fixture exposes it, the test
+reads it, so "the confirmed booking" means the same thing at every hop.
+
+Where that type and a domain type would otherwise collide on a name, **namespace separation is the answer** —
+they live in different namespaces and a `using` alias disambiguates the one file needing both. Never introduce
+a `Snapshot`, `Source`, mirror, adapter or wrapper type to dodge a collision. A parallel hierarchy has to be
+updated in lockstep with the real one, silently drifts when it is not, and the test's expectation then no
+longer describes what was actually seeded.
+
 ## Scoped services and event handlers
 
 An integration test is a scope root. Resolve an `IScoped<T>` abstraction from the fixture's services and use its
@@ -69,26 +80,94 @@ registered handler **inside that one scope**, matching the in-process message pi
 **Do not use `IScoped<T>` from code already running inside a request or fixture-provided scope.** Resolve the
 dependency from the ambient scope instead, so its `DbContext` and transaction stay shared.
 
-## Naming and grouping
+## Group tests by the public resource being exercised
 
-**Naming.** Test files are `<Resource><Qualifier>ApiTests` — the resource or controller first, then any
-qualifier, then the fixed `ApiTests` suffix. The suffix is never dropped and the resource always leads, so a
-courier slice of the Shipment controller is `ShipmentCourierApiTests`, never `CourierShipmentApiTests`. `Api` rather
-than `Endpoints` or `Controller`, because these drive the real HTTP surface through the Api assembly, not a
-controller class in isolation.
+A service or module integration project is organized by the **public resource its API exposes**. Every
+operation on one resource lives in one `<Resource><Qualifier>ApiTests` class — resource or controller first,
+then any qualifier, then the fixed `ApiTests` suffix, which is never dropped. A courier slice of the Shipment
+controller is `ShipmentCourierApiTests`, never `CourierShipmentApiTests`. `Api` rather than `Endpoints` or
+`Controller`, because these drive the real HTTP surface through the Api assembly, not a controller class in
+isolation.
 
-**Regions handle one axis of variation; a file split handles the second.** Most controllers vary on a single
-axis — their endpoints — so they get one file with a `#region` per endpoint, named for the endpoint under test,
-or for the behaviour where a cluster is not a single endpoint (`#region Cancel from payment failure`). Group with
-`#region` — **never** `// ---- X ----` comment dividers.
+Once a resource carries a substantial set of operations, group them with a `#region` per operation — `#region
+Get`, `#region Create`, `#region Accept` — or per behaviour cluster where that is not a single operation
+(`#region Cancel from payment failure`). Group with `#region`, **never** `// ---- X ----` dividers.
 
-A controller that varies on **two** axes is a matrix, and a single regioned file cannot express it: one axis
-becomes regions and the other becomes repeated sub-blocks inside every region. For that shape:
+**A new class needs a reason of its own.** One operation currently having a single test is not one: it goes in
+its resource's class under its own region, and that class absorbs the next operation without a rename. Split
+only where the new class is a genuinely distinct **resource**, a distinct **public boundary**, a distinct
+**fixture**, or one **coherent process** worth reading end to end. A class per variant — per deal type, per
+status, per request shape — scatters one resource's contract across a directory and hides which operations are
+covered at all.
 
-- **Primary axis → file split.** Split on the axis where behaviour genuinely forks — typically a lifecycle
-  discriminator, one file per value. The qualifier in the file name *is* the primary-axis value.
-- **Secondary axis → `#region`s inside each file.**
-- **Cross-cutting behaviour belonging to no single value → its own file**, rather than duplicated across every
-  value's file.
+```csharp
+public sealed class ShipmentApiTests(ShipmentApiFixture fixture)
+{
+    #region Get
 
-Regioning is for navigation, not a licence to sprawl.
+    [Fact]
+    public async Task Get_ReturnsOnlyTheOwningTenantsShipments()
+    {
+        var client = fixture.CreateClient(fixture.SeedState.WarehouseManager);
+
+        var response = await client.GetAsync("/api/shipments");
+
+        await response.ShouldBe(HttpStatusCode.OK);
+        var shipments = await response.Content.ReadAsync<IReadOnlyList<ShipmentSummary>>();
+        Assert.Contains(shipments!, item => item.Id == fixture.SeedState.PendingShipment.Id);
+        Assert.All(shipments, item => Assert.Equal(fixture.SeedState.Warehouse.TenantId, item.TenantId));
+    }
+
+    #endregion
+
+    #region Dispatch
+
+    [Fact]
+    public async Task Dispatch_MarksTheShipmentDispatchedAndQueuesTheCourierHandover()
+    {
+        var shipment = fixture.SeedState.PendingShipment;
+        var client = fixture.CreateClient(fixture.SeedState.WarehouseManager);
+
+        var response = await client.PostAsync($"/api/shipments/{shipment.Id}/dispatch", null);
+
+        await response.ShouldBe(HttpStatusCode.OK);
+        var dispatched = await fixture.Scoped<IShipmentReadDbContext>()
+            .RunAsync(db => db.Shipments.SingleAsync(item => item.Id == shipment.Id));
+        Assert.Equal(ShipmentStatus.Dispatched, dispatched.Status);
+        Assert.Single(fixture.CourierHandovers, handover => handover.ShipmentId == shipment.Id);
+    }
+
+    #endregion
+}
+```
+
+## Each endpoint test proves its own contract
+
+Every test owns a real scenario for one operation: arrange the state or dependency response that matters, call
+the endpoint, and assert the observable result — the returned contract, the persisted effect, the published
+event. A successful status is one assertion inside that, never the whole test. Share setup and assertion
+helpers wherever that removes repetition without hiding the scenario.
+
+**A parameterized "these routes all return OK" test is not endpoint coverage.** It proves routing and
+authorization wiring and nothing about behaviour, while reading as though the endpoints are covered. Keep
+such a sweep — if at all — as one explicitly-named smoke test beside the real per-operation tests, never in
+place of them.
+
+## A module test stays at its owning public boundary
+
+A module integration test drives that module's own public API and asserts only what the module owns: its
+returned contract, its own persistence, the events it publishes. Reading a seeded identity off the shared seed
+state to address its own API is not a boundary crossing; querying another module's `DbContext`, or invoking
+another module's domain behaviour to arrange or assert, is.
+
+**A journey that crosses modules belongs in the process integration tier** — its own suite, driving the real
+host and observing each module through HTTP or a deliberate Contracts surface, referencing no module's Domain
+or Infrastructure assembly. Pushing a cross-module journey down into one module's suite is exactly what forces
+that suite to reach into persistence it does not own.
+
+## A fixture helper stays fixture infrastructure
+
+A helper that forces a deterministic failure, takes or holds a lock, or manipulates state that exists only for
+a test **belongs to the fixture project**. It is never added as a member on a production `DbContext`,
+repository or service: production then carries an API no production caller has, and the compiler can no longer
+tell the two apart.
