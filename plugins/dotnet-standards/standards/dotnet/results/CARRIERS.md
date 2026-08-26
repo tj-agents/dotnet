@@ -232,7 +232,9 @@ obscure whether the correct contract was nullable, Option, or Result.
 
 Ordinary composition is fail-fast, and combinators do not catch exceptions: cancellation, dependency
 failures, and faults pass through the exception path unless an infrastructure adapter explicitly
-normalizes a known dependency condition.
+normalizes a known dependency condition. That adapter returns the operation's expected error case; it
+does not put the caught exception inside the Result. Catch only the dependency exceptions that define
+that expected condition so cancellation, programmer errors, and unexpected faults still propagate.
 
 ## .NET 11 native unions
 
