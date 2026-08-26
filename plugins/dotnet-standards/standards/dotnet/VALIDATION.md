@@ -9,6 +9,12 @@ Required, length, range, enum membership, format, per-property conditions — an
 `AbstractValidator<TRequest>`, registered in the owning module's composition root with
 `AddValidatorsFromAssemblyContaining<TValidator>(includeInternalTypes: true)`.
 
+Inside an invariant-owning value or entity, reuse the shared domain guard for required text, then perform
+trim and length normalization in one plainly named method. Keep that method non-nullable when required
+callers have already established the invariant. For the few optional inputs, branch at the call site and
+normalize only the present value; do not weaken the common method with nullable input and a nullable
+return merely to hide those branches.
+
 **How it is invoked depends on how the input arrives, and this is the part that is easy to get wrong:**
 
 | The input arrives… | How it is validated |

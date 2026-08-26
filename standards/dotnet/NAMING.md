@@ -34,6 +34,11 @@ Two rules follow from the table:
 - **`Builder` vs `Generator` vs `Factory` is decided by mechanics, not vibes** — mutable-then-finalize
   is a `Builder`, a one-shot value from inputs is a `Generator`, a one-shot *component* is a `Factory`.
 
+A separate factory or generator must represent a real construction collaborator or a family of outputs.
+When it only constructs one owned type, put a named static creation method on that type. Keep each
+top-level request, result, status, and execution shape in the correspondingly named file; do not collect
+unrelated roles in a generic `Models` file.
+
 **A type whose whole job is one operation is named for the agent-noun of that method** —
 `Mapper.Map`, `Resolver.Resolve`, `Calculator.Calculate`, `Renderer.Render`, `Serializer.Serialize`.
 The table above is the same rule widened to collaborator shapes.
@@ -119,8 +124,9 @@ A decision over two or more peer inputs belongs to neither receiver. Keep the po
 site behind an operation-specific static type such as `TransitionEvaluator.Evaluate(current, observed)`.
 Do not call an evaluator a `Specification` unless you mean query-specification semantics.
 
-Represent a closed, deterministic key-to-value table once with `FrozenDictionary` or `FrozenSet` when the
-entries are **data** rather than behaviour — enum translations, provider-status normalization, fixed
-error definitions, legal transition edges. Use guarded code when the outcome depends on contextual
-validation or calculation. Where the entries are *behaviour* selected by a closed key, use the validated
-registry in the `keyed-strategies` skill instead — never a parallel frozen map per consumer.
+Use an exhaustive switch in an `XMappers` extension for a small closed enum conversion. A
+`FrozenDictionary` or `FrozenSet` is for a deterministic table whose entries are materially easier to
+inspect and maintain as data — provider-status normalization, fixed error definitions, or legal transition
+edges — not a lookup-shaped replacement for a two-case switch. Use guarded code when the outcome depends
+on contextual validation or calculation. Where the entries are *behaviour* selected by a closed key, use
+the validated registry in the `keyed-strategies` skill instead — never a parallel frozen map per consumer.

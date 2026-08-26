@@ -14,6 +14,17 @@ Style rules an analyzer can express belong in `.editorconfig`, not here. Configu
 
 The rules below are the ones prose has to carry, plus the reasoning behind the enforced ones.
 
+## Model value semantics and real choices
+
+Use a `readonly record struct` for a small immutable value whose identity is entirely its fields. Keep
+construction private when creation enforces canonicalization or another invariant; expose the named
+creation operation on the value itself.
+
+An enum represents a genuine closed choice. Do not introduce a one-member enum for possible future
+variation, and do not encode an unrelated consumer's workflow vocabulary in a lower-level component.
+When the component supports several modes, accept its own provider-neutral mode from the caller and
+validate every defined choice.
+
 ## Private fields carry no underscore prefix; constructors qualify with `this.`
 
 ```csharp
