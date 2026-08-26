@@ -49,3 +49,27 @@ Where a request header or token already selects a scope, do not duplicate that s
 string. A zero-or-one relationship is a **singleton sub-resource** (`/api/organization/venue`), not an invented
 multi-item collection and not a human-user resource; a canonical entity stays addressable by its own id at
 `/api/venue/{venueId}`.
+
+## Name the resource once, as a constant — never retype the route literal
+
+A controller whose actions span more than one route prefix for the same resource (a public/admin family under
+`/api/<resource>` alongside a self-service family under `/api/organization/<resource>`, or a sibling controller
+nesting under the same resource) declares the segment once:
+
+```csharp
+[ApiController]
+[Route($"api/{RouteSegment}")]
+internal sealed class WarehouseController : ControllerBase
+{
+    internal const string RouteSegment = "warehouse";
+
+    [HttpGet($"/api/organization/{RouteSegment}")]
+    public async Task<ActionResult<WarehouseDto>> GetCurrent(...) => ...;
+}
+```
+
+and every other route on the resource — including an absolute per-action override, and a sibling controller
+nesting a sub-resource under it (`$"api/{WarehouseController.RouteSegment}/{{warehouseId:int}}/reviews"`) —
+interpolates that same constant rather than retyping the resource name as a second literal. Two literal
+spellings of one resource name drift the moment either is renamed; the compiler cannot catch a route string
+that silently stopped matching its sibling.
