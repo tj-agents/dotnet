@@ -34,10 +34,12 @@ Two rules follow from the table:
 - **`Builder` vs `Generator` vs `Factory` is decided by mechanics, not vibes** — mutable-then-finalize
   is a `Builder`, a one-shot value from inputs is a `Generator`, a one-shot *component* is a `Factory`.
 
-A separate factory or generator must represent a real construction collaborator or a family of outputs.
-When it only constructs one owned type, put a named static creation method on that type. Keep each
-top-level request, result, status, and execution shape in the correspondingly named file; do not collect
-unrelated roles in a generic `Models` file.
+A separate factory or generator must represent a real construction collaborator, a family of outputs, or
+construction owned by an outer layer. When creation is the owned type's own domain behavior and the
+separate type only constructs that one type, put a named static creation method on the owned type. Keep
+infrastructure, test, and seed construction outside the domain type; the seeding-specific factory shape is
+owned by the `seeding` skill. Keep each top-level request, result, status, and execution shape in the
+correspondingly named file; do not collect unrelated roles in a generic `Models` file.
 
 **A type whose whole job is one operation is named for the agent-noun of that method** —
 `Mapper.Map`, `Resolver.Resolve`, `Calculator.Calculate`, `Renderer.Render`, `Serializer.Serialize`.
