@@ -232,7 +232,12 @@ obscure whether the correct contract was nullable, Option, or Result.
 
 Ordinary composition is fail-fast, and combinators do not catch exceptions: cancellation, dependency
 failures, and faults pass through the exception path unless an infrastructure adapter explicitly
-normalizes a known dependency condition.
+normalizes a known dependency condition. Normalize to the operation's typed error only when dependency
+unavailability is an expected application outcome that callers can act on. When transport retry,
+dead-letter, or 503/504 policy owns the failure, preserve it as the explicit dependency exception described
+by the `result-terminals` skill. A Result carries error data, never the caught exception itself. Catch only
+the dependency exceptions that define the selected policy so cancellation, programmer errors, and
+unexpected faults still propagate.
 
 ## .NET 11 native unions
 
