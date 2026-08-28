@@ -1,4 +1,4 @@
-# Result and Option carriers
+﻿# Result and Option carriers
 
 Reunion is the single carrier family: `Reunion` owns `Result`, `Result<TValue>`,
 `Result<TValue, TError>`, `UnitResult<TError>`, `Option<T>`, their named cases, and the composition,
@@ -38,7 +38,9 @@ The layer is a strong heuristic, not the decision by itself. Repository and prov
 return `T?`. Domain, application, module-facade, service, and published client query contracts normally
 promote ordinary absence to `Option<T>` so callers cannot reach `T` without observing the case. Commands
 and queries with named rejections use a Result. A guaranteed value stays a plain value, and an optional
-property on a DTO stays nullable rather than wrapping each field in an Option.
+property on a DTO stays nullable rather than wrapping each field in an Option — converted once at that
+boundary, and grouped so values sharing a lifetime become one nullable value object rather than several
+independently-nullable fields.
 
 **An expected failure is part of normal control flow** and gives the caller a legitimate branch: not
 found, invalid input, conflict, unauthenticated, forbidden, payment required, or another named domain
