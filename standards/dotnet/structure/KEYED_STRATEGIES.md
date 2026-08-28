@@ -1,4 +1,4 @@
-# Keyed strategies
+﻿# Keyed strategies
 
 **When behaviour varies by a closed key**, declare every strategy family vertically at the owning module's
 composition root. A module-local generic factory owns keyed resolution; operation-specific facades delegate
@@ -56,8 +56,9 @@ services.AddFulfilmentStrategies(strategies =>
 - **A factory returns a selected component; a resolver consumes one and returns the final domain answer.**
   Mappers, renderers, serializers, and calculators keep naming the operation they perform — sharing a
   selection mechanism never flattens those suffixes into `Strategy`.
-- **Factories and builders are module-local.** Two modules with different runtime concerns own separate
-  implementations. Do not create a cross-module registry or put the factory in a shared contracts package.
+- **Factories and keys are module-local; a key-generic builder may be shared from a service-internal
+  library.** Two modules with different runtime concerns own separate factories and registration blocks. Do
+  not create a cross-module registry or put the factory in a shared contracts package.
 - **Only the factory implementation performs keyed lookup.** A composition root may register the scoped
   keyed-provider adapter; application handlers, steps, services, and named facades never inject it or call
   `GetRequiredKeyedService`.
