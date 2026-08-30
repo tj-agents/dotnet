@@ -221,16 +221,23 @@ continuation is multi-statement, extract a private operation whose return type h
 `MapAsync` (`Task<TNext>`) from `BindAsync` (`Task<Result<TNext, TError>>`).
 
 The null-coalescing operator works only on nullable operands and cannot be overloaded, so
-`option ?? fallback` does not compile and no implicit conversion can make it. Convert explicitly at a
-framework edge that genuinely needs a nullable:
+`option ?? fallback` does not compile and no implicit conversion can make it. Exit explicitly with
+Reunion's `ToNullable()`, and only at a boundary the carrier must not cross — a serialized DTO, a
+protobuf message, or another framework contract:
 
 ```csharp
-string? redirect = option.Match<string?>(static value => value, static () => null);
+RefundResponse? refund = refundOption.ToNullable(value => new RefundResponse(value.RefundId));
 ```
 
+The projected overload replaces a `Map` immediately before the exit. `ToNullable()` is two
+constraint-overloaded extensions, so it is unavailable in a generic method constrained only to
+`where T : notnull`.
+
 Prefer keeping a framework-provided nullable *nullable* where wrapping and immediately unwrapping adds no
-application outcome. Do not add local `ToNullable`, `GetValueOrDefault`, or fallback helpers — they
-obscure whether the correct contract was nullable, Option, or Result.
+application outcome, and never flatten an option to carry absence across an *in-process* boundary: a
+nullable parameter the callee branches on is a decision the caller should have made. Do not add local
+`ToNullable`, `GetValueOrDefault`, or fallback helpers; they obscure whether the correct contract was
+nullable, Option, or Result.
 
 Ordinary composition is fail-fast, and combinators do not catch exceptions: cancellation, dependency
 failures, and faults pass through the exception path unless an infrastructure adapter explicitly
