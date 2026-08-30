@@ -62,6 +62,36 @@ carries the subject.
 **A qualifier only exists to contrast with a sibling.** `PublicXRepository` with no `AdminXRepository`
 to disambiguate from is noise — name it `XRepository` and rename the day the second stance is born.
 
+## Keep the collaborator shape in its variable name
+
+Name an injected constructor parameter and its field from the collaborator type in lower camel case,
+retaining the shape noun: `ISettlementService settlementService`, `IConcertRepository concertRepository`,
+`IConcertModule concertModule`. Do not contract these to `settlement`, `concerts`, `service`, `repository`,
+or `module`; the variable must preserve what kind of collaborator the caller is using.
+
+```csharp
+internal sealed class BookingHandler
+{
+    private readonly ISettlementService settlementService;
+    private readonly IConcertRepository concertRepository;
+    private readonly IConcertModule concertModule;
+}
+```
+
+Drop the domain prefix only when the containing type already supplies that exact prefix. The remaining
+shape noun is then unambiguous and avoids repeating the owner:
+
+```csharp
+internal sealed class SettlementService
+{
+    private readonly ISettlementRepository repository;
+    private readonly IConcertModule concertModule;
+}
+```
+
+`repository` is unambiguous inside `SettlementService` because both names share `Settlement`; `concertModule`
+keeps its prefix because `Concert` is a different domain noun.
+
 ## Name a repository method for the query, a service method for the intent
 
 A repository finder says literally what it fetches and by what key — `GetByCustomerIdAsync`,
@@ -72,6 +102,15 @@ name down onto the repository.
 Reserve `CurrentUser`, `ForUser`, `Me`, and `Self` for data belonging to the authenticated human. Do not
 append a scope word to every method merely to restate the default scope; name the ordinary use case for
 its domain intent and name the *alternative* capability explicitly (`GetDetailsByIdAsync`).
+
+**Name an eager-loaded relation for the real navigation it joins, not a bucket noun or a use case.** A
+method that loads specific related entities beyond the bare aggregate spells out the actual navigation
+properties fetched — `GetWithArtistAndOpportunityByIdAsync`, `GetWithConfigurationByIdAsync` — never a
+generic bucket word with no corresponding type (`GetDetailsByIdAsync`, `GetFullByIdAsync` where no
+`XDetails` type exists), and never the use case the join happens to serve
+(`GetForSettlementByConcertIdAsync` — name the `Application`/`Opportunity` actually joined, not
+"settlement"). The real relation name is unambiguous at the call site; a bucket noun or an intent word is
+not.
 
 ## `Response` is HTTP-only; `Dto` is a deliberate disambiguator
 
