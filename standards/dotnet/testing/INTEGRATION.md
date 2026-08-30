@@ -24,6 +24,16 @@ database-reset fixture, the test auth handler, the shared mocks, and the setup e
 - **Webhook simulation** dispatches provider events directly to the registered handlers in a new scope, bypassing
   HTTP entirely.
 
+## Respawn owns fixture-wide cleanup
+
+A fixture's between-test database reset goes through **Respawn**, never a hand-written blanket
+`DELETE`/`TRUNCATE`/`DBCC CHECKIDENT` batch. A manual batch duplicates Respawn's dependency ordering and identity
+reseeding, then silently misses tables as the schema grows.
+
+The normal single-database fixture keeps its connection and `Respawner` together behind one reset abstraction.
+When a specialized fixture creates several database catalogs, give each catalog one such encapsulated reset
+object and reset each of them; do not spread a catalog's connection and `Respawner` across the parent fixture.
+
 ## Anything shared by two fixtures belongs in the shared library
 
 A fixture must never re-hand-roll setup another service already has. Anything common to two or more suites goes
