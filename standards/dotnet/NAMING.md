@@ -59,8 +59,11 @@ type names no single subject, so a bare verb reads "do what?": `IConcertModule.E
 contrapositive of the agent-noun one: narrow single-purpose type → bare verb; broad surface → the method
 carries the subject.
 
-**A qualifier only exists to contrast with a sibling.** `PublicXRepository` with no `AdminXRepository`
-to disambiguate from is noise — name it `XRepository` and rename the day the second stance is born.
+**A qualifier only exists to contrast with a sibling in the same namespace.** `PublicXRepository` with
+no `AdminXRepository` to disambiguate from is noise — name it `XRepository` and rename the day the
+second stance is born. A payload word is never that qualifier: the application-layer collaborator that
+produces `XDto` is `XMapper`, not `XDtoMapper` — the assembly already separates it from the API layer's
+own `XMapper`.
 
 ## Keep the collaborator shape in its variable name
 

@@ -6,7 +6,6 @@ Style rules an analyzer can express belong in `.editorconfig`, not here. Configu
 | Rule | Setting |
 |---|---|
 | No underscore prefix on private instance fields | `dotnet_naming_rule` + a camelCase-only style |
-| `this.` on field access | `dotnet_style_qualification_for_field = true:error` |
 | No braces on a single statement | `csharp_prefer_braces = when_multiline:error` |
 | File-scoped namespaces | `csharp_style_namespace_declarations = file_scoped:error` |
 | Seal what isn't inherited from | `MA0053` |
@@ -14,7 +13,7 @@ Style rules an analyzer can express belong in `.editorconfig`, not here. Configu
 
 The rules below are the ones prose has to carry, plus the reasoning behind the enforced ones.
 
-## Private fields carry no underscore prefix; constructors qualify with `this.`
+## Private fields carry no underscore prefix; `this.` only where a parameter shadows
 
 ```csharp
 // CORRECT
@@ -29,10 +28,12 @@ public OrderService(OrderDbContext context)
 private readonly OrderDbContext _context;
 ```
 
-**Every constructor assignment is `this.`-qualified — fields *and* public auto-properties.** Where a
-member is a surfaced public auto-property, still write `this.Property = param`. Uniform `this.` makes
-the member-vs-parameter split obvious at a glance instead of depending on the reader knowing which
-identifiers are members.
+**`this.` exists to disambiguate a shadowed member, and for nothing else.** Qualify where a parameter
+or local carries the member's own name — every constructor assignment, fields *and* public
+auto-properties (`this.Property = param`), and the rarer setter that takes a same-named parameter.
+Once nothing shadows it, read and write the member bare: a `this.` in a method body that disambiguates
+nothing is noise. This is not enforceable through `dotnet_style_qualification_for_field`, which is
+all-or-nothing; reviewers carry it.
 
 ## A populated-later member defaults to `null!`, never `string.Empty`
 
