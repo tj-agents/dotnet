@@ -122,6 +122,14 @@ Awaiting *inside* the selector is the real defect anyway — that is a per-row r
 - **`IUnitOfWorkBehavior<T>.ExecuteAsync(block)`** — cross-module only. Wraps the block in an ambient
   `TransactionScope` so writes to several modules' contexts inside one service enlist in one transaction; a
   single-context transaction cannot span them.
+- **`IUnitOfWorkBehavior<T>.TryExecuteAsync(block, isExpected, onExpectedFailure)`** — the same ambient
+  scope when a write failure is expected. It rolls the scope back before classifying, so the recovery runs
+  against no transaction.
+
+**Never classify an expected failure with `TrySaveChangesAsync` inside an ambient scope.** A block that
+returns normally commits that scope, so a failure swallowed inside it still commits whatever the failed
+save's pre-commit handlers wrote to the other enlisted contexts. Only the scope's owner can roll back:
+nested inside another scope `TryExecuteAsync` classifies nothing and lets the failure reach the root.
 
 **Never share a transaction across services.** A separate service owns its own database — coordinate those
 with messages through an outbox, never a unit of work.
