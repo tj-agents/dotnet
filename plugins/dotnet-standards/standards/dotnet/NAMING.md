@@ -103,6 +103,11 @@ Name a query result for the role it plays, not for the layer that returned it:
 Mapping goes in a static `XMappers` class as extension methods named for the target, never as private
 `MapX` helpers on the consumer.
 
+`X` is the mapped subject, and one class covers that subject's family — both directions and its parts.
+Name it for the family, not for one member of it (`PaymentMappers`, not `PaymentVerificationMappers`).
+A name statable only as a category or a location — `Value`, `Common`, `Misc`, the owning module or
+layer — is a junk drawer that will collect unrelated subjects; split it by subject.
+
 ```csharp
 internal static class ShipmentMappers
 {
