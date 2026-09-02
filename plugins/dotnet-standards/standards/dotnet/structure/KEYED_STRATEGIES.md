@@ -1,4 +1,4 @@
-﻿# Keyed strategies
+# Keyed strategies
 
 **When behaviour varies by a closed key**, declare every strategy family vertically at the owning module's
 composition root. A module-local generic factory owns keyed resolution; operation-specific facades delegate
@@ -67,8 +67,55 @@ services.AddFulfilmentStrategies(strategies =>
 - **Named facades remain the business API.** They implement their operation-specific interfaces and delegate
   selection to the module factory. A *named* factory stays a factory where its caller genuinely needs the
   selected instance itself.
+- **One exhaustive match over a sealed hierarchy, at one call site, is not the anti-pattern.** The
+  prohibition is on a branch *repeated* across agnostic components. A module boundary needs a carrier, and
+  matching its arms once where that carrier is received is the boundary working.
 - **Methods return existing domain types or scalars.** Do not mint a one-use DTO, and do not return an enum
   every caller must reinterpret; add a second operation-specific method when a caller needs another value.
+
+## When the container cannot reach the branch, the type is the family
+
+An entity is materialised by the ORM, not the container, so it can neither inject the factory nor be a keyed
+leaf. There the **type hierarchy is the family** and the persistence discriminator is the key. Map TPH onto
+the key column that already exists rather than adding a second one:
+
+```csharp
+builder.HasDiscriminator(fulfilment => fulfilment.Mode);
+```
+
+Each leaf then declares what the branch used to ask for, and there is nowhere left for a switch to live:
+
+```csharp
+public abstract class Fulfilment
+{
+    public abstract bool RequiresTracking { get; }
+}
+
+public sealed class CourierFulfilment : Fulfilment
+{
+    public string TrackingNumber { get; private set; } = null!;
+
+    public override bool RequiresTracking => true;
+}
+```
+
+One leaf per key, each holding only its own fields. **A leaf covering two keys still has to re-ask the key** —
+that is the signal the hierarchy sits at the wrong granularity, and it is what the `_ => throw` arm of an
+inexhaustive switch is really reporting. Columns meaningful for some keys and always null for the rest say
+the same thing one layer down.
+
+Never hoist a leaf's operation onto the base to make one signature fit. A leaf overriding with a discard
+parameter means the leaves perform *different* operations; match once at the call site owning that
+calculation instead.
+
+## Match on capability, not on the key
+
+Concerns partition a key differently: the values sharing a settlement rule are rarely the values sharing a
+financial operation or a cancellation path. No single inheritance axis serves every partition, which is why
+one coarse hierarchy leaves each consumer re-splitting by hand. Give the shared concern its own interface and
+match on that. A `bool RequiresX` threaded through constructors is the same branch, hidden — the leaves that
+set it *are* the capability. Earn each capability on a second real consumer, never on the partition table
+alone.
 
 ## The anti-patterns this replaces — never do these
 
@@ -84,5 +131,11 @@ services.AddFulfilmentStrategies(strategies =>
   the branch across the codebase. Return the resolved *value*.
 - **Throwaway result records.** A record created only to carry one resolver's return values is noise —
   prefer separate methods or an existing domain type.
+- **Mirroring a family into a downstream module.** Copying per-key fields into a second parallel hierarchy
+  duplicates the data instead of dispatching it. Where a value must survive later edits to its source,
+  freeze it once on the type that owns the frozen fact and carry it onward as one payload.
+- **A per-key literal in a base constructor call.** `: Base(..., true, ...)` written once per leaf is a
+  switch spelled as N call sites, and it reaches storage as a column no reader can trust. Declare it as an
+  overridden member on the leaf that knows the answer.
 - **Discard-tuple calls.** `var (thing, _) = await GetPairAsync(...)` means the API is the wrong shape for the
   caller; add the single-value method to the interface.
