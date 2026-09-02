@@ -31,7 +31,7 @@ Generated:
 Plugins carry the domains `.agents/plugins/payloads.json` assigns them, so a consumer installs per
 stack rather than receiving every corpus. The 10 utility skills ship in no plugin - they are machine
 tooling, delivered by deploy-skills.ps1 from this clone. The write-time router hook
-lives in `Concertable/agent-standards` and ships in its `agent-process` plugin, so a project wanting
+lives in `Concertable/agent-standards` and ships in its `concertable` plugin, so a project wanting
 enforcement installs that too.
 
 Refuses to write when the two structures disagree: a router naming a doc that does not exist, a doc no
