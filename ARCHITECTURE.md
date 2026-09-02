@@ -170,16 +170,25 @@ plugin cannot reference outside its root.
 
 An earlier revision named the fourth repo as the point where sharing them stops being the more expensive
 option. **It was measured when the fourth arrived, and it is not** — for two reasons the estimate did not
-have. First, the copies are structurally parallel but *not* converging: this one handles utility stubs,
-`process-agents` handles hooks, route-table payloads, workflow contracts, host agent roles and Codex skill
-payloads, `agent-standards` handles route tables and the routed `dotnet`/`react` trees, and `react-agents`
-handles none of it. What each repo does *not* ship is as load-bearing as what it does. Second, every
-consumer is private, so sharing means either a public tooling repo or a PAT provisioned into four CI
-workflows — a real, recurring cost against copies that already diverge on purpose.
+have.
 
-So they stay copies, and stay **diffable**: the shared spine is byte-identical and each repo's own payload
-handling is gated on its `payloads.json` declaring an owner, so a repo that ships no hooks or no workflows
-runs the same script and simply generates less. Diff two of them before editing either.
+First, they are not four near-copies of one script. They are **two pairs**, and the pairs are a factor of
+two apart in size:
+
+| Pair | Lines | Handles |
+|---|---|---|
+| `dotagents`, `react-agents` | ~356 | routed docs and their skills only (`dotagents` also emits utility stubs) |
+| `agent-standards`, `process-agents` | ~700 | that, plus hook payloads, route tables, workflow contracts, host agent roles, Codex skill payloads |
+
+Within each pair the two files are byte-identical apart from one header paragraph. Across the pairs they are
+different programs, and what each repo does *not* ship is as load-bearing as what it does. Second, every
+consumer is private, so sharing means a public tooling repo or a PAT provisioned into four CI workflows —
+a real, recurring cost against files that are not converging.
+
+So they stay copies, and stay **diffable within a pair**: each optional payload is gated on that repo's
+`payloads.json` declaring an owner, so `agent-standards` (no hooks, no workflows) and `process-agents` (both)
+run the identical 700 lines and simply generate different amounts. Diff against the other member of the pair
+before editing either.
 
 ## Per-machine setup — one time, both harnesses
 

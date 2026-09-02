@@ -46,4 +46,4 @@ Where the suite trusts a checked-in baseline of passing and failing scenarios, t
 Playwright runs headless; headed mode changes nothing that is asserted, so use it only when a human is
 watching. Before rerunning a suite that
 died at fixture startup, treat it as an environment problem — see the container-health rule in the
-`agent-process` standards rather than debugging application code.
+`process-standards` standards rather than debugging application code.
