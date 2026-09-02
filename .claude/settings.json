@@ -64,6 +64,5 @@
   },
   "skipWorkflowUsageWarning": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true,
-  "model": "opusplan"
+  "voiceEnabled": true
 }

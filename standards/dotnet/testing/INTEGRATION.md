@@ -160,7 +160,7 @@ returned contract, its own persistence, the events it publishes. Reading a seede
 state to address its own API is not a boundary crossing; querying another module's `DbContext`, or invoking
 another module's domain behaviour to arrange or assert, is.
 
-**A journey that crosses modules belongs in the process integration tier** — its own suite, driving the real
+**A journey that crosses modules belongs in the journey integration tier** — its own suite, driving the real
 host and observing each module through HTTP or a deliberate Contracts surface, referencing no module's Domain
 or Infrastructure assembly. Pushing a cross-module journey down into one module's suite is exactly what forces
 that suite to reach into persistence it does not own.
