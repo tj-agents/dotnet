@@ -68,6 +68,9 @@ its domain intent and name the *alternative* capability explicitly (`GetDetailsB
   data shape from a same-named entity or domain concept (`OrderDto`); omit it where the payload name is
   already unambiguous (`Shipment`, `Refund`, `Invoice`). Accept an SDK name collision and resolve it with
   a `using` alias in the few files that need both types.
+- **The entity's own name — bare or `Dto`-suffixed — belongs to the shape that models the entity.**
+  Name a partial shape for what it actually is; whether a field belongs to that concept is a question
+  about the domain word, never about whether the field is sensitive.
 
 ```csharp
 // CORRECT — unambiguous payloads need no suffix
