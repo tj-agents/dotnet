@@ -2,7 +2,9 @@
 
 `dot` is **dotNET**. Personal config for AI coding agents (Claude Code, Codex, etc.), synced across
 machines, plus the generic .NET engineering standards. The TypeScript/React half is
-`tomjseery/react-agents`; anything Concertable-specific is `Concertable/agent-standards`.
+`tomjseery/react-agents`; the stack-agnostic method — branching, plans, reviews, merging, and the hooks
+that enforce them — is `tomjseery/process-agents`; anything Concertable-specific is
+`Concertable/agent-standards`.
 
 **How this is authored and delivered — read [`ARCHITECTURE.md`](ARCHITECTURE.md) before changing the
 shape of any of it.** It carries the repo map and why the repos stay separate, the
@@ -73,9 +75,9 @@ React/TS standards are not here — look them up in
 [`react-agents`](https://github.com/tomjseery/react-agents).
 
 Each index is generated from the tree, so it cannot drift from it — which the hand-maintained table it
-replaced could and did. Process standards (branching, committing, merging, plans) are not here; they are
-Concertable-org and live in `Concertable/agent-standards`, deployed into the same
-`~/.agents/standards/process/`.
+replaced could and did. Process standards (branching, committing, merging, plans) are not here; they bind
+to no stack and live in [`process-agents`](https://github.com/tomjseery/process-agents), which is also
+where the write-time hooks ship from.
 
 Doc names never repeat their folder (`dotnet/STYLE.md`, not `dotnet/CSHARP_STYLE.md`) while skill names
 stay globally unique (`csharp-style`), because the deployed skill namespace is flat and spans every
@@ -93,8 +95,8 @@ The frontend gaps moved out with the corpus; they are listed in `react-agents`' 
 
 ## Setup on a new machine
 
-1. Clone this repo to `~/source/repos/dotagents`, and `tomjseery/react-agents` and
-   `Concertable/agent-standards` beside it.
+1. Clone this repo to `~/source/repos/dotagents`, and `tomjseery/react-agents`,
+   `tomjseery/process-agents` and `Concertable/agent-standards` beside it.
 2. Copy `AGENTS.md` and `.claude/` into `%USERPROFILE%`, merging with anything already there.
 3. Junction the skills and the standards trees into place:
    ```

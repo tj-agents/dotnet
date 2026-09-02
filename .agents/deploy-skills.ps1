@@ -35,6 +35,9 @@ destroys the only copy. Two such edits were found and recovered on 2026-08-17 (d
 #>
 [CmdletBinding(SupportsShouldProcess)]
 param(
+    # `process-agents` is deliberately absent. Its skills are self-contained, so Test-IsRouter below
+    # would read them as utilities and junction all 45 flat into ~/.claude/skills - a second, stale
+    # answer beside the plugin's, indistinguishable to the reader. They come from the plugin only.
     [string[]]$SourceRoot = @(
         (Join-Path $HOME 'source/repos/dotagents/.agents/skills'),
         (Join-Path $HOME 'source/repos/react-agents/.agents/skills'),
@@ -43,6 +46,7 @@ param(
     [string[]]$StandardsRoot = @(
         (Join-Path $HOME 'source/repos/dotagents/standards'),
         (Join-Path $HOME 'source/repos/react-agents/standards'),
+        (Join-Path $HOME 'source/repos/process-agents/standards'),
         (Join-Path $HOME 'source/repos/agent-standards/standards')
     ),
     [string]$StandardsTarget = (Join-Path $HOME '.agents/standards'),
