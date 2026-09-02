@@ -78,9 +78,7 @@ handed its caller an unbounded query surface and an open connection.
 
 **Every async application-service and repository method that can reach I/O takes a
 `CancellationToken ct = default`** and passes it to every awaited call that accepts one. Cancellation
-propagates as cancellation; it is never converted into a Result. An HTTP endpoint accepts the request token
-and forwards that same token through its application service and every downstream operation; never replace it
-with `default` or `CancellationToken.None`.
+propagates as cancellation; it is never converted into a Result.
 
 ## Schema and table names are module constants
 
