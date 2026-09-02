@@ -32,6 +32,10 @@ Standards are delivered as docs under `~/.agents/standards/<domain>/`, each rout
 skill in `~/.agents/skills/`. Every domain carries a generated `INDEX.md` — **look a topic up there before
 writing a rule down**, and never restate one here.
 
+**`.agents/` is what both harnesses share; `.claude/` is Claude only; `.codex/` is Codex only.** A shared
+mechanism lives in `.agents/` once and each harness's folder only names it — never a second copy. Anything
+one harness alone runs is authored in that harness's folder, never in `.agents/`.
+
 ## Work vs personal repos — the Azure-DevOps / PR skills are WORK-ONLY
 
 The skills **`create-devops-item`**, **`create-gh-pr`**, **`ship`**, and **`implement`** are
