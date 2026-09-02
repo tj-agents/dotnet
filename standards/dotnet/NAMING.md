@@ -59,6 +59,17 @@ Reserve `CurrentUser`, `ForUser`, `Me`, and `Self` for data belonging to the aut
 append a scope word to every method merely to restate the default scope; name the ordinary use case for
 its domain intent and name the *alternative* capability explicitly (`GetDetailsByIdAsync`).
 
+A single-query service method is named for what it returns, not for the scope it already runs under by
+default:
+
+```csharp
+// WRONG — "Own" restates a scope the caller/context already fixes
+Task<Option<InvoiceSummary>> GetOwnSummaryAsync(CancellationToken ct = default);
+
+// CORRECT — the shape returned is the whole name
+Task<Option<InvoiceSummary>> GetSummaryAsync(CancellationToken ct = default);
+```
+
 ## `Response` is HTTP-only; `Dto` is a deliberate disambiguator
 
 - The `Response` suffix belongs to the **HTTP wire layer** only. It does not belong on the C#
