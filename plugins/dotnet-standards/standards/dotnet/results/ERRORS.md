@@ -85,11 +85,10 @@ The owning error and case names derive the lowercase dot-separated code: repeate
 a trailing `Case` are ignored, while acronyms and digits split naturally, so
 `OrderRefundError.OrderNotFound` publishes `order.refund_not_found`.
 
-Prefer the code derived from the owning error and case names. Use `[ErrorCode("...")]` **only** when the code
-itself is an established external contract and the natural derivation cannot represent it â€” most commonly to
-preserve an already-published code across an honest rename. It belongs on the case, is not inherited from the
-union, and is never a routine part of declaring a new error. Never add service-local reflection or code
-generation to reproduce the code and message derivation.
+Use `[ErrorCode("...")]` **only** to preserve an already-published code where a rename or an exceptional
+prefix would otherwise change it. It belongs on the case, is not inherited from the union, and is never
+decoration added to every case. Never add service-local reflection or code generation to reproduce the
+code and message derivation.
 
 Typed error cases never use `[DisplayName]`. Repository entity lookup is a separate concern, where an
 entity-oriented helper such as `OrNotFound<TEntity>()` may use the entity type's display name.

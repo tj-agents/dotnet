@@ -18,7 +18,7 @@ Pick the layers the component needs — not every module has all five.
 
 ```text
 Contracts       → Kernel (and other Contracts when sharing base types)
-Domain          → Kernel
+Domain          → Contracts, Kernel
 Application     → Domain, Contracts, Kernel
 Infrastructure  → Application, Domain, Contracts, Kernel, framework deps
 Api             → Application, Contracts, Kernel, ASP.NET
@@ -26,15 +26,6 @@ Api             → Application, Contracts, Kernel, ASP.NET
 
 **Arrows only point inward.** `Domain` never references `Infrastructure`; `Contracts` never references
 `Application`.
-
-## Domain owns its model; contracts stop at the boundary
-
-`*.Domain` must not reference `*.Contracts`. A domain entity, value object, method parameter, return value,
-or domain event never contains a DTO, integration event, facade request, or any other contract type.
-
-Map a contract into an owned domain command or value object in `Application` or `Infrastructure` before invoking
-domain behaviour. Map an owned domain outcome to a contract at the same boundary. A DTO exists only where a
-boundary needs one and uses the `Dto` suffix; it is never persisted on or exposed by a domain entity.
 
 When each layer is warranted:
 
