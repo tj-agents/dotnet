@@ -47,6 +47,28 @@ member is a surfaced public auto-property, still write `this.Property = param`. 
 the member-vs-parameter split obvious at a glance instead of depending on the reader knowing which
 identifiers are members.
 
+## Test variables directly for null
+
+Use `is null` or `is not null` when the expression is already a local variable or parameter. Do not
+recapture that variable with `is { } value`; the second name obscures a plain null check. For a nullable
+value type, use `.Value` inside the guarded branch.
+
+Reserve a property-pattern capture for avoiding repetition of a full object/member expression.
+
+```csharp
+// CORRECT
+if (tenantId is not null)
+    Load(tenantId.Value);
+
+// CORRECT — avoids repeating the member access
+if (request.Context.ActiveTenantId is { } tenantId)
+    Load(tenantId);
+
+// WRONG — tenantId is already the complete name
+if (tenantId is { } value)
+    Load(value);
+```
+
 ## A populated-later member defaults to `null!`, never `string.Empty`
 
 A non-nullable `string` that something else fills in — a deserialization DTO, a persistence entity, a
