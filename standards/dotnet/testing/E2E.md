@@ -47,3 +47,21 @@ Playwright runs headless; headed mode changes nothing that is asserted, so use i
 watching. Before rerunning a suite that
 died at fixture startup, treat it as an environment problem — see the container-health rule in the
 `concertable` standards rather than debugging application code.
+
+## Another service's state is read through that service's own Db class
+
+A suite never inlines a SQL string against another service's tables — not in a fixture, and least of all in
+the shared harness, which is service-agnostic and has to move the moment it names one service's table. The
+read belongs in a small `XDb` class in that service's E2E helpers, and the suite depends on it explicitly.
+
+## A readiness gate asserts what the tests consume, and re-asserts after a reset
+
+Counting rows proves nothing. The count can be satisfied by records the tests never touch, and a row can
+exist while the half a test needs is still absent — a payout owner with its payee account provisioned but
+not yet its payer side reads as "ready" and then fails the first charge. Gate on the **identities the suite
+transacts as** and on every field it depends on.
+
+Assert it again after any reset that replays provisioning, not only at boot: the reset re-drives the
+registration chain, and the first test after it is the one that races the window. A gate that only runs at
+startup produces a suite where the first test fails and the same call succeeds later — which reads as
+flakiness and is not.
