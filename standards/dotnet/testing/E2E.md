@@ -61,7 +61,10 @@ exist while the half a test needs is still absent — a payout owner with its pa
 not yet its payer side reads as "ready" and then fails the first charge. Gate on the **identities the suite
 transacts as** and on every field it depends on.
 
-Assert it again after any reset that replays provisioning, not only at boot: the reset re-drives the
-registration chain, and the first test after it is the one that races the window. A gate that only runs at
-startup produces a suite where the first test fails and the same call succeeds later — which reads as
-flakiness and is not.
+Whether the gate belongs after a reset too is decided by one thing: whether the resetter clears those rows.
+A resetter that excludes the provisioning tables leaves them intact, so a post-reset gate polls for a
+condition already true; one that truncates them re-drives the registration chain, and the first test after
+each reset races that window. Check the resetter's exclusion list rather than assuming either.
+
+Either way the gate at boot is not optional. Without it the suite fails its first test and succeeds on the
+same call later — which reads as flakiness and is not.
