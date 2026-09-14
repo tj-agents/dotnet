@@ -55,7 +55,7 @@ gate yourself first, so a bad engine is caught before anything else:
 ./scripts/docker-health.ps1   # fresh container + published port + real HTTP round-trip + stability; exit 1 = unhealthy
 ```
 
-It is vendored from `tomjseery/process-agents`, so that path is the same in every repo. The entrypoint
+It is vendored from `tomjseery/base-agents`, so that path is the same in every repo. The entrypoint
 runs it too and refuses to boot on failure. If it reports unhealthy, **stop**: tell the user Docker is
 half-started or down and to wait for Docker Desktop to show **Running**, then retry. Do not re-run the suite
 and do not debug application code — it is an environment failure. If a run dies instantly with a payment-auth
