@@ -1,21 +1,23 @@
 ---
 name: worktree
-description: Spin up / list / tear down an isolated git worktree per PR, so parallel branches never step on each other's single working tree (e.g. a stray AGENTS.md edit bleeding into an unrelated refactor). Creates a sibling worktree at ../<repo>.worktrees/<Branch> off fresh origin default, respecting the repo's capitalized <Type>/<Name> convention and matching any existing branch casing, then wires the new checkout's .agents skills and .Codex settings so local agent setup carries over. Use when Tommy says "worktree", "/worktree", "spin up a worktree", "new worktree for <Branch>", "isolate this PR", "list worktrees", or "remove the worktree for <Branch>". Personal repos (plain git / gh) — not the work Azure-DevOps flow.
+description: Spin up / list / tear down an isolated git worktree per PR, so parallel branches never step on each other's single working tree (e.g. a stray AGENTS.md edit bleeding into an unrelated refactor). Creates the worktree INSIDE the repo at <repo>/.worktrees/<Branch-flattened> off fresh origin default, respecting the repo's capitalized <Type>/<Name> convention and matching any existing branch casing, then wires the new checkout's .agents skills and .Codex settings so local agent setup carries over. Use when Tommy says "worktree", "/worktree", "spin up a worktree", "new worktree for <Branch>", "isolate this PR", "list worktrees", or "remove the worktree for <Branch>". Personal repos (plain git / gh) — not the work Azure-DevOps flow.
 ---
 
 # worktree
 
 Give every in-flight PR its **own** working tree, so two branches can't corrupt each other through the
-single shared checkout. Worktrees live in a sibling dir — **`../<repo>.worktrees/<Branch>`** — fully
-outside the repo, so there's nothing to gitignore and no tool ever scans into a nested checkout. Run
-everything below via the available shell/terminal tool from the repo root. No preamble — do the thing and
-report the final state.
+single shared checkout. Worktrees live **inside the repo folder** — **`<repo>/.worktrees/<Branch>`**,
+with `/` in the branch flattened to `-`. Never a sibling `<repo>.worktrees/` dir at the same root: that
+scatters one repo across two top-level entries and breaks every "the repo is one folder" assumption.
+`create` writes `/.worktrees/` into `.git/info/exclude` so the nested checkouts stay out of `git status`.
+Run everything below via the available shell/terminal tool from the repo root. No preamble — do the thing
+and report the final state.
 
 Three modes, dispatched on the first arg: **`create <Branch>`**, **`list`**, **`remove <Branch>`**.
 
 > **Footgun — never nest worktrees under `.Codex/worktrees/`.** That path is reserved by the Codex
 > Code harness for its own ephemeral agent worktrees; manual worktrees there collide with it and land
-> as stray gitlinks that break submodule-aware checkouts (mirror.yml). Sibling only.
+> as stray gitlinks that break submodule-aware checkouts (mirror.yml). `.worktrees/` only.
 
 ## If the invocation carries a task, the worktree is step one, not the whole job
 
@@ -42,13 +44,13 @@ this skill exists to avoid. The loop is: `create` → work → open PR → **mer
 
 ## create — `worktree create <Type>/<Name>`
 
-Adds a worktree for `<Branch>` at `../<repo>.worktrees/<Branch>`, branched off **fresh** `origin`
+Adds a worktree for `<Branch>` at `<repo>/.worktrees/<Branch-flattened>`, branched off **fresh** `origin`
 default, then links in local `.agents` skills and snapshots `.Codex/settings.local.json` for a fresh checkout.
 
 ```bash
 BRANCH="$1"   # e.g. Refactor/DomainStereotypeLayout-Phase3
 [ -n "$BRANCH" ] || { echo "usage: worktree create <Type>/<Name>"; exit 1; }
-root=$(git rev-parse --show-toplevel); repo=$(basename "$root"); parent=$(dirname "$root")
+root=$(git rev-parse --show-toplevel)
 DEF=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@'); DEF=${DEF:-master}
 git fetch origin --quiet
 
@@ -69,8 +71,9 @@ else
   START="origin/$DEF"                             # new branch off fresh default
 fi
 
-WT="$parent/$repo.worktrees/$BRANCH"
+WT="$root/.worktrees/${BRANCH//\//-}"
 mkdir -p "$(dirname "$WT")"
+grep -qx '/.worktrees/' "$root/.git/info/exclude" 2>/dev/null || printf '/.worktrees/\n' >> "$root/.git/info/exclude"
 if [ -z "$START" ]; then git worktree add "$WT" "$BRANCH"; else git worktree add "$WT" -b "$BRANCH" "$START"; fi || exit 1
 
 # Wire .agents skills: tracked skills arrive with the checkout; junction ONLY the local-only ones
@@ -99,7 +102,7 @@ echo "Open a NEW Codex session there:  cd \"$WT\""
 git worktree list
 ```
 
-The main checkout is line 1. Sibling `<repo>.worktrees/…` entries are yours (this skill).
+The main checkout is line 1. `<repo>/.worktrees/…` entries are yours (this skill).
 `.Codex/worktrees/agent-…` entries are the harness's ephemeral agent worktrees — **not** managed here;
 leave them alone.
 
@@ -159,8 +162,10 @@ git worktree list
 
 ## Rules
 
-- **Sibling location, never inside the repo.** `../<repo>.worktrees/<Branch>` — outside the checkout,
-  no `.gitignore` upkeep, and clear of the harness-reserved `.Codex/worktrees/`.
+- **Inside the repo, never a sibling dir.** `<repo>/.worktrees/<Branch-flattened>` — one repo is one
+  top-level folder, and `create` adds `/.worktrees/` to `.git/info/exclude` so it stays out of `git
+  status`. A sibling `<repo>.worktrees/` at the same root is the banned layout. Still clear of the
+  harness-reserved `.Codex/worktrees/`.
 - **Match existing branch casing.** If a branch of the same name exists in any casing, reuse that exact
   ref — never create a second casing (Windows can't hold both; it breaks `fetch`/`pull` for everyone).
   Only when creating a genuinely new branch, enforce the Capitalized `<Type>/` prefix.
