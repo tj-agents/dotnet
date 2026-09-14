@@ -115,6 +115,27 @@ Awaiting *inside* the selector is the real defect anyway — that is a per-row r
 
 ## Unit of work — choose by the number of flushes and contexts
 
+Every generic carrier a module uses is aliased once, in the module, exactly as `Repository<TEntity>` is —
+`IUnitOfWork`, `IUnitOfWorkBehavior`, `IOutboxUnitOfWorkBehavior`, `IUnitOfWorkBoundary`. The alias binds the
+module's concrete context so nothing downstream ever spells the closed generic again:
+
+```csharp
+internal interface IUnitOfWork : DataAccess.Application.IUnitOfWork<OrderDbContext>;
+
+internal sealed class UnitOfWork(OrderDbContext context)
+    : DataAccess.Infrastructure.UnitOfWork<OrderDbContext>(context), IUnitOfWork;
+```
+
+```csharp
+services.AddScoped<IUnitOfWork, UnitOfWork>();
+services.AddScoped<IUnitOfWorkBehavior, UnitOfWorkBehavior>();
+```
+
+**Alias the whole set or none of it.** A module that aliases `IUnitOfWorkBehavior` but registers
+`IUnitOfWork<XDbContext>` open has two vocabularies for one context, and the second consumer picks the wrong
+one. Registering an open generic where the module owns an alias is the defect.
+
+
 - **`IUnitOfWork<T>.SaveChangesAsync()`** — the default for one context and one flush. Stage every entity
   change, then save once; EF commits that save atomically.
 - **`IUnitOfWork<T>.ExecuteAsync(block)`** — one context where the operation genuinely needs several

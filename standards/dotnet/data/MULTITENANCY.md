@@ -19,9 +19,120 @@ The building blocks, all in the service's data-access infrastructure:
 - **`XReadDbContext`** (one concrete read context per module that needs one) — the tenant-independent read
   stance, composing the configuration provider with no tenancy on top. **Read-only by construction:**
   `SaveChanges` throws, so the write-side tenant interceptor can never be bypassed through it.
-- **`AdminDbContext`** (abstract) — the platform-admin stance: no tenancy, but **writable**, so a
-  cross-tenant operator can act on rows it does not own. The interceptor's write guard no-ops for a
-  tenant-less admin.
+- **`PrivilegedDbContext`** (abstract) — the unfiltered **writable** stance, so a cross-tenant operator can
+  act on rows it does not own; the interceptor's write guard no-ops for a tenant-less write. A module with
+  no tenant-scoped entity at all takes this base too — there, "privileged" degenerates to "nothing to
+  filter". Do not call it `AdminDbContext`: that name reads as the Admin *module's* context, a different
+  thing entirely.
+
+## The concrete context is `DbSet`s, filters and nothing else
+
+The base owns `OnModelCreating` — default schema, then the provider, then filters, in that sealed order. **A
+concrete context never declares `OnModelCreating`.** Modules hand-rolling those two lines is how one of them
+silently drifts off its stance.
+
+**Tenant-filtered** — a `DbSet` per entity, and `ApplyTenantFilters` naming only the entities whose reads are
+tenant-private:
+
+```csharp
+internal sealed class OrderDbContext(
+    DbContextOptions<OrderDbContext> options,
+    OrderConfigurationProvider provider,
+    ITenantContext tenantContext)
+    : TenantScopedDbContext(options, provider, tenantContext, Schema.Name)
+{
+    public DbSet<OrderEntity> Orders => Set<OrderEntity>();
+    public DbSet<OrderLineEntity> OrderLines => Set<OrderLineEntity>();
+
+    protected override void ApplyTenantFilters(ModelBuilder modelBuilder) =>
+        modelBuilder.ApplySingleOwner<OrderEntity>(this);
+}
+```
+
+**Tenant-independent read** — a named `IQueryable` per entity, implemented *explicitly* against the module's
+own read interface. No `DbSet`, no public member:
+
+```csharp
+internal interface IOrderReadDbContext
+{
+    IQueryable<OrderEntity> Orders { get; }
+}
+
+internal sealed class OrderReadDbContext(
+    DbContextOptions<OrderReadDbContext> options,
+    OrderConfigurationProvider provider)
+    : ReadDbContext(options, provider, Schema.Name), IOrderReadDbContext
+{
+    IQueryable<OrderEntity> IOrderReadDbContext.Orders => Query<OrderEntity>();
+}
+```
+
+`IXReadDbContext` deliberately does **not** extend `IReadDbContext`. The two are not general and specific:
+the shared contract *is* the open `Query<TEntity>()`, so extending it would make the module's interface
+**wider**, handing every consumer a query over every entity the module's provider maps — including the ones
+an aggregate repository owns. Restriction is the whole job of the interface, and a restriction never
+inherits the capability it restricts, for the same reason `IReadOnlyList<T>` does not extend `IList<T>`. The
+concrete context still satisfies `IReadDbContext` through its base, which is what the shared read-repository
+bases bind to. Implement the properties explicitly so the surface is reachable only through the interface.
+
+**The interface earns its place from a production consumer** — an `XReadRepository`, or a purpose-named
+abstraction over a domain fact. A test fixture resolving the read stance for unfiltered assertions is the
+normal pattern and justifies the *context*; it does not justify the *interface*, which exists to narrow what
+a production consumer can reach. With no such consumer there is nothing to narrow, so resolve the concrete
+context in the fixture and add the interface when the first one arrives.
+
+**Unfiltered and writable** — same provider, no tenancy, `DbSet`s public because the writer needs them:
+
+```csharp
+internal sealed class OrderModerationDbContext(
+    DbContextOptions<OrderModerationDbContext> options,
+    OrderConfigurationProvider provider)
+    : PrivilegedDbContext(options, provider, Schema.Name)
+{
+    public DbSet<OrderEntity> Orders => Set<OrderEntity>();
+}
+```
+
+## Register a stance the same way in every module
+
+The write context takes the interceptors and seeding support; the read context takes neither, adds
+`NoTracking`, and is the only one exposed behind an interface. Provider options — a spatial extension, a
+retry policy — belong to the database, not to one module's taste: put them in one shared options extension
+so two contexts over the same database cannot disagree.
+
+```csharp
+services.AddDbContext<OrderDbContext>((sp, options) =>
+    options.UseOrdersDb(configuration)
+        .AddInterceptors(
+            sp.GetRequiredService<AuditInterceptor>(),
+            sp.GetRequiredService<TenantInterceptor>(),
+            sp.GetRequiredService<IDomainEventDispatchInterceptor>())
+        .UseSeedingSupport(sp));
+
+services.AddDbContext<OrderReadDbContext>(options =>
+    options.UseOrdersDb(configuration)
+        .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+services.AddScoped<IOrderReadDbContext>(sp => sp.GetRequiredService<OrderReadDbContext>());
+```
+
+## Every module with a filtered context owns a stance test
+
+The stance is an *assertion about the model*, so assert it. One test per module, naming every filtered
+entity, fails the day someone adds an entity to a filtered context and forgets its filter, or gives a read
+context write capability:
+
+```csharp
+Assert.IsAssignableFrom<IReadDbContext>(readContext);
+Assert.False(typeof(IDbContext).IsAssignableFrom(readContext.GetType()));
+Assert.Equal(QueryTrackingBehavior.NoTracking, readContext.ChangeTracker.QueryTrackingBehavior);
+await Assert.ThrowsAsync<InvalidOperationException>(() => readContext.SaveChangesAsync());
+Assert.All(TenantFilteredTypes, type =>
+    Assert.Empty(readContext.Model.FindEntityType(type)!.GetDeclaredQueryFilters()));
+Assert.All(TenantFilteredTypes, type =>
+    Assert.NotEmpty(tenantContext.Model.FindEntityType(type)!.GetDeclaredQueryFilters()));
+```
+
+Building the model needs no database, so this is a unit test. Put it at the same path in every module.
 
 ## One data-access stance per query class
 
@@ -32,8 +143,8 @@ honours.
   default.
 - **`XReadRepository`** — read-only access through the module's tenant-independent read context. Its
   contract controls which data leaves the module.
-- **`XAdminRepository`** — privileged cross-tenant read/write on the writable admin context. Only where an
-  admin write flow actually exists.
+- **`XPrivilegedRepository`** — unfiltered cross-tenant read/write on the writable privileged context. Only
+  where such a write flow actually exists.
 - **A domain fact that is not naturally an entity repository** may get its own purpose-named abstraction
   over the read context — `IStockAvailability` — where it is a real, independently consumed capability. Do
   not wrap a single query already owned by an aggregate repository in a one-method interface.
@@ -62,7 +173,7 @@ A qualifier describes the contract that differs from the service's unqualified d
 vocabulary to impose on every service:
 
 - **Data-access stance** — `XRepository` (tenant-bound), `XReadRepository` (tenant-independent, read-only),
-  `XAdminRepository` (unfiltered and writable). **Name the composed contract, never the mechanism**: no
+  `XPrivilegedRepository` (unfiltered and writable). **Name the composed contract, never the mechanism**: no
   `Unscoped`, no `CrossTenant`.
 - **Mutability** — a `Repository<…>` surface permits writes; a `ReadRepository<…>` exposes queries only. An
   event-synced replica therefore uses `XReadRepository` even with no writable sibling: `Read` states a

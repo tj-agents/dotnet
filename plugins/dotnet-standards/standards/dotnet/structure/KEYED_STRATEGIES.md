@@ -5,6 +5,11 @@ composition root. A module-local generic factory owns keyed resolution; operatio
 through it. Consumers never branch on the key, never see the registration mechanism, and never inject the
 generic factory merely to perform a business operation.
 
+**This document covers variants that share one identical interface.** Where the variants differ in parameters
+or return type, the family is a union resolved by key, not a strategy — `KEYED_UNIONS.md` owns that half.
+Applying these rules to that shape is what produces implementations that discard parameters, marker-interface
+arms, and parameter objects invented to force differently-shaped variants into one signature.
+
 The factory's noun names **what it returns**. The key is only the selection input:
 
 ```csharp
