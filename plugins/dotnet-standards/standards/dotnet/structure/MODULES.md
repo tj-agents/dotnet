@@ -36,6 +36,13 @@ When each layer is warranted:
 - **Infrastructure** — there are concrete implementations behind those abstractions, or it owns EF mappings.
 - **Api** — it exposes HTTP endpoints.
 
+## Time
+
+`TimeProvider` is resolved in `Application` or `Infrastructure`, once per operation, and the instant passed
+into domain methods as a value. An entity never holds a clock — EF materializes it and cannot inject one.
+A `Domain`-declared `IClock` is warranted only when a domain service consumes it, implemented in
+`Infrastructure` over `TimeProvider`; declared earlier it is a port in a layer that never calls it.
+
 ## Visibility cascade
 
 - `*.Contracts` types are `public` — they *are* the cross-boundary contract.
