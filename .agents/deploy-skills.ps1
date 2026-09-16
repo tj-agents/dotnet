@@ -36,6 +36,7 @@ destroys the only copy. Two such edits were found and recovered on 2026-08-17 (d
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [string[]]$SourceRoot = @(
+        (Join-Path $HOME 'source/repos/agent-utilities/.agents/skills'),
         (Join-Path $HOME 'source/repos/dotagents/.agents/skills'),
         (Join-Path $HOME 'source/repos/react-agents/.agents/skills'),
         (Join-Path $HOME 'source/repos/agent-standards/.agents/skills')
