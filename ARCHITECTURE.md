@@ -13,7 +13,7 @@ says.
 
 | Tier | Repo | Scope | Sections |
 |---|---|---|---|
-| Generic .NET | `tomjseery/dotagents` | every .NET repo Tommy owns | the .NET concerns, plus his personal machine config |
+| Generic .NET | `tomjseery/dotagents` | every .NET repo Tommy owns | the .NET concerns, plus the `%USERPROFILE%` agent config it mirrors |
 | Generic React/TS | `tomjseery/react-agents` | every React/TS repo Tommy owns | the React concerns |
 | Concertable | `Concertable/agent-standards` | everything Concertable-specific | `dotnet/`, `react/`, `process/` |
 | One microservice | that service's own repo | only what is true of that service alone | `AGENTS.md` plus sibling docs it names |
@@ -48,10 +48,11 @@ out of a generic doc is how rules become ungreppable and unenforceable — see `
 Audience, not repo count. A TypeScript project has no use for the C# corpus, and a work repo has no use for
 Concertable's merge queue. Plugins make count nearly free, because a project installs only what applies to
 it. `dotagents` additionally mirrors `%USERPROFILE%` (`~/AGENTS.md`, `~/.agents/`, `~/.claude/`), which is
-why the personal machine config sits alongside its .NET standards rather than in an org repo.
+why that agent config sits alongside its .NET standards rather than in an org repo.
 
-Also present: `Infonetica/standards-docs` (work standards, separate audience), `agent-utilities` (session
-tooling, no standards), `agent-starter-kit` (archived — strict subset of `dotagents`).
+Also present: `Infonetica/standards-docs` (work standards, separate audience), `agent-utilities` (the
+machine layer — the PowerShell profile and the utility skills, no standards), `agent-starter-kit`
+(archived — strict subset of what `agent-utilities` now holds).
 
 ## The doc is the payload; the skill is a router
 
