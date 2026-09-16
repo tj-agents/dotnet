@@ -35,8 +35,9 @@ Each row has a skill covering *how* to use it well; this file only decides *what
 `Microsoft.Extensions.*` and the BCL have absorbed most of what a library used to be needed for, and each
 package not taken is one fewer thing to keep current across every service.
 
-- **`TimeProvider`** for the clock, never `DateTime.Now` and never a hand-rolled `IClock`. It is testable
-  out of the box with `Microsoft.Extensions.TimeProvider.Testing`.
+- **`TimeProvider`** for the clock, never `DateTime.Now` and never a hand-rolled `IClock` outside the one
+  case in [`structure/MODULES.md`](structure/MODULES.md#time). It is testable out of the box with
+  `Microsoft.Extensions.TimeProvider.Testing`.
 - **`System.Text.Json`** for serialization. It is the framework's serializer, it is what ASP.NET Core
   already uses, and a second serializer in one process means two sets of naming and null rules.
 - **`IHttpClientFactory`** for outbound HTTP lifetime, never a `new HttpClient()` held in a field.
