@@ -62,25 +62,24 @@ correspondingly named file; do not collect unrelated roles in a generic `Models`
 still a repository, and a service with one business operation is still a service. A resolver applies
 selection or resolution rules; fetching an entity by its key remains a repository query.
 
-**A qualifier only exists to contrast with a sibling.** `PublicXRepository` with no `AdminXRepository`
-to disambiguate from is noise — name it `XRepository` and rename the day the second stance is born.
+**An audience or alternative-stance qualifier only exists to contrast with a sibling.**
+`PublicXRepository` with no `AdminXRepository` to disambiguate from is noise — name it `XRepository`
+and rename the day the second stance is born. A capability or shape qualifier such as `Read` or
+`Snapshot` instead states a real contract or guarantee and does not require a sibling.
 
 ## Keep database queries on repositories
 
-`GetByIdAsync` remains a repository finder when it returns a projection, exposes only reads, or serves
-authorization. Reuse the entity's repository and the applicable stance; do not create an injected
-`XLookup`, `XFacts`, `XProvider` or `XStore` as another home for the same database queries.
-A service adds use-case rules or orchestration; it does not earn its name by forwarding one finder.
+Name a database-backed entity query with repository vocabulary even when it returns a projection,
+exposes only reads, or serves authorization. A service adds use-case rules or orchestration; it does
+not earn its name by forwarding one finder.
 
 `Lookup` describes an indexed data structure or view, such as
 [`ILookup<TKey,TElement>`](https://learn.microsoft.com/en-us/dotnet/api/system.linq.ilookup-2?view=net-10.0).
 `OrderRepository.GetByIdAsync(id)` communicates persistence; `OrderLookup.GetAsync(id)` obscures it.
-A narrow consumer interface may expose only the required queries without exposing the repository's
-entities or write methods. That boundary does not require a duplicate query implementation.
-
-Repository bases and ownership are defined in [Persistence](data/PERSISTENCE.md); stance and projection
-qualifiers are defined in [Multitenancy](data/MULTITENANCY.md). Follow those rules when a separate
-repository capability is warranted.
+`Lookup`, `Facts`, `Provider` and `Store` are not substitute names for repository-owned queries.
+Repository placement and consumer boundaries are defined in [Persistence](data/PERSISTENCE.md); stance
+and projection ownership are defined in [Multitenancy](data/MULTITENANCY.md). Follow those owners to
+decide whether a separate repository capability is warranted.
 
 Framework-owned contracts retain their framework names. ASP.NET Core
 [`IUserStore<TUser>`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserstore-1?view=aspnetcore-10.0)
