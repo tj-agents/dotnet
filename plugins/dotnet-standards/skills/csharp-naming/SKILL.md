@@ -1,6 +1,6 @@
 ---
 name: csharp-naming
-description: Generic C# naming standard — the collaborator-suffix table (`Service`, `Repository`, `Store`, `Client`, `Factory`, `Generator`, `Builder`, `Provider`, `Accessor`, `Handler`, `Helper`) and what shape each one claims, the agent-noun rule for a single-operation type, repository methods named for the query and service methods for the intent, `Response` as an HTTP-only suffix, `Dto` as a deliberate disambiguator, `Projection` for an intermediate query shape only, `XMappers` extension classes, receiver-owned extensions versus named policy evaluators, and frozen lookup tables. Use when naming a new type or method, choosing or questioning a type suffix, naming a DTO or query-result shape, deciding where a pure operation lives, or reviewing a name that reads like a different shape than the type actually has.
+description: Generic C# naming standard — choose the domain concept and existing owner before a suffix; distinguish repository queries, service orchestration, resolvers and lookup data structures; name data shapes by their meaning rather than generic Fact/Facts, Info, Data or Model suffixes; use Snapshot only for captured state. Covers collaborator suffixes, interface/implementation pairs, keyed finder names, HTTP-only Response, deliberate Dto, intermediate Projection, XMappers and policy evaluators. Use when designing or reviewing types, members, contracts or plan snippets, especially when a proposed name obscures responsibility or duplicates an existing owner.
 ---
 
 # csharp-naming
