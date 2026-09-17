@@ -1,5 +1,20 @@
 # C# naming
 
+## Choose the domain concept and its owner before the suffix
+
+Read the type's contract, implementation and callers before naming it. Reuse the domain noun and the
+existing owner of that responsibility. Within one bounded context, the same concept keeps the same word
+across types, members, parameters and contracts; a different word must describe a real semantic difference.
+
+A suffix states a contract the implementation must satisfy. DI registration, an async method, a record
+declaration or a read-only operation does not decide that contract. Add an operation to its cohesive owner
+before inventing another collaborator; renaming a misplaced query does not fix its ownership.
+
+Follow the [framework type-naming guidance](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-classes-structs-and-interfaces):
+types use noun phrases and methods use verb phrases. An ordinary interface/implementation pair shares its
+name apart from the interface's `I`; qualify an implementation only for a real alternate strategy or role.
+Use the repository's established vocabulary consistently in proposed code as well as executable code.
+
 ## Pick a suffix from the type's shape, not from "it's injectable"
 
 `Service` is the suffix that rots first: it gets used for anything injectable, and once a pure
@@ -9,9 +24,9 @@ is DI-registered; that fact carries no naming information.
 
 | Suffix | The shape it claims | Framework precedent |
 |---|---|---|
-| `Service` | Orchestrates domain logic **over a repository**. Stateful collaborator, owns a unit of work. | — |
-| `Repository` | Domain-entity persistence via a `DbContext`. | — |
-| `Store` | Bytes/blobs in and out of a backing store, no domain logic. | `IUserStore` |
+| `Service` | Orchestrates a domain use case over repositories; owns the unit of work when the use case writes. | — |
+| `Repository` | Domain-entity persistence and queries, including read-only queries and projections, via a `DbContext`. | — |
+| `Store` | Opaque bytes/blobs in and out of a backing store, no domain operations. | — |
 | `Client` | A remote or third-party API. | `HttpClient`, `BlobServiceClient` |
 | `Factory` | Creates **instances/components**, usually of a type family. | `IHttpClientFactory`, `ILoggerFactory` |
 | `Generator` | Produces a **value/artifact** from inputs. | `LinkGenerator`, `RandomNumberGenerator` |
@@ -41,12 +56,35 @@ infrastructure, test, and seed construction outside the domain type; the seeding
 owned by the `seeding` skill. Keep each top-level request, result, status, and execution shape in the
 correspondingly named file; do not collect unrelated roles in a generic `Models` file.
 
-**A type whose whole job is one operation is named for the agent-noun of that method** —
-`Mapper.Map`, `Resolver.Resolve`, `Calculator.Calculate`, `Renderer.Render`, `Serializer.Serialize`.
-The table above is the same rule widened to collaborator shapes.
+**A focused operation collaborator uses the agent-noun of its operation** —
+`Mapper.Map`, `Resolver.Resolve`, `Calculator.Calculate`, `Renderer.Render`, `Serializer.Serialize`,
+`Exporter.Export`. Operation count does not override responsibility: a repository with one finder is
+still a repository, and a service with one business operation is still a service. A resolver applies
+selection or resolution rules; fetching an entity by its key remains a repository query.
 
 **A qualifier only exists to contrast with a sibling.** `PublicXRepository` with no `AdminXRepository`
 to disambiguate from is noise — name it `XRepository` and rename the day the second stance is born.
+
+## Keep database queries on repositories
+
+`GetByIdAsync` remains a repository finder when it returns a projection, exposes only reads, or serves
+authorization. Reuse the entity's repository and the applicable stance; do not create an injected
+`XLookup`, `XFacts`, `XProvider` or `XStore` as another home for the same database queries.
+A service adds use-case rules or orchestration; it does not earn its name by forwarding one finder.
+
+`Lookup` describes an indexed data structure or view, such as
+[`ILookup<TKey,TElement>`](https://learn.microsoft.com/en-us/dotnet/api/system.linq.ilookup-2?view=net-10.0).
+`OrderRepository.GetByIdAsync(id)` communicates persistence; `OrderLookup.GetAsync(id)` obscures it.
+A narrow consumer interface may expose only the required queries without exposing the repository's
+entities or write methods. That boundary does not require a duplicate query implementation.
+
+Repository bases and ownership are defined in [Persistence](data/PERSISTENCE.md); stance and projection
+qualifiers are defined in [Multitenancy](data/MULTITENANCY.md). Follow those rules when a separate
+repository capability is warranted.
+
+Framework-owned contracts retain their framework names. ASP.NET Core
+[`IUserStore<TUser>`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.iuserstore-1?view=aspnetcore-10.0)
+manages user accounts; its established name is not the precedent for naming our entity repositories.
 
 ## Name a repository method for the query, a service method for the intent
 
@@ -58,6 +96,24 @@ name down onto the repository.
 Reserve `CurrentUser`, `ForUser`, `Me`, and `Self` for data belonging to the authenticated human. Do not
 append a scope word to every method merely to restate the default scope; name the ordinary use case for
 its domain intent and name the *alternative* capability explicitly (`GetDetailsByIdAsync`).
+
+## Name a data shape for what it represents
+
+Use the domain noun first. Add a qualifier only when it identifies a real shape or guarantee:
+
+| Shape | Name communicates |
+|---|---|
+| `OrderSummary` / `OrderDetails` | The actual summary or detail contract |
+| `OrderStatus` | Lifecycle state |
+| `OrderSnapshot` | Values captured at a defined time or revision, independent of later changes |
+
+Do not append `Fact`/`Facts`, `Info`, `Data` or `Model` simply because a type carries data. A suffix
+needs a domain meaning or an established framework contract: a fact in a rule engine or dimensional
+model is meaningful; `OrderFact` as a generic name for an order query result is not.
+
+Do not replace every `Fact` with `Snapshot`. Being a record or read-only DTO does not establish snapshot
+semantics. Apply the `Dto` and `Projection` rules below when those distinctions are the actual reason
+for a separate shape.
 
 ## `Response` is HTTP-only; `Dto` is a deliberate disambiguator
 
