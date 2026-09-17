@@ -62,10 +62,10 @@ correspondingly named file; do not collect unrelated roles in a generic `Models`
 still a repository, and a service with one business operation is still a service. A resolver applies
 selection or resolution rules; fetching an entity by its key remains a repository query.
 
-**An audience or alternative-stance qualifier only exists to contrast with a sibling.**
-`PublicXRepository` with no `AdminXRepository` to disambiguate from is noise — name it `XRepository`
-and rename the day the second stance is born. A capability or shape qualifier such as `Read` or
-`Snapshot` instead states a real contract or guarantee and does not require a sibling.
+**A role qualifier only exists to contrast with a sibling.** `PrimaryOrderResolver` with no
+`FallbackOrderResolver` to disambiguate from is noise — name it `OrderResolver` and rename the day
+the second role is born. A capability or shape qualifier such as `Read` or `Snapshot` instead states
+a real contract or guarantee and does not require a sibling.
 
 ## Keep database queries on repositories
 
@@ -77,7 +77,7 @@ not earn its name by forwarding one finder.
 [`ILookup<TKey,TElement>`](https://learn.microsoft.com/en-us/dotnet/api/system.linq.ilookup-2?view=net-10.0).
 `OrderRepository.GetByIdAsync(id)` communicates persistence; `OrderLookup.GetAsync(id)` obscures it.
 `Lookup`, `Facts`, `Provider` and `Store` are not substitute names for repository-owned queries.
-Repository placement and consumer boundaries are defined in [Persistence](data/PERSISTENCE.md); stance
+Repository placement is defined in [Persistence](data/PERSISTENCE.md); consumer boundaries plus stance
 and projection ownership are defined in [Multitenancy](data/MULTITENANCY.md). Follow those owners to
 decide whether a separate repository capability is warranted.
 
