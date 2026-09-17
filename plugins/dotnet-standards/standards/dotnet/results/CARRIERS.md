@@ -1,4 +1,4 @@
-﻿# Result and Option carriers
+# Result and Option carriers
 
 Reunion is the single carrier family: `Reunion` owns `Result`, `Result<TValue>`,
 `Result<TValue, TError>`, `UnitResult<TError>`, `Option<T>`, their named cases, and the composition,
@@ -20,6 +20,7 @@ Pick the return type from the decisions the caller must make:
 | Expected failure, otherwise an optional value | `Result<Option<T>, TError>` |
 | Provider, storage, framework, wire, or short local value that may be null | `T?` |
 | Zero or more values | `IReadOnlyList<T>`; no matches is an empty list |
+| Zero or more values, unique by construction | `IReadOnlySet<T>` |
 | No actionable alternate outcome | Plain value, `Task`, or another completion type |
 | Capability question only | `bool` |
 
@@ -33,6 +34,11 @@ absence is a named failure, needs an explanation, or must coexist with other fai
 genuine, intentional outcome that requires different caller behaviour from `Some(empty)`. If a missing
 owner, profile, scope, or filter merely means there are no values to return, use `IReadOnlyList<T>` and
 return `[]`. Do not create two representations of “no items” that every caller immediately collapses.
+
+**Uniqueness belongs in the type.** Where elements are unique by construction — keys, ids drawn from a
+unique index, an already-deduplicated projection — declare `IReadOnlySet<T>`. A caller calling `.Distinct()`
+on a value it was handed, or a callee guarding against duplicates it cannot receive, is the signature
+understating its contract.
 
 The layer is a strong heuristic, not the decision by itself. Repository and provider lookups normally
 return `T?`. Domain, application, module-facade, service, and published client query contracts normally
