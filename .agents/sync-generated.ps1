@@ -29,8 +29,8 @@ Generated:
                                    .claude-plugin/plugin.json and .codex-plugin/plugin.json.
 
 Plugins carry the domains `.agents/plugins/payloads.json` assigns them, so a consumer installs per
-stack rather than receiving every corpus. The 10 utility skills ship in no plugin - they are machine
-tooling, delivered by deploy-skills.ps1 from this clone. The write-time router hook
+stack rather than receiving every corpus. This repo ships only generic .NET contracts; machine operations
+belong to `base@base-agents`. The write-time router hook
 lives in `Concertable/agents` and ships in its `concertable` plugin, so a project wanting
 enforcement installs that too.
 
