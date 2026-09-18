@@ -11,7 +11,9 @@ tomjseery/base-agents. React and TypeScript contracts belong in tomjseery/react-
 
 ## Authoring
 
-Every skill declares kind: contract and routes to exactly one standards document. After a change run:
+The open skill-kind taxonomy is defined in
+[`base-agents/SKILL_KINDS.md`](https://github.com/tomjseery/base-agents/blob/main/SKILL_KINDS.md).
+Every skill here declares `kind: contract` and routes to exactly one standards document. After a change run:
 
     pwsh .agents/sync-generated.ps1
     pwsh .agents/sync-generated.ps1 -Check
