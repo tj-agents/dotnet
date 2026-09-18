@@ -251,6 +251,13 @@ foreach ($entry in $manifestJson.plugins) {
     foreach ($field in @('name', 'description', 'author', 'repository', 'keywords')) {
         Assert-SameJsonField $claudePlugin.$field $codexPlugin.$field $field $entry.name
     }
+    foreach ($field in @('description', 'keywords')) {
+        $claudeEntryJson = ConvertTo-Json -InputObject $claudeEntry.$field -Compress -Depth 20
+        $claudePluginJson = ConvertTo-Json -InputObject $claudePlugin.$field -Compress -Depth 20
+        if ($claudeEntryJson -cne $claudePluginJson) {
+            throw "Plugin '$($entry.name)' has different '$field' metadata in its Claude marketplace entry and manifest."
+        }
+    }
     if ($claudePlugin.displayName -cne $codexPlugin.interface.displayName) {
         throw "Plugin '$($entry.name)' has different display names in its Claude and Codex manifests."
     }
