@@ -5,10 +5,10 @@
   },
   "plugins": [
     {
-      "name": "dotnet-standards",
+      "name": "dotnet",
       "source": {
         "source": "local",
-        "path": "./plugins/dotnet-standards"
+        "path": "./plugins/dotnet"
       },
       "policy": {
         "installation": "INSTALLED_BY_DEFAULT",

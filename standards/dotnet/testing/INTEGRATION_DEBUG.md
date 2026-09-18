@@ -176,7 +176,7 @@ was missed.
 Step 2 stays serial for one failure. For a large failing set the parent may dispatch independent read-only
 Workflow v2 roles over the same immutable run — `log-analyst` to reduce each project's last-run log to
 signatures and chronology, `test-impact-analyst` to map the affected projects and their exact filters — using
-the semantic dispatch/result envelopes the `process-standards` plugin ships as
+the semantic dispatch/result envelopes the `concertable` plugin ships as
 `workflows/contract/v2`. Never name an agent or model.
 
 Readers never diagnose. Step 3's read order, the cause, and the fix stay with the parent, and an invalid,
