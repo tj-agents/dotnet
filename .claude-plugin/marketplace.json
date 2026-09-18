@@ -6,8 +6,8 @@
   },
   "plugins": [
     {
-      "name": "dotnet-standards",
-      "source": "./plugins/dotnet-standards",
+      "name": "dotnet",
+      "source": "./plugins/dotnet",
       "description": "The generic C# and .NET standard: style and naming, comments and XML doc, dependency injection, logging, validation, EF Core persistence and multitenancy, seeding, the Result/Option carriers with their typed errors and transport terminals, module and service-boundary structure, gRPC contracts, keyed strategies, and the unit/integration/E2E test tiers. Names no product.",
       "category": "standards",
       "keywords": ["standards", "dotnet", "csharp", "ef-core", "testing", "architecture"]
