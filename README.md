@@ -23,6 +23,6 @@ payload that would reference files outside its own subtree.
 
 The central Concertable provisioner installs dotnet@dotagents for both harnesses:
 
-    pwsh path	oagentsscriptsprovision-agents.ps1
+    pwsh path\to\agents\scripts\provision-agents.ps1
 
 A running session retains the payload loaded at startup; restart it after an update.
