@@ -1,0 +1,20 @@
+{
+  "name": "dotagents",
+  "interface": {
+    "displayName": ".NET Agent Standards"
+  },
+  "plugins": [
+    {
+      "name": "dotnet",
+      "source": {
+        "source": "local",
+        "path": "./plugins/dotnet"
+      },
+      "policy": {
+        "installation": "INSTALLED_BY_DEFAULT",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

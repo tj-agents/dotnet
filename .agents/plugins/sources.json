@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "scope": {
+    "root": ".agents",
+    "layout": "kind",
+    "domain": "dotnet",
+    "plugin": "dotnet"
+  },
+  "host_adapter_roots": {
+    "agents": ".agents/skills",
+    "codex": ".codex/skills",
+    "claude": ".claude/skills"
+  },
+  "host_manifest_roots": {
+    "codex": ".agents/plugins/manifests/codex",
+    "claude": ".agents/plugins/manifests/claude"
+  },
+  "marketplace_templates": {
+    "codex": ".agents/plugins/manifests/codex/marketplace.json",
+    "claude": ".agents/plugins/manifests/claude/marketplace.json"
+  },
+  "marketplace_outputs": {
+    "codex": ".agents/plugins/marketplace.json",
+    "claude": ".claude-plugin/marketplace.json"
+  },
+  "package_root": "plugins",
+  "packages": {
+    "dotnet": {
+      "scope": "dotnet"
+    }
+  },
+  "generated_roots": [
+    ".agents/skills",
+    ".codex/skills",
+    ".claude/skills",
+    "plugins",
+    ".agents/plugins/marketplace.json",
+    ".claude-plugin/marketplace.json",
+    ".agents/INDEX.md"
+  ]
+}
