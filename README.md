@@ -5,7 +5,7 @@ Generic .NET guidance for Claude Code and Codex, published as `dotnet@dotagents`
 ## Ownership
 
 Full authored definitions live under `.agents/<kind>/<name>/SKILL.md`. The repository scope already means .NET,
-so there is no repeated `dotnet/` source folder. `.agents/skills`, `.codex/skills`, `.claude/skills`, marketplaces,
+so there is no repeated `dotnet/` source folder. `.codex/skills`, `.claude/skills`, marketplaces,
 the capability index, and `plugins/dotnet` are generated from those definitions and authored host manifests.
 See [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md).
 

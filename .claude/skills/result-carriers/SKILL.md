@@ -9,7 +9,7 @@ requires: reunion
 provenance: library, selected-stack, house
 ---
 
-# result-carriers
+# Result and Option carriers
 
 Read and follow the [canonical shared definition](../../../.agents/contract/result-carriers/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

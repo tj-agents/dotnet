@@ -19,7 +19,7 @@ class GeneratedRootSafetyTests(unittest.TestCase):
     def test_declared_roots_are_allowed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             paths = sync_generated.validated_generated_roots(Path(temporary), self.config())
-        self.assertEqual(7, len(paths))
+        self.assertEqual(6, len(paths))
 
     def test_arbitrary_or_reassigned_paths_are_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -28,8 +28,8 @@ class GeneratedRootSafetyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "fixed repository-owned"):
                 sync_generated.validated_generated_roots(Path(temporary), config)
             config = self.config()
-            config["host_adapter_roots"]["agents"] = "README.md"
-            config["generated_roots"] = ["README.md" if item == ".agents/skills" else item for item in config["generated_roots"]]
+            config["host_adapter_roots"]["codex"] = "README.md"
+            config["generated_roots"] = ["README.md" if item == ".codex/skills" else item for item in config["generated_roots"]]
             with self.assertRaisesRegex(ValueError, "Host adapter roots"):
                 sync_generated.validated_generated_roots(Path(temporary), config)
             config = self.config()

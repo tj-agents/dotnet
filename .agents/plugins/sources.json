@@ -7,7 +7,6 @@
     "plugin": "dotnet"
   },
   "host_adapter_roots": {
-    "agents": ".agents/skills",
     "codex": ".codex/skills",
     "claude": ".claude/skills"
   },
@@ -30,7 +29,6 @@
     }
   },
   "generated_roots": [
-    ".agents/skills",
     ".codex/skills",
     ".claude/skills",
     "plugins",
