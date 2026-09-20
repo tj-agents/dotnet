@@ -1,30 +1,35 @@
 # dotagents
 
-Generic .NET engineering contracts for Claude Code and Codex.
+Generic .NET guidance for Claude Code and Codex, published as `dotnet@dotagents`.
 
-The dotagents marketplace publishes one plugin, dotnet. Canonical skills live under .agents/skills and
-standards live under standards/dotnet. The generator produces both harness mirrors and the self-contained
-plugins/dotnet payload.
+## Ownership
 
-Concertable-specific .NET rules belong in Concertable/agents. Machine operations belong in
-tomjseery/base-agents. React and TypeScript contracts belong in tomjseery/react-agents.
+Full authored definitions live under `.agents/<kind>/<name>/SKILL.md`. The repository scope already means .NET,
+so there is no repeated `dotnet/` source folder. `.agents/skills`, `.codex/skills`, `.claude/skills`, marketplaces,
+the capability index, and `plugins/dotnet` are generated from those definitions and authored host manifests.
+See [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md).
 
-## Authoring
+## Applicability
 
-The open skill-kind taxonomy is defined in
-[`base-agents/SKILL_KINDS.md`](https://github.com/tomjseery/base-agents/blob/main/SKILL_KINDS.md).
-Every skill here declares `kind: contract` and routes to exactly one standards document. After a change run:
+The `core` profile contains only comments, C# naming, and C# style and has no application-stack prerequisite.
+ASP.NET Core, EF Core, multitenancy, distributed-service, modular-service, testing-tier, result-library, validation,
+and full-stack defaults are independent profiles. Installing the plugin makes them discoverable; a repository selects
+only the capabilities matching its actual stack.
 
-    pwsh .agents/sync-generated.ps1
-    pwsh .agents/sync-generated.ps1 -Check
+Concertable-specific rules and concrete harness commands remain in `Concertable/agents`. Machine and engineering
+workflow capabilities remain in `tomjseery/base-agents`. React and TypeScript guidance remains in
+`tomjseery/react-agents`.
 
-The generator rejects missing kinds, missing documents, orphan documents, manifest drift, and any plugin
-payload that would reference files outside its own subtree.
+## Authoring and verification
 
-## Installation
+Each definition declares `kind`, `domain`, `profile`, `applicability`, `requires`, and `provenance`. After an authored
+change run:
 
-The central Concertable provisioner installs dotnet@dotagents for both harnesses:
+```powershell
+pwsh .agents/sync-generated.ps1
+pwsh .agents/sync-generated.ps1 -Check
+python -B -m unittest discover -s .agents/tests -p "test_*.py"
+```
 
-    pwsh path\to\agents\scripts\provision-agents.ps1
-
-A running session retains the payload loaded at startup; restart it after an update.
+The generator rejects source-map drift, unsafe output roots, duplicate identities, unresolved local skill references,
+missing selection metadata, product-owner leakage, and inconsistent host manifests.

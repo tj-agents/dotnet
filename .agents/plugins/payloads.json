@@ -1,6 +1,70 @@
 {
-  "$comment": "The dotnet plugin ships the generic .NET contract domain; machine operations belong to base@base-agents.",
+  "description": "Generic .NET guidance with explicit applicability for core C#, ASP.NET Core, EF Core, distributed services, testing tiers, and Tommy's selected libraries.",
+  "publicPlugins": [
+    "dotnet"
+  ],
   "payloads": {
-    "dotnet": ["dotnet"]
+    "dotnet": [
+      "dotnet"
+    ]
+  },
+  "profiles": {
+    "core": [
+      "comments",
+      "csharp-naming",
+      "csharp-style"
+    ],
+    "extensions": [
+      "dependency-injection",
+      "logging"
+    ],
+    "selected-stack": [
+      "dotnet-stack"
+    ],
+    "domain-model": [
+      "domain-events"
+    ],
+    "aspnet": [
+      "http-api"
+    ],
+    "integration-testing": [
+      "integration-debug",
+      "integration-testing"
+    ],
+    "e2e": [
+      "e2e-api-debug",
+      "e2e-debug",
+      "e2e-scenarios",
+      "e2e-ui-debug"
+    ],
+    "keyed-design": [
+      "keyed-strategies",
+      "keyed-unions"
+    ],
+    "distributed-services": [
+      "microservice-boundaries",
+      "proto"
+    ],
+    "modular-services": [
+      "module-structure"
+    ],
+    "ef-core": [
+      "persistence",
+      "seeding"
+    ],
+    "multitenancy": [
+      "multitenancy"
+    ],
+    "results": [
+      "result-carriers",
+      "result-errors",
+      "result-terminals"
+    ],
+    "unit-testing": [
+      "unit-testing"
+    ],
+    "validation": [
+      "validation"
+    ]
   }
 }

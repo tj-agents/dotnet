@@ -1,0 +1,17 @@
+{
+  "name": "dotnet",
+  "displayName": ".NET Standards",
+  "description": "Generic C# and .NET engineering standards.",
+  "author": {
+    "name": "Tommy Seery"
+  },
+  "repository": "https://github.com/tomjseery/dotagents",
+  "skills": "./skills/",
+  "keywords": [
+    "standards",
+    "dotnet",
+    "csharp",
+    "ef-core",
+    "testing"
+  ]
+}

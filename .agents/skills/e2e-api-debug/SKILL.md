@@ -1,10 +1,15 @@
 ---
 name: e2e-api-debug
-description: Run the service end-to-end suite (xUnit over a full Aspire DistributedApplication with no browser, real payment test mode and a real Service Bus emulator) and drive every failure to green. Covers the three failure shapes and how to tell them apart — a synchronous status mismatch that already carries URL, status and response body; a polling timeout, which is the common one and means a downstream reaction never completed; and a completed flow that computed the wrong value — plus mapping the state that never appeared to the resource that owed it, why a gRPC error surfaces only in the callee's log, the startup-hang watch, and why widening a polling window is banned in a tier that has no baseline and no quarantine lane. Use whenever the user wants a service-layer E2E failure debugged, that suite run, or a settlement, payment or event-propagation flow investigated below the browser.
-
-kind: contract
+description: Run and repair a repository's service-level end-to-end tier through its own full-stack harness, separating response mismatches, polling timeouts and wrong completed values, tracing missing state to the responsible resource, and verifying the exact scenario plus its owning scope. Use when a service E2E scenario or backend full-stack CI job fails.
+kind: operation
+domain: dotnet
+profile: e2e
+applicability: service end-to-end suites using a repository-owned full-stack harness
+requires: full-stack-test-harness
+provenance: operation, selected-stack
 ---
 
-# e2e-api-debug
+# Debugging a service end-to-end suite
 
-The standard is `standards/dotnet/testing/E2E_API_DEBUG.md` in `tomjseery/dotagents`, deployed to `~/.agents/standards/dotagents/dotnet/testing/E2E_API_DEBUG.md`. Read it and follow it; this skill only routes to it.
+Read and follow the [canonical shared definition](../../operation/e2e-api-debug/SKILL.md) in full.
+This discovery entry is generated; edit the referenced `.agents/` definition.
