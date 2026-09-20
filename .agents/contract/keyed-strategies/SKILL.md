@@ -9,7 +9,7 @@ requires: microsoft-extensions-dependency-injection
 provenance: framework, pattern, house
 ---
 
-﻿# Keyed strategies
+# Keyed strategies
 
 ## Applicability
 

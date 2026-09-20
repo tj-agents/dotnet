@@ -15,7 +15,6 @@ QUALIFIED_SKILL = re.compile(r"(?<![-/\w])(dotnet|engineering):(?!:)([a-z][a-z0-
 REQUIRED_METADATA = ("name", "description", "kind", "domain", "profile", "applicability", "requires", "provenance")
 RESERVED_AGENT_DIRS = {"plugins", "skills", "tests"}
 EXPECTED_GENERATED_ROOTS = (
-    ".agents/skills",
     ".codex/skills",
     ".claude/skills",
     "plugins",
@@ -23,7 +22,7 @@ EXPECTED_GENERATED_ROOTS = (
     ".claude-plugin/marketplace.json",
     ".agents/INDEX.md",
 )
-EXPECTED_HOST_ADAPTER_ROOTS = {"agents": ".agents/skills", "codex": ".codex/skills", "claude": ".claude/skills"}
+EXPECTED_HOST_ADAPTER_ROOTS = {"codex": ".codex/skills", "claude": ".claude/skills"}
 EXPECTED_HOST_MANIFEST_ROOTS = {"codex": ".agents/plugins/manifests/codex", "claude": ".agents/plugins/manifests/claude"}
 EXPECTED_MARKETPLACE_TEMPLATES = {
     "codex": ".agents/plugins/manifests/codex/marketplace.json",
@@ -69,6 +68,8 @@ def discover(root: Path, config: dict) -> dict[str, dict]:
     for kind_dir in sorted(path for path in agents_root.iterdir() if path.is_dir() and path.name not in RESERVED_AGENT_DIRS):
         for path in sorted(kind_dir.glob("*/SKILL.md")):
             body = read(path)
+            if "\ufeff" in body:
+                raise ValueError(f"{path}: embedded UTF-8 BOM")
             values = metadata(body, path)
             name = values["name"]
             if name != path.parent.name:
@@ -111,6 +112,37 @@ def validated_config(config: dict) -> None:
         raise ValueError("Package outputs must remain rooted at plugins/dotnet")
 
 
+def validate_host_metadata(codex: dict, claude: dict, codex_marketplace: dict, claude_marketplace: dict) -> None:
+    for field in ("name", "description", "author", "repository", "skills", "keywords"):
+        if codex.get(field) != claude.get(field):
+            raise ValueError(f"Claude and Codex manifests disagree on {field}")
+    if claude.get("version") is not None:
+        raise ValueError("Claude manifest must remain commit-versioned and omit version")
+    if not re.fullmatch(r"\d+\.\d+\.\d+", str(codex.get("version", ""))):
+        raise ValueError("Codex manifest must declare a semantic version")
+    if claude.get("displayName") != codex.get("interface", {}).get("displayName"):
+        raise ValueError("Claude and Codex manifests disagree on display name")
+
+    codex_entries = codex_marketplace.get("plugins", [])
+    claude_entries = claude_marketplace.get("plugins", [])
+    if len(codex_entries) != 1 or len(claude_entries) != 1:
+        raise ValueError("Each marketplace must declare exactly the dotnet plugin")
+    codex_entry, claude_entry = codex_entries[0], claude_entries[0]
+    if codex_entry.get("name") != "dotnet" or claude_entry.get("name") != "dotnet":
+        raise ValueError("Each marketplace must declare exactly the dotnet plugin")
+    if codex_entry.get("source") != {"source": "local", "path": "./plugins/dotnet"}:
+        raise ValueError("Codex marketplace must use the repository-local dotnet package")
+    if codex_entry.get("policy") != {"installation": "INSTALLED_BY_DEFAULT", "authentication": "ON_INSTALL"}:
+        raise ValueError("Codex marketplace policy changed")
+    if claude_entry.get("source") != "./plugins/dotnet":
+        raise ValueError("Claude marketplace must use the repository-local dotnet package")
+    if claude_entry.get("category") != codex_entry.get("category"):
+        raise ValueError("Claude and Codex marketplaces disagree on category")
+    for field in ("description", "keywords"):
+        if claude_entry.get(field) != claude.get(field):
+            raise ValueError(f"Claude marketplace and plugin disagree on {field}")
+
+
 def validate(root: Path, config: dict, payloads: dict, skills: dict[str, dict]) -> None:
     validated_config(config)
     if payloads.get("publicPlugins") != ["dotnet"] or payloads.get("payloads") != {"dotnet": ["dotnet"]}:
@@ -132,15 +164,11 @@ def validate(root: Path, config: dict, payloads: dict, skills: dict[str, dict]) 
         for namespace, name in QUALIFIED_SKILL.findall(skill["body"]):
             if namespace == "dotnet" and name not in skills:
                 raise ValueError(f"{skill['name']}: missing local skill reference {namespace}:{name}")
-    for host, manifest_root in EXPECTED_HOST_MANIFEST_ROOTS.items():
-        manifest = load(root / manifest_root / "dotnet.json")
-        if manifest.get("name") != "dotnet" or manifest.get("skills") != "./skills/":
-            raise ValueError(f"Invalid {host} dotnet manifest")
-    for host, template in EXPECTED_MARKETPLACE_TEMPLATES.items():
-        marketplace = load(root / template)
-        entries = marketplace.get("plugins", [])
-        if [entry.get("name") for entry in entries] != ["dotnet"]:
-            raise ValueError(f"Invalid {host} marketplace template")
+    codex = load(root / EXPECTED_HOST_MANIFEST_ROOTS["codex"] / "dotnet.json")
+    claude = load(root / EXPECTED_HOST_MANIFEST_ROOTS["claude"] / "dotnet.json")
+    codex_marketplace = load(root / EXPECTED_MARKETPLACE_TEMPLATES["codex"])
+    claude_marketplace = load(root / EXPECTED_MARKETPLACE_TEMPLATES["claude"])
+    validate_host_metadata(codex, claude, codex_marketplace, claude_marketplace)
 
 
 def adapter_body(skill: dict, adapter_root: str) -> str:

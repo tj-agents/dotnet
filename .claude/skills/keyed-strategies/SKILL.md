@@ -9,7 +9,7 @@ requires: microsoft-extensions-dependency-injection
 provenance: framework, pattern, house
 ---
 
-# keyed-strategies
+# Keyed strategies
 
 Read and follow the [canonical shared definition](../../../.agents/contract/keyed-strategies/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

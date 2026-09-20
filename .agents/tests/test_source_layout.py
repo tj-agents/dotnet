@@ -64,7 +64,7 @@ class SourceLayoutTests(unittest.TestCase):
             source = ROOT / skill["relative"]
             package = ROOT / "plugins/dotnet/skills" / name / "SKILL.md"
             self.assertEqual(source.read_bytes(), package.read_bytes())
-            for adapter_root in (".agents/skills", ".codex/skills", ".claude/skills"):
+            for adapter_root in (".codex/skills", ".claude/skills"):
                 adapter = (ROOT / adapter_root / name / "SKILL.md").read_text(encoding="utf-8")
                 self.assertIn("canonical shared definition", adapter)
                 self.assertNotEqual(source.read_text(encoding="utf-8"), adapter)
@@ -80,6 +80,26 @@ class SourceLayoutTests(unittest.TestCase):
                 if namespace == "dotnet" and target not in self.skills:
                     offenders.append(f"{name}: {namespace}:{target}")
         self.assertEqual([], offenders)
+
+    def test_host_manifests_reject_drift_and_cache_pinning(self) -> None:
+        codex = json.loads((ROOT / ".agents/plugins/manifests/codex/dotnet.json").read_text(encoding="utf-8"))
+        claude = json.loads((ROOT / ".agents/plugins/manifests/claude/dotnet.json").read_text(encoding="utf-8"))
+        codex_marketplace = json.loads((ROOT / ".agents/plugins/manifests/codex/marketplace.json").read_text(encoding="utf-8"))
+        claude_marketplace = json.loads((ROOT / ".agents/plugins/manifests/claude/marketplace.json").read_text(encoding="utf-8"))
+        sync_generated.validate_host_metadata(codex, claude, codex_marketplace, claude_marketplace)
+
+        changed = dict(claude)
+        changed["description"] = "drifted"
+        with self.assertRaisesRegex(ValueError, "disagree on description"):
+            sync_generated.validate_host_metadata(codex, changed, codex_marketplace, claude_marketplace)
+        changed = dict(claude)
+        changed["version"] = "1.1.0"
+        with self.assertRaisesRegex(ValueError, "omit version"):
+            sync_generated.validate_host_metadata(codex, changed, codex_marketplace, claude_marketplace)
+
+    def test_canonical_definitions_have_no_embedded_bom(self) -> None:
+        for skill in self.skills.values():
+            self.assertNotIn("\ufeff", skill["body"])
 
     def test_generated_selection_matches_metadata(self) -> None:
         selection = json.loads((ROOT / "plugins/dotnet/selection.json").read_text(encoding="utf-8"))

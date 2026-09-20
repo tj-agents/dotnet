@@ -12,7 +12,7 @@ profiles independently selectable inside that package.
 
 ## Generated
 
-- `.agents/skills`, `.codex/skills`, `.claude/skills` — thin discovery entries referencing canonical definitions.
+- `.codex/skills`, `.claude/skills` — host-specific thin discovery entries referencing canonical definitions.
 - `.agents/INDEX.md` — kind/profile navigation.
 - `.agents/plugins/marketplace.json`, `.claude-plugin/marketplace.json` — host marketplace bridges.
 - `plugins/dotnet` — self-contained manifests, full definitions, index, and selection metadata.

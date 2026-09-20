@@ -9,7 +9,7 @@ requires: reunion
 provenance: library, selected-stack, house
 ---
 
-﻿# Result and Option carriers
+# Result and Option carriers
 
 ## Applicability
 
