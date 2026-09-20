@@ -1,21 +1,22 @@
 # Architecture
 
-dotagents owns generic .NET contracts only. Its terminal marketplace identity is dotagents and its sole
-plugin identity is dotnet.
+dotagents owns one scope: generic .NET guidance. It publishes one plugin, `dotnet`, while keeping optional application
+profiles independently selectable inside that package.
 
-Authored sources:
+## Authored
 
-- .agents/skills contains contract routers.
-- standards/dotnet contains the contract documents.
-- .agents/plugins contains marketplace and payload declarations.
+- `.agents/<kind>/<name>/SKILL.md` — full host-neutral capability definitions.
+- `.agents/plugins/sources.json` — source map and exact generated roots.
+- `.agents/plugins/payloads.json` — public package and selection profiles.
+- `.agents/plugins/manifests/{codex,claude}/` — host-native manifest inputs.
 
-Generated delivery:
+## Generated
 
-- .claude/skills mirrors the canonical routers for repository-local Claude sessions.
-- plugins/dotnet contains installable Claude and Codex manifests, routers, and standards.
-- .claude-plugin/marketplace.json and .agents/plugins/marketplace.json describe the same plugin to their
-  respective harnesses.
+- `.codex/skills`, `.claude/skills` — host-specific thin discovery entries referencing canonical definitions.
+- `.agents/INDEX.md` — kind/profile navigation.
+- `.agents/plugins/marketplace.json`, `.claude-plugin/marketplace.json` — host marketplace bridges.
+- `plugins/dotnet` — self-contained manifests, full definitions, index, and selection metadata.
 
-Concertable/agents owns Concertable-specific contracts, workflows, profiles, and hooks. base-agents owns
-machine operations. react-agents owns generic React and TypeScript contracts. Shared behavior is never
-copied between those repositories.
+Core C# rules have no stack prerequisite. Every other capability names the framework, library, architecture, or test
+tier that makes it applicable. Generic debug operations discover a consuming repository's supported entrypoint;
+product topology, commands, fixtures, and rosters remain with that product.
