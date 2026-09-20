@@ -114,13 +114,15 @@ def validated_config(config: dict) -> None:
 
 def validate_host_metadata(codex: dict, claude: dict, codex_marketplace: dict, claude_marketplace: dict) -> None:
     for field in ("name", "description", "author", "repository", "skills", "keywords"):
-        if codex.get(field) != claude.get(field):
+        if not codex.get(field) or codex.get(field) != claude.get(field):
             raise ValueError(f"Claude and Codex manifests disagree on {field}")
-    if claude.get("version") is not None:
+    if codex.get("name") != "dotnet" or codex.get("skills") != "./skills/":
+        raise ValueError("Host manifests must retain the dotnet identity and packaged skills path")
+    if "version" in claude:
         raise ValueError("Claude manifest must remain commit-versioned and omit version")
     if not re.fullmatch(r"\d+\.\d+\.\d+", str(codex.get("version", ""))):
         raise ValueError("Codex manifest must declare a semantic version")
-    if claude.get("displayName") != codex.get("interface", {}).get("displayName"):
+    if not claude.get("displayName") or claude.get("displayName") != codex.get("interface", {}).get("displayName"):
         raise ValueError("Claude and Codex manifests disagree on display name")
 
     codex_entries = codex_marketplace.get("plugins", [])
@@ -136,7 +138,7 @@ def validate_host_metadata(codex: dict, claude: dict, codex_marketplace: dict, c
         raise ValueError("Codex marketplace policy changed")
     if claude_entry.get("source") != "./plugins/dotnet":
         raise ValueError("Claude marketplace must use the repository-local dotnet package")
-    if claude_entry.get("category") != codex_entry.get("category"):
+    if not codex_entry.get("category") or claude_entry.get("category") != codex_entry.get("category"):
         raise ValueError("Claude and Codex marketplaces disagree on category")
     for field in ("description", "keywords"):
         if claude_entry.get(field) != claude.get(field):

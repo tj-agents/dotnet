@@ -96,6 +96,18 @@ class SourceLayoutTests(unittest.TestCase):
         changed["version"] = "1.1.0"
         with self.assertRaisesRegex(ValueError, "omit version"):
             sync_generated.validate_host_metadata(codex, changed, codex_marketplace, claude_marketplace)
+        changed_codex, changed_claude = dict(codex), dict(claude)
+        changed_codex["name"] = changed_claude["name"] = "other"
+        with self.assertRaisesRegex(ValueError, "dotnet identity"):
+            sync_generated.validate_host_metadata(changed_codex, changed_claude, codex_marketplace, claude_marketplace)
+        changed_codex, changed_claude = dict(codex), dict(claude)
+        changed_codex["skills"] = changed_claude["skills"] = "./missing/"
+        with self.assertRaisesRegex(ValueError, "packaged skills path"):
+            sync_generated.validate_host_metadata(changed_codex, changed_claude, codex_marketplace, claude_marketplace)
+        changed = dict(claude)
+        changed["version"] = None
+        with self.assertRaisesRegex(ValueError, "omit version"):
+            sync_generated.validate_host_metadata(codex, changed, codex_marketplace, claude_marketplace)
 
     def test_canonical_definitions_have_no_embedded_bom(self) -> None:
         for skill in self.skills.values():
