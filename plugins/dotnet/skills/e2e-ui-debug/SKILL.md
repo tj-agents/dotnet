@@ -1,10 +1,30 @@
 ---
 name: e2e-ui-debug
-description: Run the browser end-to-end suite (Reqnroll scenarios over Playwright against the full Aspire stack) and drive every failure to green — discover failures, re-run each one alone for the enriched output, and diagnose HTTP 4xx/5xx first, then a gRPC error in the callee's forwarded resource log, then browser console and on-screen errors, then the failure screenshot. Covers the entrypoint's command grammar and how to discover this repo's suites from it, headless as the default and why a direct dotnet test run is headed unless told otherwise, the startup-hang watch and the four causes that recur, preserving scenario semantics when changing a shared fixture or page object, and why widening a timeout or suppressing a build is banned rather than discouraged. Use whenever the user wants a browser E2E failure debugged, the full suite run, newly-passing or newly-failing scenarios discovered, or a flaky scenario investigated.
-
-kind: contract
+description: Run and repair a repository's browser end-to-end tier through its own full-stack harness, checking readiness and server or RPC failures before browser console, UI and screenshot evidence, while preserving scenario semantics. Use when a browser E2E scenario or UI full-stack CI job fails.
+kind: operation
+domain: dotnet
+profile: e2e
+applicability: browser end-to-end suites using a repository-owned full-stack harness
+requires: browser-e2e, playwright
+provenance: operation, selected-stack
 ---
 
-# e2e-ui-debug
+# Debugging a browser end-to-end suite
 
-The standard is `../../standards/dotnet/testing/E2E_UI_DEBUG.md`, shipped in this plugin. Read it and follow it; this skill only routes to it.
+## Applicability
+
+This operation applies only when the repository defines a browser E2E tier and supplies its own full-stack
+entrypoint, scenario filters, resource logs, and artifact locations.
+
+## Procedure
+
+1. Discover the repository's supported browser suites and run the narrowest failing scenario headless.
+2. Confirm the full stack reached its declared ready state before interpreting a browser timeout.
+3. Diagnose HTTP 4xx/5xx first, then callee-side RPC/resource logs, then browser console and visible UI errors.
+4. Inspect the failure screenshot or trace only after transport and server failures are ruled out.
+5. Preserve the scenario's behavior when changing shared fixtures, page objects, or fast-forward setup.
+6. Fix the cause; do not widen timeouts, suppress builds, or move a failing scenario into an ignore list.
+7. Re-run the scenario alone, then its owning browser suite.
+
+Use `engineering:failing-tests`, `engineering:failure-provenance`, and `engineering:remote-validation` for the
+shared delivery rules. Use `dotnet:e2e-scenarios` for scenario authoring.

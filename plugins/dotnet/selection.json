@@ -1,0 +1,496 @@
+{
+  "plugin": "dotnet",
+  "profiles": {
+    "core": [
+      "comments",
+      "csharp-naming",
+      "csharp-style"
+    ],
+    "extensions": [
+      "dependency-injection",
+      "logging"
+    ],
+    "selected-stack": [
+      "dotnet-stack"
+    ],
+    "domain-model": [
+      "domain-events"
+    ],
+    "aspnet": [
+      "http-api"
+    ],
+    "integration-testing": [
+      "integration-debug",
+      "integration-testing"
+    ],
+    "e2e": [
+      "e2e-api-debug",
+      "e2e-debug",
+      "e2e-scenarios",
+      "e2e-ui-debug"
+    ],
+    "keyed-design": [
+      "keyed-strategies",
+      "keyed-unions"
+    ],
+    "distributed-services": [
+      "microservice-boundaries",
+      "proto"
+    ],
+    "modular-services": [
+      "module-structure"
+    ],
+    "ef-core": [
+      "persistence",
+      "seeding"
+    ],
+    "multitenancy": [
+      "multitenancy"
+    ],
+    "results": [
+      "result-carriers",
+      "result-errors",
+      "result-terminals"
+    ],
+    "unit-testing": [
+      "unit-testing"
+    ],
+    "validation": [
+      "validation"
+    ]
+  },
+  "skills": [
+    {
+      "name": "comments",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "csharp-naming",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "csharp-style",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "dependency-injection",
+      "kind": "contract",
+      "profile": "extensions",
+      "applicability": [
+        "projects using Microsoft.Extensions.DependencyInjection"
+      ],
+      "requires": [
+        "microsoft-extensions-dependency-injection"
+      ],
+      "provenance": [
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "domain-events",
+      "kind": "contract",
+      "profile": "domain-model",
+      "applicability": [
+        "domain models dispatching events through an EF Core save boundary"
+      ],
+      "requires": [
+        "domain-events",
+        "ef-core"
+      ],
+      "provenance": [
+        "library",
+        "architecture",
+        "house"
+      ]
+    },
+    {
+      "name": "dotnet-stack",
+      "kind": "contract",
+      "profile": "selected-stack",
+      "applicability": [
+        "repositories that explicitly select Tommy's full application stack"
+      ],
+      "requires": [
+        "selected-stack-profile"
+      ],
+      "provenance": [
+        "selected-stack"
+      ]
+    },
+    {
+      "name": "e2e-api-debug",
+      "kind": "operation",
+      "profile": "e2e",
+      "applicability": [
+        "service end-to-end suites using a repository-owned full-stack harness"
+      ],
+      "requires": [
+        "full-stack-test-harness"
+      ],
+      "provenance": [
+        "operation",
+        "selected-stack"
+      ]
+    },
+    {
+      "name": "e2e-debug",
+      "kind": "operation",
+      "profile": "e2e",
+      "applicability": [
+        "repositories that provide both service and browser end-to-end tiers"
+      ],
+      "requires": [
+        "service-e2e",
+        "browser-e2e"
+      ],
+      "provenance": [
+        "operation",
+        "selected-stack"
+      ]
+    },
+    {
+      "name": "e2e-scenarios",
+      "kind": "contract",
+      "profile": "e2e",
+      "applicability": [
+        "browser end-to-end suites using Gherkin and Playwright"
+      ],
+      "requires": [
+        "reqnroll",
+        "playwright"
+      ],
+      "provenance": [
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "e2e-ui-debug",
+      "kind": "operation",
+      "profile": "e2e",
+      "applicability": [
+        "browser end-to-end suites using a repository-owned full-stack harness"
+      ],
+      "requires": [
+        "browser-e2e",
+        "playwright"
+      ],
+      "provenance": [
+        "operation",
+        "selected-stack"
+      ]
+    },
+    {
+      "name": "http-api",
+      "kind": "contract",
+      "profile": "aspnet",
+      "applicability": [
+        "ASP.NET Core HTTP APIs"
+      ],
+      "requires": [
+        "aspnet-core"
+      ],
+      "provenance": [
+        "framework",
+        "house"
+      ]
+    },
+    {
+      "name": "integration-debug",
+      "kind": "operation",
+      "profile": "integration-testing",
+      "applicability": [
+        "ASP.NET Core integration suites with a real database reset between tests"
+      ],
+      "requires": [
+        "aspnet-core",
+        "xunit",
+        "testcontainers",
+        "respawn"
+      ],
+      "provenance": [
+        "framework",
+        "library",
+        "operation"
+      ]
+    },
+    {
+      "name": "integration-testing",
+      "kind": "contract",
+      "profile": "integration-testing",
+      "applicability": [
+        "ASP.NET Core integration suites with a real database reset between tests"
+      ],
+      "requires": [
+        "aspnet-core",
+        "xunit",
+        "testcontainers",
+        "respawn"
+      ],
+      "provenance": [
+        "framework",
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "keyed-strategies",
+      "kind": "contract",
+      "profile": "keyed-design",
+      "applicability": [
+        "closed-key behaviour selected through keyed dependency injection"
+      ],
+      "requires": [
+        "microsoft-extensions-dependency-injection"
+      ],
+      "provenance": [
+        "framework",
+        "pattern",
+        "house"
+      ]
+    },
+    {
+      "name": "keyed-unions",
+      "kind": "contract",
+      "profile": "keyed-design",
+      "applicability": [
+        "closed-key variants with different signatures"
+      ],
+      "requires": [
+        "dunet"
+      ],
+      "provenance": [
+        "library",
+        "pattern",
+        "house"
+      ]
+    },
+    {
+      "name": "logging",
+      "kind": "contract",
+      "profile": "extensions",
+      "applicability": [
+        "projects using Microsoft.Extensions.Logging"
+      ],
+      "requires": [
+        "microsoft-extensions-logging"
+      ],
+      "provenance": [
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "microservice-boundaries",
+      "kind": "contract",
+      "profile": "distributed-services",
+      "applicability": [
+        "distributed services"
+      ],
+      "requires": [
+        "distributed-service-architecture"
+      ],
+      "provenance": [
+        "architecture",
+        "selected-stack"
+      ]
+    },
+    {
+      "name": "module-structure",
+      "kind": "contract",
+      "profile": "modular-services",
+      "applicability": [
+        "modular service or layered shared-library architecture"
+      ],
+      "requires": [
+        "modular-service-architecture"
+      ],
+      "provenance": [
+        "architecture",
+        "house"
+      ]
+    },
+    {
+      "name": "multitenancy",
+      "kind": "contract",
+      "profile": "multitenancy",
+      "applicability": [
+        "multi-tenant projects using EF Core"
+      ],
+      "requires": [
+        "ef-core",
+        "multitenancy"
+      ],
+      "provenance": [
+        "library",
+        "architecture",
+        "house"
+      ]
+    },
+    {
+      "name": "persistence",
+      "kind": "contract",
+      "profile": "ef-core",
+      "applicability": [
+        "projects using EF Core and the selected repository/unit-of-work abstractions"
+      ],
+      "requires": [
+        "ef-core",
+        "selected-data-access-abstractions"
+      ],
+      "provenance": [
+        "library",
+        "selected-stack",
+        "house"
+      ]
+    },
+    {
+      "name": "proto",
+      "kind": "contract",
+      "profile": "distributed-services",
+      "applicability": [
+        "services using gRPC and Protobuf"
+      ],
+      "requires": [
+        "grpc",
+        "protobuf"
+      ],
+      "provenance": [
+        "protocol",
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "result-carriers",
+      "kind": "contract",
+      "profile": "results",
+      "applicability": [
+        "projects that select Reunion result and option carriers"
+      ],
+      "requires": [
+        "reunion"
+      ],
+      "provenance": [
+        "library",
+        "selected-stack",
+        "house"
+      ]
+    },
+    {
+      "name": "result-errors",
+      "kind": "contract",
+      "profile": "results",
+      "applicability": [
+        "projects that select Reunion errors and Dunet unions"
+      ],
+      "requires": [
+        "reunion",
+        "dunet"
+      ],
+      "provenance": [
+        "library",
+        "selected-stack",
+        "house"
+      ]
+    },
+    {
+      "name": "result-terminals",
+      "kind": "contract",
+      "profile": "results",
+      "applicability": [
+        "ASP.NET Core or worker/RPC edges using Reunion carriers"
+      ],
+      "requires": [
+        "reunion",
+        "aspnet-core-or-worker-rpc"
+      ],
+      "provenance": [
+        "library",
+        "framework",
+        "house"
+      ]
+    },
+    {
+      "name": "seeding",
+      "kind": "contract",
+      "profile": "ef-core",
+      "applicability": [
+        "projects using EF Core seeders"
+      ],
+      "requires": [
+        "ef-core"
+      ],
+      "provenance": [
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "unit-testing",
+      "kind": "contract",
+      "profile": "unit-testing",
+      "applicability": [
+        "projects using xUnit for deterministic core logic"
+      ],
+      "requires": [
+        "xunit"
+      ],
+      "provenance": [
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "validation",
+      "kind": "contract",
+      "profile": "validation",
+      "applicability": [
+        "projects using FluentValidation and Reunion validation results"
+      ],
+      "requires": [
+        "fluentvalidation",
+        "reunion"
+      ],
+      "provenance": [
+        "library",
+        "selected-stack",
+        "house"
+      ]
+    }
+  ]
+}

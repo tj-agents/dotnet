@@ -7,12 +7,15 @@ on:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-
-      # Also proves the generator runs on Linux and on PowerShell 7. It is written to work under
-      # Windows PowerShell 5.1 too, because that is all some machines carrying this clone have.
       - name: generated files are current
         shell: pwsh
         run: ./.agents/sync-generated.ps1 -Check
+      - name: source and applicability contracts
+        shell: pwsh
+        run: python -B -m unittest discover -s .agents/tests -p "test_*.py"
