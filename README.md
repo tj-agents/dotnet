@@ -1,6 +1,7 @@
-# dotagents
+# dotnet
 
 Generic .NET guidance for Claude Code and Codex, published as `dotnet@dotagents`.
+The canonical repository is [`tj-agents/dotnet`](https://github.com/tj-agents/dotnet); the marketplace ID remains `dotagents`.
 
 ## Ownership
 
@@ -17,8 +18,8 @@ and full-stack defaults are independent profiles. Installing the plugin makes th
 only the capabilities matching its actual stack.
 
 Concertable-specific rules and concrete harness commands remain in `Concertable/agents`. Machine and engineering
-workflow capabilities remain in `tomjseery/base-agents`. React and TypeScript guidance remains in
-`tomjseery/react-agents`.
+workflow capabilities remain in `tj-agents/core`. React and TypeScript guidance remains in
+`tj-agents/react`.
 
 ## Authoring and verification
 

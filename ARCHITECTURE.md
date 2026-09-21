@@ -1,6 +1,6 @@
 # Architecture
 
-dotagents owns one scope: generic .NET guidance. It publishes one plugin, `dotnet`, while keeping optional application
+`tj-agents/dotnet` owns one scope: generic .NET guidance. It publishes one plugin, `dotnet`, while keeping optional application
 profiles independently selectable inside that package.
 
 ## Authored
