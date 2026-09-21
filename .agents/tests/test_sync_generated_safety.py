@@ -38,6 +38,19 @@ class GeneratedRootSafetyTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "ancestor"):
                     sync_generated.validated_generated_roots(root, self.config())
 
+    def test_legacy_windows_reparse_point_is_rejected(self) -> None:
+        class LegacyWindowsPath:
+            @staticmethod
+            def is_symlink() -> bool:
+                return False
+
+            @staticmethod
+            def lstat():
+                return type("StatResult", (), {"st_file_attributes": 0x400})()
+
+        with mock.patch.object(sync_generated.os, "name", "nt"):
+            self.assertTrue(sync_generated.is_link_or_junction(LegacyWindowsPath()))
+
     def test_wrapper_fails_when_python_cannot_launch(self) -> None:
         pwsh = shutil.which("pwsh")
         if pwsh is None:
