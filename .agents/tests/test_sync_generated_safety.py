@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = importlib.util.spec_from_file_location("sync_generated", ROOT / ".agents" / "sync_generated.py")
@@ -20,6 +24,44 @@ class GeneratedRootSafetyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             paths = sync_generated.validated_generated_roots(Path(temporary), self.config())
         self.assertEqual(6, len(paths))
+
+    def test_generated_root_dangling_link_ancestor_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            original = Path.is_symlink
+            with mock.patch.object(
+                Path,
+                "is_symlink",
+                autospec=True,
+                side_effect=lambda path: path.name == ".codex" or original(path),
+            ):
+                with self.assertRaisesRegex(ValueError, "ancestor"):
+                    sync_generated.validated_generated_roots(root, self.config())
+
+    def test_wrapper_fails_when_python_cannot_launch(self) -> None:
+        pwsh = shutil.which("pwsh")
+        if pwsh is None:
+            self.skipTest("PowerShell is unavailable")
+        with tempfile.TemporaryDirectory() as temporary:
+            environment = os.environ.copy()
+            environment["PATH"] = temporary
+            result = subprocess.run(
+                [
+                    pwsh,
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-File",
+                    str(ROOT / ".agents/sync-generated.ps1"),
+                    "-Check",
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                env=environment,
+            )
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("python", f"{result.stdout}\n{result.stderr}".lower())
 
     def test_arbitrary_or_reassigned_paths_are_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
