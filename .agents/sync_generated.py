@@ -7,6 +7,7 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
+import stat
 
 
 FRONTMATTER = re.compile(r"\A---\n(?P<header>.*?)\n---\n(?P<body>.*)\Z", re.DOTALL)
@@ -236,6 +237,22 @@ def build(root: Path) -> tuple[dict[str, bytes], dict]:
     return output, config
 
 
+def is_link_or_junction(path: Path) -> bool:
+    if path.is_symlink():
+        return True
+    is_junction = getattr(path, "is_junction", None)
+    if is_junction is not None and is_junction():
+        return True
+    if os.name != "nt":
+        return False
+    try:
+        attributes = path.lstat().st_file_attributes
+    except FileNotFoundError:
+        return False
+    reparse_point = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    return bool(attributes & reparse_point)
+
+
 def validated_generated_roots(root: Path, config: dict) -> list[Path]:
     validated_config(config)
     resolved_root = root.resolve()
@@ -248,14 +265,13 @@ def validated_generated_roots(root: Path, config: dict) -> list[Path]:
         ancestor = resolved_root
         for part in relative.parts:
             ancestor = ancestor / part
-            is_junction = getattr(ancestor, "is_junction", lambda: False)()
-            if ancestor.is_symlink() or is_junction:
+            if is_link_or_junction(ancestor):
                 raise ValueError(f"Generated root ancestor must not be a link or junction: {ancestor}")
         path = lexical.resolve()
         if path == resolved_root or not path.is_relative_to(resolved_root):
             raise ValueError(f"Generated root escapes or equals repository root: {value}")
-        if lexical.is_symlink():
-            raise ValueError(f"Generated root must not be a symlink: {value}")
+        if is_link_or_junction(lexical):
+            raise ValueError(f"Generated root must not be a link or junction: {value}")
         result.append(path)
     return result
 
