@@ -1,4 +1,4 @@
-# dotagents
+# dotnet
 
 Read README.md and SOURCE_LAYOUT.md before changing repository structure.
 
