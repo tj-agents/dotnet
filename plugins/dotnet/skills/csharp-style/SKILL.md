@@ -31,11 +31,8 @@ The rules below are the ones prose has to carry, plus the reasoning behind the e
 
 ## Model value semantics and real choices
 
-Use a `readonly record struct` for a small immutable value whose identity is entirely its fields when
-`default(T)` is valid or harmless. Keep construction private when ordinary creation canonicalizes the
-value, but remember that every struct still has an all-default value; reject that value at the consuming
-invariant boundary when it is merely harmless. If an invalid default must be impossible to represent, use
-a reference value object instead.
+Modelling a small immutable value, and choosing a `readonly record struct` against a reference value
+object, is the `value-semantics` contract.
 
 An enum represents a genuine closed choice. Do not introduce a one-member enum for possible future
 variation, and do not encode an unrelated consumer's workflow vocabulary in a lower-level component.

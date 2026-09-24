@@ -69,7 +69,9 @@ outcome. Infrastructure faults, violated invariants, programmer errors, and canc
 exceptions.
 
 Use `bool` only for an actual predicate such as `CanAuthenticate`. A command must not return `bool` when
-`false` hides several caller actions. Conversely, do not manufacture a Result for uniformity when every
+`false` hides several caller actions. A `TryGet…` following the BCL `Try` shape is a different, narrower
+exception — no error value is worth carrying and the caller already expects a bool-and-`out` — and is the
+`value-semantics` contract's job, not a reason to loosen this table. Conversely, do not manufacture a Result for uniformity when every
 expected outcome is *intentionally* indistinguishable to the caller — a login where bad credentials and
 an unknown account are both ordinary absence, precisely to avoid an account-enumeration branch.
 
