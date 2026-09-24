@@ -5,6 +5,7 @@ Generated from canonical `.agents/<kind>/<name>/` definitions.
 - `comments` — contract — core — `.agents/contract/comments/SKILL.md`
 - `csharp-naming` — contract — core — `.agents/contract/csharp-naming/SKILL.md`
 - `csharp-style` — contract — core — `.agents/contract/csharp-style/SKILL.md`
+- `ddd` — contract — domain-model — `.agents/contract/ddd/SKILL.md`
 - `dependency-injection` — contract — extensions — `.agents/contract/dependency-injection/SKILL.md`
 - `domain-events` — contract — domain-model — `.agents/contract/domain-events/SKILL.md`
 - `dotnet-stack` — contract — selected-stack — `.agents/contract/dotnet-stack/SKILL.md`
@@ -25,6 +26,7 @@ Generated from canonical `.agents/<kind>/<name>/` definitions.
 - `seeding` — contract — ef-core — `.agents/contract/seeding/SKILL.md`
 - `unit-testing` — contract — unit-testing — `.agents/contract/unit-testing/SKILL.md`
 - `validation` — contract — validation — `.agents/contract/validation/SKILL.md`
+- `value-semantics` — contract — patterns — `.agents/contract/value-semantics/SKILL.md`
 - `e2e-api-debug` — operation — e2e — `.agents/operation/e2e-api-debug/SKILL.md`
 - `e2e-debug` — operation — e2e — `.agents/operation/e2e-debug/SKILL.md`
 - `e2e-ui-debug` — operation — e2e — `.agents/operation/e2e-ui-debug/SKILL.md`

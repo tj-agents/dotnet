@@ -14,6 +14,7 @@
       "dotnet-stack"
     ],
     "domain-model": [
+      "ddd",
       "domain-events"
     ],
     "aspnet": [
@@ -32,6 +33,9 @@
     "keyed-design": [
       "keyed-strategies",
       "keyed-unions"
+    ],
+    "patterns": [
+      "value-semantics"
     ],
     "distributed-services": [
       "microservice-boundaries",
@@ -102,6 +106,24 @@
       ],
       "provenance": [
         "language",
+        "house"
+      ]
+    },
+    {
+      "name": "ddd",
+      "kind": "contract",
+      "profile": "domain-model",
+      "applicability": [
+        "domain models designed with DDD building blocks (entities",
+        "value objects",
+        "aggregates)"
+      ],
+      "requires": [
+        "domain-model-architecture"
+      ],
+      "provenance": [
+        "architecture",
+        "pattern",
         "house"
       ]
     },
@@ -489,6 +511,22 @@
       "provenance": [
         "library",
         "selected-stack",
+        "house"
+      ]
+    },
+    {
+      "name": "value-semantics",
+      "kind": "contract",
+      "profile": "patterns",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "pattern",
         "house"
       ]
     }

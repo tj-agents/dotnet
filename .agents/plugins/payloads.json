@@ -22,6 +22,7 @@
       "dotnet-stack"
     ],
     "domain-model": [
+      "ddd",
       "domain-events"
     ],
     "aspnet": [
@@ -40,6 +41,9 @@
     "keyed-design": [
       "keyed-strategies",
       "keyed-unions"
+    ],
+    "patterns": [
+      "value-semantics"
     ],
     "distributed-services": [
       "microservice-boundaries",
