@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "tier": "dotnet",
+  "stack": ".NET",
+  "applies": "stack-present",
+  "owner_repository": [
+    "tj-agents/dotnet",
+    "tomjseery/dotagents"
+  ],
+  "detect": {
+    "files": [
+      "global.json",
+      "Directory.Build.props",
+      "Directory.Packages.props",
+      "NuGet.config"
+    ],
+    "globs": [
+      "*.sln",
+      "*.slnx",
+      "*.csproj",
+      "*.fsproj",
+      "*.vbproj",
+      "*.cs"
+    ]
+  }
+}
