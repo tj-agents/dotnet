@@ -1,6 +1,6 @@
 ---
 name: value-semantics
-description: The pattern for a small immutable value and its construction — choosing a `readonly record struct` against a reference value object on the `default(T)` and allocation-volume tests, putting construction and the value's own behaviour on the type as a static `From` or `TryGet…` rather than in helpers beside it, and the shape a `Try` method follows. Use when introducing a type to carry a value, when a method returns several related values, when deciding between a struct and a class for one, or when reviewing a `Try` signature.
+description: The pattern for a small immutable value and its construction — choosing a `readonly record struct` against a reference value object on the `default(T)` and allocation-volume tests, putting construction and the value's own behaviour on the type as a static `From`/`Create`/`TryGet…` rather than in helpers beside it, and the shape a `Try` method follows. Use when introducing a type to carry a value, when a method returns several related values, when deciding between a struct and a class for one, or when reviewing a `Try` signature.
 kind: contract
 domain: dotnet
 profile: patterns
@@ -28,8 +28,10 @@ materialised collection rather than a handful.
 
 ## Construction belongs on the type
 
-Give the type a static `From` or `TryGet…` and let it carry its own behaviour. A helper that builds or
-compares the value from outside splits one concept across two places.
+Give the type a static factory and let it carry its own behaviour: `From` converts an existing external
+shape (a row, a DTO, a raw string), `Create` builds directly from the value's own constituent parts, and
+`TryGet…` covers either when construction can fail. A helper that builds or compares the value from
+outside splits one concept across two places.
 
 ## A `Try` method follows the BCL shape
 
