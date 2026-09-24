@@ -30,6 +30,7 @@ EXPECTED_MARKETPLACE_TEMPLATES = {
     "claude": ".agents/plugins/manifests/claude/marketplace.json",
 }
 EXPECTED_MARKETPLACE_OUTPUTS = {"codex": ".agents/plugins/marketplace.json", "claude": ".claude-plugin/marketplace.json"}
+TIER_DECLARATION = ".agents/plugins/tier.json"
 
 
 def read(path: Path) -> str:
@@ -113,6 +114,19 @@ def validated_config(config: dict) -> None:
         raise ValueError("Package outputs must remain rooted at plugins/dotnet")
 
 
+def validate_tier(root: Path) -> None:
+    declaration = load(root / TIER_DECLARATION)
+    if declaration.get("schema_version") != 1:
+        raise ValueError("The tier declaration must stay at schema_version 1")
+    if declaration.get("tier") != "dotnet" or declaration.get("applies") != "stack-present":
+        raise ValueError("dotnet is a stack tier and must declare itself as one")
+    if "tj-agents/dotnet" not in (declaration.get("owner_repository") or []):
+        raise ValueError("The tier declaration must name this repository as its owner")
+    detect = declaration.get("detect") or {}
+    if not any(detect.get(field) for field in ("files", "globs", "content")):
+        raise ValueError("A stack tier must declare at least one detectable marker")
+
+
 def validate_host_metadata(codex: dict, claude: dict, codex_marketplace: dict, claude_marketplace: dict) -> None:
     for field in ("name", "description", "author", "repository", "skills", "keywords"):
         if not codex.get(field) or codex.get(field) != claude.get(field):
@@ -167,6 +181,7 @@ def validate(root: Path, config: dict, payloads: dict, skills: dict[str, dict]) 
         for namespace, name in QUALIFIED_SKILL.findall(skill["body"]):
             if namespace == "dotnet" and name not in skills:
                 raise ValueError(f"{skill['name']}: missing local skill reference {namespace}:{name}")
+    validate_tier(root)
     codex = load(root / EXPECTED_HOST_MANIFEST_ROOTS["codex"] / "dotnet.json")
     claude = load(root / EXPECTED_HOST_MANIFEST_ROOTS["claude"] / "dotnet.json")
     codex_marketplace = load(root / EXPECTED_MARKETPLACE_TEMPLATES["codex"])
@@ -215,6 +230,7 @@ def build(root: Path) -> tuple[dict[str, bytes], dict]:
         emit(f"plugins/dotnet/skills/{skill['name']}/SKILL.md", skill["body"])
     for host, manifest_root in EXPECTED_HOST_MANIFEST_ROOTS.items():
         emit(f"plugins/dotnet/.{host}-plugin/plugin.json", read(root / manifest_root / "dotnet.json"))
+    emit("plugins/dotnet/tier.json", read(root / TIER_DECLARATION))
     emit("plugins/dotnet/INDEX.md", "\n".join(lines).replace("# dotnet capabilities", "# dotnet package capabilities"))
     selection = {
         "plugin": "dotnet",

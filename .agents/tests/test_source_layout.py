@@ -20,7 +20,7 @@ class SourceLayoutTests(unittest.TestCase):
         cls.skills = sync_generated.discover(ROOT, cls.config)
 
     def test_inventory_and_kinds(self) -> None:
-        self.assertEqual(27, len(self.skills))
+        self.assertEqual(29, len(self.skills))
         operations = {name for name, skill in self.skills.items() if skill["metadata"]["kind"] == "operation"}
         self.assertEqual({"e2e-api-debug", "e2e-debug", "e2e-ui-debug", "integration-debug"}, operations)
         self.assertEqual({"contract", "operation"}, {skill["metadata"]["kind"] for skill in self.skills.values()})
