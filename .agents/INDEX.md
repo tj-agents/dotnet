@@ -24,6 +24,7 @@ Generated from canonical `.agents/<kind>/<name>/` definitions.
 - `result-errors` — contract — results — `.agents/contract/result-errors/SKILL.md`
 - `result-terminals` — contract — results — `.agents/contract/result-terminals/SKILL.md`
 - `seeding` — contract — ef-core — `.agents/contract/seeding/SKILL.md`
+- `stack` — contract — selected-stack — `.agents/contract/stack/SKILL.md`
 - `unit-testing` — contract — unit-testing — `.agents/contract/unit-testing/SKILL.md`
 - `validation` — contract — validation — `.agents/contract/validation/SKILL.md`
 - `value-semantics` — contract — patterns — `.agents/contract/value-semantics/SKILL.md`

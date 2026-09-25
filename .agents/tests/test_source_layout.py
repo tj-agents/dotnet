@@ -20,7 +20,7 @@ class SourceLayoutTests(unittest.TestCase):
         cls.skills = sync_generated.discover(ROOT, cls.config)
 
     def test_inventory_and_kinds(self) -> None:
-        self.assertEqual(29, len(self.skills))
+        self.assertEqual(30, len(self.skills))
         operations = {name for name, skill in self.skills.items() if skill["metadata"]["kind"] == "operation"}
         self.assertEqual({"e2e-api-debug", "e2e-debug", "e2e-ui-debug", "integration-debug"}, operations)
         self.assertEqual({"contract", "operation"}, {skill["metadata"]["kind"] for skill in self.skills.values()})
@@ -30,12 +30,13 @@ class SourceLayoutTests(unittest.TestCase):
         self.assertEqual(["comments", "csharp-naming", "csharp-style"], profiles["core"])
         for name in profiles["core"]:
             self.assertEqual("none", self.skills[name]["metadata"]["requires"])
-        for name in ("http-api", "persistence", "multitenancy", "microservice-boundaries", "integration-testing", "e2e-scenarios", "dotnet-stack"):
+        for name in ("http-api", "persistence", "multitenancy", "microservice-boundaries", "integration-testing", "e2e-scenarios", "stack", "dotnet-stack"):
             self.assertNotIn(name, profiles["core"])
             self.assertNotEqual("none", self.skills[name]["metadata"]["requires"])
         assigned = [name for names in profiles.values() for name in names]
         self.assertEqual(len(assigned), len(set(assigned)))
         self.assertEqual(set(self.skills), set(assigned))
+        self.assertIn("[dotnet:stack](../stack/SKILL.md)", self.skills["dotnet-stack"]["body"])
 
     def test_consumption_profiles_do_not_imply_unselected_stacks(self) -> None:
         profiles = self.payloads["profiles"]
