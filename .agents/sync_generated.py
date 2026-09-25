@@ -175,7 +175,13 @@ def validate(root: Path, config: dict, payloads: dict, skills: dict[str, dict]) 
         assigned.extend(names)
     if len(assigned) != len(set(assigned)) or set(assigned) & set(aliases) or set(assigned) | set(aliases) != set(skills):
         raise ValueError("Every skill must be selected once or declared as a compatibility alias")
-    for alias, target in aliases.items():
+    for alias, declaration in aliases.items():
+        if not isinstance(declaration, dict) or set(declaration) != {"replacedBy", "removeAfter"}:
+            raise ValueError(f"Invalid compatibility skill alias declaration: {alias}")
+        replacement = declaration["replacedBy"]
+        if not isinstance(replacement, str) or not replacement.startswith("dotnet:") or declaration["removeAfter"] != "2027-03-31":
+            raise ValueError(f"Invalid compatibility skill alias metadata: {alias}")
+        target = replacement.removeprefix("dotnet:")
         if target not in assigned or skills[alias]["metadata"]["profile"] != skills[target]["metadata"]["profile"]:
             raise ValueError(f"Invalid compatibility skill alias: {alias} -> {target}")
     if profiles.get("core") != ["comments", "csharp-naming", "csharp-style"]:
