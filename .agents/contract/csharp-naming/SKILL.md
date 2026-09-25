@@ -28,7 +28,10 @@ before inventing another collaborator; renaming a misplaced query does not fix i
 Follow the [framework type-naming guidance](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-classes-structs-and-interfaces):
 types use noun phrases and methods use verb phrases. An ordinary interface/implementation pair shares its
 name apart from the interface's `I`; qualify an implementation only for a real alternate strategy or role.
-Use the repository's established vocabulary consistently in proposed code as well as executable code.
+A capability interface (`IDisposable`, `IPausable`) keeps its `-able` word to itself: each implementation is
+named for what it is or acts on (`OutboxDispatcher`, `HostPauser`), never `XPausable`, `PausableX` or a
+pattern name such as `Composite`. Use the repository's established vocabulary consistently in proposed code as
+well as executable code.
 
 ## Pick a suffix from the type's shape, not from "it's injectable"
 
