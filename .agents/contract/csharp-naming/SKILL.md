@@ -30,7 +30,8 @@ types use noun phrases and methods use verb phrases. An ordinary interface/imple
 name apart from the interface's `I`; qualify an implementation only for a real alternate strategy or role.
 A capability interface (`IDisposable`, `IPausable`) keeps its `-able` word to itself: each implementation is
 named for what it is or acts on (`OutboxDispatcher`, `HostPauser`), never `XPausable`, `PausableX` or a
-pattern name such as `Composite`. Use the repository's established vocabulary consistently in proposed code as well as executable code.
+pattern name such as `Composite`. Use the repository's established vocabulary consistently in proposed code as
+well as executable code.
 
 ## Pick a suffix from the type's shape, not from "it's injectable"
 
