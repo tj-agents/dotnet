@@ -8,6 +8,9 @@
       "dotnet"
     ]
   },
+  "compatibilitySkillAliases": {
+    "dotnet-stack": "stack"
+  },
   "profiles": {
     "core": [
       "comments",
@@ -19,8 +22,7 @@
       "logging"
     ],
     "selected-stack": [
-      "stack",
-      "dotnet-stack"
+      "stack"
     ],
     "domain-model": [
       "ddd",
