@@ -165,18 +165,30 @@ def validate(root: Path, config: dict, payloads: dict, skills: dict[str, dict]) 
     if payloads.get("publicPlugins") != ["dotnet"] or payloads.get("payloads") != {"dotnet": ["dotnet"]}:
         raise ValueError("The public dotnet package declaration changed")
     profiles = payloads.get("profiles", {})
+    aliases = payloads.get("compatibilitySkillAliases", {})
+    if not isinstance(aliases, dict):
+        raise ValueError("Compatibility skill aliases must be a mapping")
     assigned: list[str] = []
     for profile, names in profiles.items():
         if not NAME.fullmatch(profile) or len(names) != len(set(names)):
             raise ValueError(f"Invalid profile: {profile}")
         assigned.extend(names)
-    if len(assigned) != len(set(assigned)) or set(assigned) != set(skills):
-        raise ValueError("Every skill must belong to exactly one selection profile")
+    if len(assigned) != len(set(assigned)) or set(assigned) & set(aliases) or set(assigned) | set(aliases) != set(skills):
+        raise ValueError("Every skill must be selected once or declared as a compatibility alias")
+    for alias, declaration in aliases.items():
+        if not isinstance(declaration, dict) or set(declaration) != {"replacedBy", "removeAfter"}:
+            raise ValueError(f"Invalid compatibility skill alias declaration: {alias}")
+        replacement = declaration["replacedBy"]
+        if not isinstance(replacement, str) or not replacement.startswith("dotnet:") or declaration["removeAfter"] != "2027-03-31":
+            raise ValueError(f"Invalid compatibility skill alias metadata: {alias}")
+        target = replacement.removeprefix("dotnet:")
+        if target not in assigned or skills[alias]["metadata"]["profile"] != skills[target]["metadata"]["profile"]:
+            raise ValueError(f"Invalid compatibility skill alias: {alias} -> {target}")
     if profiles.get("core") != ["comments", "csharp-naming", "csharp-style"]:
         raise ValueError("The stack-free core profile changed")
     for skill in skills.values():
         values = skill["metadata"]
-        if skill["name"] not in profiles.get(values["profile"], []):
+        if skill["name"] not in aliases and skill["name"] not in profiles.get(values["profile"], []):
             raise ValueError(f"{skill['name']}: profile metadata disagrees with payloads")
         for namespace, name in QUALIFIED_SKILL.findall(skill["body"]):
             if namespace == "dotnet" and name not in skills:
@@ -235,6 +247,7 @@ def build(root: Path) -> tuple[dict[str, bytes], dict]:
     selection = {
         "plugin": "dotnet",
         "profiles": payloads["profiles"],
+        "compatibilitySkillAliases": payloads["compatibilitySkillAliases"],
         "skills": [
             {
                 "name": skill["name"],
