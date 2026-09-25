@@ -8,6 +8,12 @@
       "dotnet"
     ]
   },
+  "compatibilitySkillAliases": {
+    "dotnet-stack": {
+      "replacedBy": "dotnet:stack",
+      "removeAfter": "2027-03-31"
+    }
+  },
   "profiles": {
     "core": [
       "comments",
@@ -19,7 +25,7 @@
       "logging"
     ],
     "selected-stack": [
-      "dotnet-stack"
+      "stack"
     ],
     "domain-model": [
       "ddd",

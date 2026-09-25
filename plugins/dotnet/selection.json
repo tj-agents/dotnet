@@ -11,7 +11,7 @@
       "logging"
     ],
     "selected-stack": [
-      "dotnet-stack"
+      "stack"
     ],
     "domain-model": [
       "ddd",
@@ -62,6 +62,12 @@
     "validation": [
       "validation"
     ]
+  },
+  "compatibilitySkillAliases": {
+    "dotnet-stack": {
+      "replacedBy": "dotnet:stack",
+      "removeAfter": "2027-03-31"
+    }
   },
   "skills": [
     {
@@ -480,6 +486,20 @@
       "provenance": [
         "library",
         "house"
+      ]
+    },
+    {
+      "name": "stack",
+      "kind": "contract",
+      "profile": "selected-stack",
+      "applicability": [
+        "repositories that explicitly select Tommy's full application stack"
+      ],
+      "requires": [
+        "selected-stack-profile"
+      ],
+      "provenance": [
+        "selected-stack"
       ]
     },
     {
