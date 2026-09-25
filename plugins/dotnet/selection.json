@@ -64,7 +64,10 @@
     ]
   },
   "compatibilitySkillAliases": {
-    "dotnet-stack": "stack"
+    "dotnet-stack": {
+      "replacedBy": "dotnet:stack",
+      "removeAfter": "2027-03-31"
+    }
   },
   "skills": [
     {

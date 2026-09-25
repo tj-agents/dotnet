@@ -36,7 +36,7 @@ class SourceLayoutTests(unittest.TestCase):
         assigned = [name for names in profiles.values() for name in names]
         self.assertEqual(len(assigned), len(set(assigned)))
         self.assertEqual(["stack"], profiles["selected-stack"])
-        self.assertEqual({"dotnet-stack": "stack"}, self.payloads["compatibilitySkillAliases"])
+        self.assertEqual({"dotnet-stack": {"replacedBy": "dotnet:stack", "removeAfter": "2027-03-31"}}, self.payloads["compatibilitySkillAliases"])
         self.assertEqual(set(self.skills), set(assigned) | set(self.payloads["compatibilitySkillAliases"]))
         self.assertIn("[dotnet:stack](../stack/SKILL.md)", self.skills["dotnet-stack"]["body"])
 
