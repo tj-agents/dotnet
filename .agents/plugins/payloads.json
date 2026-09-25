@@ -19,6 +19,7 @@
       "logging"
     ],
     "selected-stack": [
+      "stack",
       "dotnet-stack"
     ],
     "domain-model": [
