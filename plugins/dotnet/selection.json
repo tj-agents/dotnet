@@ -11,8 +11,7 @@
       "logging"
     ],
     "selected-stack": [
-      "stack",
-      "dotnet-stack"
+      "stack"
     ],
     "domain-model": [
       "ddd",
@@ -63,6 +62,9 @@
     "validation": [
       "validation"
     ]
+  },
+  "compatibilitySkillAliases": {
+    "dotnet-stack": "stack"
   },
   "skills": [
     {

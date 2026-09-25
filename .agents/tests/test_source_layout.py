@@ -35,7 +35,9 @@ class SourceLayoutTests(unittest.TestCase):
             self.assertNotEqual("none", self.skills[name]["metadata"]["requires"])
         assigned = [name for names in profiles.values() for name in names]
         self.assertEqual(len(assigned), len(set(assigned)))
-        self.assertEqual(set(self.skills), set(assigned))
+        self.assertEqual(["stack"], profiles["selected-stack"])
+        self.assertEqual({"dotnet-stack": "stack"}, self.payloads["compatibilitySkillAliases"])
+        self.assertEqual(set(self.skills), set(assigned) | set(self.payloads["compatibilitySkillAliases"]))
         self.assertIn("[dotnet:stack](../stack/SKILL.md)", self.skills["dotnet-stack"]["body"])
 
     def test_consumption_profiles_do_not_imply_unselected_stacks(self) -> None:
