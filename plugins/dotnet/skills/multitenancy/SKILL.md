@@ -160,6 +160,9 @@ honours.
   contract controls which data leaves the module.
 - **`XPrivilegedRepository`** — unfiltered cross-tenant read/write on the writable privileged context. Only
   where such a write flow actually exists.
+- **`XPrivilegedReadRepository`** — a query-only contract on the privileged stance, including queries
+  enlisted in a shared transaction through the existing writable context.
+- **`XPrivilegedWriteRepository`** — a write-only contract on that privileged stance.
 - **An independently consumed domain capability**, such as `IStockAvailability`, uses its domain name
   and owns its resolution contract. Entity queries remain on their cohesive repository owner.
 
@@ -186,14 +189,14 @@ public browse split off to the read stance.
 A qualifier describes the contract that differs from the service's unqualified default. It is not one
 vocabulary to impose on every service:
 
-- **Data-access stance** — `XRepository` (tenant-bound), `XReadRepository` (tenant-independent, read-only),
-  `XPrivilegedRepository` (the writable privileged context). Name the composed visibility contract.
-  Transaction-enlisted queries using that privileged context retain the privileged repository owner.
+- **Visibility** — retain the selected scope qualifier, such as `Privileged` for an unfiltered
+  alternative to the module's ordinary owner. Compose it with the exposed persistence capability:
+  `XPrivilegedReadRepository`, `XPrivilegedWriteRepository` or `XPrivilegedRepository`.
 - **Mutability** — use the read, write or combined repository capability defined by
-  [dotnet:persistence](../persistence/SKILL.md). An event-synced replica uses `XReadRepository` for its
-  query-only contract, including when it has no writable sibling.
-- **Projection shape** — `XHeaderRepository`, `XAutocompleteRepository` describe the projection served, not
-  visibility or write capability.
+  [dotnet:persistence](../persistence/SKILL.md). A query-only interface retains `Read`, including when
+  its implementation uses a wider context capability or it has no writable sibling.
+- **Projection shape** — `XHeaderReadRepository` and `XAutocompleteReadRepository` name their queried
+  projection and retain the read capability. The projection qualifier describes the returned shape.
 
 The dimensions are independent, and audience belongs at the API contract rather than in a persistence type
 name. Keep the ordinary owned, scoped, writable repository unqualified.
