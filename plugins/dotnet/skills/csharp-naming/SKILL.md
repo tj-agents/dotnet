@@ -33,6 +33,20 @@ named for what it is or acts on (`OutboxDispatcher`, `HostPauser`), never `XPaus
 pattern name such as `Composite`. Use the repository's established vocabulary consistently in proposed code as
 well as executable code.
 
+## Read the name at the call site
+
+Follow [Microsoft's general naming guidance](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/general-naming-conventions):
+prefer readable, meaningful names over cryptic abbreviations. Clarity does not require spelling out every
+implementation detail. Read the identifier with its receiver, parameter names and return type; omit words
+that only repeat that context. Preserve distinctions callers need, such as ownership, scope, locking,
+units or captured revision. Do not shorten names to meet a character count.
+
+The suffix vocabulary below describes existing responsibilities; it is not a checklist for creating new
+types or appending multiple labels. A domain noun can stand alone. Name the responsibility before deciding
+whether a separate collaborator or shared abstraction is warranted. A `Core` suffix is useful when it
+identifies an implementation step behind a wrapper with a different contract; being private or protected
+alone does not require it.
+
 ## Pick a suffix from the type's shape, not from "it's injectable"
 
 `Service` is the suffix that rots first: it gets used for anything injectable, and once a pure
@@ -105,10 +119,15 @@ manages user accounts; its established name is not the precedent for naming our 
 
 ## Name a repository method for the query, a service method for the intent
 
-A repository finder says literally what it fetches and by what key — `GetByCustomerIdAsync`,
-`GetUnreadCountByCustomerIdAsync` — so the data access is obvious at the call site. The use-case name
-(`GetInboxAsync`, `GetInboxSummaryAsync`) belongs on the *service* that calls it. Never push an intent
-name down onto the repository.
+A repository finder names the data and the distinguishing query — `GetByCustomerIdAsync`,
+`GetUnreadCountByCustomerIdAsync` — so the data access is clear at the call site. The use-case name
+(`GetInboxAsync`, `GetInboxSummaryAsync`) belongs on the *service* that calls it.
+
+A composite key does not require an `And` chain containing every parameter. An established domain key
+such as a scoped request can be named as a whole: `receipts.GetByRequestForUpdateAsync(tenantId,
+operation, requestId, ct)`. Keep every identity predicate in the query and preserve the visible locking
+contract. Use the explicit component names when a shorter query name would conceal materially different
+selection semantics; do not invent a key type or wrapper merely to shorten a method name.
 
 Reserve `CurrentUser`, `ForUser`, `Me`, and `Self` for data belonging to the authenticated human. Do not
 append a scope word to every method merely to restate the default scope; name the ordinary use case for
