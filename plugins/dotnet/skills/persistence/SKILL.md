@@ -88,7 +88,10 @@ The read, write and combined triples above own persistence vocabulary. Use `XRea
 read-only contract, `XWriteRepository` for a write-only contract, and `XRepository` for the combined
 contract, following the existing entity owner. Module-local aliases bind these shared capabilities to
 the selected context. A narrower interface can be implemented by the existing repository when it owns
-that capability. Capability separation describes data access within the project's chosen architecture.
+that capability. Select mutability from the operations the contract exposes: a query-only contract
+retains `Read` when its implementation enlists a writable context in a shared transaction. The
+implementation's wider context capability does not widen that interface. Capability separation describes
+data access within the project's chosen architecture.
 
 The contract includes persistence queries that return projections or provide inputs for authorization.
 Name it by its entity and persistence capability. Transaction participation and the calling use case
