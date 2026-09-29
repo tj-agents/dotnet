@@ -12,7 +12,9 @@ See [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md).
 
 ## Applicability
 
-The `core` profile contains only comments, C# naming, and C# style and has no application-stack prerequisite.
+The `core` profile contains shared C# naming/style, comments, collaborator naming, data-contract naming,
+and mapping. Each has its own task trigger and no application-stack prerequisite. Persistence naming
+belongs to the EF Core profile; HTTP and protobuf naming stay with their respective transport profiles.
 ASP.NET Core, EF Core, multitenancy, distributed-service, modular-service, testing-tier, result-library, validation,
 and full-stack defaults are independent profiles. Installing the plugin makes them discoverable; a repository selects
 only the capabilities matching its actual stack.

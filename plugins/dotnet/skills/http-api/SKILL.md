@@ -35,7 +35,9 @@ value is that the internal read DTO can grow server-only fields or change projec
 public clients. That covers the public details reads, not every DTO.
 
 Drop the `Dto` suffix where the name already says what the shape is; keep it only to disambiguate from a
-same-named entity. Full suffix rules are in the `csharp-naming` skill.
+same-named entity. Data-shape conventions belong to
+[dotnet:data-contract-naming](../data-contract-naming/SKILL.md). HTTP `Request` and `Response`
+names describe the boundary contracts defined here; the application keeps its domain-shaped payloads.
 
 ## Write inputs are `Request` records
 

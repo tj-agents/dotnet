@@ -8,7 +8,7 @@
     {
       "name": "dotnet",
       "source": "./plugins/dotnet",
-      "description": "Generic C# and .NET engineering standards.",
+      "description": "Concern-specific C# and .NET engineering standards.",
       "category": "Productivity",
       "keywords": [
         "standards",

@@ -164,6 +164,8 @@ is not an aggregator of one member shape, split it instead of regioning it.
 Test classes have the analogous rule — region per method under test — in the `unit-testing` and
 `integration-testing` skills.
 
+Mapping-family and receiver-extension names follow [dotnet:mapping](../mapping/SKILL.md).
+
 ## New extension members go in `extension()` blocks
 
 All ordinary extension members use `extension(Receiver)` blocks — the C# 14 unified form, which also
