@@ -15,6 +15,9 @@ provenance: library, house
 
 This contract applies only to projects using Microsoft.Extensions.DependencyInjection. It requires `microsoft-extensions-dependency-injection`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
 
+Collaborator names follow [dotnet:collaborator-naming](../collaborator-naming/SKILL.md).
+Registration composes those responsibilities; their names describe what they do.
+
 ## Inject interfaces; register them in the owning composition root
 
 Injected collaborators default to interface-typed dependencies and interface-to-implementation

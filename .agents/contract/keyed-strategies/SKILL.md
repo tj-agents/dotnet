@@ -146,7 +146,7 @@ alone.
   handler, step, service, or named facade leaks the dispatch mechanism into business code.
 - **Parallel hand-written maps.** A `FrozenDictionary<TKey, …>` per facade duplicates the coverage
   declaration and lets one family drift when a new key is added. Declare all families in the validated
-  builder instead. (A frozen map is right for closed key-to-**data** tables — see `csharp-naming`.)
+  builder instead. (A frozen map is right for closed key-to-**data** tables — see [dotnet:mapping](../mapping/SKILL.md).)
 - **Enum plus switch as an API.** Returning a label every caller re-interprets with its own switch multiplies
   the branch across the codebase. Return the resolved *value*.
 - **Throwaway result records.** A record created only to carry one resolver's return values is noise —

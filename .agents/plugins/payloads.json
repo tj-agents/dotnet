@@ -16,9 +16,12 @@
   },
   "profiles": {
     "core": [
+      "collaborator-naming",
       "comments",
       "csharp-naming",
-      "csharp-style"
+      "csharp-style",
+      "data-contract-naming",
+      "mapping"
     ],
     "extensions": [
       "dependency-injection",

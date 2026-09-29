@@ -2,9 +2,11 @@
 
 Generated from canonical `.agents/<kind>/<name>/` definitions.
 
+- `collaborator-naming` — contract — core — `.agents/contract/collaborator-naming/SKILL.md`
 - `comments` — contract — core — `.agents/contract/comments/SKILL.md`
 - `csharp-naming` — contract — core — `.agents/contract/csharp-naming/SKILL.md`
 - `csharp-style` — contract — core — `.agents/contract/csharp-style/SKILL.md`
+- `data-contract-naming` — contract — core — `.agents/contract/data-contract-naming/SKILL.md`
 - `ddd` — contract — domain-model — `.agents/contract/ddd/SKILL.md`
 - `dependency-injection` — contract — extensions — `.agents/contract/dependency-injection/SKILL.md`
 - `domain-events` — contract — domain-model — `.agents/contract/domain-events/SKILL.md`
@@ -15,6 +17,7 @@ Generated from canonical `.agents/<kind>/<name>/` definitions.
 - `keyed-strategies` — contract — keyed-design — `.agents/contract/keyed-strategies/SKILL.md`
 - `keyed-unions` — contract — keyed-design — `.agents/contract/keyed-unions/SKILL.md`
 - `logging` — contract — extensions — `.agents/contract/logging/SKILL.md`
+- `mapping` — contract — core — `.agents/contract/mapping/SKILL.md`
 - `microservice-boundaries` — contract — distributed-services — `.agents/contract/microservice-boundaries/SKILL.md`
 - `module-structure` — contract — modular-services — `.agents/contract/module-structure/SKILL.md`
 - `multitenancy` — contract — multitenancy — `.agents/contract/multitenancy/SKILL.md`

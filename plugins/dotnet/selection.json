@@ -2,9 +2,12 @@
   "plugin": "dotnet",
   "profiles": {
     "core": [
+      "collaborator-naming",
       "comments",
       "csharp-naming",
-      "csharp-style"
+      "csharp-style",
+      "data-contract-naming",
+      "mapping"
     ],
     "extensions": [
       "dependency-injection",
@@ -71,6 +74,21 @@
   },
   "skills": [
     {
+      "name": "collaborator-naming",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
       "name": "comments",
       "kind": "contract",
       "profile": "core",
@@ -102,6 +120,21 @@
     },
     {
       "name": "csharp-style",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "data-contract-naming",
       "kind": "contract",
       "profile": "core",
       "applicability": [
@@ -339,6 +372,21 @@
       ],
       "provenance": [
         "library",
+        "house"
+      ]
+    },
+    {
+      "name": "mapping",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
         "house"
       ]
     },

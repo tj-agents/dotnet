@@ -82,8 +82,36 @@ or it hand-writes a `GetXByIdAsync`/`AddX` pair that re-implements what the gene
 service then injects two repositories. That is the service's job, not a reason to merge the persistence
 contracts.
 
-Naming — a repository method says what it fetches and by what key, a service method says the intent — is in
-the `csharp-naming` skill, along with the `Projection` suffix rule.
+## Repository names express their capability
+
+The read, write and combined triples above own persistence vocabulary. Use `XReadRepository` for a
+read-only contract, `XWriteRepository` for a write-only contract, and `XRepository` for the combined
+contract, following the existing entity owner. Module-local aliases bind these shared capabilities to
+the selected context. A narrower interface can be implemented by the existing repository when it owns
+that capability. Capability separation describes data access within the project's chosen architecture.
+
+The contract includes persistence queries that return projections or provide inputs for authorization.
+Name it by its entity and persistence capability. Transaction participation and the calling use case
+are part of the operation contract; they do not create a separate repository naming category.
+
+Visibility qualifiers belong to [dotnet:multitenancy](../multitenancy/SKILL.md) in tenant-aware modules.
+Returned data shapes follow [dotnet:data-contract-naming](../data-contract-naming/SKILL.md).
+
+## Method names express the actual operation
+
+A finder names the data and distinguishing query: `GetByCustomerIdAsync` or
+`GetUnreadCountByCustomerIdAsync`. An operation that resolves and validates a selection retains a
+resolution verb such as `ResolveAsync`. Choose the verb from the full contract, including any required
+locks or transaction, rather than from the class suffix alone. Use-case orchestration belongs to its
+application owner under [dotnet:collaborator-naming](../collaborator-naming/SKILL.md).
+
+A composite identity can use an established domain key as a whole:
+`receipts.GetByRequestForUpdateAsync(tenantId, operation, requestId, ct)`. Keep all identity predicates
+and the visible locking contract. Spell out component names when they distinguish materially different
+queries. Keep the existing input shape when changing only the method name.
+
+Finder names expose the actual selection key. Scope defaults for application operations belong to
+[dotnet:multitenancy](../multitenancy/SKILL.md) when that profile applies.
 
 ## Repositories never leak `IQueryable`
 

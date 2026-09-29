@@ -1,7 +1,7 @@
 {
   "name": "dotnet",
   "version": "1.1.2",
-  "description": "Generic C# and .NET engineering standards.",
+  "description": "Concern-specific C# and .NET engineering standards.",
   "author": {
     "name": "Tommy Seery"
   },
@@ -17,7 +17,7 @@
   "interface": {
     "displayName": ".NET Standards",
     "shortDescription": "Generic C# and .NET conventions.",
-    "longDescription": "Load-on-demand standards for C# style, persistence, results, service structure, and every .NET testing tier.",
+    "longDescription": "Load-on-demand C# standards grouped by shared naming, collaborators, data contracts, mapping, persistence, transport, and testing.",
     "developerName": "Tommy Seery",
     "category": "Productivity",
     "capabilities": [],
