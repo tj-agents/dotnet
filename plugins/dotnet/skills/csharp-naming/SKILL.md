@@ -1,6 +1,6 @@
 ---
 name: csharp-naming
-description: Shared C# naming conventions — domain vocabulary, identifiers, interface/type pairing and readable method names. Routes collaborator responsibility, return contracts, validation, persistence, data shapes, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
+description: Shared C# naming conventions — domain vocabulary, identifiers, interface/type pairing and readable method names. Routes domain modeling, value construction, collaborator responsibility, return contracts, validation, persistence, data shapes, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
 kind: contract
 domain: dotnet
 profile: core
@@ -18,6 +18,8 @@ owner for the task at hand; load the relevant owner when its concern and prerequ
 
 | Task | Naming owner |
 |---|---|
+| Design an entity, value object, aggregate or domain service when DDD is selected | [dotnet:ddd](../ddd/SKILL.md) |
+| Choose an immutable value representation, construction or owned behavior | [dotnet:value-semantics](../value-semantics/SKILL.md) |
 | Define a collaborator role, operation and semantic outcome | [dotnet:collaborator-naming](../collaborator-naming/SKILL.md) |
 | Select application presence/failure carriers when Reunion is selected | [dotnet:result-carriers](../result-carriers/SKILL.md) |
 | Name a data contract or query result | [dotnet:data-contract-naming](../data-contract-naming/SKILL.md) |

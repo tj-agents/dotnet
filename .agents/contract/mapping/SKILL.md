@@ -37,13 +37,15 @@ Use the extension syntax supported by the project's language version; syntax and
 belong to [dotnet:csharp-style](../csharp-style/SKILL.md). Keep asynchronous data loading and use-case
 orchestration with their respective collaborators; pass the resulting inputs to the pure conversion.
 
-## Receiver-owned operations use extensions
+## Pure conversions and queries use receiver extensions
 
-An operation with one clear receiver lives with that receiver's related operations in `XExtensions`,
+A pure conversion or derived query with one clear receiver lives with its related operations in `XExtensions`,
 or in its mapping family when it is a conversion. Examples are `value.ToDto()`,
 `reading.ToNormalized()` and `state.IsTerminal()`. Use the shortest unambiguous domain name at the call
-site. A decision over independent peer inputs follows the evaluator convention in
-[dotnet:collaborator-naming](../collaborator-naming/SKILL.md).
+site. For intrinsic domain behavior and value construction, select the owner through
+[dotnet:ddd](../ddd/SKILL.md) when DDD applies and
+[dotnet:value-semantics](../value-semantics/SKILL.md). A separate decision over independent peer inputs
+follows the collaborator convention in [dotnet:collaborator-naming](../collaborator-naming/SKILL.md).
 
 ## Choose conversion mechanics for the data
 

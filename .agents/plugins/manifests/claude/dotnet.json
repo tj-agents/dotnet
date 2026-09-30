@@ -1,7 +1,7 @@
 {
   "name": "dotnet",
   "displayName": ".NET Standards",
-  "description": "Concern-owned C# and .NET standards for coherent names, responsibilities and operation contracts.",
+  "description": "Concern-owned C# and .NET standards for domain modeling, names, responsibilities and operation contracts.",
   "author": {
     "name": "Tommy Seery"
   },

@@ -1,6 +1,6 @@
 ---
 name: ddd
-description: Domain-driven design's building-block vocabulary for a .NET domain model — the entity/value-object split by identity, equality, and lifecycle (an entity's own behaviour lives here; a value object's struct-or-class mechanics are the `value-semantics` contract's job), the aggregate as the transactional consistency boundary with a root-only external reference rule, an aggregate announcing its own state change through a domain event (owned by the `domain-events` contract), and the anti-patterns — an anemic model whose rules leaked into an application service, a God aggregate, and an invariant enforced by reaching across an aggregate boundary. Use when designing a domain type, deciding whether something is an entity or a value object, drawing or crossing an aggregate boundary, or reviewing a domain model for behaviour that belongs on a type but lives in a service instead.
+description: Domain-driven design's building-block vocabulary for a .NET domain model — the entity/value-object split by identity, equality, and lifecycle (an entity's own behaviour lives here; a value object's struct-or-class mechanics are the `value-semantics` contract's job), the aggregate as the transactional consistency boundary with a root-only external reference rule, an aggregate announcing its own state change through a domain event (owned by the `domain-events` contract), domain services for business operations without a natural entity/value owner and their boundary with application orchestration, and the anti-patterns — an anemic model whose rules leaked into an application service, a God aggregate, and an invariant enforced by reaching across an aggregate boundary. Use when designing a domain type, deciding whether something is an entity or a value object, drawing or crossing an aggregate boundary, or reviewing a domain model for behaviour that belongs on a type but lives in a service instead.
 kind: contract
 domain: dotnet
 profile: domain-model
@@ -40,6 +40,22 @@ or a domain event that should carry the second half of the work instead.
 
 Put an invariant on the aggregate that owns every field it constrains. A rule that reads two aggregates'
 state to validate one of them has no single owner and drifts the moment either changes independently.
+
+## Domain services own business operations without a natural entity or value owner
+
+A domain service expresses a business operation that belongs to neither an entity nor a value object.
+Its inputs and result use the domain language; its behavior is a cohesive business rule. An application
+service coordinates the use case: it obtains inputs, invokes the domain model and arranges persistence
+and external effects. The entity or value keeps the rules governing its own valid state.
+
+For example, `Order.Cancel` owns the order's state transition; a pricing rule over independent domain
+inputs can belong to `PricingService.Quote`. A domain service can assess a cross-aggregate rule, while
+the operation still needs an explicit consistency mechanism when concurrent changes could invalidate
+that decision. The service name alone supplies no transaction guarantee.
+
+Name the selected collaborator and operation through
+[dotnet:collaborator-naming](../collaborator-naming/SKILL.md). Its role follows the business operation;
+the application-service row describes orchestration, not every service in a domain model.
 
 ## A state change worth telling the rest of the system about is a domain event
 
