@@ -16,6 +16,9 @@ jobs:
       - name: generated files are current
         shell: pwsh
         run: ./.agents/sync-generated.ps1 -Check
+      - name: source and applicability contracts
+        shell: pwsh
+        run: python -B -m unittest discover -s .agents/tests -p "test_*.py"
       - uses: actions/checkout@v4
         with:
           repository: tj-agents/core
@@ -23,6 +26,3 @@ jobs:
       - name: tier payloads conform to the shipped shape
         shell: pwsh
         run: python -B .core-standards/plugins/base/hooks/check_tier_payload.py --root .
-      - name: source and applicability contracts
-        shell: pwsh
-        run: python -B -m unittest discover -s .agents/tests -p "test_*.py"
