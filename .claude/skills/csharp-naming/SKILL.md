@@ -1,6 +1,6 @@
 ---
 name: csharp-naming
-description: Shared C# naming conventions — domain vocabulary, identifiers, interface/type pairing and readable method names. Routes repository, collaborator, data-contract, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
+description: Shared C# naming conventions — domain vocabulary, identifiers, interface/type pairing and readable method names. Routes collaborator responsibility, return contracts, validation, persistence, data shapes, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
 kind: contract
 domain: dotnet
 profile: core

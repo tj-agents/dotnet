@@ -23,6 +23,30 @@ Concertable-specific rules and concrete harness commands remain in `Concertable/
 workflow capabilities remain in `tj-agents/core`. React and TypeScript guidance remains in
 `tj-agents/react`.
 
+## Canonical naming and contract owners
+
+Start with `csharp-naming` to select the relevant owner. A collaborator change includes its operation
+and returned outcomes; its result profile is selected alongside its role. Source ownership is physical:
+these definitions are separate authored skills with separate discovery triggers.
+
+| Concern | Canonical source |
+|---|---|
+| Shared spelling, interface/type pairs and task routing | [csharp-naming](.agents/contract/csharp-naming/SKILL.md) |
+| Collaborator responsibility, verb and semantic outcome | [collaborator-naming](.agents/contract/collaborator-naming/SKILL.md) |
+| Meaning of DTOs, snapshots, summaries and projections | [data-contract-naming](.agents/contract/data-contract-naming/SKILL.md) |
+| Pure conversion and receiver extensions | [mapping](.agents/contract/mapping/SKILL.md) |
+| Repository capability, query names and storage returns | [persistence](.agents/contract/persistence/SKILL.md) |
+| In-process presence, failure and composition with Reunion | [result-carriers](.agents/contract/result-carriers/SKILL.md) |
+| Input and domain validation contracts for the selected stack | [validation](.agents/contract/validation/SKILL.md) |
+| HTTP and protobuf contracts | [http-api](.agents/contract/http-api/SKILL.md), [proto](.agents/contract/proto/SKILL.md) |
+| DI registration and lifetime mechanics | [dependency-injection](.agents/contract/dependency-injection/SKILL.md) |
+
+Core role conventions describe outcomes without requiring a result library. Selected profiles map
+those outcomes to concrete types. An EF finder can return `T?`, an application resolver can return
+Reunion `Option<T>`, and a domain validator can return Reunion `ValidationResult` within the same
+project. Their role, operation, result and caller handling form one coherent contract. These are
+canonical house conventions; framework/library-defined APIs retain their own names and signatures.
+
 ## Authoring and verification
 
 Each definition declares `kind`, `domain`, `profile`, `applicability`, `requires`, and `provenance`. After an authored

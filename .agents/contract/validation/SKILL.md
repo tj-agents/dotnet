@@ -43,14 +43,29 @@ an outcome the operation cannot produce.
 
 ## Domain eligibility is a hand-written validator returning `ValidationResult`
 
-A business precondition that needs other aggregates, other modules, or the clock cannot be expressed
-naturally in FluentValidation. That is a hand-written validator returning `ValidationResult` from
-`Reunion.Validation` — "is this order still open, in stock, and inside its cancellation window". Its
+A business precondition involving other aggregates, modules or the clock uses the selected domain
+validation contract: a hand-written validator returning `ValidationResult` from `Reunion.Validation`.
+For example, it assesses whether an order is still open, in stock and inside its cancellation window. Its
 result composes into the operation's Result chain; it is not an HTTP concern and has no auto-validation
 equivalent.
 
-Validator *files* stay named `XValidators` either way; the types inside keep their own shape
-(`PlaceOrderRequestValidator`, `OrderValidator`).
+## Type, operation and result form one contract
+
+Use `XValidator` for the assessed subject or request: `PlaceOrderRequestValidator`, `OrderValidator`.
+Each top-level type has its matching file, following
+[dotnet:csharp-naming](../csharp-naming/SKILL.md). The collaborator role is defined by
+[dotnet:collaborator-naming](../collaborator-naming/SKILL.md).
+
+| Validation responsibility | Operation | Result owner |
+|---|---|---|
+| Input shape under FluentValidation | `Validate` / `ValidateAsync` on `IValidator<T>` | FluentValidation validation result |
+| Domain eligibility under Reunion | `ValidateCheckout` / `ValidateCheckoutAsync` on the domain validator | `Reunion.Validation.ValidationResult` |
+
+Both report validity and diagnostics about the supplied candidate. A boolean capability predicate uses
+`Can`, `Is` or `Has` and returns `bool`. A collaborator returning a selected or resolved application value
+uses its resolver contract, including the presence/failure carrier from
+[dotnet:result-carriers](../result-carriers/SKILL.md). Loading data and checking rules can occur in either
+implementation; the responsibility and returned outcome establish which contract the caller consumes.
 
 ## The carrier: `ValidationResult`
 
@@ -94,12 +109,12 @@ validation-aware `Ensure` overload:
 return orderModule.GetByIdAsync(orderId)
     .OrFailure<Order, CheckoutError>(new CheckoutError.OrderNotFound(orderId))
     .Ensure(
-        order => orderValidator.CanCheckOut(order, quantity),
+        order => orderValidator.ValidateCheckout(order, quantity),
         errors => new CheckoutError.Invalid(errors));
 ```
 
-Use validation-aware `Ensure` when a Result already carries the value to preserve, `Map` when validation
-genuinely creates a new success value, and `TryGetErrors`/`TryGetFailure` when a standalone validation
+Use validation-aware `Ensure` when a Result already carries the value to preserve, `Map` when the next
+successful step constructs a new value, and `TryGetErrors`/`TryGetFailure` when a standalone validation
 guard is the clearest shape. `ToResult` remains available where an explicit carrier conversion fits the
 call site.
 

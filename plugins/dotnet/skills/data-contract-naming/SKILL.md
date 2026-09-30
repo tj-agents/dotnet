@@ -60,3 +60,15 @@ For example, a query can return `OrderSummary` directly. A query returning compo
 service combines with delivery information can return `OrderProjection`, and the service produces
 `OrderDetails`. The distinct name reflects the distinct contract. Storage location alone does not
 create a second data shape.
+
+## Payload shape and operation outcome have separate owners
+
+The shape name states what the value represents; the collaborator method states how it is produced.
+`OrderSnapshot` can be read, resolved or sent to a caller without changing its captured-state meaning.
+A resolution operation can return that snapshot directly; a separate `Resolution` payload is useful
+when the result itself contains distinct resolution information consumed together.
+
+Presence, failure and validation decisions follow their selected result/validation contracts. With
+Reunion, an application operation may return `Option<OrderSnapshot>` while `OrderSnapshot` retains its
+normal properties. Whole-operation absence and a nullable property inside a DTO represent different
+contracts. See [dotnet:result-carriers](../result-carriers/SKILL.md) when that profile is selected.
