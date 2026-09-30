@@ -1,6 +1,6 @@
 ---
 name: result-carriers
-description: Choosing and using the Reunion Result/Option carriers in a .NET service — the table that picks `Result<TValue, TError>` / `UnitResult<TError>` / `Option<T>` / `T?` / `IReadOnlyList<T>` / plain value from the decisions a caller must make, where each carrier may and may not appear (never in HTTP DTOs, protobuf, events, entities, or config), target-typed construction versus named cases versus factories, observation through `Match`/`TryGetValue` with no throwing accessor, composition with `Map`/`Bind`/`MapError`/`Ensure`/`OrFailure`/`ValueOr`/`Sequence`/`Traverse`, and .NET 11 native-union matching. Use when picking a return type for a new method, converting a nullable to an Option, composing a chain of fallible operations, or reviewing code that reaches for a bool, an enum, or an exception where a Result belongs.
+description: Choosing and using the Reunion Result/Option carriers in a .NET service — the table that picks `Result<TValue, TError>` / `UnitResult<TError>` / `Option<T>` / `T?` / `IReadOnlyList<T>` / plain value from the decisions a caller must make, where each carrier may and may not appear (never in HTTP DTOs, protobuf, events, entities, or config), target-typed construction versus named cases versus factories, observation through `Match`/`TryGetValue` with no throwing accessor, composition with `Map`/`Bind`/`MapError`/`Ensure`/`OrFailure`/`ValueOr`/`Sequence`/`Traverse`, and .NET 11 native-union matching. Use when defining or moving a collaborator contract, picking a return type for a new method, converting a nullable to an Option, composing a chain of fallible operations, or reviewing code that reaches for a bool, an enum, or an exception where a Result belongs.
 kind: contract
 domain: dotnet
 profile: results
@@ -39,7 +39,7 @@ Pick the return type from the decisions the caller must make:
 | No actionable alternate outcome | Plain value, `Task`, or another completion type |
 | Capability question only | `bool` |
 
-The short rule: use `T?` for technical nullability that stays in infrastructure or short local plumbing;
+Use `T?` for provider/framework boundary nullability and short local values;
 use `Option<T>` when `Some(T)` and `None` are the complete, intentional outcomes of an in-process API. If
 absence is a named failure, needs an explanation, or must coexist with other failure cases, use
 `Result<TValue, TError>`.
@@ -55,9 +55,12 @@ unique index, an already-deduplicated projection — declare `IReadOnlySet<T>`. 
 on a value it was handed, or a callee guarding against duplicates it cannot receive, is the signature
 understating its contract.
 
-The layer is a strong heuristic, not the decision by itself. Repository and provider lookups normally
-return `T?`. Domain, application, module-facade, service, and published client query contracts normally
-promote ordinary absence to `Option<T>` so callers cannot reach `T` without observing the case. Commands
+The exposed responsibility and caller decisions select the carrier. A project or namespace called
+Infrastructure can implement both persistence and application collaborators. Repository/provider lookups
+return `T?`; application resolver, service, domain, module-facade and published client contracts expose
+intentional present-or-absent outcomes as `Option<T>`. Moving an operation across that boundary includes
+its return contract and all observers. The role and method are selected by
+[dotnet:collaborator-naming](../collaborator-naming/SKILL.md). Commands
 and queries with named rejections use a Result. A guaranteed value stays a plain value, and an optional
 property on a DTO stays nullable rather than wrapping each field in an Option — converted once at that
 boundary, and grouped so values sharing a lifetime become one nullable value object rather than several
@@ -119,6 +122,21 @@ public interface IWarehouseService
 public async Task<Option<WarehouseDetails>> GetDetailsByIdAsync(int warehouseId) =>
     await repository.GetDetailsByIdAsync(warehouseId);
 ```
+
+A resolver follows the same application boundary:
+
+```csharp
+public interface IOrderResolver
+{
+    Task<Option<OrderSnapshot>> ResolveSnapshotAsync(int orderId, CancellationToken ct = default);
+}
+```
+
+Here `Some(snapshot)` means resolution succeeded; `None` means no usable snapshot was resolved. The
+caller maps that absence to its own operation error or terminal response when appropriate. Repository
+queries supplying the candidates retain their provider-shaped contracts. Validators use the validation
+result owned by [dotnet:validation](../validation/SKILL.md), because they report a decision about the
+input rather than an optional success payload.
 
 The implicit conversion translates the provider's nullable row into the application's explicit
 `Some | None` outcome. A command that *requires* the warehouse instead returns an operation-owned
@@ -233,7 +251,7 @@ public Task<Result<Checkout, CheckoutError>> CheckoutAsync(int orderId, int quan
     orderModule.GetByIdAsync(orderId)
         .OrFailure<Order, CheckoutError>(new CheckoutError.OrderNotFound(orderId))
         .Ensure(
-            order => orderValidator.CanCheckOut(order, quantity),
+            order => orderValidator.ValidateCheckout(order, quantity),
             errors => new CheckoutError.Invalid(errors))
         .MapAsync(order => CreateCheckoutAsync(order, quantity));
 ```

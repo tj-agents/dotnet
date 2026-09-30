@@ -100,6 +100,19 @@ are part of the operation contract; they do not create a separate repository nam
 Visibility qualifiers belong to [dotnet:multitenancy](../multitenancy/SKILL.md) in tenant-aware modules.
 Returned data shapes follow [dotnet:data-contract-naming](../data-contract-naming/SKILL.md).
 
+## Persistence return contracts
+
+A single-row query returns the row/projection or `null`; a zero-or-more query returns a collection,
+empty when there are no matches. Use a set when uniqueness is part of the exposed contract. Staged
+writes and affected-row counts express their persistence operation. Nullable finder results belong
+to this storage contract even when the repository is consumed by a resolver or validator.
+
+The consuming application collaborator owns conversion to the project's selected presence/failure
+carrier. Projects selecting Reunion follow [dotnet:result-carriers](../result-carriers/SKILL.md).
+The component's exposed responsibility, rather than its Infrastructure project location, selects this
+boundary. Extracting resolution into a collaborator includes converting its application return contract
+and updating the consuming branches, while repository queries retain their persistence contract.
+
 ## Method names express the actual operation
 
 Repository methods describe persistence operations: retrieve rows or projections, test existence,
