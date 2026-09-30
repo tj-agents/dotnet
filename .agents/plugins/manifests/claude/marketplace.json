@@ -8,7 +8,7 @@
     {
       "name": "dotnet",
       "source": "./plugins/dotnet",
-      "description": "Concern-owned C# and .NET standards for coherent names, responsibilities and operation contracts.",
+      "description": "Concern-owned C# and .NET standards for domain modeling, names, responsibilities and operation contracts.",
       "category": "Productivity",
       "keywords": [
         "standards",

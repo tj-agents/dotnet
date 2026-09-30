@@ -1,7 +1,7 @@
 {
   "name": "dotnet",
   "version": "1.1.2",
-  "description": "Concern-owned C# and .NET standards for coherent names, responsibilities and operation contracts.",
+  "description": "Concern-owned C# and .NET standards for domain modeling, names, responsibilities and operation contracts.",
   "author": {
     "name": "Tommy Seery"
   },
@@ -17,7 +17,7 @@
   "interface": {
     "displayName": ".NET Standards",
     "shortDescription": "Generic C# and .NET conventions.",
-    "longDescription": "Canonical C# roles and operation contracts with separate owners for shared identifiers, collaborators, payloads, mapping, ORM-independent repository contracts, persistence, result carriers, validation and transports. Optional library profiles apply only when selected.",
+    "longDescription": "Canonical C# roles and operation contracts with separate owners for domain modeling, value construction, shared identifiers, collaborators, payloads, mapping, ORM-independent repository contracts, persistence, result carriers, validation and transports. Optional architecture and library profiles apply only when selected.",
     "developerName": "Tommy Seery",
     "category": "Productivity",
     "capabilities": [],

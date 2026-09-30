@@ -1,6 +1,6 @@
 ---
 name: data-contract-naming
-description: Name C# data contracts by their meaning — domain payloads, summaries, details, statuses, captured snapshots, DTO disambiguation and intermediate projections. Use when defining or reviewing a record, DTO, query result or contract shared by application callers.
+description: Name C# data contracts by their meaning — application payloads, summaries, details, statuses, captured snapshots, DTO disambiguation and intermediate projections. Use when defining or reviewing a record, DTO, query result or contract shared by application callers.
 kind: contract
 domain: dotnet
 profile: core
@@ -14,9 +14,10 @@ provenance: language, house
 ## Applicability
 
 These conventions apply to C# data shapes independently of a persistence library or transport.
-Shared identifiers follow [dotnet:csharp-naming](../csharp-naming/SKILL.md). Domain modeling and value
-invariants follow the selected [dotnet:ddd](../ddd/SKILL.md) and
-[dotnet:value-semantics](../value-semantics/SKILL.md) contracts.
+Shared identifiers follow [dotnet:csharp-naming](../csharp-naming/SKILL.md). Entity/value identity,
+behavior and aggregate boundaries belong to the selected [dotnet:ddd](../ddd/SKILL.md) contract; value
+representation and construction belong to [dotnet:value-semantics](../value-semantics/SKILL.md). This
+contract names the data shapes carried between callers.
 
 ## Name what the value represents
 
@@ -24,7 +25,7 @@ Use the established domain noun and add the distinction carried by the shape:
 
 | Meaning | Example |
 |---|---|
-| The domain payload | `Shipment`, `Invoice`, `Address` |
+| An application payload | `Shipment`, `Invoice`, `Address` |
 | A summary or details contract | `OrderSummary`, `OrderDetails` |
 | A lifecycle state | `OrderStatus` |
 | Values captured at a defined instant or revision | `OrderSnapshot` |

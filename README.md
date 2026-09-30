@@ -31,6 +31,8 @@ these definitions are separate authored skills with separate discovery triggers.
 
 | Concern | Canonical source |
 |---|---|
+| Entity/value identity, aggregate boundaries and domain behavior ownership | [ddd](.agents/contract/ddd/SKILL.md) |
+| Immutable value representation and construction | [value-semantics](.agents/contract/value-semantics/SKILL.md) |
 | Shared spelling, interface/type pairs and task routing | [csharp-naming](.agents/contract/csharp-naming/SKILL.md) |
 | Collaborator responsibility, verb and semantic outcome | [collaborator-naming](.agents/contract/collaborator-naming/SKILL.md) |
 | Meaning of DTOs, snapshots, summaries and projections | [data-contract-naming](.agents/contract/data-contract-naming/SKILL.md) |
@@ -41,6 +43,10 @@ these definitions are separate authored skills with separate discovery triggers.
 | Input and domain validation contracts for the selected stack | [validation](.agents/contract/validation/SKILL.md) |
 | HTTP and protobuf contracts | [http-api](.agents/contract/http-api/SKILL.md), [proto](.agents/contract/proto/SKILL.md) |
 | DI registration and lifetime mechanics | [dependency-injection](.agents/contract/dependency-injection/SKILL.md) |
+
+DDD remains an independently selected `domain-model` profile. Its entity, value and aggregate semantics
+establish behavior ownership before collaborator or data-contract naming. The `value-semantics` pattern
+remains available without selecting DDD.
 
 Core role conventions describe outcomes without requiring a result library. Selected profiles map
 those outcomes to concrete types. An EF finder can return `T?`, an application resolver can return

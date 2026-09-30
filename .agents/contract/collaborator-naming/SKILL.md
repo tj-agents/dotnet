@@ -23,6 +23,11 @@ to [dotnet:data-contract-naming](../data-contract-naming/SKILL.md). Concrete suc
 carriers belong to the project's selected result contract; projects selecting Reunion use
 [dotnet:result-carriers](../result-carriers/SKILL.md). The role and outcome decisions apply together.
 
+For a DDD model, [dotnet:ddd](../ddd/SKILL.md) establishes which behavior belongs on an entity, value
+object or domain service, and which work an application service coordinates. Select that owner before
+applying collaborator roles. Value construction follows
+[dotnet:value-semantics](../value-semantics/SKILL.md).
+
 ## Select a complete operation contract
 
 Read the implementation and production callers. Establish these five parts before naming the type:
