@@ -23,6 +23,7 @@ Generated from canonical `.agents/<kind>/<name>/` definitions.
 - `multitenancy` — contract — multitenancy — `.agents/contract/multitenancy/SKILL.md`
 - `persistence` — contract — ef-core — `.agents/contract/persistence/SKILL.md`
 - `proto` — contract — distributed-services — `.agents/contract/proto/SKILL.md`
+- `repository-naming` — contract — core — `.agents/contract/repository-naming/SKILL.md`
 - `result-carriers` — contract — results — `.agents/contract/result-carriers/SKILL.md`
 - `result-errors` — contract — results — `.agents/contract/result-errors/SKILL.md`
 - `result-terminals` — contract — results — `.agents/contract/result-terminals/SKILL.md`

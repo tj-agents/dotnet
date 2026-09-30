@@ -82,58 +82,13 @@ or it hand-writes a `GetXByIdAsync`/`AddX` pair that re-implements what the gene
 service then injects two repositories. That is the service's job, not a reason to merge the persistence
 contracts.
 
-## Repository names express their capability
+## Repository contracts
 
-The read, write and combined triples above own persistence vocabulary. Use `XReadRepository` for a
-read-only contract, `XWriteRepository` for a write-only contract, and `XRepository` for the combined
-contract, following the existing entity owner. Module-local aliases bind these shared capabilities to
-the selected context. A narrower interface can be implemented by the existing repository when it owns
-that capability. Select mutability from the operations the contract exposes: a query-only contract
-retains `Read` when its implementation enlists a writable context in a shared transaction. The
-implementation's wider context capability does not widen that interface. Capability separation describes
-data access within the project's chosen architecture.
-
-The contract includes persistence queries that return projections or provide inputs for authorization.
-Name it by its entity and persistence capability. Transaction participation and the calling use case
-are part of the operation contract; they do not create a separate repository naming category.
-
-Visibility qualifiers belong to [dotnet:multitenancy](../multitenancy/SKILL.md) in tenant-aware modules.
-Returned data shapes follow [dotnet:data-contract-naming](../data-contract-naming/SKILL.md).
-
-## Persistence return contracts
-
-A single-row query returns the row/projection or `null`; a zero-or-more query returns a collection,
-empty when there are no matches. Use a set when uniqueness is part of the exposed contract. Staged
-writes and affected-row counts express their persistence operation. Nullable finder results belong
-to this storage contract even when the repository is consumed by a resolver or validator.
-
-The consuming application collaborator owns conversion to the project's selected presence/failure
-carrier. Projects selecting Reunion follow [dotnet:result-carriers](../result-carriers/SKILL.md).
-The component's exposed responsibility, rather than its Infrastructure project location, selects this
-boundary. Extracting resolution into a collaborator includes converting its application return contract
-and updating the consuming branches, while repository queries retain their persistence contract.
-
-## Method names express the actual operation
-
-Repository methods describe persistence operations: retrieve rows or projections, test existence,
-aggregate, and stage writes. A finder names the data and distinguishing query, such as
-`GetByCustomerIdAsync` or `GetUnreadCountByCustomerIdAsync`; its name also exposes required locking.
-SQL predicates, projection, transaction enlistment and row locks stay with the repository.
-
-Resolution rules, selection among candidates, validation of an expected actor or result, and assembly
-from several data sources belong to a resolver under
-[dotnet:collaborator-naming](../collaborator-naming/SKILL.md). The resolver consumes repository queries
-and exposes `ResolveAsync`. When those responsibilities are mixed in a repository, separate their
-implementation and dependencies before naming the resulting contracts. A renamed interface alone does
-not establish that boundary.
-
-A composite identity can use an established domain key as a whole:
-`receipts.GetByRequestForUpdateAsync(tenantId, operation, requestId, ct)`. Keep all identity predicates
-and the visible locking contract. Spell out component names when they distinguish materially different
-queries. Keep the existing input shape when changing only the method name.
-
-Finder names expose the actual selection key. Scope defaults for application operations belong to
-[dotnet:multitenancy](../multitenancy/SKILL.md) when that profile applies.
+[dotnet:repository-naming](../repository-naming/SKILL.md) owns entity/capability names, query and write
+verbs, storage return shapes, visibility composition and the boundary to application collaborators.
+Apply it together with this selected EF Core implementation contract. Module-local aliases bind the
+exposed capability to the corresponding context triple described above; the context's wider capability
+preserves the narrower interface's contract.
 
 ## Repositories never leak `IQueryable`
 

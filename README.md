@@ -13,8 +13,8 @@ See [SOURCE_LAYOUT.md](SOURCE_LAYOUT.md).
 ## Applicability
 
 The `core` profile contains shared C# naming/style, comments, collaborator naming, data-contract naming,
-and mapping. Each has its own task trigger and no application-stack prerequisite. Persistence naming
-belongs to the EF Core profile; HTTP and protobuf naming stay with their respective transport profiles.
+mapping, and repository naming. Each has its own task trigger and no application-stack prerequisite.
+EF Core persistence mechanics, HTTP and protobuf stay with their respective optional profiles.
 ASP.NET Core, EF Core, multitenancy, distributed-service, modular-service, testing-tier, result-library, validation,
 and full-stack defaults are independent profiles. Installing the plugin makes them discoverable; a repository selects
 only the capabilities matching its actual stack.
@@ -35,7 +35,8 @@ these definitions are separate authored skills with separate discovery triggers.
 | Collaborator responsibility, verb and semantic outcome | [collaborator-naming](.agents/contract/collaborator-naming/SKILL.md) |
 | Meaning of DTOs, snapshots, summaries and projections | [data-contract-naming](.agents/contract/data-contract-naming/SKILL.md) |
 | Pure conversion and receiver extensions | [mapping](.agents/contract/mapping/SKILL.md) |
-| Repository capability, query names and storage returns | [persistence](.agents/contract/persistence/SKILL.md) |
+| Repository capability, query names and storage returns | [repository-naming](.agents/contract/repository-naming/SKILL.md) |
+| EF Core context/base bindings and persistence mechanics | [persistence](.agents/contract/persistence/SKILL.md) |
 | In-process presence, failure and composition with Reunion | [result-carriers](.agents/contract/result-carriers/SKILL.md) |
 | Input and domain validation contracts for the selected stack | [validation](.agents/contract/validation/SKILL.md) |
 | HTTP and protobuf contracts | [http-api](.agents/contract/http-api/SKILL.md), [proto](.agents/contract/proto/SKILL.md) |

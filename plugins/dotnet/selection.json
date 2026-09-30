@@ -7,7 +7,8 @@
       "csharp-naming",
       "csharp-style",
       "data-contract-naming",
-      "mapping"
+      "mapping",
+      "repository-naming"
     ],
     "extensions": [
       "dependency-injection",
@@ -468,6 +469,21 @@
       "provenance": [
         "protocol",
         "library",
+        "house"
+      ]
+    },
+    {
+      "name": "repository-naming",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "C# projects exposing repository contracts",
+        "regardless of persistence library"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
         "house"
       ]
     },
