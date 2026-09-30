@@ -1,7 +1,7 @@
 {
   "name": "dotnet",
   "displayName": ".NET Standards",
-  "description": "Concern-specific C# and .NET engineering standards.",
+  "description": "Concern-specific C# and .NET standards with explicit component responsibilities.",
   "author": {
     "name": "Tommy Seery"
   },

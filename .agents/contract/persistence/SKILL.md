@@ -102,11 +102,17 @@ Returned data shapes follow [dotnet:data-contract-naming](../data-contract-namin
 
 ## Method names express the actual operation
 
-A finder names the data and distinguishing query: `GetByCustomerIdAsync` or
-`GetUnreadCountByCustomerIdAsync`. An operation that resolves and validates a selection retains a
-resolution verb such as `ResolveAsync`. Choose the verb from the full contract, including any required
-locks or transaction, rather than from the class suffix alone. Use-case orchestration belongs to its
-application owner under [dotnet:collaborator-naming](../collaborator-naming/SKILL.md).
+Repository methods describe persistence operations: retrieve rows or projections, test existence,
+aggregate, and stage writes. A finder names the data and distinguishing query, such as
+`GetByCustomerIdAsync` or `GetUnreadCountByCustomerIdAsync`; its name also exposes required locking.
+SQL predicates, projection, transaction enlistment and row locks stay with the repository.
+
+Resolution rules, selection among candidates, validation of an expected actor or result, and assembly
+from several data sources belong to a resolver under
+[dotnet:collaborator-naming](../collaborator-naming/SKILL.md). The resolver consumes repository queries
+and exposes `ResolveAsync`. When those responsibilities are mixed in a repository, separate their
+implementation and dependencies before naming the resulting contracts. A renamed interface alone does
+not establish that boundary.
 
 A composite identity can use an established domain key as a whole:
 `receipts.GetByRequestForUpdateAsync(tenantId, operation, requestId, ct)`. Keep all identity predicates
