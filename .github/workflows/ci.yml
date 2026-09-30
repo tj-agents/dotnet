@@ -19,3 +19,10 @@ jobs:
       - name: source and applicability contracts
         shell: pwsh
         run: python -B -m unittest discover -s .agents/tests -p "test_*.py"
+      - uses: actions/checkout@v4
+        with:
+          repository: tj-agents/core
+          path: .core-standards
+      - name: tier payloads conform to the shipped shape
+        shell: pwsh
+        run: python -B .core-standards/plugins/base/hooks/check_tier_payload.py --root .
