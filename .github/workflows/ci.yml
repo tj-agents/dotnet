@@ -22,7 +22,7 @@ jobs:
           path: .core-standards
       - name: tier payloads conform to the shipped shape
         shell: pwsh
-        run: python -B .core-standards/.agents/base/stack-tiers/scripts/check_tier_payload.py --root .
+        run: python -B .core-standards/plugins/base/skills/stack-tiers/scripts/check_tier_payload.py --root .
       - name: source and applicability contracts
         shell: pwsh
         run: python -B -m unittest discover -s .agents/tests -p "test_*.py"
