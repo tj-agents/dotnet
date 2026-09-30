@@ -57,7 +57,7 @@ Creating an object can be one step in a calculation. Name the complete responsib
 | Decide over peer inputs | `TransitionEvaluator.Evaluate` | The decision over those inputs |
 
 Persistence roles and their method/return contracts are owned by
-[dotnet:persistence](../persistence/SKILL.md). Pure conversions are owned by
+[dotnet:repository-naming](../repository-naming/SKILL.md). Pure conversions are owned by
 [dotnet:mapping](../mapping/SKILL.md). An operation count or DI registration does not alter these roles.
 
 ## Resolver contracts

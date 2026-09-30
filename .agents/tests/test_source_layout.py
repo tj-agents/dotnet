@@ -20,14 +20,14 @@ class SourceLayoutTests(unittest.TestCase):
         cls.skills = sync_generated.discover(ROOT, cls.config)
 
     def test_inventory_and_kinds(self) -> None:
-        self.assertEqual(33, len(self.skills))
+        self.assertEqual(34, len(self.skills))
         operations = {name for name, skill in self.skills.items() if skill["metadata"]["kind"] == "operation"}
         self.assertEqual({"e2e-api-debug", "e2e-debug", "e2e-ui-debug", "integration-debug"}, operations)
         self.assertEqual({"contract", "operation"}, {skill["metadata"]["kind"] for skill in self.skills.values()})
 
     def test_stack_free_core_and_independent_optional_profiles(self) -> None:
         profiles = self.payloads["profiles"]
-        self.assertEqual(["collaborator-naming", "comments", "csharp-naming", "csharp-style", "data-contract-naming", "mapping"], profiles["core"])
+        self.assertEqual(["collaborator-naming", "comments", "csharp-naming", "csharp-style", "data-contract-naming", "mapping", "repository-naming"], profiles["core"])
         for name in profiles["core"]:
             self.assertEqual("none", self.skills[name]["metadata"]["requires"])
         for name in ("http-api", "persistence", "multitenancy", "microservice-boundaries", "integration-testing", "e2e-scenarios", "stack", "dotnet-stack"):

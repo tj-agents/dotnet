@@ -21,7 +21,8 @@
       "csharp-naming",
       "csharp-style",
       "data-contract-naming",
-      "mapping"
+      "mapping",
+      "repository-naming"
     ],
     "extensions": [
       "dependency-injection",

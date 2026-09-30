@@ -22,7 +22,8 @@ owner for the task at hand; load the relevant owner when its concern and prerequ
 | Select application presence/failure carriers when Reunion is selected | [dotnet:result-carriers](../result-carriers/SKILL.md) |
 | Name a data contract or query result | [dotnet:data-contract-naming](../data-contract-naming/SKILL.md) |
 | Name a mapper or receiver extension | [dotnet:mapping](../mapping/SKILL.md) |
-| Name a repository or persistence method | [dotnet:persistence](../persistence/SKILL.md) |
+| Name a repository, persistence operation and storage return contract | [dotnet:repository-naming](../repository-naming/SKILL.md) |
+| Implement EF Core repository/context conventions when selected | [dotnet:persistence](../persistence/SKILL.md) |
 | Distinguish tenant visibility in repository contracts | [dotnet:multitenancy](../multitenancy/SKILL.md) |
 | Name HTTP contracts or routes | [dotnet:http-api](../http-api/SKILL.md) |
 | Name protobuf messages and RPC contracts | [dotnet:proto](../proto/SKILL.md) |

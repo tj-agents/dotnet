@@ -103,7 +103,8 @@ published C# client signatures. They never appear in:
 - configuration or serialized cache contracts.
 
 Each edge maps the carrier to its own wire or storage contract. Repository single-item lookups return
-nullable values such as `Task<TEntity?>`, matching the provider's missing-row contract. Convert nullable
+nullable values such as `Task<TEntity?>`, matching the provider's missing-row contract under
+[dotnet:repository-naming](../repository-naming/SKILL.md). Convert nullable
 to `Option<T>` when ordinary present-or-absent crosses a domain, application, module, service, or client
 boundary. Do not push `Option<T>` into EF or repository contracts, and do not wrap a nullable merely to
 unwrap it again in the same local flow.

@@ -184,7 +184,7 @@ def validate(root: Path, config: dict, payloads: dict, skills: dict[str, dict]) 
         target = replacement.removeprefix("dotnet:")
         if target not in assigned or skills[alias]["metadata"]["profile"] != skills[target]["metadata"]["profile"]:
             raise ValueError(f"Invalid compatibility skill alias: {alias} -> {target}")
-    if profiles.get("core") != ["collaborator-naming", "comments", "csharp-naming", "csharp-style", "data-contract-naming", "mapping"]:
+    if profiles.get("core") != ["collaborator-naming", "comments", "csharp-naming", "csharp-style", "data-contract-naming", "mapping", "repository-naming"]:
         raise ValueError("The stack-free core profile changed")
     for skill in skills.values():
         values = skill["metadata"]

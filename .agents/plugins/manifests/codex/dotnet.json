@@ -17,7 +17,7 @@
   "interface": {
     "displayName": ".NET Standards",
     "shortDescription": "Generic C# and .NET conventions.",
-    "longDescription": "Canonical C# roles and operation contracts with separate owners for shared identifiers, collaborators, payloads, mapping, persistence, result carriers, validation and transports. Optional library profiles apply only when selected.",
+    "longDescription": "Canonical C# roles and operation contracts with separate owners for shared identifiers, collaborators, payloads, mapping, ORM-independent repository contracts, persistence, result carriers, validation and transports. Optional library profiles apply only when selected.",
     "developerName": "Tommy Seery",
     "category": "Productivity",
     "capabilities": [],
