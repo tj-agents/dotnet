@@ -64,7 +64,8 @@ prefer readable, meaningful names. Read the identifier with its receiver, parame
 Include distinctions the caller needs, such as scope, locking, units or revision; use the surrounding
 context for information it already supplies.
 
-Keep verbs that express the actual contract: `Get` retrieves, `Resolve` applies resolution rules,
-`Calculate` computes and `Create` constructs. Method naming follows the operation even when a class
-contains several kinds of operation. A shared implementation step may use `Core` when a wrapper gives
-that step a different contract.
+Choose verbs within the responsibility owned by the component: repository finders retrieve with `Get`,
+resolvers apply resolution rules with `Resolve`, calculators compute with `Calculate`, and creation uses
+`Create` with its construction owner. A method whose responsibility belongs elsewhere requires an
+ownership correction before a naming correction. A shared implementation step may use `Core` when a
+wrapper gives that step a different contract.

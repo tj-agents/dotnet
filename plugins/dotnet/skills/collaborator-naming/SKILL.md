@@ -44,9 +44,14 @@ Entity persistence follows the repository capabilities in
 [dotnet:mapping](../mapping/SKILL.md). A one-operation repository retains its repository role, just as a
 one-operation application service retains its service role.
 
-`Resolver.Resolve` conveys selection or resolution, including asynchronous resolution. Keep that verb
-when the actual operation retains those semantics. A simple keyed retrieval follows the persistence
-finder convention.
+`Resolver.Resolve` owns selection and resolution rules, including asynchronous resolution. It obtains
+persisted inputs through repository query contracts, applies those rules and produces the resolved result.
+The repositories retain querying, projection, persistence and locking; the resolver owns interpreting and
+combining their results. A simple keyed retrieval belongs to the repository's finder contract.
+
+Review the implementation and dependencies before changing a role name. Extract mixed responsibilities
+into their owners, then update contracts, registrations and callers together. Preserving a useful verb
+means keeping it on the component that owns that operation.
 
 ## Place construction with its owner
 
