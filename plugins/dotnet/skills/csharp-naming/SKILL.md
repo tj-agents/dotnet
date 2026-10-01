@@ -1,6 +1,6 @@
 ---
 name: csharp-naming
-description: Shared C# naming conventions — domain vocabulary, identifiers, interface/type pairing and readable method names. Routes domain modeling, value construction, collaborator responsibility, return contracts, validation, persistence, data shapes, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
+description: Shared C# naming conventions — domain vocabulary, namespace-aware identifiers, interface/type pairing and readable method names. Routes domain modeling, value construction, collaborator responsibility, return contracts, validation, persistence, data shapes, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
 kind: contract
 domain: dotnet
 profile: core
@@ -68,6 +68,19 @@ Use PascalCase for type and public member names, camelCase for parameters and lo
 suffix for asynchronous operations. Field formatting and constructor qualification belong to
 [dotnet:csharp-style](../csharp-style/SKILL.md). File names follow their top-level type; each top-level
 request, result, status and execution shape has its own correspondingly named file.
+
+## Use the containing namespace when naming a type
+
+Read a proposed type name with its namespace and existing responsibility owner. Add a subject or
+qualifier when it names a domain concept, responsibility, contract or real distinction. Do not add a
+module, layer, product or default-scope prefix merely to repeat its containing namespace or make the
+simple name globally unique. For example, `Billing.IntegrationTests.ApiFixture` is clear without
+`BillingApiFixture`; `OrderRepository` still names the repository's subject and role.
+
+Apply the same rule to fixtures, test types and names proposed in code or plan snippets. Preserve
+framework-defined and published contract names, and keep qualifiers that distinguish actual
+strategies or capabilities. When two otherwise appropriate simple names collide at a rare call site,
+qualify the reference or use an alias there.
 
 ## Read the name in context
 
