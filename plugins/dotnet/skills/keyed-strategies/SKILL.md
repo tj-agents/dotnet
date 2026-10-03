@@ -11,6 +11,8 @@ provenance: framework, pattern, house
 
 # Keyed strategies
 
+Owns the shape for behaviour that varies by a closed key through keyed dependency injection.
+
 ## Applicability
 
 This contract applies only to closed-key behaviour selected through keyed dependency injection. It requires `microsoft-extensions-dependency-injection`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
@@ -21,7 +23,7 @@ through it. Consumers never branch on the key, never see the registration mechan
 generic factory merely to perform a business operation.
 
 **This document covers variants that share one identical interface.** Where the variants differ in parameters
-or return type, the family is a union resolved by key, not a strategy — `KEYED_UNIONS.md` owns that half.
+or return type, the family is a union resolved by key, not a strategy — `dotnet:keyed-unions` owns that half.
 Applying these rules to that shape is what produces implementations that discard parameters, marker-interface
 arms, and parameter objects invented to force differently-shaped variants into one signature.
 
@@ -146,7 +148,7 @@ alone.
   handler, step, service, or named facade leaks the dispatch mechanism into business code.
 - **Parallel hand-written maps.** A `FrozenDictionary<TKey, …>` per facade duplicates the coverage
   declaration and lets one family drift when a new key is added. Declare all families in the validated
-  builder instead. (A frozen map is right for closed key-to-**data** tables — see `csharp-naming`.)
+  builder instead. (A frozen map is right for closed key-to-**data** tables — see `dotnet:naming-mapping`.)
 - **Enum plus switch as an API.** Returning a label every caller re-interprets with its own switch multiplies
   the branch across the codebase. Return the resolved *value*.
 - **Throwaway result records.** A record created only to carry one resolver's return values is noise —

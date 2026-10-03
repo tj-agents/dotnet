@@ -1,6 +1,6 @@
 ---
 name: e2e-api-debug
-description: Run and repair a repository's service-level end-to-end tier through its own full-stack harness, separating response mismatches, polling timeouts and wrong completed values, tracing missing state to the responsible resource, and verifying the exact scenario plus its owning scope. Use when a service E2E scenario or backend full-stack CI job fails.
+description: Compatibility name for dotnet:debug-e2e-api; remove after 2027-03-31. Use the shorter canonical name for new references.
 kind: operation
 domain: dotnet
 profile: e2e
@@ -9,7 +9,7 @@ requires: full-stack-test-harness
 provenance: operation, selected-stack
 ---
 
-# Debugging a service end-to-end suite
+# Service end-to-end debugging compatibility
 
-Read and follow the [canonical shared definition](../../../.agents/operation/e2e-api-debug/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/operation/e2e-api-debug/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

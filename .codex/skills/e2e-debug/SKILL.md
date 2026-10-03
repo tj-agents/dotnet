@@ -1,6 +1,6 @@
 ---
 name: e2e-debug
-description: Run a repository's service and browser end-to-end tiers in dependency order, driving the service tier green before the browser tier and reporting both against one source revision. Use only when both selected tiers need a complete sweep.
+description: Compatibility name for dotnet:debug-e2e; remove after 2027-03-31. Use the shorter canonical name for new references.
 kind: operation
 domain: dotnet
 profile: e2e
@@ -9,7 +9,7 @@ requires: service-e2e, browser-e2e
 provenance: operation, selected-stack
 ---
 
-# Sweeping service and browser end-to-end tiers
+# End-to-end sweep compatibility
 
-Read and follow the [canonical shared definition](../../../.agents/operation/e2e-debug/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/operation/e2e-debug/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

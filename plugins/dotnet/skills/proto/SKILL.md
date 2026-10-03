@@ -11,6 +11,8 @@ provenance: protocol, library, house
 
 # gRPC and Protobuf standard
 
+Owns proto/C# naming, mapper ownership, what may cross the wire, and client error mapping.
+
 ## Applicability
 
 This contract applies only to services using gRPC and Protobuf. It requires `grpc, protobuf`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
@@ -23,8 +25,9 @@ hop is gRPC at all — is a separate decision and is not this skill's concern.
 A `.proto` message keeps the native RPC `*Response` / `*Request` naming. That name is generated,
 wire-only, and never surfaces as the application payload type.
 
-The C# payload is named for its shape, with no `Response` suffix — the `csharp-naming` skill owns that
-rule and the alias escape hatch for an SDK collision.
+The application C# payload follows `dotnet:naming-data-contracts`,
+including shape names and local aliases for SDK collisions. Generated RPC payloads retain their
+protocol-owned `Request` / `Response` names.
 
 ```csharp
 // CORRECT — proto keeps RPC vocabulary; the C# payload is named for what it is
@@ -36,7 +39,7 @@ Task<Result<ShipmentResponse, DispatchError>> DispatchAsync(...);
 
 ## Each side owns its own mappers
 
-Proto ⇄ domain conversion follows the ordinary `XMappers` extension-class rule in `csharp-naming`, with
+Proto ⇄ domain conversion follows `dotnet:naming-mapping`, with
 the client and server sides each owning their own mappers rather than sharing one.
 
 ```csharp

@@ -1,6 +1,6 @@
 ---
 name: result-carriers
-description: Choosing and using the Reunion Result/Option carriers in a .NET service — the table that picks `Result<TValue, TError>` / `UnitResult<TError>` / `Option<T>` / `T?` / `IReadOnlyList<T>` / plain value from the decisions a caller must make, where each carrier may and may not appear (never in HTTP DTOs, protobuf, events, entities, or config), target-typed construction versus named cases versus factories, observation through `Match`/`TryGetValue` with no throwing accessor, composition with `Map`/`Bind`/`MapError`/`Ensure`/`OrFailure`/`ValueOr`/`Sequence`/`Traverse`, and .NET 11 native-union matching. Use when picking a return type for a new method, converting a nullable to an Option, composing a chain of fallible operations, or reviewing code that reaches for a bool, an enum, or an exception where a Result belongs.
+description: Compatibility name for dotnet:errors-carriers; remove after 2027-03-31. Use the shorter canonical name for new references.
 kind: contract
 domain: dotnet
 profile: results
@@ -9,7 +9,7 @@ requires: reunion
 provenance: library, selected-stack, house
 ---
 
-# Result and Option carriers
+# Result and Option carriers compatibility
 
-Read and follow the [canonical shared definition](../../../.agents/contract/result-carriers/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/result-carriers/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

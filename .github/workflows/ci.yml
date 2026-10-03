@@ -7,22 +7,8 @@ on:
 
 jobs:
   verify:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: generated files are current
-        shell: pwsh
-        run: ./.agents/sync-generated.ps1 -Check
-      - name: source and applicability contracts
-        shell: pwsh
-        run: python -B -m unittest discover -s .agents/tests -p "test_*.py"
-      - uses: actions/checkout@v4
-        with:
-          repository: tj-agents/core
-          path: .core-standards
-      - name: tier payloads conform to the shipped shape
-        shell: pwsh
-        run: python -B .core-standards/plugins/base/hooks/check_tier_payload.py --root .
+    uses: tj-agents/kit/.github/workflows/plugin-ci.yml@v1.1.0
+    with:
+      kit_ref: v1.1.0
+    secrets:
+      read_token: ${{ secrets.TJ_AGENTS_READ_TOKEN }}

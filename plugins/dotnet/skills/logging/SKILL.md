@@ -11,6 +11,8 @@ provenance: library, house
 
 # Logging
 
+Owns the project's `Log.cs` — source-generated `[LoggerMessage]` methods and the observability rule.
+
 ## Applicability
 
 This contract applies only to projects using Microsoft.Extensions.Logging. It requires `microsoft-extensions-logging`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
@@ -31,7 +33,7 @@ Set `CA1848` to `error` in `.editorconfig`. That makes the inline form a build f
 convention someone has to remember, and it is the reason the debugging rule below has no exception.
 
 `Log.cs` is the one file where `#region` is right — one region per emitting class, named for that class.
-See the `csharp-style` skill.
+See the `style` skill.
 
 ## Observability is production code, including a probe
 

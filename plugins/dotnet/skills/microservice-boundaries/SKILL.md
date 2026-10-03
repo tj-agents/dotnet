@@ -11,6 +11,8 @@ provenance: architecture, selected-stack
 
 # Service boundaries and communication
 
+Owns what a .NET service may depend on, how services talk, and the protocol decision table.
+
 ## Applicability
 
 This contract applies only to distributed services. It requires `distributed-service-architecture`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.

@@ -1,6 +1,6 @@
 ---
 name: e2e-scenarios
-description: Authoring rules for browser E2E scenarios (Gherkin bound with Reqnroll, driven through Playwright) — a scenario tests one behaviour and starts at the nearest already-verified state, fast-forwarding through seeded data rather than replaying earlier stages through the UI, creating a prerequisite through its real production API or handler where seeding rules forbid seeding that row, splitting a scenario whose assertion needs genuine external-provider state, keeping a trusted baseline file's scenario lists and counts reconciled, and running headless by default. Use when writing or reviewing a UI E2E scenario, adding setup steps to reach a starting state, or reconciling a suite's pass/fail baseline.
+description: Compatibility name for dotnet:testing-e2e; remove after 2027-03-31. Use the shorter canonical name for new references.
 kind: contract
 domain: dotnet
 profile: e2e
@@ -9,7 +9,7 @@ requires: reqnroll, playwright
 provenance: library, house
 ---
 
-# E2E scenario authoring
+# E2E scenario authoring compatibility
 
-Read and follow the [canonical shared definition](../../../.agents/contract/e2e-scenarios/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/e2e-scenarios/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

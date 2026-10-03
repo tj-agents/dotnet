@@ -11,6 +11,8 @@ provenance: library, selected-stack, house
 
 # Persistence
 
+Owns the EF Core repository base hierarchy, aliasing, writes and the unit-of-work carriers.
+
 ## Applicability
 
 This contract applies only to projects using EF Core and the selected repository/unit-of-work abstractions. It requires `ef-core, selected-data-access-abstractions`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
@@ -82,8 +84,13 @@ or it hand-writes a `GetXByIdAsync`/`AddX` pair that re-implements what the gene
 service then injects two repositories. That is the service's job, not a reason to merge the persistence
 contracts.
 
-Naming — a repository method says what it fetches and by what key, a service method says the intent — is in
-the `csharp-naming` skill, along with the `Projection` suffix rule.
+## Repository contracts
+
+`dotnet:naming-repositories` owns entity/capability names, query and write
+verbs, storage return shapes, visibility composition and the boundary to application collaborators.
+Apply it together with this selected EF Core implementation contract. Module-local aliases bind the
+exposed capability to the corresponding context triple described above; the context's wider capability
+preserves the narrower interface's contract.
 
 ## Repositories never leak `IQueryable`
 
