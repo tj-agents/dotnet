@@ -11,5 +11,5 @@ provenance: library, architecture, house
 
 # Domain events — raised in the domain, dispatched by the save, published as integration events
 
-Read and follow the [canonical shared definition](../../../.agents/contract/domain-events/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/domain/events/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

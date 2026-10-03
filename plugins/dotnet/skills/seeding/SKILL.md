@@ -11,6 +11,8 @@ provenance: library, house
 
 # Seeding
 
+Owns what a seeder may write directly, the dev/test split, seeding simulators and idempotency.
+
 ## Applicability
 
 This contract applies only to projects using EF Core seeders. It requires `ef-core`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.

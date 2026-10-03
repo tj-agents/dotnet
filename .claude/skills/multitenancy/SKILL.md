@@ -11,5 +11,5 @@ provenance: library, architecture, house
 
 # Multitenancy
 
-Read and follow the [canonical shared definition](../../../.agents/contract/multitenancy/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/multitenancy/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

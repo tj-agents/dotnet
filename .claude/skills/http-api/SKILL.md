@@ -11,5 +11,5 @@ provenance: framework, house
 
 # HTTP API contracts
 
-Read and follow the [canonical shared definition](../../../.agents/contract/http-api/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/http-api/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

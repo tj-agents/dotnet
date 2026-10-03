@@ -1,6 +1,6 @@
 ---
 name: dotnet-stack
-description: Compatibility name for dotnet:stack; remove after 2027-03-31. Use the shorter canonical name for new references.
+description: Compatibility name for dotnet:libraries-selected; remove after 2027-03-31. Use the shorter canonical name for new references.
 kind: contract
 domain: dotnet
 profile: selected-stack
@@ -11,4 +11,6 @@ provenance: selected-stack
 
 # .NET stack compatibility
 
-Read and follow [dotnet:stack](../stack/SKILL.md) in full.
+Owns the compatibility forward to `dotnet:libraries-selected`.
+
+Read and follow `dotnet:libraries-selected` in full.

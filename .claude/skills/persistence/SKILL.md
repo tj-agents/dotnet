@@ -11,5 +11,5 @@ provenance: library, selected-stack, house
 
 # Persistence
 
-Read and follow the [canonical shared definition](../../../.agents/contract/persistence/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/persistence/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

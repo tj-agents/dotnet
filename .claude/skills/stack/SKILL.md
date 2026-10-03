@@ -1,6 +1,6 @@
 ---
 name: stack
-description: Tommy's optional selected .NET application stack, mapping each job to one chosen library or platform facility and recording deliberate exclusions. Apply only when a repository selects this profile; use core C# guidance without it.
+description: Compatibility name for dotnet:libraries-selected; remove after 2027-03-31. Use the shorter canonical name for new references.
 kind: contract
 domain: dotnet
 profile: selected-stack
@@ -9,7 +9,7 @@ requires: selected-stack-profile
 provenance: selected-stack
 ---
 
-# Stack defaults
+# Stack defaults compatibility
 
-Read and follow the [canonical shared definition](../../../.agents/contract/stack/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/stack/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

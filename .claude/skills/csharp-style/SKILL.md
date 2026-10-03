@@ -1,6 +1,6 @@
 ---
 name: csharp-style
-description: Generic C# style standard — private fields without an underscore prefix, `this.`-qualified constructor assignments, `null!` rather than `string.Empty` for populated-later members, explicit fields instead of primary-constructor captures, brace and empty-block shape, when an optional parameter has stopped paying for itself, `base.`-qualified inherited calls, `#region` only in an aggregating file, and C# 14 `extension()` blocks. Use when writing or reviewing any C# type, choosing between a primary constructor and explicit fields, adding a parameter to an existing signature, adding an extension method, or deciding whether a style rule belongs in prose or in `.editorconfig`.
+description: Compatibility name for dotnet:style; remove after 2027-03-31. Use the shorter canonical name for new references.
 kind: contract
 domain: dotnet
 profile: core
@@ -9,7 +9,7 @@ requires: none
 provenance: language, house
 ---
 
-# C# style
+# C# style compatibility
 
-Read and follow the [canonical shared definition](../../../.agents/contract/csharp-style/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/csharp-style/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

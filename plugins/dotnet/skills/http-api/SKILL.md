@@ -11,6 +11,8 @@ provenance: framework, house
 
 # HTTP API contracts
 
+Owns the HTTP contract shape — DTO vs Response, write-input `Request` records, route vocabulary.
+
 ## Applicability
 
 This contract applies only to ASP.NET Core HTTP APIs. It requires `aspnet-core`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
@@ -35,7 +37,9 @@ value is that the internal read DTO can grow server-only fields or change projec
 public clients. That covers the public details reads, not every DTO.
 
 Drop the `Dto` suffix where the name already says what the shape is; keep it only to disambiguate from a
-same-named entity. Full suffix rules are in the `csharp-naming` skill.
+same-named entity. Data-shape conventions belong to
+`dotnet:naming-data-contracts`. HTTP `Request` and `Response`
+names describe the boundary contracts defined here; the application keeps its domain-shaped payloads.
 
 ## Write inputs are `Request` records
 

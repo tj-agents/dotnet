@@ -11,6 +11,8 @@ provenance: library, architecture, house
 
 # Domain events — raised in the domain, dispatched by the save, published as integration events
 
+Owns how a domain event is raised, dispatched at save, and translated into a published integration event.
+
 ## Applicability
 
 This contract applies only to domain models dispatching events through an EF Core save boundary. It requires `domain-events, ef-core`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.

@@ -11,5 +11,5 @@ provenance: library, selected-stack, house
 
 # Validation
 
-Read and follow the [canonical shared definition](../../../.agents/contract/validation/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/validation/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

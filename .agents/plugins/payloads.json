@@ -1,80 +1,83 @@
 {
-  "description": "Generic .NET guidance with explicit applicability for core C#, ASP.NET Core, EF Core, distributed services, testing tiers, and Tommy's selected libraries.",
-  "publicPlugins": [
-    "dotnet"
-  ],
   "payloads": {
     "dotnet": [
       "dotnet"
     ]
   },
   "compatibilitySkillAliases": {
-    "dotnet-stack": {
-      "replacedBy": "dotnet:stack",
-      "removeAfter": "2027-03-31"
+    "dotnet": {
+      "comments": {
+        "replacedBy": "dotnet:style-comments",
+        "removeAfter": "2027-03-31"
+      },
+      "csharp-naming": {
+        "replacedBy": "dotnet:naming",
+        "removeAfter": "2027-03-31"
+      },
+      "csharp-style": {
+        "replacedBy": "dotnet:style",
+        "removeAfter": "2027-03-31"
+      },
+      "ddd": {
+        "replacedBy": "dotnet:domain-ddd",
+        "removeAfter": "2027-03-31"
+      },
+      "value-semantics": {
+        "replacedBy": "dotnet:domain-values",
+        "removeAfter": "2027-03-31"
+      },
+      "module-structure": {
+        "replacedBy": "dotnet:structure-modules",
+        "removeAfter": "2027-03-31"
+      },
+      "stack": {
+        "replacedBy": "dotnet:libraries-selected",
+        "removeAfter": "2027-03-31"
+      },
+      "dotnet-stack": {
+        "replacedBy": "dotnet:libraries-selected",
+        "removeAfter": "2027-03-31"
+      },
+      "result-errors": {
+        "replacedBy": "dotnet:errors-results",
+        "removeAfter": "2027-03-31"
+      },
+      "result-carriers": {
+        "replacedBy": "dotnet:errors-carriers",
+        "removeAfter": "2027-03-31"
+      },
+      "result-terminals": {
+        "replacedBy": "dotnet:errors-terminals",
+        "removeAfter": "2027-03-31"
+      },
+      "unit-testing": {
+        "replacedBy": "dotnet:testing-unit",
+        "removeAfter": "2027-03-31"
+      },
+      "integration-testing": {
+        "replacedBy": "dotnet:testing-integration",
+        "removeAfter": "2027-03-31"
+      },
+      "e2e-scenarios": {
+        "replacedBy": "dotnet:testing-e2e",
+        "removeAfter": "2027-03-31"
+      },
+      "integration-debug": {
+        "replacedBy": "dotnet:debug-integration",
+        "removeAfter": "2027-03-31"
+      },
+      "e2e-debug": {
+        "replacedBy": "dotnet:debug-e2e",
+        "removeAfter": "2027-03-31"
+      },
+      "e2e-api-debug": {
+        "replacedBy": "dotnet:debug-e2e-api",
+        "removeAfter": "2027-03-31"
+      },
+      "e2e-ui-debug": {
+        "replacedBy": "dotnet:debug-e2e-ui",
+        "removeAfter": "2027-03-31"
+      }
     }
-  },
-  "profiles": {
-    "core": [
-      "comments",
-      "csharp-naming",
-      "csharp-style"
-    ],
-    "extensions": [
-      "dependency-injection",
-      "logging"
-    ],
-    "selected-stack": [
-      "stack"
-    ],
-    "domain-model": [
-      "ddd",
-      "domain-events"
-    ],
-    "aspnet": [
-      "http-api"
-    ],
-    "integration-testing": [
-      "integration-debug",
-      "integration-testing"
-    ],
-    "e2e": [
-      "e2e-api-debug",
-      "e2e-debug",
-      "e2e-scenarios",
-      "e2e-ui-debug"
-    ],
-    "keyed-design": [
-      "keyed-strategies",
-      "keyed-unions"
-    ],
-    "patterns": [
-      "value-semantics"
-    ],
-    "distributed-services": [
-      "microservice-boundaries",
-      "proto"
-    ],
-    "modular-services": [
-      "module-structure"
-    ],
-    "ef-core": [
-      "persistence",
-      "seeding"
-    ],
-    "multitenancy": [
-      "multitenancy"
-    ],
-    "results": [
-      "result-carriers",
-      "result-errors",
-      "result-terminals"
-    ],
-    "unit-testing": [
-      "unit-testing"
-    ],
-    "validation": [
-      "validation"
-    ]
   }
 }
