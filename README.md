@@ -5,16 +5,25 @@ The canonical repository is [`tj-agents/dotnet`](https://github.com/tj-agents/do
 
 ## Skills
 
-- Knowledge: `dotnet:direction`, `dotnet:knowledge`, `dotnet:learning`.
-- Contracts: `dotnet:naming` (`naming:collaborators`, `naming:data-contracts`, `naming:mapping`, `naming:repositories`),
-  `dotnet:style` (`style:comments`), `dotnet:structure` (`structure:modules`), `dotnet:domain-design`
-  (`domain:ddd`, `domain:values`, `domain:events`), `dotnet:errors` (`errors:results`, `errors:carriers`,
-  `errors:terminals`), `dotnet:testing` (`testing:unit`, `testing:integration`, `testing:e2e`), `dotnet:build`,
-  `dotnet:libraries` (`libraries:selected`), `dotnet:keyed-strategies`, `dotnet:keyed-unions`, and the extras
-  `dotnet:dependency-injection`, `dotnet:http-api`, `dotnet:logging`, `dotnet:microservice-boundaries`,
-  `dotnet:multitenancy`, `dotnet:persistence`, `dotnet:proto`, `dotnet:seeding`, `dotnet:validation`.
+Families are folders, family first; a skill's name is its folder path joined by hyphens.
+
+- Knowledge: `dotnet:learning`, `dotnet:knowledge`, `dotnet:direction`.
+- Naming: `dotnet:naming`, `dotnet:naming-collaborators`, `dotnet:naming-repositories`,
+  `dotnet:naming-data-contracts`, `dotnet:naming-mapping`.
+- Style: `dotnet:style`, `dotnet:style-comments`.
+- Structure: `dotnet:structure`, `dotnet:structure-modules`.
+- Domain: `dotnet:domain-design`, `dotnet:domain-ddd`, `dotnet:domain-values`, `dotnet:domain-events`.
+- Errors: `dotnet:errors`, `dotnet:errors-results`, `dotnet:errors-carriers`, `dotnet:errors-terminals`.
+- Testing: `dotnet:testing`, `dotnet:testing-unit`, `dotnet:testing-integration`, `dotnet:testing-e2e`.
+- Libraries: `dotnet:libraries`, `dotnet:libraries-selected`.
+- Keyed: `dotnet:keyed-strategies`, `dotnet:keyed-unions`.
+- Other contracts: `dotnet:build`, `dotnet:dependency-injection`, `dotnet:http-api`, `dotnet:logging`,
+  `dotnet:microservice-boundaries`, `dotnet:multitenancy`, `dotnet:persistence`, `dotnet:proto`,
+  `dotnet:seeding`, `dotnet:validation`.
 - Operations: `dotnet:debug-integration`, `dotnet:debug-e2e`, `dotnet:debug-e2e-api`, `dotnet:debug-e2e-ui`.
 - Utilities: `dotnet:scaffold`.
+
+Renamed skills keep their old names as forwarding aliases; see [MIGRATION.md](MIGRATION.md).
 
 ## Applicability
 
