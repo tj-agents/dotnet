@@ -11,5 +11,5 @@ provenance: architecture, selected-stack
 
 # Service boundaries and communication
 
-Read and follow the [canonical shared definition](../../../.agents/contract/microservice-boundaries/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/microservice-boundaries/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

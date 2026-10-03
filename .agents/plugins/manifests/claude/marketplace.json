@@ -3,20 +3,5 @@
   "description": "Generic .NET guidance, distributed as load-on-demand skills with explicit stack and test-tier applicability. React and TypeScript guidance is published separately by tj-agents/react.",
   "owner": {
     "name": "Tommy Seery"
-  },
-  "plugins": [
-    {
-      "name": "dotnet",
-      "source": "./plugins/dotnet",
-      "description": "Generic C# and .NET engineering standards.",
-      "category": "Productivity",
-      "keywords": [
-        "standards",
-        "dotnet",
-        "csharp",
-        "ef-core",
-        "testing"
-      ]
-    }
-  ]
+  }
 }
