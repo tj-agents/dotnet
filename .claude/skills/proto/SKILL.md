@@ -11,5 +11,5 @@ provenance: protocol, library, house
 
 # gRPC and Protobuf standard
 
-Read and follow the [canonical shared definition](../../../.agents/contract/proto/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/proto/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

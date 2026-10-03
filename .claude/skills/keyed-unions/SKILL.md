@@ -11,5 +11,5 @@ provenance: library, pattern, house
 
 # Keyed unions
 
-Read and follow the [canonical shared definition](../../../.agents/contract/keyed-unions/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/keyed/unions/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.
