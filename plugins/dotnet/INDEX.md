@@ -1,34 +1,63 @@
 # dotnet package capabilities
 
-Generated from canonical `.agents/<kind>/<name>/` definitions.
-
-- `comments` — contract — core — `.agents/contract/comments/SKILL.md`
-- `csharp-naming` — contract — core — `.agents/contract/csharp-naming/SKILL.md`
-- `csharp-style` — contract — core — `.agents/contract/csharp-style/SKILL.md`
-- `ddd` — contract — domain-model — `.agents/contract/ddd/SKILL.md`
-- `dependency-injection` — contract — extensions — `.agents/contract/dependency-injection/SKILL.md`
-- `domain-events` — contract — domain-model — `.agents/contract/domain-events/SKILL.md`
-- `dotnet-stack` — contract — selected-stack — `.agents/contract/dotnet-stack/SKILL.md`
-- `e2e-scenarios` — contract — e2e — `.agents/contract/e2e-scenarios/SKILL.md`
-- `http-api` — contract — aspnet — `.agents/contract/http-api/SKILL.md`
-- `integration-testing` — contract — integration-testing — `.agents/contract/integration-testing/SKILL.md`
-- `keyed-strategies` — contract — keyed-design — `.agents/contract/keyed-strategies/SKILL.md`
-- `keyed-unions` — contract — keyed-design — `.agents/contract/keyed-unions/SKILL.md`
-- `logging` — contract — extensions — `.agents/contract/logging/SKILL.md`
-- `microservice-boundaries` — contract — distributed-services — `.agents/contract/microservice-boundaries/SKILL.md`
-- `module-structure` — contract — modular-services — `.agents/contract/module-structure/SKILL.md`
-- `multitenancy` — contract — multitenancy — `.agents/contract/multitenancy/SKILL.md`
-- `persistence` — contract — ef-core — `.agents/contract/persistence/SKILL.md`
-- `proto` — contract — distributed-services — `.agents/contract/proto/SKILL.md`
-- `result-carriers` — contract — results — `.agents/contract/result-carriers/SKILL.md`
-- `result-errors` — contract — results — `.agents/contract/result-errors/SKILL.md`
-- `result-terminals` — contract — results — `.agents/contract/result-terminals/SKILL.md`
-- `seeding` — contract — ef-core — `.agents/contract/seeding/SKILL.md`
-- `stack` — contract — selected-stack — `.agents/contract/stack/SKILL.md`
-- `unit-testing` — contract — unit-testing — `.agents/contract/unit-testing/SKILL.md`
-- `validation` — contract — validation — `.agents/contract/validation/SKILL.md`
-- `value-semantics` — contract — patterns — `.agents/contract/value-semantics/SKILL.md`
-- `e2e-api-debug` — operation — e2e — `.agents/operation/e2e-api-debug/SKILL.md`
-- `e2e-debug` — operation — e2e — `.agents/operation/e2e-debug/SKILL.md`
-- `e2e-ui-debug` — operation — e2e — `.agents/operation/e2e-ui-debug/SKILL.md`
-- `integration-debug` — operation — integration-testing — `.agents/operation/integration-debug/SKILL.md`
+- `build` — contract — core
+- `comments` — contract — core
+- `csharp-naming` — contract — core
+- `csharp-style` — contract — core
+- `ddd` — contract — domain-model
+- `dependency-injection` — contract — extensions
+- `domain-ddd` — contract — domain-model
+- `domain-design` — contract — core
+- `domain-events` — contract — domain-model
+- `domain-values` — contract — patterns
+- `dotnet-stack` — contract — selected-stack
+- `e2e-scenarios` — contract — e2e
+- `errors` — contract — core
+- `errors-carriers` — contract — results
+- `errors-results` — contract — results
+- `errors-terminals` — contract — results
+- `http-api` — contract — aspnet
+- `integration-testing` — contract — integration-testing
+- `keyed-strategies` — contract — keyed-design
+- `keyed-unions` — contract — keyed-design
+- `libraries` — contract — core
+- `libraries-selected` — contract — selected-stack
+- `logging` — contract — extensions
+- `microservice-boundaries` — contract — distributed-services
+- `module-structure` — contract — modular-services
+- `multitenancy` — contract — multitenancy
+- `naming` — contract — core
+- `naming-collaborators` — contract — core
+- `naming-data-contracts` — contract — core
+- `naming-mapping` — contract — core
+- `naming-repositories` — contract — core
+- `persistence` — contract — ef-core
+- `proto` — contract — distributed-services
+- `result-carriers` — contract — results
+- `result-errors` — contract — results
+- `result-terminals` — contract — results
+- `seeding` — contract — ef-core
+- `stack` — contract — selected-stack
+- `structure` — contract — core
+- `structure-modules` — contract — modular-services
+- `style` — contract — core
+- `style-comments` — contract — core
+- `testing` — contract — core
+- `testing-e2e` — contract — e2e
+- `testing-integration` — contract — integration-testing
+- `testing-unit` — contract — unit-testing
+- `unit-testing` — contract — unit-testing
+- `validation` — contract — validation
+- `value-semantics` — contract — patterns
+- `direction` — knowledge — knowledge
+- `knowledge` — knowledge — knowledge
+- `learning` — knowledge — knowledge
+- `debug-e2e` — operation — e2e
+- `debug-e2e-api` — operation — e2e
+- `debug-e2e-ui` — operation — e2e
+- `debug-integration` — operation — integration-testing
+- `e2e-api-debug` — operation — e2e
+- `e2e-debug` — operation — e2e
+- `e2e-ui-debug` — operation — e2e
+- `integration-debug` — operation — integration-testing
+- `scaffold` — utility — scaffold

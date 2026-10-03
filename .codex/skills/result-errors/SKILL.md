@@ -1,6 +1,6 @@
 ---
 name: result-errors
-description: Typed application errors for .NET services — one closed, operation-owned `XError` union per operation implementing `IError`, declared with Dunet and implicit conversions disabled, placed beside its widest in-process caller, with `Definition` derived in a single exhaustive switch over `ErrorDefinition.Invalid/NotFound/Conflict/Unauthenticated/Forbidden/PaymentRequired/Validation` factories, published dot-separated codes derived from the owner and case names, `[ErrorCode]` only to preserve an already-published code, honest agreement between a case name and its semantic kind, and an exact definition contract test per case. Use when adding or changing an error case, designing an operation's failure set, choosing a semantic kind, renaming an error, or reviewing a shared error catalog or a `NotFound<T>` base class.
+description: Compatibility name for dotnet:errors-results; remove after 2027-03-31. Use the shorter canonical name for new references.
 kind: contract
 domain: dotnet
 profile: results
@@ -9,7 +9,7 @@ requires: reunion, dunet
 provenance: library, selected-stack, house
 ---
 
-# Typed application errors
+# Typed application errors compatibility
 
-Read and follow the [canonical shared definition](../../../.agents/contract/result-errors/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/result-errors/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

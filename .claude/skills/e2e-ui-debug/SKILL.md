@@ -1,6 +1,6 @@
 ---
 name: e2e-ui-debug
-description: Run and repair a repository's browser end-to-end tier through its own full-stack harness, checking readiness and server or RPC failures before browser console, UI and screenshot evidence, while preserving scenario semantics. Use when a browser E2E scenario or UI full-stack CI job fails.
+description: Compatibility name for dotnet:debug-e2e-ui; remove after 2027-03-31. Use the shorter canonical name for new references.
 kind: operation
 domain: dotnet
 profile: e2e
@@ -9,7 +9,7 @@ requires: browser-e2e, playwright
 provenance: operation, selected-stack
 ---
 
-# Debugging a browser end-to-end suite
+# Browser end-to-end debugging compatibility
 
-Read and follow the [canonical shared definition](../../../.agents/operation/e2e-ui-debug/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/operation/e2e-ui-debug/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

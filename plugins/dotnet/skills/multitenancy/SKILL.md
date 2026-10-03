@@ -11,6 +11,8 @@ provenance: library, architecture, house
 
 # Multitenancy
 
+Owns multi-tenant EF Core visibility — context stances, filter declarations and repository qualifiers.
+
 ## Applicability
 
 This contract applies only to multi-tenant projects using EF Core. It requires `ef-core, multitenancy`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
@@ -160,16 +162,18 @@ honours.
   contract controls which data leaves the module.
 - **`XPrivilegedRepository`** — unfiltered cross-tenant read/write on the writable privileged context. Only
   where such a write flow actually exists.
-- **A domain fact that is not naturally an entity repository** may get its own purpose-named abstraction
-  over the read context — `IStockAvailability` — where it is a real, independently consumed capability. Do
-  not wrap a single query already owned by an aggregate repository in a one-method interface.
+- **`XPrivilegedReadRepository`** — a query-only contract on the privileged stance, including queries
+  enlisted in a shared transaction through the existing writable context.
+- **`XPrivilegedWriteRepository`** — a write-only contract on that privileged stance.
+- **An independently consumed domain capability**, such as `IStockAvailability`, uses its domain name
+  and owns its resolution contract. Entity queries remain on their cohesive repository owner.
 
 The injection site then documents itself: a service holding both `repository` and `readRepository` states
 exactly which of its queries see what.
 
-**A stance class only exists once the entity has more than one stance.** A single-stance entity is a plain
-`XRepository` — don't pre-qualify it with no sibling to contrast against; rename it the day the second
-stance is born.
+Use the plain `XRepository` name for the ordinary scoped writable owner. Name an alternative visibility
+contract when a production caller needs it. A read-only capability retains `Read` even when it is the
+entity's only repository; mutability and visibility are independent dimensions.
 
 ## Declare filters per entity, and only where reads are tenant-private
 
@@ -187,14 +191,20 @@ public browse split off to the read stance.
 A qualifier describes the contract that differs from the service's unqualified default. It is not one
 vocabulary to impose on every service:
 
-- **Data-access stance** — `XRepository` (tenant-bound), `XReadRepository` (tenant-independent, read-only),
-  `XPrivilegedRepository` (unfiltered and writable). **Name the composed contract, never the mechanism**: no
-  `Unscoped`, no `CrossTenant`.
-- **Mutability** — a `Repository<…>` surface permits writes; a `ReadRepository<…>` exposes queries only. An
-  event-synced replica therefore uses `XReadRepository` even with no writable sibling: `Read` states a
-  capability, not an audience.
-- **Projection shape** — `XHeaderRepository`, `XAutocompleteRepository` describe the projection served, not
-  visibility or write capability.
+- **Visibility** — retain the selected scope qualifier, such as `Privileged` for an unfiltered
+  alternative to the module's ordinary owner. Compose it with the exposed persistence capability:
+  `XPrivilegedReadRepository`, `XPrivilegedWriteRepository` or `XPrivilegedRepository`.
+- **Mutability** — use the read, write or combined repository capability defined by
+  `dotnet:persistence`. A query-only interface retains `Read`, including when
+  its implementation uses a wider context capability or it has no writable sibling.
+- **Projection shape** — `XHeaderReadRepository` and `XAutocompleteReadRepository` name their queried
+  projection and retain the read capability. The projection qualifier describes the returned shape.
 
 The dimensions are independent, and audience belongs at the API contract rather than in a persistence type
 name. Keep the ordinary owned, scoped, writable repository unqualified.
+
+## Scope in application operation names
+
+The ordinary scoped use case uses its domain intent, such as `GetDetailsAsync`. Name an alternative
+scope explicitly, such as `GetDetailsByIdAsync`; its repository query names the actual selection key.
+`CurrentUser`, `ForUser`, `Me` and `Self` identify data belonging to the authenticated human.

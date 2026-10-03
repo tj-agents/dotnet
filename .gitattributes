@@ -1,5 +1,1 @@
-.agents/** text eol=lf
-.codex/** text eol=lf
-.claude/** text eol=lf
-.claude-plugin/** text eol=lf
-plugins/** text eol=lf
+* text=auto eol=lf

@@ -1,75 +1,176 @@
 {
   "plugin": "dotnet",
+  "dependencies": [],
   "profiles": {
-    "core": [
-      "comments",
-      "csharp-naming",
-      "csharp-style"
-    ],
-    "extensions": [
-      "dependency-injection",
-      "logging"
-    ],
-    "selected-stack": [
-      "stack"
-    ],
-    "domain-model": [
-      "ddd",
-      "domain-events"
-    ],
     "aspnet": [
       "http-api"
     ],
-    "integration-testing": [
-      "integration-debug",
-      "integration-testing"
-    ],
-    "e2e": [
-      "e2e-api-debug",
-      "e2e-debug",
-      "e2e-scenarios",
-      "e2e-ui-debug"
-    ],
-    "keyed-design": [
-      "keyed-strategies",
-      "keyed-unions"
-    ],
-    "patterns": [
-      "value-semantics"
+    "core": [
+      "build",
+      "domain-design",
+      "errors",
+      "libraries",
+      "naming",
+      "naming-collaborators",
+      "naming-data-contracts",
+      "naming-mapping",
+      "naming-repositories",
+      "structure",
+      "style",
+      "style-comments",
+      "testing"
     ],
     "distributed-services": [
       "microservice-boundaries",
       "proto"
     ],
-    "modular-services": [
-      "module-structure"
+    "domain-model": [
+      "domain-ddd",
+      "domain-events"
+    ],
+    "e2e": [
+      "debug-e2e",
+      "debug-e2e-api",
+      "debug-e2e-ui",
+      "testing-e2e"
     ],
     "ef-core": [
       "persistence",
       "seeding"
     ],
+    "extensions": [
+      "dependency-injection",
+      "logging"
+    ],
+    "integration-testing": [
+      "debug-integration",
+      "testing-integration"
+    ],
+    "keyed-design": [
+      "keyed-strategies",
+      "keyed-unions"
+    ],
+    "knowledge": [
+      "direction",
+      "knowledge",
+      "learning"
+    ],
+    "modular-services": [
+      "structure-modules"
+    ],
     "multitenancy": [
       "multitenancy"
     ],
+    "patterns": [
+      "domain-values"
+    ],
     "results": [
-      "result-carriers",
-      "result-errors",
-      "result-terminals"
+      "errors-carriers",
+      "errors-results",
+      "errors-terminals"
+    ],
+    "scaffold": [
+      "scaffold"
+    ],
+    "selected-stack": [
+      "libraries-selected"
     ],
     "unit-testing": [
-      "unit-testing"
+      "testing-unit"
     ],
     "validation": [
       "validation"
     ]
   },
   "compatibilitySkillAliases": {
+    "comments": {
+      "replacedBy": "dotnet:style-comments",
+      "removeAfter": "2027-03-31"
+    },
+    "csharp-naming": {
+      "replacedBy": "dotnet:naming",
+      "removeAfter": "2027-03-31"
+    },
+    "csharp-style": {
+      "replacedBy": "dotnet:style",
+      "removeAfter": "2027-03-31"
+    },
+    "ddd": {
+      "replacedBy": "dotnet:domain-ddd",
+      "removeAfter": "2027-03-31"
+    },
+    "value-semantics": {
+      "replacedBy": "dotnet:domain-values",
+      "removeAfter": "2027-03-31"
+    },
+    "module-structure": {
+      "replacedBy": "dotnet:structure-modules",
+      "removeAfter": "2027-03-31"
+    },
+    "stack": {
+      "replacedBy": "dotnet:libraries-selected",
+      "removeAfter": "2027-03-31"
+    },
     "dotnet-stack": {
-      "replacedBy": "dotnet:stack",
+      "replacedBy": "dotnet:libraries-selected",
+      "removeAfter": "2027-03-31"
+    },
+    "result-errors": {
+      "replacedBy": "dotnet:errors-results",
+      "removeAfter": "2027-03-31"
+    },
+    "result-carriers": {
+      "replacedBy": "dotnet:errors-carriers",
+      "removeAfter": "2027-03-31"
+    },
+    "result-terminals": {
+      "replacedBy": "dotnet:errors-terminals",
+      "removeAfter": "2027-03-31"
+    },
+    "unit-testing": {
+      "replacedBy": "dotnet:testing-unit",
+      "removeAfter": "2027-03-31"
+    },
+    "integration-testing": {
+      "replacedBy": "dotnet:testing-integration",
+      "removeAfter": "2027-03-31"
+    },
+    "e2e-scenarios": {
+      "replacedBy": "dotnet:testing-e2e",
+      "removeAfter": "2027-03-31"
+    },
+    "integration-debug": {
+      "replacedBy": "dotnet:debug-integration",
+      "removeAfter": "2027-03-31"
+    },
+    "e2e-debug": {
+      "replacedBy": "dotnet:debug-e2e",
+      "removeAfter": "2027-03-31"
+    },
+    "e2e-api-debug": {
+      "replacedBy": "dotnet:debug-e2e-api",
+      "removeAfter": "2027-03-31"
+    },
+    "e2e-ui-debug": {
+      "replacedBy": "dotnet:debug-e2e-ui",
       "removeAfter": "2027-03-31"
     }
   },
   "skills": [
+    {
+      "name": "build",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        ".NET projects"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
+        "house"
+      ]
+    },
     {
       "name": "comments",
       "kind": "contract",
@@ -134,6 +235,72 @@
       ]
     },
     {
+      "name": "debug-e2e",
+      "kind": "operation",
+      "profile": "e2e",
+      "applicability": [
+        "repositories that provide both service and browser end-to-end tiers"
+      ],
+      "requires": [
+        "service-e2e",
+        "browser-e2e"
+      ],
+      "provenance": [
+        "operation",
+        "selected-stack"
+      ]
+    },
+    {
+      "name": "debug-e2e-api",
+      "kind": "operation",
+      "profile": "e2e",
+      "applicability": [
+        "service end-to-end suites using a repository-owned full-stack harness"
+      ],
+      "requires": [
+        "full-stack-test-harness"
+      ],
+      "provenance": [
+        "operation",
+        "selected-stack"
+      ]
+    },
+    {
+      "name": "debug-e2e-ui",
+      "kind": "operation",
+      "profile": "e2e",
+      "applicability": [
+        "browser end-to-end suites using a repository-owned full-stack harness"
+      ],
+      "requires": [
+        "browser-e2e",
+        "playwright"
+      ],
+      "provenance": [
+        "operation",
+        "selected-stack"
+      ]
+    },
+    {
+      "name": "debug-integration",
+      "kind": "operation",
+      "profile": "integration-testing",
+      "applicability": [
+        "ASP.NET Core integration suites with a real database reset between tests"
+      ],
+      "requires": [
+        "aspnet-core",
+        "xunit",
+        "testcontainers",
+        "respawn"
+      ],
+      "provenance": [
+        "framework",
+        "library",
+        "operation"
+      ]
+    },
+    {
       "name": "dependency-injection",
       "kind": "contract",
       "profile": "extensions",
@@ -145,6 +312,52 @@
       ],
       "provenance": [
         "library",
+        "house"
+      ]
+    },
+    {
+      "name": "direction",
+      "kind": "knowledge",
+      "profile": "knowledge",
+      "applicability": [
+        ".NET learning"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
+        "house"
+      ]
+    },
+    {
+      "name": "domain-ddd",
+      "kind": "contract",
+      "profile": "domain-model",
+      "applicability": [
+        "domain models designed with DDD building blocks (entities",
+        "value objects",
+        "aggregates)"
+      ],
+      "requires": [
+        "domain-model-architecture"
+      ],
+      "provenance": [
+        "architecture",
+        "pattern",
+        "house"
+      ]
+    },
+    {
+      "name": "domain-design",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        ".NET projects"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
         "house"
       ]
     },
@@ -162,6 +375,22 @@
       "provenance": [
         "library",
         "architecture",
+        "house"
+      ]
+    },
+    {
+      "name": "domain-values",
+      "kind": "contract",
+      "profile": "patterns",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "pattern",
         "house"
       ]
     },
@@ -240,6 +469,70 @@
       "provenance": [
         "operation",
         "selected-stack"
+      ]
+    },
+    {
+      "name": "errors",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        ".NET projects"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
+        "house"
+      ]
+    },
+    {
+      "name": "errors-carriers",
+      "kind": "contract",
+      "profile": "results",
+      "applicability": [
+        "projects that select Reunion result and option carriers"
+      ],
+      "requires": [
+        "reunion"
+      ],
+      "provenance": [
+        "library",
+        "selected-stack",
+        "house"
+      ]
+    },
+    {
+      "name": "errors-results",
+      "kind": "contract",
+      "profile": "results",
+      "applicability": [
+        "projects that select Reunion errors and Dunet unions"
+      ],
+      "requires": [
+        "reunion",
+        "dunet"
+      ],
+      "provenance": [
+        "library",
+        "selected-stack",
+        "house"
+      ]
+    },
+    {
+      "name": "errors-terminals",
+      "kind": "contract",
+      "profile": "results",
+      "applicability": [
+        "ASP.NET Core or worker/RPC edges using Reunion carriers"
+      ],
+      "requires": [
+        "reunion",
+        "aspnet-core-or-worker-rpc"
+      ],
+      "provenance": [
+        "library",
+        "framework",
+        "house"
       ]
     },
     {
@@ -328,6 +621,62 @@
       ]
     },
     {
+      "name": "knowledge",
+      "kind": "knowledge",
+      "profile": "knowledge",
+      "applicability": [
+        ".NET learning"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
+        "house"
+      ]
+    },
+    {
+      "name": "learning",
+      "kind": "knowledge",
+      "profile": "knowledge",
+      "applicability": [
+        ".NET projects and learning"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
+        "house"
+      ]
+    },
+    {
+      "name": "libraries",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        ".NET projects"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
+        "house"
+      ]
+    },
+    {
+      "name": "libraries-selected",
+      "kind": "contract",
+      "profile": "selected-stack",
+      "applicability": [
+        "repositories that explicitly select Tommy's full application stack"
+      ],
+      "requires": [
+        "selected-stack-profile"
+      ],
+      "provenance": [
+        "selected-stack"
+      ]
+    },
+    {
       "name": "logging",
       "kind": "contract",
       "profile": "extensions",
@@ -386,6 +735,81 @@
       "provenance": [
         "library",
         "architecture",
+        "house"
+      ]
+    },
+    {
+      "name": "naming",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "naming-collaborators",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "naming-data-contracts",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "naming-mapping",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "naming-repositories",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "C# projects exposing repository contracts",
+        "regardless of persistence library"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
         "house"
       ]
     },
@@ -474,6 +898,20 @@
       ]
     },
     {
+      "name": "scaffold",
+      "kind": "utility",
+      "profile": "scaffold",
+      "applicability": [
+        "new .NET projects"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
+        "house"
+      ]
+    },
+    {
       "name": "seeding",
       "kind": "contract",
       "profile": "ef-core",
@@ -500,6 +938,129 @@
       ],
       "provenance": [
         "selected-stack"
+      ]
+    },
+    {
+      "name": "structure",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        ".NET projects"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
+        "house"
+      ]
+    },
+    {
+      "name": "structure-modules",
+      "kind": "contract",
+      "profile": "modular-services",
+      "applicability": [
+        "modular service or layered shared-library architecture"
+      ],
+      "requires": [
+        "modular-service-architecture"
+      ],
+      "provenance": [
+        "architecture",
+        "house"
+      ]
+    },
+    {
+      "name": "style",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "style-comments",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "testing",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        ".NET projects"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
+        "house"
+      ]
+    },
+    {
+      "name": "testing-e2e",
+      "kind": "contract",
+      "profile": "e2e",
+      "applicability": [
+        "browser end-to-end suites using Gherkin and Playwright"
+      ],
+      "requires": [
+        "reqnroll",
+        "playwright"
+      ],
+      "provenance": [
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "testing-integration",
+      "kind": "contract",
+      "profile": "integration-testing",
+      "applicability": [
+        "ASP.NET Core integration suites with a real database reset between tests"
+      ],
+      "requires": [
+        "aspnet-core",
+        "xunit",
+        "testcontainers",
+        "respawn"
+      ],
+      "provenance": [
+        "framework",
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "testing-unit",
+      "kind": "contract",
+      "profile": "unit-testing",
+      "applicability": [
+        "projects using xUnit for deterministic core logic"
+      ],
+      "requires": [
+        "xunit"
+      ],
+      "provenance": [
+        "library",
+        "house"
       ]
     },
     {

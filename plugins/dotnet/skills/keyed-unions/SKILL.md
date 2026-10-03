@@ -11,12 +11,14 @@ provenance: library, pattern, house
 
 # Keyed unions
 
+Owns the shape for behaviour that varies by a closed key when the variants have different signatures.
+
 ## Applicability
 
 This contract applies only to closed-key variants with different signatures. It requires `dunet`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 **When behaviour varies by a closed key and the variants do not share one signature**, resolve a *union* by
-key rather than a strategy. `KEYED_STRATEGIES.md` owns the other half; the two are different patterns sharing
+key rather than a strategy. `dotnet:keyed-strategies` owns the other half; the two are different patterns sharing
 a registration mechanism, and applying the strategy rules to a union problem is the failure this document
 exists to prevent.
 

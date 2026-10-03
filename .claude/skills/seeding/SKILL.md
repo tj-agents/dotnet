@@ -11,5 +11,5 @@ provenance: library, house
 
 # Seeding
 
-Read and follow the [canonical shared definition](../../../.agents/contract/seeding/SKILL.md) in full.
+Read and follow the [canonical definition](../../../.agents/dotnet/contract/seeding/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

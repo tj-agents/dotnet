@@ -11,9 +11,14 @@ provenance: library, house
 
 # Dependency injection
 
+Owns DI registration shape — interface-typed dependencies, composition roots and dependency-holders.
+
 ## Applicability
 
 This contract applies only to projects using Microsoft.Extensions.DependencyInjection. It requires `microsoft-extensions-dependency-injection`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+
+Collaborator names follow `dotnet:naming-collaborators`.
+Registration composes those responsibilities; their names describe what they do.
 
 ## Inject interfaces; register them in the owning composition root
 
@@ -66,7 +71,7 @@ assignments are `this.`-qualified like any other constructor assignment.
 **This is not a licence to drop `private readonly` fields elsewhere.** It applies only where the member is
 a genuine public part of the type's contract that passes the dependency straight through. A dependency the
 type consumes *internally* — a repository a service queries, a client a step invokes — stays a
-`private readonly` field, which is captured state and still governed by the `csharp-style` rule against
+`private readonly` field, which is captured state and still governed by the `style` rule against
 primary-constructor captures.
 
 ## Lifetimes
