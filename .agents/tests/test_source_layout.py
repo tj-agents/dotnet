@@ -23,7 +23,7 @@ generator = load("dotnet_sync_generated", ROOT / ".agents/sync_generated.py")
 CORE_MEMBERS = {
     "naming",
     "naming-collaborators",
-    "naming-data-contracts",
+    "naming-data-shapes",
     "naming-mapping",
     "naming-repositories",
     "style",
@@ -38,6 +38,7 @@ CORE_MEMBERS = {
     "csharp-naming",
     "csharp-style",
     "comments",
+    "naming-data-contracts",
 }
 ALLOWED_CORE_REQUIRES = {"none", "dotnet"}
 PREREQUISITE_BEARING = (
