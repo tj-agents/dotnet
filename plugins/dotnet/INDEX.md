@@ -29,8 +29,8 @@
 - `naming` — contract — core
 - `naming-collaborators` — contract — core
 - `naming-data-contracts` — contract — core
+- `naming-dtos` — contract — core
 - `naming-mapping` — contract — core
-- `naming-payloads` — contract — core
 - `naming-repositories` — contract — core
 - `persistence` — contract — ef-core
 - `proto` — contract — distributed-services

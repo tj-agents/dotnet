@@ -1,6 +1,6 @@
 ---
-name: naming-payloads
-description: Name C# payloads by their meaning — when the domain noun stands alone and when a suffix such as Dto, Summary, Snapshot, Projection, Decision, Evidence, Proof, Descriptor, Catalog, Binding or Context carries a real distinction. Use when defining or reviewing a record, DTO, query result or payload shared by application callers.
+name: naming-dtos
+description: Name C# DTOs by their meaning — when the domain noun stands alone, when a suffix such as Summary, Snapshot, Projection, Decision, Evidence, Proof, Descriptor, Catalog, Binding or Context carries the distinction, and when Dto itself earns its place. Use when defining or reviewing a record, DTO, query result or shape shared by application callers.
 kind: contract
 domain: dotnet
 profile: core
@@ -9,17 +9,17 @@ requires: none
 provenance: language, house
 ---
 
-# Payload naming
+# DTO naming
 
-Owns the naming of C# payloads carried between callers — summaries, snapshots, projections, decisions.
+Owns the naming of C# DTOs carried between callers — summaries, snapshots, projections, decisions.
 
 ## Applicability
 
-These conventions apply to C# payloads independently of a persistence library or transport.
+These conventions apply to C# DTOs independently of a persistence library or transport.
 Shared identifiers follow `dotnet:naming`. Entity/value identity,
 behavior and aggregate boundaries belong to the selected `dotnet:domain-ddd`
 contract; value representation and construction belong to
-`dotnet:domain-values`. This contract names the payloads carried between
+`dotnet:domain-values`. This contract names the shapes carried between
 callers.
 
 ## Name what the value represents
@@ -46,8 +46,10 @@ concept across application and internal module boundaries.
 ## DTOs describe the application contract
 
 Use `Dto` where it distinguishes a transfer contract from a same-named entity or value. Use the domain
-noun alone where the contract is already unambiguous. Keep names stable when the same application shape
-is consumed from different transports. Resolve an SDK name collision with a local `using` alias.
+noun alone where the contract is already unambiguous. A meaning-bearing suffix already marks the shape:
+`OrderSnapshot` is a DTO on its own, and `OrderSnapshotDto` is redundant unless the domain itself owns
+an `OrderSnapshot` to distinguish from. Keep names stable when the same application shape is consumed
+from different transports. Resolve an SDK name collision with a local `using` alias.
 
 Application input types name the accepted operation or reusable input shape. Endpoint-specific naming
 and wire shaping follow `dotnet:http-api` for HTTP or
@@ -63,7 +65,7 @@ that boundary.
 For example, a query can return `OrderSummary` directly. A query returning component values that the
 service combines with delivery information can return `OrderProjection`, and the service produces
 `OrderDetails`. The distinct name reflects the distinct contract. Storage location alone does not
-create a second payload.
+create a second DTO.
 
 ## Decisions, evidence and proofs
 
