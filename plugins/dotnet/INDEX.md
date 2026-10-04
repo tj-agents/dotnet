@@ -28,7 +28,6 @@
 - `multitenancy` — contract — multitenancy
 - `naming` — contract — core
 - `naming-collaborators` — contract — core
-- `naming-data-contracts` — contract — core
 - `naming-dtos` — contract — core
 - `naming-mapping` — contract — core
 - `naming-repositories` — contract — core

@@ -38,7 +38,6 @@ CORE_MEMBERS = {
     "csharp-naming",
     "csharp-style",
     "comments",
-    "naming-data-contracts",
 }
 ALLOWED_CORE_REQUIRES = {"none", "dotnet"}
 PREREQUISITE_BEARING = (
