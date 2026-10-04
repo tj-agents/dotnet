@@ -23,7 +23,7 @@ generator = load("dotnet_sync_generated", ROOT / ".agents/sync_generated.py")
 CORE_MEMBERS = {
     "naming",
     "naming-collaborators",
-    "naming-data-shapes",
+    "naming-payloads",
     "naming-mapping",
     "naming-repositories",
     "style",

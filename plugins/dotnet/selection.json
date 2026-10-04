@@ -13,8 +13,8 @@
       "naming",
       "naming-collaborators",
       "naming-data-contracts",
-      "naming-data-shapes",
       "naming-mapping",
+      "naming-payloads",
       "naming-repositories",
       "structure",
       "style",
@@ -785,7 +785,7 @@
       ]
     },
     {
-      "name": "naming-data-shapes",
+      "name": "naming-mapping",
       "kind": "contract",
       "profile": "core",
       "applicability": [
@@ -800,7 +800,7 @@
       ]
     },
     {
-      "name": "naming-mapping",
+      "name": "naming-payloads",
       "kind": "contract",
       "profile": "core",
       "applicability": [

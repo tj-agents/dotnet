@@ -1,6 +1,6 @@
 ---
-name: naming-data-shapes
-description: Name C# data shapes by their meaning — when the domain noun stands alone and when a suffix such as Dto, Summary, Snapshot, Projection, Decision, Evidence, Proof, Descriptor, Catalog, Binding or Context carries a real distinction. Use when defining or reviewing a record, DTO, query result or shape shared by application callers.
+name: naming-payloads
+description: Name C# payloads by their meaning — when the domain noun stands alone and when a suffix such as Dto, Summary, Snapshot, Projection, Decision, Evidence, Proof, Descriptor, Catalog, Binding or Context carries a real distinction. Use when defining or reviewing a record, DTO, query result or payload shared by application callers.
 kind: contract
 domain: dotnet
 profile: core
@@ -9,17 +9,17 @@ requires: none
 provenance: language, house
 ---
 
-# Data-shape naming
+# Payload naming
 
-Owns the naming of C# data shapes carried between callers — payloads, summaries, snapshots, projections.
+Owns the naming of C# payloads carried between callers — summaries, snapshots, projections, decisions.
 
 ## Applicability
 
-These conventions apply to C# data shapes independently of a persistence library or transport.
+These conventions apply to C# payloads independently of a persistence library or transport.
 Shared identifiers follow `dotnet:naming`. Entity/value identity,
 behavior and aggregate boundaries belong to the selected `dotnet:domain-ddd`
 contract; value representation and construction belong to
-`dotnet:domain-values`. This contract names the data shapes carried between
+`dotnet:domain-values`. This contract names the payloads carried between
 callers.
 
 ## Name what the value represents
@@ -63,7 +63,7 @@ that boundary.
 For example, a query can return `OrderSummary` directly. A query returning component values that the
 service combines with delivery information can return `OrderProjection`, and the service produces
 `OrderDetails`. The distinct name reflects the distinct contract. Storage location alone does not
-create a second data shape.
+create a second payload.
 
 ## Decisions, evidence and proofs
 
