@@ -1,6 +1,6 @@
 ---
 name: naming
-description: Shared C# naming conventions — domain vocabulary, namespace-aware identifiers, interface/type pairing and readable method names. Routes domain modeling, value construction, collaborator responsibility, return contracts, validation, persistence, data shapes, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
+description: Shared C# naming conventions — domain vocabulary, namespace-aware identifiers, interface/type pairing and readable method names. Routes domain modeling, value construction, collaborator responsibility, return contracts, validation, persistence, DTOs, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
 kind: contract
 domain: dotnet
 profile: core
@@ -24,7 +24,7 @@ owner for the task at hand; load the relevant owner when its concern and prerequ
 | Choose an immutable value representation, construction or owned behavior | `dotnet:domain-values` |
 | Define a collaborator role, operation and semantic outcome | `dotnet:naming-collaborators` |
 | Select application presence/failure carriers when Reunion is selected | `dotnet:errors-carriers` |
-| Name a data contract or query result | `dotnet:naming-data-contracts` |
+| Name a DTO or query result | `dotnet:naming-dtos` |
 | Name a mapper or receiver extension | `dotnet:naming-mapping` |
 | Name a repository, persistence operation and storage return contract | `dotnet:naming-repositories` |
 | Implement EF Core repository/context conventions when selected | `dotnet:persistence` |
@@ -41,7 +41,7 @@ owner for the task at hand; load the relevant owner when its concern and prerequ
 ## Reuse the domain language and responsibility owner
 
 Select the concern owner from the table before naming or moving a contract. A collaborator operation
-loads its role owner and the selected return-contract owner; a data shape loads its own naming owner.
+loads its role owner and the selected return-contract owner; a DTO loads its own naming owner.
 Each owner defines its concern once. Shared spelling conventions apply across them.
 
 Read the declaration, implementation and callers together. Reuse the established word for the same

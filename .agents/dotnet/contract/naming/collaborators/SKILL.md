@@ -1,6 +1,6 @@
 ---
 name: naming-collaborators
-description: Canonical C# collaborator roles and operation contracts — select the subject, responsibility, verb, returned value and caller-visible outcomes together. Distinguishes resolvers, validators, services, repositories, mappers, factories, calculators, providers and accessors, with separate owners for persistence, result carriers, validation and DI. Use when designing, naming or reviewing a collaborator and its interface.
+description: Canonical C# collaborator roles and operation contracts — select the subject, responsibility, verb, returned value and caller-visible outcomes together. Distinguishes resolvers, validators, services, repositories, mappers, factories, calculators, providers, accessors, registries, policies, evaluators, specifications, sessions, runners and committers, with separate owners for persistence, result carriers, validation and DI. Use when designing, naming or reviewing a collaborator and its interface.
 kind: contract
 domain: dotnet
 profile: core
@@ -21,7 +21,7 @@ interfaces retain their defined contracts. Shared identifiers follow
 `dotnet:dependency-injection` when selected.
 
 This owner defines what a collaborator does and how that operation is named. Payload meaning belongs
-to `dotnet:naming-data-contracts`. Concrete success, absence and failure
+to `dotnet:naming-dtos`. Concrete success, absence and failure
 carriers belong to the project's selected result contract; projects selecting Reunion use
 `dotnet:errors-carriers`. The role and outcome decisions apply together.
 
@@ -61,7 +61,13 @@ Creating an object can be one step in a calculation. Name the complete responsib
 | Expose a current or ambient value | `RequestContextAccessor.Current` | The value already associated with that context |
 | React to an event or message | `OrderPlacedHandler.HandleAsync` | Handling completion under the messaging contract |
 | Render, serialize or export | `InvoiceRenderer.Render`, `OrderSerializer.Serialize`, `ReportExporter.Export` | The rendered or encoded representation |
-| Decide over peer inputs | `TransitionEvaluator.Evaluate` | The decision over those inputs |
+| Decide an outcome by applying declared rules | `TransitionEvaluator.Evaluate`, `ShipmentReleaseEvaluator.EvaluateAsync` | The decision as a verdict type, over the inputs and any state the rules require |
+| Declare a named rule with no side effects | `ShipmentGrantPolicy` | The rule as data or expression; an evaluator or filter composition enforces it |
+| Test a candidate against a composable predicate | `OverdueOrderSpecification.IsSatisfiedBy` | Whether the candidate satisfies the specification |
+| Look up declarations registered at composition | `CarrierRegistry.GetByCode` | The declaration for that key |
+| Hold a scoped conversation's accumulating state | `PickingSession.Complete` | The session's state over its lifetime, created and ended by its owner |
+| Execute caller-supplied work inside an owned envelope | `TransactionRunner.RunAsync` | The work's own result, run under the envelope's guarantee |
+| Commit work staged elsewhere | `CheckoutCommitter.CommitAsync` | The terminal commit of the staged unit |
 
 Persistence roles and their method/return contracts are owned by
 `dotnet:naming-repositories`. Pure conversions are owned by
@@ -97,6 +103,53 @@ and domain-eligibility contracts, including their validation result types. Libra
 methods retain their library signatures. A resolver may check candidate validity while returning a
 resolved value; its useful result remains a resolution. Conversely, validation may load data while
 returning a validation decision. Both implementation and returned contract establish the role.
+
+## Decision roles
+
+A policy is a named declarative rule — requirements or a filter expression — with no side effects;
+something else enforces it. GoF and Evans both name Strategy "also known as Policy", and
+[ASP.NET Core authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/policies)
+defines a policy as a named set of requirements evaluated by handlers.
+
+An evaluator applies declared rules to a subject and returns the decision as a verdict type, never a
+payload. It may be injected and load the state its rules require — the decision is the contract, data
+access the implementation: ASP.NET Core's
+[`IPolicyEvaluator`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authorization.policy.ipolicyevaluator)
+authenticates before authorizing, while
+[`IAuthorizationEvaluator`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authorization.iauthorizationevaluator)
+stays a pure decision over a prepared context. Both forms are evaluators.
+
+A specification is a combinable predicate value object — `IsSatisfiedBy(candidate)` with and/or/not
+composition and no dependencies — for a rule used in more than one mode, such as testing a candidate
+and selecting matching rows ([Evans & Fowler, Specifications](https://martinfowler.com/apsupp/spec.pdf)).
+
+Keep the boundaries: a validator assesses a supplied candidate and reports diagnostics; an evaluator
+decides an outcome; a resolver produces a usable value; a calculator computes an amount. An evaluator
+returns a `Decision`; the `Evidence` and `Proof` shapes around it follow
+`dotnet:naming-dtos`.
+
+## Registries, sessions and envelopes
+
+A registry is a keyed collection of declarations populated at composition time and read at runtime —
+[Fowler's "well-known object that other objects can use to find common objects and services"](https://martinfowler.com/eaaCatalog/registry.html).
+It holds data: bindings, capabilities, descriptors. Behaviour selected by key belongs to
+`dotnet:keyed-strategies`; a complete enumeration consumed as a whole is a
+catalog under `dotnet:naming-dtos`.
+
+A session is a stateful object scoping a conversation: created, accumulating or caching state for its
+lifetime, then ended (Hibernate's and ASP.NET Core's `ISession`). A context carries ambient values with
+no conversational lifecycle; an accessor exposes that context.
+
+A runner executes caller-supplied work inside an envelope it owns — transaction bracket, retry, scope —
+and owns no business logic: `TransactionRunner.RunAsync(ct => PlaceAsync(ct))`, the contract shape of
+EF Core's `IExecutionStrategy.Execute` and of every test or task runner. Use `Runner`, not Java's
+`Executor`. A committer owns only the terminal commit of work staged elsewhere — the commit phase of
+[PoEAA's Unit of Work](https://martinfowler.com/eaaCatalog/unitOfWork.html) as its own responsibility.
+The service still owns the use case; a handler still reacts to a message.
+
+`Command` names a real command object — a GoF Command, a CQRS/mediator dispatch message or a CLI
+command — never a synonym for "a write". An ordinary write operation belongs to its service, repository
+or handler under the roles above.
 
 ## Construction and qualifiers
 

@@ -1,6 +1,6 @@
 ---
 name: naming
-description: Shared C# naming conventions — domain vocabulary, namespace-aware identifiers, interface/type pairing and readable method names. Routes domain modeling, value construction, collaborator responsibility, return contracts, validation, persistence, data shapes, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
+description: Shared C# naming conventions — domain vocabulary, namespace-aware identifiers, interface/type pairing and readable method names. Routes domain modeling, value construction, collaborator responsibility, return contracts, validation, persistence, DTOs, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
 kind: contract
 domain: dotnet
 profile: core

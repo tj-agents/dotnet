@@ -37,8 +37,8 @@ value is that the internal read DTO can grow server-only fields or change projec
 public clients. That covers the public details reads, not every DTO.
 
 Drop the `Dto` suffix where the name already says what the shape is; keep it only to disambiguate from a
-same-named entity. Data-shape conventions belong to
-`dotnet:naming-data-contracts`. HTTP `Request` and `Response`
+same-named entity. DTO conventions belong to
+`dotnet:naming-dtos`. HTTP `Request` and `Response`
 names describe the boundary contracts defined here; the application keeps its domain-shaped payloads.
 
 ## Write inputs are `Request` records
@@ -52,6 +52,19 @@ Where create and update accept the identical writable shape, share **one** `XReq
 
 Which validator shape a request gets, and whether it is auto-validated or injected, is the `validation`
 skill's subject.
+
+## Idempotency is an API-boundary concern
+
+Use the vocabulary of the IETF
+[`Idempotency-Key` draft](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/)
+(expired, but the de facto industry term —
+[Stripe's idempotent requests](https://docs.stripe.com/api/idempotent_requests) use the same model). The
+client sends an `Idempotency-Key` header carrying a UUID; the server derives a fingerprint from the
+payload and stores the `IdempotencyKey` itself — key, fingerprint, outcome — with no `Record`, `Receipt`
+or `Command` noun. A missing key on an endpoint that requires one is `400`; the same key with a
+different fingerprint is `422`; a retry while the original is still processing is `409`; a completed
+request replays its stored outcome. The key stays at the API boundary — domain and application
+operations never take it as a concept of their own.
 
 ## Translate domain vocabulary into product vocabulary once, at the boundary
 
