@@ -21,7 +21,7 @@ owner for the task at hand; load the relevant owner when its concern and prerequ
 | Task | Naming owner |
 |---|---|
 | Design an entity, value object, aggregate or domain service when DDD is selected | `dotnet:domain-ddd` |
-| Choose an immutable value representation, construction or owned behavior | `dotnet:domain-values` |
+| Choose or review an immutable value representation, construction or owned behavior | `dotnet:domain-values` |
 | Define a collaborator role, operation and semantic outcome | `dotnet:naming-collaborators` |
 | Select application presence/failure carriers when Reunion is selected | `dotnet:errors-carriers` |
 | Name a DTO or query result | `dotnet:naming-dtos` |
@@ -89,7 +89,8 @@ qualify the reference or use an alias there.
 Follow [Microsoft's general naming guidance](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/general-naming-conventions):
 prefer readable, meaningful names. Read the identifier with its receiver, parameters and return type.
 Include distinctions the caller needs, such as scope, locking, units or revision; use the surrounding
-context for information it already supplies.
+context for information it already supplies. A name claims no more than its type holds: a lone hash is
+a `Hash`, not a `Fingerprint`, `Record` or `Receipt`.
 
 The collaborator or persistence owner defines the verb and its semantic outcome together. Qualify an
 operation by a meaningful returned shape, such as `ResolveSnapshotAsync`, or by a distinguishing input
