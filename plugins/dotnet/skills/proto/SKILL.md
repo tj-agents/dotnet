@@ -25,7 +25,7 @@ hop is gRPC at all — is a separate decision and is not this skill's concern.
 A `.proto` message keeps the native RPC `*Response` / `*Request` naming. That name is generated,
 wire-only, and never surfaces as the application payload type.
 
-The application C# payload follows `dotnet:naming-data-contracts`,
+The application C# payload follows `dotnet:naming-dtos`,
 including shape names and local aliases for SDK collisions. Generated RPC payloads retain their
 protocol-owned `Request` / `Response` names.
 

@@ -1,6 +1,6 @@
 ---
 name: multitenancy
-description: Multi-tenant EF Core standard — visibility comes from what a context is composed from, never from disabling a filter per query (`IgnoreQueryFilters` banned via `RS0030`), the anemic per-module configuration provider that every stance composes, the tenant-scoped / read-only / privileged-writable context stances and the verbatim shape of each (bases own `OnModelCreating`; a read context exposes named `IQueryable`s through an explicitly-implemented `IXReadDbContext` that never extends `IReadDbContext` and must have a production consumer), the uniform DI registration of a stance, the per-module stance test, one data-access stance per query class, declaring a filter per entity rather than deriving it from a marker interface, filtering only where an entity's *reads* are tenant-private, and the independent naming dimensions (stance, mutability, projection shape) for repository qualifiers. Use when adding a `DbContext` or a repository to a tenant-aware module, wiring a context into DI, deciding whether an entity should be query-filtered, hitting data that a filter is hiding, or reviewing any code that wants to bypass a global query filter.
+description: Multi-tenant EF Core standard — visibility comes from what a context is composed from, never from disabling a filter per query (`IgnoreQueryFilters` banned via `RS0030`), the anemic per-module configuration provider that every stance composes, the tenant-scoped / read-only / privileged-writable context stances and the verbatim shape of each (bases own `OnModelCreating`; a read context exposes named `IQueryable`s through an explicitly-implemented `IXReadDbContext` that never extends `IReadDbContext` and must have a production consumer), the uniform DI registration of a stance, the per-module stance test, one data-access stance per query class, declaring a filter per entity rather than deriving it from a marker interface, filtering only where an entity's *reads* are tenant-private, and the independent naming dimensions (stance — `Private` tenant-scoped versus `Privileged` unfiltered — mutability, projection shape) for repository qualifiers. Use when adding a `DbContext` or a repository to a tenant-aware module, wiring a context into DI, deciding whether an entity should be query-filtered, hitting data that a filter is hiding, or reviewing any code that wants to bypass a global query filter.
 kind: contract
 domain: dotnet
 profile: multitenancy
@@ -160,6 +160,9 @@ honours.
   default.
 - **`XReadRepository`** — read-only access through the module's tenant-independent read context. Its
   contract controls which data leaves the module.
+- **`XPrivateReadRepository`** — a read-only contract on the tenant-bound filtered context, named only
+  where the module also has a tenant-independent `XReadRepository` to distinguish from. `Private` states
+  the tenant-private stance the plain `Read` name can no longer carry there.
 - **`XPrivilegedRepository`** — unfiltered cross-tenant read/write on the writable privileged context. Only
   where such a write flow actually exists.
 - **`XPrivilegedReadRepository`** — a query-only contract on the privileged stance, including queries
@@ -191,9 +194,10 @@ public browse split off to the read stance.
 A qualifier describes the contract that differs from the service's unqualified default. It is not one
 vocabulary to impose on every service:
 
-- **Visibility** — retain the selected scope qualifier, such as `Privileged` for an unfiltered
-  alternative to the module's ordinary owner. Compose it with the exposed persistence capability:
-  `XPrivilegedReadRepository`, `XPrivilegedWriteRepository` or `XPrivilegedRepository`.
+- **Visibility** — retain the selected scope qualifier: `Privileged` for an unfiltered alternative to
+  the module's ordinary owner, `Private` for the tenant-scoped filtered stance where the module's
+  `XReadRepository` already names the tenant-independent read stance. Compose it with the exposed
+  persistence capability: `XPrivilegedReadRepository`, `XPrivateReadRepository` or `XPrivilegedRepository`.
 - **Mutability** — use the read, write or combined repository capability defined by
   `dotnet:persistence`. A query-only interface retains `Read`, including when
   its implementation uses a wider context capability or it has no writable sibling.
