@@ -21,10 +21,10 @@ This contract applies to every C#/.NET repository and has no application-stack p
 
 Use a `readonly record struct` for a small immutable value whose identity is entirely its fields. Keep
 construction private when ordinary creation canonicalizes the value, but every struct still has an
-all-default value. An invalid default is harmless when each consumer's invariant boundary rejects it —
-the holding entity's constructor, a required column — so a single-field validated wrapper stays a
-struct. Use a reference value object only when some consumer acts on the value without such a boundary,
-so an invalid default must be impossible to represent.
+all-default value. An invalid default is harmless when each consumer's invariant boundary, such as the
+holding entity's constructor, rejects it, so a single-field validated wrapper stays a struct. Use a
+reference value object only when some consumer acts on the value without such a boundary, so an invalid
+default must be impossible to represent.
 
 Allocation volume is a reason on its own. Prefer the struct where one is created per item of a
 materialised collection rather than a handful.
