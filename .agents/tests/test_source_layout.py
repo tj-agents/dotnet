@@ -34,10 +34,6 @@ CORE_MEMBERS = {
     "testing",
     "build",
     "libraries",
-    # compatibility aliases of the above, keeping the same profile as their replacement
-    "csharp-naming",
-    "csharp-style",
-    "comments",
 }
 ALLOWED_CORE_REQUIRES = {"none", "dotnet"}
 PREREQUISITE_BEARING = (
