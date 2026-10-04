@@ -12,7 +12,6 @@
       "libraries",
       "naming",
       "naming-collaborators",
-      "naming-data-contracts",
       "naming-dtos",
       "naming-mapping",
       "naming-repositories",
@@ -756,21 +755,6 @@
     },
     {
       "name": "naming-collaborators",
-      "kind": "contract",
-      "profile": "core",
-      "applicability": [
-        "all C# and .NET code"
-      ],
-      "requires": [
-        "none"
-      ],
-      "provenance": [
-        "language",
-        "house"
-      ]
-    },
-    {
-      "name": "naming-data-contracts",
       "kind": "contract",
       "profile": "core",
       "applicability": [

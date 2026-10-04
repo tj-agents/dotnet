@@ -32,7 +32,6 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `multitenancy` — contract — multitenancy — `.agents/dotnet/contract/multitenancy/SKILL.md`
 - `naming` — contract — core — `.agents/dotnet/contract/naming/SKILL.md`
 - `naming-collaborators` — contract — core — `.agents/dotnet/contract/naming/collaborators/SKILL.md`
-- `naming-data-contracts` — contract — core — `.agents/dotnet/contract/naming/data-contracts/SKILL.md`
 - `naming-dtos` — contract — core — `.agents/dotnet/contract/naming/dtos/SKILL.md`
 - `naming-mapping` — contract — core — `.agents/dotnet/contract/naming/mapping/SKILL.md`
 - `naming-repositories` — contract — core — `.agents/dotnet/contract/naming/repositories/SKILL.md`
