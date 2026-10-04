@@ -64,7 +64,7 @@ predicate; spell out component names when they distinguish different queries.
 
 Repositories own storage queries, filtering, projection, persistence and the locks/enlistment supporting
 those operations. Returned payload names follow
-`dotnet:naming-payloads`; a final `OrderSummary` retains that name
+`dotnet:naming-dtos`; a final `OrderSummary` retains that name
 when a repository projects it directly.
 
 Application selection, resolution rules and the interpretation of several persisted inputs belong to

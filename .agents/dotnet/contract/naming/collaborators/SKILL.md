@@ -21,7 +21,7 @@ interfaces retain their defined contracts. Shared identifiers follow
 `dotnet:dependency-injection` when selected.
 
 This owner defines what a collaborator does and how that operation is named. Payload meaning belongs
-to `dotnet:naming-payloads`. Concrete success, absence and failure
+to `dotnet:naming-dtos`. Concrete success, absence and failure
 carriers belong to the project's selected result contract; projects selecting Reunion use
 `dotnet:errors-carriers`. The role and outcome decisions apply together.
 
@@ -126,7 +126,7 @@ and selecting matching rows ([Evans & Fowler, Specifications](https://martinfowl
 Keep the boundaries: a validator assesses a supplied candidate and reports diagnostics; an evaluator
 decides an outcome; a resolver produces a usable value; a calculator computes an amount. An evaluator
 returns a `Decision`; the `Evidence` and `Proof` shapes around it follow
-`dotnet:naming-payloads`.
+`dotnet:naming-dtos`.
 
 ## Registries, sessions and envelopes
 
@@ -134,7 +134,7 @@ A registry is a keyed collection of declarations populated at composition time a
 [Fowler's "well-known object that other objects can use to find common objects and services"](https://martinfowler.com/eaaCatalog/registry.html).
 It holds data: bindings, capabilities, descriptors. Behaviour selected by key belongs to
 `dotnet:keyed-strategies`; a complete enumeration consumed as a whole is a
-catalog under `dotnet:naming-payloads`.
+catalog under `dotnet:naming-dtos`.
 
 A session is a stateful object scoping a conversation: created, accumulating or caching state for its
 lifetime, then ended (Hibernate's and ASP.NET Core's `ISession`). A context carries ambient values with
