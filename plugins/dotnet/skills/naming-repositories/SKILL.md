@@ -35,7 +35,8 @@ Transaction participation and use by an authorization operation preserve that pe
 
 Visibility is a separate qualifier. When the project selects multitenancy, compose its
 visibility convention in `dotnet:multitenancy` with the exposed capability, such as
-`OrderPrivilegedReadRepository`. Framework-owned repository interfaces keep their framework contracts.
+`OrderPrivilegedReadRepository` or `OrderPrivateReadRepository`. Framework-owned repository interfaces
+keep their framework contracts.
 
 ## Query and write contracts
 
@@ -53,8 +54,10 @@ query would otherwise have identical names and parameters, expose their shape or
 Every asynchronous operation uses `Async`, accepts cancellation when it can reach I/O and propagates it.
 
 Expose locking guarantees callers must rely on, such as `GetByIdForUpdateAsync` or
-`GetSnapshotsByIdsForShareAsync`. A composite identity can use an established domain key as a whole:
-`receipts.GetByRequestForUpdateAsync(tenantId, operation, requestId, ct)`. Preserve every identity
+`GetSnapshotsByIdsForShareAsync`. The suffix names the SQL locking clause (`FOR UPDATE`, `FOR SHARE`)
+taken with the returned row, not the caller's purpose — the contract is the lock, whatever the caller
+does next. A composite identity can use an established domain key as a whole:
+`idempotencyKeys.GetByRequestForUpdateAsync(tenantId, operation, requestId, ct)`. Preserve every identity
 predicate; spell out component names when they distinguish different queries.
 
 ## Persistence and application boundaries

@@ -1,6 +1,6 @@
 ---
 name: naming-data-contracts
-description: Name C# data contracts by their meaning — application payloads, summaries, details, statuses, captured snapshots, DTO disambiguation and intermediate projections. Use when defining or reviewing a record, DTO, query result or contract shared by application callers.
+description: Name C# data contracts by their meaning — application payloads, summaries, details, statuses, captured snapshots, DTO disambiguation, intermediate projections, decisions with their evidence and proofs, descriptors, catalogs, bindings and contexts. Use when defining or reviewing a record, DTO, query result or contract shared by application callers.
 kind: contract
 domain: dotnet
 profile: core
@@ -34,6 +34,13 @@ Use the established domain noun and add the distinction carried by the shape:
 | Values captured at a defined instant or revision | `OrderSnapshot` |
 | A transfer shape distinguished from the entity of the same subject | `OrderDto` |
 | An intermediate query shape awaiting mapping or enrichment | `OrderProjection` |
+| An operation's verdict with its diagnostics | `ReleaseDecision` |
+| Facts gathered to support a decision | `ResidencyEvidence` |
+| A value issued when a check succeeded, carried to show it ran | `ShipmentReleaseProof` |
+| Metadata describing a declared thing | `CarrierDescriptor` |
+| The complete enumeration of a closed set | `PermissionCatalog` |
+| An association between two declared identities | `RoutePolicyBinding` |
+| The current operation's ambient values | `RequestContext` |
 
 A snapshot's values represent that captured state independently of later changes. The name follows
 that guarantee. A summary or selection remains named for its represented meaning when immutability is
@@ -64,6 +71,29 @@ For example, a query can return `OrderSummary` directly. A query returning compo
 service combines with delivery information can return `OrderProjection`, and the service produces
 `OrderDetails`. The distinct name reflects the distinct contract. Storage location alone does not
 create a second data shape.
+
+## Decisions, evidence and proofs
+
+A decision is the verdict an evaluator returns — the outcome plus the diagnostics the caller acts on,
+as in ASP.NET Core's `AuthorizationResult`. Evidence names the input facts gathered to support that
+decision. A proof is issued only when the check succeeded; possession demonstrates the check ran, so a
+later operation can require it instead of re-checking. This is the vocabulary of
+[RFC 9334](https://www.rfc-editor.org/rfc/rfc9334): evidence is appraised, and the appraisal result is
+what relying parties consume. One decision family uses one of each name, never near-synonyms side by
+side.
+
+## Descriptors, catalogs, bindings and contexts
+
+A descriptor is an immutable metadata record describing a declared thing, keyed by its identity — the
+thing itself lives elsewhere, as .NET's `ServiceDescriptor` describes a service's type, implementation
+and lifetime. A catalog is the complete authoritative enumeration of a closed set, usually generated or
+static and consumed by enumeration, like a database's system catalog; a keyed lookup populated by
+registrants is a registry under `dotnet:naming-collaborators`. A binding
+pairs two declared identities — subject bound to target — and carries only that association and its
+qualifiers, as a WSDL binding ties an abstract interface to a concrete protocol; a domain fact with its
+own granted-and-revoked lifecycle is an assignment, not a binding. A context carries the current
+operation's ambient values, assembled at the boundary and supplied to collaborators, with no use-case
+behaviour, like `HttpContext`; a conversation that accumulates state over a lifetime is a session.
 
 ## Payload shape and operation outcome have separate owners
 

@@ -1,6 +1,6 @@
 ---
 name: naming-data-contracts
-description: Name C# data contracts by their meaning — application payloads, summaries, details, statuses, captured snapshots, DTO disambiguation and intermediate projections. Use when defining or reviewing a record, DTO, query result or contract shared by application callers.
+description: Name C# data contracts by their meaning — application payloads, summaries, details, statuses, captured snapshots, DTO disambiguation, intermediate projections, decisions with their evidence and proofs, descriptors, catalogs, bindings and contexts. Use when defining or reviewing a record, DTO, query result or contract shared by application callers.
 kind: contract
 domain: dotnet
 profile: core
