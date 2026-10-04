@@ -24,7 +24,7 @@ owner for the task at hand; load the relevant owner when its concern and prerequ
 | Choose an immutable value representation, construction or owned behavior | `dotnet:domain-values` |
 | Define a collaborator role, operation and semantic outcome | `dotnet:naming-collaborators` |
 | Select application presence/failure carriers when Reunion is selected | `dotnet:errors-carriers` |
-| Name a data contract or query result | `dotnet:naming-data-contracts` |
+| Name a data shape or query result | `dotnet:naming-data-shapes` |
 | Name a mapper or receiver extension | `dotnet:naming-mapping` |
 | Name a repository, persistence operation and storage return contract | `dotnet:naming-repositories` |
 | Implement EF Core repository/context conventions when selected | `dotnet:persistence` |

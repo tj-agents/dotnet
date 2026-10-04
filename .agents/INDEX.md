@@ -33,6 +33,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `naming` — contract — core — `.agents/dotnet/contract/naming/SKILL.md`
 - `naming-collaborators` — contract — core — `.agents/dotnet/contract/naming/collaborators/SKILL.md`
 - `naming-data-contracts` — contract — core — `.agents/dotnet/contract/naming/data-contracts/SKILL.md`
+- `naming-data-shapes` — contract — core — `.agents/dotnet/contract/naming/data-shapes/SKILL.md`
 - `naming-mapping` — contract — core — `.agents/dotnet/contract/naming/mapping/SKILL.md`
 - `naming-repositories` — contract — core — `.agents/dotnet/contract/naming/repositories/SKILL.md`
 - `persistence` — contract — ef-core — `.agents/dotnet/contract/persistence/SKILL.md`

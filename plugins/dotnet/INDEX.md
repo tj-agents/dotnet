@@ -29,6 +29,7 @@
 - `naming` — contract — core
 - `naming-collaborators` — contract — core
 - `naming-data-contracts` — contract — core
+- `naming-data-shapes` — contract — core
 - `naming-mapping` — contract — core
 - `naming-repositories` — contract — core
 - `persistence` — contract — ef-core
