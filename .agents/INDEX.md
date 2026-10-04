@@ -20,7 +20,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `libraries` — contract — core — `.agents/dotnet/contract/libraries/SKILL.md`
 - `libraries-selected` — contract — selected-stack — `.agents/dotnet/contract/libraries/selected/SKILL.md`
 - `logging` — contract — extensions — `.agents/dotnet/contract/logging/SKILL.md`
-- `microservice-boundaries` — contract — distributed-services — `.agents/dotnet/contract/microservice-boundaries/SKILL.md`
+- `microservice-boundaries` — contract — distributed-services — `.agents/dotnet/contract/microservice/boundaries/SKILL.md`
 - `multitenancy` — contract — multitenancy — `.agents/dotnet/contract/multitenancy/SKILL.md`
 - `naming` — contract — core — `.agents/dotnet/contract/naming/SKILL.md`
 - `naming-collaborators` — contract — core — `.agents/dotnet/contract/naming/collaborators/SKILL.md`
