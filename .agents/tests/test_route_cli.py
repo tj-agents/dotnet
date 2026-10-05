@@ -12,6 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 GENERATOR = ROOT / ".agents/dotnet/utility/skill-routes/scripts/gen_skill_routes.py"
+CORE_ROOTS = (ROOT / ".core", ROOT.parent / "core", ROOT.parent.parent.parent / "core")
 
 
 def load(name: str, path: Path):
@@ -21,28 +22,36 @@ def load(name: str, path: Path):
     return module
 
 
+def core_root() -> Path | None:
+    for root in CORE_ROOTS:
+        if (root / "plugins/base/hooks/skill_router.py").is_file():
+            return root
+    return None
+
+
 generator = load("dotnet_gen_skill_routes", GENERATOR)
 
 TEST_CSPROJ = '<Project Sdk="Microsoft.NET.Sdk"><ItemGroup><PackageReference Include="Microsoft.NET.Test.Sdk" /></ItemGroup></Project>'
 
 CARVED_TREE = {
-    ("api/src/Infonetica.Cris.Authz.Api/Placeholder/PlaceholderEndpoints.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:http-api"},
-    ("api/src/Infonetica.Cris.Authz.Api/Placeholder/PlaceholderResponse.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:naming-dtos"},
-    ("api/src/Infonetica.Cris.Authz.Api/OpenFga/ServiceCollectionExtensions.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:dependency-injection"},
-    ("api/src/Infonetica.Cris.Authz.Api/Program.cs", "var builder = WebApplication.CreateBuilder(args);"): {"dotnet:style", "dotnet:naming", "dotnet:dependency-injection"},
-    ("api/src/Infonetica.Cris.Authz.Domain/SystemClock.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:domain-design"},
-    ("api/src/Infonetica.Cris.Authz.Contracts/PermissionCheck.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:naming-dtos"},
-    ("api/src/Infonetica.Cris.Authz.Api/Persistence/MigrationRunner.cs", ""): {"dotnet:style", "dotnet:naming"},
-    ("api/test/Infonetica.Cris.Authz.Api.Tests.Integration/ApiFixture.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:testing", "dotnet:testing-integration"},
-    ("api/test/Infonetica.Cris.Authz.Api.Tests.Unit/TelemetryTestEnvironment.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:testing", "dotnet:testing-unit"},
-    ("api/test/Infonetica.Cris.Authz.Tests.Builders/AccessGrantBuilder.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:testing"},
-    ("api/src/Infonetica.Cris.Authz.Api/Infonetica.Cris.Authz.Api.csproj", '<Project Sdk="Microsoft.NET.Sdk.Web"></Project>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure"},
-    ("api/test/Infonetica.Cris.Authz.Api.Tests.Unit/Infonetica.Cris.Authz.Api.Tests.Unit.csproj", TEST_CSPROJ): {"dotnet:build", "dotnet:libraries", "dotnet:structure", "dotnet:testing", "dotnet:testing-unit"},
-    ("api/test/Infonetica.Cris.Authz.Tests.E2E/Features/AccessReview.feature", ""): {"dotnet:testing", "dotnet:testing-e2e"},
-    ("api/src/Infonetica.Cris.Authz.Api/Telemetry/Log.cs", "[LoggerMessage(Level = LogLevel.Information)]"): {"dotnet:style", "dotnet:naming", "dotnet:logging"},
-    ("api/src/Infonetica.Cris.Authz.Api/OpenFga/OpenFgaStore.cs", "private readonly ILogger<OpenFgaStore> logger;"): {"dotnet:style", "dotnet:naming", "dotnet:logging"},
-    ("api/src/Infonetica.Cris.Authz.Application/Access/RequestAccess.cs", "public Result<AccessGrant, RequestAccessError> Handle()"): {"dotnet:style", "dotnet:naming", "dotnet:structure-modules", "dotnet:errors"},
-    ("api/src/Infonetica.Cris.Authz.Api/CLAUDE.md", ""): {"engineering:docs-and-debt"},
+    ("api/src/Acme.Authz.Api/Placeholder/PlaceholderEndpoints.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:http-api"},
+    ("api/src/Acme.Authz.Api/Placeholder/PlaceholderResponse.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:naming-dtos"},
+    ("api/src/Acme.Authz.Api/Grants/ServiceCollectionExtensions.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:dependency-injection"},
+    ("api/src/Acme.Authz.Api/Program.cs", "var builder = WebApplication.CreateBuilder(args);"): {"dotnet:style", "dotnet:naming", "dotnet:dependency-injection"},
+    ("api/src/Acme.Authz.Domain/SystemClock.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:domain-design"},
+    ("api/src/Acme.Authz.Contracts/PermissionCheck.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:naming-dtos"},
+    ("api/src/Acme.Authz.Api/Persistence/MigrationRunner.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:persistence"},
+    ("api/test/Acme.Authz.Api.Tests.Integration/ApiFixture.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:testing", "dotnet:testing-integration"},
+    ("api/test/Acme.Authz.Api.Tests.Unit/TelemetryTestEnvironment.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:testing", "dotnet:testing-unit"},
+    ("api/test/Acme.Authz.Tests.Builders/AccessGrantBuilder.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:testing"},
+    ("api/src/Acme.Authz.Api/Acme.Authz.Api.csproj", '<Project Sdk="Microsoft.NET.Sdk.Web"></Project>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure"},
+    ("api/test/Acme.Authz.Api.Tests.Unit/Acme.Authz.Api.Tests.Unit.csproj", TEST_CSPROJ): {"dotnet:build", "dotnet:libraries", "dotnet:structure", "dotnet:testing", "dotnet:testing-unit"},
+    ("api/test/Acme.Authz.Tests.E2E/Features/AccessReview.feature", ""): {"dotnet:testing", "dotnet:testing-e2e"},
+    ("features/AccessReview.feature", ""): {"dotnet:testing", "dotnet:testing-e2e"},
+    ("api/src/Acme.Authz.Api/Telemetry/Log.cs", "[LoggerMessage(Level = LogLevel.Information)]"): {"dotnet:style", "dotnet:naming", "dotnet:logging"},
+    ("api/src/Acme.Authz.Api/Grants/GrantStore.cs", "private readonly ILoggerFactory loggerFactory;"): {"dotnet:style", "dotnet:naming", "dotnet:logging"},
+    ("api/src/Acme.Authz.Application/Access/RequestAccess.cs", "public Result<AccessGrant, RequestAccessError> Handle()"): {"dotnet:style", "dotnet:naming", "dotnet:structure-modules", "dotnet:errors"},
+    ("api/src/Acme.Authz.Api/CLAUDE.md", ""): {"engineering:docs-and-debt"},
     ("src/Acme.Billing.Infrastructure/Repositories/InvoiceRepository.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:structure-modules", "dotnet:persistence", "dotnet:naming-repositories"},
     ("src/Acme.Billing.Application/Invoices/RegisterInvoiceHandler.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:structure-modules"},
     ("src/Acme.Billing.Infrastructure/BillingDbContext.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:structure-modules", "dotnet:persistence"},
@@ -66,6 +75,26 @@ class RouteDerivationTests(unittest.TestCase):
         for (path, content), expected in CARVED_TREE.items():
             with self.subTest(path=path):
                 self.assertEqual(expected, generator.skills_for("dotnet-service", path, content))
+
+    def test_matching_agrees_with_the_shipped_router(self) -> None:
+        root = core_root()
+        if root is None:
+            self.skipTest("no core checkout visible to load the shipped router")
+        hooks = root / "plugins/base/hooks"
+        sys.path.insert(0, str(hooks))
+        try:
+            router = load("core_skill_router", hooks / "skill_router.py")
+        finally:
+            sys.path.remove(str(hooks))
+        routes = generator.routes("dotnet-service")["routes"]
+        for (path, content), expected in CARVED_TREE.items():
+            with self.subTest(path=path):
+                matched = {
+                    skill
+                    for route in router.matching_routes(routes, path, content)
+                    for skill in route.get("skills") or []
+                }
+                self.assertEqual(expected, matched)
 
     def test_every_csharp_file_hits_the_floor(self) -> None:
         for (path, content), _ in CARVED_TREE.items():
@@ -91,28 +120,31 @@ class RouteDerivationTests(unittest.TestCase):
             )
             self.assertTrue(fired, f"route {index} ({route['path']}) matches nothing in the simulated tree")
 
+    def test_route_path_strings_are_pairwise_distinct(self) -> None:
+        paths = [route["path"] for route in generator.routes("dotnet-service")["routes"]]
+        self.assertEqual(len(paths), len(set(paths)), "skill_router keys seen-state on the path string")
+
     def test_routed_skills_resolve_and_stay_inside_the_layers(self) -> None:
         declaration = generator.routes("dotnet-service")
-        core_roots = [root for root in (ROOT / ".core", ROOT.parent / "core") if root.is_dir()]
+        root = core_root()
         for route in declaration["routes"]:
             for identifier in route["skills"]:
                 package, capability = identifier.split(":")
                 self.assertIn(package, declaration["layers"])
                 if package == "dotnet":
                     self.assertTrue((ROOT / "plugins" / package / "skills" / capability / "SKILL.md").is_file(), identifier)
-                elif core_roots:
-                    self.assertTrue(
-                        any((root / "plugins" / package / "skills" / capability / "SKILL.md").is_file() for root in core_roots),
-                        identifier,
-                    )
+                else:
+                    if root is None:
+                        self.skipTest("no core checkout visible to verify engineering skills")
+                    self.assertTrue((root / "plugins" / package / "skills" / capability / "SKILL.md").is_file(), identifier)
 
     def test_registry_names_known_kinds_and_lowercase_identities(self) -> None:
         document = generator.registry_document()
         self.assertEqual(sorted(generator.REGISTRY), list(document["repos"]))
+        self.assertTrue(document["repos"])
         for identity, kind in document["repos"].items():
             self.assertRegex(identity, r"^[a-z0-9][a-z0-9._-]*/[a-z0-9][a-z0-9._-]*$")
             self.assertIn(kind, generator.KINDS)
-        self.assertEqual("dotnet-service", document["repos"]["infonetica/cris-authz"])
 
 
 class RouteCliTests(unittest.TestCase):

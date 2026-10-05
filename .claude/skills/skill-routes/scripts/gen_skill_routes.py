@@ -10,8 +10,12 @@ from pathlib import Path
 
 
 CS_PATH = r"(?i:\.cs$)"
+# Textually distinct from CS_PATH: skill_router keys its per-session seen-state on the path string,
+# so a row reusing the floor's exact pattern is never enforced after the floor first fires.
+LOGGING_CS_PATH = r"(?i:\.(cs)$)"
+ERRORS_CS_PATH = r"(?i:(\.cs)$)"
 BUILD_PATH = r"(?i:(^|/)([^/]+\.(csproj|sln|slnx)|Directory\.(Build|Packages)\.props|Directory\.Build\.targets|global\.json|nuget\.config))$"
-TEST_PATH = r"(?i:(^|/)tests?/|\.tests[./])"
+TEST_PATH = r"(?i:(^|/)tests?/|\.tests[./]|\.feature$)"
 TEST_PROJECT_CONTENT = r"(?i:<istestproject>\s*true|microsoft\.net\.test\.sdk)"
 UNIT_TEST_PATH = r"(?i:(tests\.unit|unittests)[./])"
 INTEGRATION_TEST_PATH = r"(?i:(tests\.integration|integrationtests)[./])"
@@ -21,10 +25,10 @@ MODULE_LAYER_PATH = r"(?i:\.(application|infrastructure)/.*\.cs$)"
 HTTP_EDGE_PATH = r"(?i:(controller|endpoint)s?\.cs$)"
 DTO_PATH = r"(?i:\.contracts/.*\.cs$|(dto|request|response)s?\.cs$)"
 REPOSITORY_PATH = r"(?i:(repository|repositories)\.cs$)"
-PERSISTENCE_PATH = r"(?i:dbcontext\.cs$|(^|/)migrations/.*\.cs$)"
+PERSISTENCE_PATH = r"(?i:dbcontext\.cs$|(^|/)(migrations|persistence)/.*\.cs$)"
 COMPOSITION_PATH = r"(?i:(^|/)program\.cs$|(servicecollection|dependencyinjection)[^/]*\.cs$)"
 LOG_FILE_PATH = r"(?i:(^|/)log\.cs$)"
-LOGGING_CONTENT = r"(?i:\bilogger\b|loggermessage)"
+LOGGING_CONTENT = r"(?i:\bilogger|loggermessage)"
 ERRORS_CONTENT = r"(?i:\bresult<|\bunitresult<|\boption<|\bierror\b)"
 VALIDATOR_PATH = r"(?i:validators?\.cs$)"
 MAPPER_PATH = r"(?i:mappers?\.cs$)"
@@ -60,8 +64,8 @@ def routes(kind: str) -> dict:
         {"path": PERSISTENCE_PATH, "skills": ["dotnet:persistence"]},
         {"path": COMPOSITION_PATH, "skills": ["dotnet:dependency-injection"]},
         {"path": LOG_FILE_PATH, "skills": ["dotnet:logging"]},
-        {"path": CS_PATH, "content_requires": LOGGING_CONTENT, "skills": ["dotnet:logging"]},
-        {"path": CS_PATH, "content_requires": ERRORS_CONTENT, "skills": ["dotnet:errors"]},
+        {"path": LOGGING_CS_PATH, "content_requires": LOGGING_CONTENT, "skills": ["dotnet:logging"]},
+        {"path": ERRORS_CS_PATH, "content_requires": ERRORS_CONTENT, "skills": ["dotnet:errors"]},
         {"path": VALIDATOR_PATH, "skills": ["dotnet:validation"]},
         {"path": MAPPER_PATH, "skills": ["dotnet:naming-mapping"]},
         {"path": SEEDING_PATH, "skills": ["dotnet:seeding"]},
@@ -120,7 +124,10 @@ def write_or_check(files: dict[Path, str], check: bool) -> int:
     stale = False
     for target, expected in files.items():
         if check:
-            actual = target.read_text(encoding="utf-8") if target.is_file() else None
+            try:
+                actual = target.read_text(encoding="utf-8")
+            except OSError:
+                actual = None
             if actual != expected:
                 print(f"STALE: {target}")
                 stale = True
