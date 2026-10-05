@@ -18,15 +18,17 @@ Its generator sits beside this file.
 ## Generate
 
 ```
-python scripts/gen_skill_routes.py --kind dotnet-service --into <repo>      # a consumer's committed table
+python scripts/gen_skill_routes.py --kind dotnet-service --into <repo>      # the consumer's table
 python scripts/gen_skill_routes.py --kind dotnet-service --into <repo> --check
 python scripts/gen_skill_routes.py --emit-registry <dir>                    # registry.json + one table per kind
 python scripts/gen_skill_routes.py --emit-registry <dir> --check
 ```
 
-The committed `--into` table is the mechanism the router resolves today; the emitted registry becomes
-live only once a routes directory ships beside the installed router. Adding a consumer repo is one
-`REGISTRY` row in the generator.
+The `--into` table is the mechanism the router resolves today; the emitted registry becomes live only
+once a routes directory ships beside the installed router. Adding a consumer repo is one `REGISTRY`
+row in the generator. **A personal repo may commit its table. A work repo never does: generate it
+locally and list `/.agents/` in `.git/info/exclude` — personal agent wiring never reaches a work
+remote, work PR, work commit, or work item.**
 
 ## Kinds
 
