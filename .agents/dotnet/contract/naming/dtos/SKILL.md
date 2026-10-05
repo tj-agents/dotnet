@@ -1,6 +1,6 @@
 ---
 name: naming-dtos
-description: Name C# DTOs by their meaning — when the domain noun stands alone, when a suffix such as Summary, Snapshot, Projection, Decision, Evidence, Proof, Descriptor, Catalog, Binding or Context carries the distinction, and when Dto itself earns its place. Use when defining or reviewing a record, DTO, query result or shape shared by application callers.
+description: Name C# DTOs by their meaning — when the domain noun stands alone, when a suffix such as Summary, Snapshot, Projection, Decision, Descriptor, Catalog, Binding or Context carries the distinction, and when Dto itself earns its place. Use when defining or reviewing a record, DTO, query result or shape shared by application callers.
 kind: contract
 domain: dotnet
 profile: core
@@ -67,15 +67,12 @@ service combines with delivery information can return `OrderProjection`, and the
 `OrderDetails`. The distinct name reflects the distinct contract. Storage location alone does not
 create a second DTO.
 
-## Decisions, evidence and proofs
+## Decisions
 
 Use `Decision` for the verdict an evaluator returns — the outcome plus the diagnostics the caller acts
-on, as in ASP.NET Core's `AuthorizationResult`. Use `Evidence` for the input facts gathered to support
-that decision, and `Proof` for a value issued only when the check succeeded, carried so a later
-operation can require that the check ran instead of re-checking — the vocabulary of
-[RFC 9334](https://www.rfc-editor.org/rfc/rfc9334), where evidence is appraised and the appraisal
-result is what relying parties consume. One decision family uses one of each, never near-synonyms side
-by side.
+on, as in ASP.NET Core's `AuthorizationResult`. The facts a check read, kept so a later step can re-read
+and compare them, are a `Snapshot`; never give one shape two near-synonym names such as `Evidence` and
+`Proof`.
 
 ## Descriptors, catalogs, bindings and contexts
 

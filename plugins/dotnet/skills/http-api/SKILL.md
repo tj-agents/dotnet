@@ -59,12 +59,13 @@ Use the vocabulary of the IETF
 [`Idempotency-Key` draft](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/)
 (expired, but the de facto industry term —
 [Stripe's idempotent requests](https://docs.stripe.com/api/idempotent_requests) use the same model). The
-client sends an `Idempotency-Key` header carrying a UUID; the server derives a fingerprint from the
-payload and stores the `IdempotencyKey` itself — key, fingerprint, outcome — with no `Record`, `Receipt`
-or `Command` noun. A missing key on an endpoint that requires one is `400`; the same key with a
-different fingerprint is `422`; a retry while the original is still processing is `409`; a completed
-request replays its stored outcome. The key stays at the API boundary — domain and application
-operations never take it as a concept of their own.
+client sends an `Idempotency-Key` header carrying a UUID; the server stores the `IdempotencyKey` itself
+— key, `IdempotencyHash`, outcome — with no `Record`, `Receipt` or `Command` noun. The hash is a SHA-256
+the server computes over the fields that define one operation; the client never sends it. A missing key
+on an endpoint that requires one is `400`; the same key with a different hash is `422`; a retry while
+the original is still processing is `409`; a completed operation with an equal hash replays its stored
+outcome. The key stays at the API boundary — domain and application operations never take it as a
+concept of their own.
 
 ## Translate domain vocabulary into product vocabulary once, at the boundary
 
