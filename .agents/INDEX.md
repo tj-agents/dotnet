@@ -47,3 +47,4 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `debug-e2e-ui` — operation — e2e — `.agents/dotnet/operation/debug/e2e-ui/SKILL.md`
 - `debug-integration` — operation — integration-testing — `.agents/dotnet/operation/debug/integration/SKILL.md`
 - `scaffold` — utility — scaffold — `.agents/dotnet/utility/scaffold/SKILL.md`
+- `skill-routes` — utility — skill-routes — `.agents/dotnet/utility/skill-routes/SKILL.md`
