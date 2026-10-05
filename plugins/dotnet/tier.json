@@ -4,8 +4,7 @@
   "stack": ".NET",
   "applies": "stack-present",
   "owner_repository": [
-    "tj-agents/dotnet",
-    "tomjseery/dotagents"
+    "tj-agents/dotnet"
   ],
   "detect": {
     "files": [
