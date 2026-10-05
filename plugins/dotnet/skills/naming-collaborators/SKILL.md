@@ -125,8 +125,7 @@ and selecting matching rows ([Evans & Fowler, Specifications](https://martinfowl
 
 Keep the boundaries: a validator assesses a supplied candidate and reports diagnostics; an evaluator
 decides an outcome; a resolver produces a usable value; a calculator computes an amount. An evaluator
-returns a `Decision`; the `Evidence` and `Proof` shapes around it follow
-`dotnet:naming-dtos`.
+returns a `Decision`, named under `dotnet:naming-dtos`.
 
 ## Registries, sessions and envelopes
 

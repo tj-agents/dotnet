@@ -1,6 +1,6 @@
 ---
 name: naming-dtos
-description: Name C# DTOs by their meaning — when the domain noun stands alone, when a suffix such as Summary, Snapshot, Projection, Decision, Evidence, Proof, Descriptor, Catalog, Binding or Context carries the distinction, and when Dto itself earns its place. Use when defining or reviewing a record, DTO, query result or shape shared by application callers.
+description: Name C# DTOs by their meaning — when the domain noun stands alone, when a suffix such as Summary, Snapshot, Projection, Decision, Descriptor, Catalog, Binding or Context carries the distinction, and when Dto itself earns its place. Use when defining or reviewing a record, DTO, query result or shape shared by application callers.
 kind: contract
 domain: dotnet
 profile: core
