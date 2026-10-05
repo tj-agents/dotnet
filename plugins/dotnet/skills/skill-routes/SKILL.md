@@ -26,9 +26,7 @@ python scripts/gen_skill_routes.py --emit-registry <dir> --check
 
 The `--into` table is the mechanism the router resolves today; the emitted registry becomes live only
 once a routes directory ships beside the installed router. Adding a consumer repo is one `REGISTRY`
-row in the generator. **A personal repo may commit its table. A work repo never does: generate it
-locally and list `/.agents/` in `.git/info/exclude` — personal agent wiring never reaches a work
-remote, work PR, work commit, or work item.**
+row in the generator.
 
 ## Kinds
 
