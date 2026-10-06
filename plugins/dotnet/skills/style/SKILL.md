@@ -33,8 +33,8 @@ The rules below are the ones prose has to carry, plus the reasoning behind the e
 
 ## Model value semantics and real choices
 
-Modelling a small immutable value, and choosing a `readonly record struct` against a reference value
-object, is the `domain-values` contract.
+Modelling a small immutable value or multi-value result, with a reference record by default and a
+`readonly record struct` only when justified, is the `domain-values` contract.
 
 An enum represents a genuine closed choice. Do not introduce a one-member enum for possible future
 variation, and do not encode an unrelated consumer's workflow vocabulary in a lower-level component.
