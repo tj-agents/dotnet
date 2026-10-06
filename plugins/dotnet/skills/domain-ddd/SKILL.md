@@ -1,6 +1,6 @@
 ---
 name: domain-ddd
-description: Domain-driven design's building-block vocabulary for a .NET domain model — the entity/value-object split by identity, equality, and lifecycle (an entity's own behaviour lives here; a value object's struct-or-class mechanics are the `domain-values` contract's job), the aggregate as the transactional consistency boundary with a root-only external reference rule, an aggregate announcing its own state change through a domain event (owned by the `domain-events` contract), domain services for business operations without a natural entity/value owner and their boundary with application orchestration, and the anti-patterns — an anemic model whose rules leaked into an application service, a God aggregate, and an invariant enforced by reaching across an aggregate boundary. Use when designing a domain type, deciding whether something is an entity or a value object, drawing or crossing an aggregate boundary, or reviewing a domain model for behaviour that belongs on a type but lives in a service instead.
+description: Domain-driven design's building-block vocabulary for a .NET domain model — the entity/value-object split by identity, equality, and lifecycle (an entity's own behaviour lives here; a value object's reference record default and tests that justify a struct are the `domain-values` contract's job), the aggregate as the transactional consistency boundary with a root-only external reference rule, an aggregate announcing its own state change through a domain event (owned by the `domain-events` contract), domain services for business operations without a natural entity/value owner and their boundary with application orchestration, and the anti-patterns — an anemic model whose rules leaked into an application service, a God aggregate, and an invariant enforced by reaching across an aggregate boundary. Use when designing a domain type, deciding whether something is an entity or a value object, drawing or crossing an aggregate boundary, or reviewing a domain model for behaviour that belongs on a type but lives in a service instead.
 kind: contract
 domain: dotnet
 profile: domain-model
@@ -27,8 +27,9 @@ method changes its own state, not a public setter another layer drives from outs
 
 A **value object** is compared and equal by its fields alone, has no independent lifecycle, and is
 replaced rather than mutated. Deciding *that* something is a value — an amount, a range, a version, a
-coordinate — is this contract's call. Deciding *how* to build it — `readonly record struct` against a
-reference type, construction, a `Try` accessor — is the `domain-values` contract's job.
+coordinate — is this contract's call. Deciding *how* to build it — reference record by default, a
+`readonly record struct` only when justified, construction, a `Try` accessor — is the `domain-values`
+contract's job.
 
 ## An aggregate is the transactional consistency boundary
 
