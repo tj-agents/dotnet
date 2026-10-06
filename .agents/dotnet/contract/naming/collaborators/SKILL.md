@@ -34,7 +34,9 @@ owner before applying collaborator roles. Value construction follows
 
 Read the implementation and production callers. Establish these five parts before naming the type:
 
-1. Subject: the established domain concept the caller works with.
+1. Subject: the established domain concept the caller works with. Collaborators for the same concept
+   use the same subject word, including exact plurality, in `<Subject><Role>`. Collaborators for distinct
+   concepts may use different subjects, even in the same folder.
 2. Responsibility: the work this component owns and the work supplied by its dependencies.
 3. Operation: the action and, when useful, the particular returned shape.
 4. Success value: the thing produced, selected, transformed or assessed.
@@ -169,5 +171,6 @@ Review the interface, implementation, DI registration, result shape and producti
 A role change includes the responsibilities and dependencies that establish it. Moving a persistence
 operation into an application collaborator also changes its boundary contract and invokes the selected
 carrier rules. Preserve transaction, cancellation and authorization guarantees through that change.
-Keep protocol-specific failure mapping at its owning boundary. Confirm that the resulting call reads
-as the domain subject performing its operation and producing the documented outcome.
+Keep protocol-specific failure mapping at its owning boundary. Compare subject spelling and plurality
+with sibling collaborators for the same concept. Confirm that the resulting call reads as the domain
+subject performing its operation and producing the documented outcome.
