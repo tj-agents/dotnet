@@ -37,6 +37,8 @@ Read the implementation and production callers. Establish these five parts befor
 1. Subject: the established domain concept the caller works with. Collaborators for the same concept
    use the same subject word, including exact plurality, in `<Subject><Role>`. Collaborators for distinct
    concepts may use different subjects, even in the same folder.
+   A field or parameter holding an injected collaborator keeps the type's subject and role:
+   `IExchangeRatesResolver exchangeRatesResolver`.
 2. Responsibility: the work this component owns and the work supplied by its dependencies.
 3. Operation: the action and, when useful, the particular returned shape.
 4. Success value: the thing produced, selected, transformed or assessed.
@@ -167,7 +169,8 @@ application collaborators are named for the domain capability their callers cons
 
 ## Review and refactoring
 
-Review the interface, implementation, DI registration, result shape and production call site together.
+Review the interface, implementation, DI registration, field and parameter names, result shape and
+production call site together.
 A role change includes the responsibilities and dependencies that establish it. Moving a persistence
 operation into an application collaborator also changes its boundary contract and invokes the selected
 carrier rules. Preserve transaction, cancellation and authorization guarantees through that change.

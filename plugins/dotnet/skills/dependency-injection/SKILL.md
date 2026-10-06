@@ -49,13 +49,13 @@ two members and a pointless double-hop for one dependency.
 internal sealed class StandardFulfilmentFlow : IFulfilmentFlow
 {
     public StandardFulfilmentFlow(
-        ReserveStockStep reserve,
-        ChargeCardStep charge,
-        DispatchStep dispatch)
+        ReserveStockStep reserveStockStep,
+        ChargeCardStep chargeCardStep,
+        DispatchStep dispatchStep)
     {
-        this.Reserve = reserve;      // concrete parameter (what DI resolves) → interface-typed property
-        this.Charge = charge;
-        this.Dispatch = dispatch;
+        this.Reserve = reserveStockStep;
+        this.Charge = chargeCardStep;
+        this.Dispatch = dispatchStep;
     }
 
     public IReserveStep Reserve { get; }
