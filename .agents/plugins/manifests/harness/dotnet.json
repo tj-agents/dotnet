@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "plugin": "dotagents/dotnet",
+  "source_roots": [
+    ".agents/dotnet"
+  ],
+  "requires": {
+    "marketplaces": [
+      {
+        "id": "dotagents",
+        "repository": "tj-agents/dotnet"
+      }
+    ],
+    "plugins": [
+      "dotagents/dotnet"
+    ],
+    "hooks": [],
+    "permissions": {
+      "claude_allow": [],
+      "codex_prefix_rules": []
+    }
+  }
+}

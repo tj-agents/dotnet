@@ -9,7 +9,7 @@ Families are folders, family first; a skill's name is its folder path joined by 
 
 - Knowledge: `dotnet:learning`, `dotnet:knowledge`, `dotnet:direction`.
 - Naming: `dotnet:naming`, `dotnet:naming-collaborators`, `dotnet:naming-repositories`,
-  `dotnet:naming-data-contracts`, `dotnet:naming-mapping`.
+  `dotnet:naming-dtos`, `dotnet:naming-mapping`.
 - Style: `dotnet:style`, `dotnet:style-comments`.
 - Structure: `dotnet:structure`, `dotnet:structure-modules`.
 - Domain: `dotnet:domain-design`, `dotnet:domain-ddd`, `dotnet:domain-values`, `dotnet:domain-events`.
