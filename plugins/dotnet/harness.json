@@ -9,10 +9,16 @@
       {
         "id": "dotagents",
         "repository": "tj-agents/dotnet"
+      },
+      {
+        "id": "base-agents",
+        "repository": "tj-agents/core"
       }
     ],
     "plugins": [
-      "dotagents/dotnet"
+      "dotagents/dotnet",
+      "base-agents/base",
+      "base-agents/engineering"
     ],
     "hooks": [],
     "permissions": {
