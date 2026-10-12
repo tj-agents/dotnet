@@ -12,6 +12,9 @@ on:
       - .agents/tests/test_scaffold.py
       - .github/workflows/scaffold.yml
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     strategy:
