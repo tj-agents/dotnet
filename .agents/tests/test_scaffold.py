@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from unittest import mock
+from uuid import uuid4
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -101,6 +102,27 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertFalse((root / "Example").exists())
             self.assertIn("src/Example.Api/Program.cs", json.loads(result.stdout)["files"])
+
+    def test_literal_home_destination_expands_without_writing(self) -> None:
+        name = f"ScaffoldHome{uuid4().hex}"
+        project = Path.home() / name
+        self.assertFalse(project.exists())
+
+        result = self.run_cli("new", "--name", name, "--destination", "~", "--preset", "minimal", "--dry-run")
+
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(str(project), json.loads(result.stdout)["destination"])
+        self.assertFalse(project.exists())
+
+    def test_csharp_intrinsics_are_rejected_in_every_namespace_segment(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for intrinsic in ("__arglist", "__makeref", "__reftype", "__refvalue"):
+                for name in (intrinsic, f"Example.{intrinsic}"):
+                    result = self.run_cli("new", "--name", name, "--destination", str(root), "--dry-run")
+
+                    self.assertEqual(2, result.returncode, result.stderr)
+                    self.assertFalse((root / name).exists())
 
     def test_existing_project_and_non_directory_destination_are_refused(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
