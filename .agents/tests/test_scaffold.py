@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import importlib.util
-import io
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
-import tarfile
 import tempfile
 import textwrap
 import unittest
@@ -824,62 +823,51 @@ class ScaffoldTests(unittest.TestCase):
             self.assertIn(str(root / "NoAzurePath"), result.stdout)
             self.assertTrue((root / "NoAzurePath" / "infra" / "app.json").is_file())
 
-    def _extract_main_scaffold(self, destination: Path) -> Path:
-        archive = subprocess.run(
-            ["git", "archive", "origin/main", "--", ".agents/dotnet/utility/scaffold"],
-            cwd=ROOT, capture_output=True, check=True,
+    def test_cloud_none_output_has_no_azure_markers_or_unresolved_tokens(self) -> None:
+        markers = (
+            "Azure.Identity",
+            "Azure.Monitor",
+            "UseAzureMonitor",
+            "AddAzureMonitorTraceExporter",
+            "UsePeriodicPasswordProvider",
+            "/health/live",
+            "/health/ready",
+            "EnableSdkContainerSupport",
+            "ContainerBaseImage",
+            "Microsoft.EntityFrameworkCore.Design",
         )
-        with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as tar:
-            tar.extractall(destination)
-        return destination / ".agents" / "dotnet" / "utility" / "scaffold" / "scripts" / "scaffold.py"
-
-    def test_cloud_none_output_matches_main_for_existing_presets(self) -> None:
+        cases = (
+            ("minimal", "Example"),
+            ("api", "ExampleApi"),
+            ("dapper-sqlserver", "ExampleDapper"),
+            ("sandbox", "Sandbox"),
+        )
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            baseline_root = root / "baseline-src"
-            baseline_root.mkdir()
-            baseline_script = self._extract_main_scaffold(baseline_root)
-            current_out = root / "current"
-            baseline_out = root / "baseline"
-            current_out.mkdir()
-            baseline_out.mkdir()
-            cases = (
-                ("minimal", "Example"),
-                ("api", "ExampleApi"),
-                ("dapper-sqlserver", "ExampleDapper"),
-                ("sandbox", "Sandbox"),
-            )
-
             for preset, name in cases:
-                current_result = subprocess.run(
-                    [
-                        sys.executable, "-B", str(SCRIPT), "new", "--name", name, "--destination", str(current_out),
-                        "--preset", preset, "--no-input",
-                    ],
-                    cwd=ROOT, capture_output=True, text=True, stdin=subprocess.DEVNULL,
-                )
-                baseline_result = subprocess.run(
-                    [sys.executable, "-B", str(baseline_script), "new", "--name", name, "--destination", str(baseline_out), "--preset", preset],
-                    cwd=baseline_root, capture_output=True, text=True, stdin=subprocess.DEVNULL,
-                )
+                result = self.create(root, name, preset)
 
-                self.assertEqual(0, current_result.returncode, current_result.stderr)
-                self.assertEqual(0, baseline_result.returncode, baseline_result.stderr)
+                self.assertEqual(0, result.returncode, result.stderr)
+                project = root / name
+                self.assertFalse((project / "infra").exists(), preset)
+                self.assertFalse((project / ".config" / "dotnet-tools.json").exists(), preset)
+                for path in project.rglob("*"):
+                    if not path.is_file():
+                        continue
+                    text = path.read_text(encoding="utf-8")
+                    for marker in markers:
+                        self.assertNotIn(marker, text, f"{preset}:{path.relative_to(project).as_posix()} contains {marker}")
+                    unresolved = re.search(r"\$[A-Z][A-Z0-9_]*\$", text)
+                    self.assertIsNone(unresolved, f"{preset}:{path.relative_to(project).as_posix()} has {unresolved}")
 
-                current_project = current_out / name
-                baseline_project = baseline_out / name
-                current_files = {
-                    path.relative_to(current_project).as_posix(): path
-                    for path in current_project.rglob("*") if path.is_file() and path.name != ".scaffold.json"
-                }
-                baseline_files = {
-                    path.relative_to(baseline_project).as_posix(): path
-                    for path in baseline_project.rglob("*") if path.is_file() and path.name != ".scaffold.json"
-                }
+    def test_azure_components_are_gated_on_cloud_azure(self) -> None:
+        azure_components = [name for name, _, _ in SCAFFOLD.component_manifests() if name.startswith("azure")]
 
-                self.assertEqual(sorted(baseline_files), sorted(current_files), preset)
-                for relative, path in current_files.items():
-                    self.assertEqual(baseline_files[relative].read_bytes(), path.read_bytes(), f"{preset}:{relative}")
+        self.assertTrue(azure_components)
+        for name, manifest, _ in SCAFFOLD.component_manifests():
+            if name not in azure_components:
+                continue
+            self.assertEqual("azure", manifest.get("when", {}).get("cloud"), f"component {name} when: {manifest.get('when')}")
 
 
 if __name__ == "__main__":
