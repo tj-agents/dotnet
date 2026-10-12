@@ -5,13 +5,13 @@
   "variables": {
     "FIXTURE_PROVIDER_USING": "using Microsoft.Data.SqlClient;\nusing Testcontainers.MsSql;",
     "FIXTURE_CONTAINER_TYPE": "MsSqlContainer",
-    "FIXTURE_CONTAINER_CREATION": "new MsSqlBuilder().Build()",
+    "FIXTURE_CONTAINER_CREATION": "new MsSqlBuilder(\"mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04\").Build()",
     "FIXTURE_CONNECTION_TYPE": "SqlConnection",
     "FIXTURE_CONNECTION_CREATION": "new SqlConnection(this.container.GetConnectionString())",
     "FIXTURE_DB_ADAPTER": "DbAdapter.SqlServer"
   },
   "append": {
     "FIXTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Testcontainers.MsSql\" />\n    <PackageReference Include=\"Microsoft.Data.SqlClient\" />",
-    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Testcontainers.MsSql\" Version=\"4.16.0\" />\n    <PackageVersion Include=\"Microsoft.Data.SqlClient\" Version=\"7.1.1\" />"
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Testcontainers.MsSql\" Version=\"4.16.0\" />"
   }
 }

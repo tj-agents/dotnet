@@ -5,7 +5,7 @@
   "append": {
     "INFRASTRUCTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Dapper\" />\n    <PackageReference Include=\"Npgsql\" />",
     "INFRASTRUCTURE_REGISTRATIONS": "services.AddScoped<IDapperConnectionFactory, DapperConnectionFactory>();",
-    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Dapper\" Version=\"2.1.89\" />\n    <PackageVersion Include=\"Npgsql\" Version=\"10.0.3\" />",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Dapper\" Version=\"2.1.89\" />",
     "SCAFFOLD_GUIDANCE": "The selected persistence profile includes Dapper with PostgreSQL.",
     "FIXTURE_SERVICE_CONFIGURATION": "            services.RemoveAll<IDapperConnectionFactory>();\n            services.AddScoped<IDapperConnectionFactory>(_ => new FixtureDapperConnectionFactory(this.container.GetConnectionString()));",
     "FIXTURE_DAPPER_FACTORY": "\n    private sealed class FixtureDapperConnectionFactory : IDapperConnectionFactory\n    {\n        private readonly string connectionString;\n\n        public FixtureDapperConnectionFactory(string connectionString)\n        {\n            this.connectionString = connectionString;\n        }\n\n        public DbConnection CreateConnection() => new NpgsqlConnection(this.connectionString);\n    }"
