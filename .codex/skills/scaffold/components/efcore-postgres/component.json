@@ -1,12 +1,11 @@
 {
-  "when": {"data": "efcore", "database": "postgres"},
-  "requires": {"data": "efcore", "database": "postgres"},
+  "when": {"data": {"oneOf": ["efcore", "efcore+dapper"]}, "database": "postgres"},
+  "requires": {"data": {"oneOf": ["efcore", "efcore+dapper"]}, "database": "postgres"},
   "conflicts": {},
-  "projects": ["src/$NAME$.Infrastructure/$NAME$.Infrastructure.csproj"],
-  "variables": {
-    "INFRASTRUCTURE_PROJECT_REFERENCE": "    <ProjectReference Include=\"../$NAME$.Infrastructure/$NAME$.Infrastructure.csproj\" />",
-    "INFRASTRUCTURE_SETUP": "builder.Services.AddInfrastructure(builder.Configuration);",
-    "INFRASTRUCTURE_USING": "using $NAME$.Infrastructure;",
-    "PERSISTENCE_CONFIGURATION": "  \"ConnectionStrings\": {\n    \"Postgres\": \"Host=localhost;Database=$NAME$;Username=postgres;Password=change-me\"\n  }"
+  "append": {
+    "INFRASTRUCTURE_USINGS": "using Microsoft.EntityFrameworkCore;\nusing $NAME$.Infrastructure.Persistence;",
+    "INFRASTRUCTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.EntityFrameworkCore\" />\n    <PackageReference Include=\"Npgsql.EntityFrameworkCore.PostgreSQL\" />",
+    "INFRASTRUCTURE_REGISTRATIONS": "var connectionString = configuration.GetConnectionString(\"Postgres\");\n\nif (string.IsNullOrWhiteSpace(connectionString))\n    throw new InvalidOperationException(\"Connection string 'Postgres' is required.\");\n\nservices.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));",
+    "SCAFFOLD_GUIDANCE": "The selected persistence profile is EF Core with PostgreSQL."
   }
 }

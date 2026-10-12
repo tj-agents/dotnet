@@ -24,6 +24,8 @@ python -B <skill-directory>/scripts/scaffold.py new --name MyService --destinati
 Use `--preset minimal` for an API with no persistence or test project. Configuration layers are defaults,
 the preset, `--config options.json`, then repeated `--set key=value`; `--dry-run` prints the resolved result
 without writing. The destination must already exist and `<destination>/<name>` must be new.
+Use `--preset dapper-sqlserver` for an API with Dapper and SQL Server. The name must be a C# namespace whose
+root segment is not `Program`.
 
 ```text
 python -B <skill-directory>/scripts/scaffold.py options --preset api
