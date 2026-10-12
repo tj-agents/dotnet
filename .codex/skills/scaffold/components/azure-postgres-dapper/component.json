@@ -1,0 +1,11 @@
+{
+  "when": {"cloud": "azure", "database": "postgres", "data": "dapper"},
+  "requires": {},
+  "conflicts": {},
+  "append": {
+    "INFRASTRUCTURE_USINGS": "using Azure.Core;\nusing Azure.Identity;\nusing Npgsql;",
+    "INFRASTRUCTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Azure.Identity\" />\n    <PackageReference Include=\"Azure.Core\" />",
+    "INFRASTRUCTURE_REGISTRATIONS": "var connectionString = configuration.GetConnectionString(\"Postgres\");\n\nif (string.IsNullOrWhiteSpace(connectionString))\n    throw new InvalidOperationException(\"Connection string 'Postgres' is required.\");\n\nvar dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);\n\nif (string.IsNullOrEmpty(dataSourceBuilder.ConnectionStringBuilder.Password))\n{\n    var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions\n    {\n        ManagedIdentityClientId = configuration[\"AZURE_CLIENT_ID\"],\n    });\n\n    dataSourceBuilder.UsePeriodicPasswordProvider(\n        async (_, cancellationToken) =>\n        {\n            var token = await credential.GetTokenAsync(\n                new TokenRequestContext([\"https://ossrdbms-aad.database.windows.net/.default\"]),\n                cancellationToken).ConfigureAwait(false);\n\n            return token.Token;\n        },\n        TimeSpan.FromMinutes(55),\n        TimeSpan.FromSeconds(10));\n}\n\nvar dataSource = dataSourceBuilder.Build();\n\nservices.AddSingleton(dataSource);\nservices.AddScoped<IDapperConnectionFactory, DapperConnectionFactory>();",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Azure.Identity\" Version=\"1.21.0\" />\n    <PackageVersion Include=\"Azure.Core\" Version=\"1.63.0\" />"
+  }
+}

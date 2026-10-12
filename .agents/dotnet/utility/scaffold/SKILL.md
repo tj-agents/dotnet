@@ -35,6 +35,27 @@ python -B <skill-directory>/scripts/scaffold.py options --preset api
 
 `add` is pending until the new-project workflow is stable.
 
+## Azure hosting (`cloud=azure`)
+
+`--set cloud=azure` wires health checks at `/health/live` and `/health/ready`, an Entra-based Npgsql
+connection for `database=postgres` (via `Azure.Identity`), `UseAzureMonitor`/`AddAzureMonitorTraceExporter`
+when `telemetry=opentelemetry`, SDK container publish for the worker, and an EF migration bundle plus
+`infra/migration.Dockerfile` when using EF. `cloud=azure` requires `database` to be `none` or `postgres`;
+`sqlserver` is rejected until azure has an Azure SQL component. The derived `infra/app.json` name is the
+solution name lowercased with non-alphanumerics dropped, truncated to 12 characters; override it with
+`--set cloud-name=<name>`.
+
+`--set azure.<option>=<value>` forwards `<option>=<value>` to azure's own `scaffold.py`, and only when
+`cloud=azure`; a `--config` file may hold an `"azure": {...}` object forwarded the same way. Give azure's
+script with `new --azure-scaffold <path>` or the `AZURE_SCAFFOLD` environment variable; without either, the
+command prints the exact azure invocation instead of running it. On a TTY, with no `--no-input` and no
+`--dry-run`, `new` prompts for every unset option (and, once `cloud=azure` and azure's path is known, for
+azure's own unset options).
+
+```text
+python -B <skill-directory>/scripts/scaffold.py new --name Sandbox --destination ~/source/repos --preset sandbox --set cloud=azure --azure-scaffold ~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py
+```
+
 ## Validation and publication
 
 If the selected hosts include Functions, restore its project before the solution:

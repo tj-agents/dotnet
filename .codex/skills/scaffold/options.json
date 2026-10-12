@@ -95,5 +95,23 @@
     "constraints": [
       {"when": {"selected-stack": true}, "conflicts": {"data": "dapper"}}
     ]
+  },
+  "cloud": {
+    "type": "string",
+    "allowed": ["none", "azure"],
+    "default": "none",
+    "description": "The target cloud for generated infrastructure.",
+    "requires": {},
+    "conflicts": {},
+    "constraints": [
+      {"when": {"cloud": "azure"}, "requires": {"database": {"oneOf": ["none", "postgres"]}}}
+    ]
+  },
+  "cloud-name": {
+    "type": "string",
+    "default": "",
+    "description": "Overrides the derived azure app profile name.",
+    "requires": {},
+    "conflicts": {}
   }
 }

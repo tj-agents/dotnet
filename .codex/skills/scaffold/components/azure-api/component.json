@@ -1,0 +1,10 @@
+{
+  "when": {"cloud": "azure", "hosts": {"contains": "api"}},
+  "requires": {},
+  "conflicts": {},
+  "append": {
+    "API_USINGS": "using Microsoft.AspNetCore.Diagnostics.HealthChecks;",
+    "API_SERVICE_REGISTRATIONS": "builder.Services.AddHealthChecks();",
+    "API_PIPELINE": "app.MapHealthChecks(\"/health/live\", new HealthCheckOptions { Predicate = _ => false });\napp.MapHealthChecks(\"/health/ready\");"
+  }
+}

@@ -23,12 +23,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: tj-agents/azure
+          path: .azure
       - uses: actions/setup-python@v5
         with:
           python-version: '3.9'
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.5
+          terraform_wrapper: false
       - run: python -B .agents/tests/test_scaffold.py
       - run: pwsh .agents/sync-generated.ps1 -Check
       - run: python -B .agents/dotnet/utility/scaffold/scripts/verify.py
+        env:
+          AZURE_SCAFFOLD: ${{ github.workspace }}/.azure/.agents/azure/utility/scaffold/scripts/scaffold.py
