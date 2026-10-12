@@ -18,10 +18,10 @@ project selects that architecture.
 
 ## Agreed
 
-_Nothing yet further._ Propose a rule through `dotnet:learning`'s convention procedure.
+Repository and service layout follows the selected architecture.
 
 ## File structure
 
-Project layout depends on the selected architecture: see `dotnet:structure-modules`
-for modular-service and layered shared-library layout. Once agreed for other architectures, this is
-the tree `dotnet:scaffold` creates.
+`dotnet:structure-single-service` owns the single-service repository layout. `dotnet:structure-modules` owns
+modular-service and layered shared-library layout. Each architecture-specific contract applies only when its
+architecture is selected.

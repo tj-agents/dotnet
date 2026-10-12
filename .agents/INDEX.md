@@ -32,6 +32,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `seeding` — contract — ef-core — `.agents/dotnet/contract/seeding/SKILL.md`
 - `structure` — contract — core — `.agents/dotnet/contract/structure/SKILL.md`
 - `structure-modules` — contract — modular-services — `.agents/dotnet/contract/structure/modules/SKILL.md`
+- `structure-single-service` — contract — single-service — `.agents/dotnet/contract/structure/single-service/SKILL.md`
 - `style` — contract — core — `.agents/dotnet/contract/style/SKILL.md`
 - `style-comments` — contract — core — `.agents/dotnet/contract/style/comments/SKILL.md`
 - `testing` — contract — core — `.agents/dotnet/contract/testing/SKILL.md`
