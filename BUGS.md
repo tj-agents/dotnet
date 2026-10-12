@@ -67,3 +67,15 @@ B003 repair progress: the Functions tracing dependency is explicit, fixture impo
 B005 repair evidence: the authored fixture csproj now explicitly sets IsTestProject=false; actual integration test projects retain their runners. Parent inspected xunit.core2.9.3/build/xunit.core.props line10 and the complete SQL/JWT final log, which builds with zero warnings/errors and discovers only the IntegrationTests assembly without a testhost abort. Final all-platform qualification remains pending.
 
 B003 final diagnosis: fresh package/reflection probes identify the missing OpenTelemetry namespace import, and rendered line mapping identifies the implicit async disposal await. A configured disposal scope preserves the original lazy Respawner initialization. Original forms reproduce CS1061/MA0004; corrected probes compile. Parent applied the specified disposal correction after the original writer released. Full-host/platform qualification is still required.
+
+## B006
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-12. The inherited consumer CLAUDE.md template contains a title and prose redirect, while the governing paired-instruction contract requires exactly @AGENTS.md. Cause confirmed: the legacy template predates the final paired-content assertion.
+- **Impact and priority:** P3; generated consumer instruction files drift from the shared host contract.
+- **Source owner:** `tj-agents/dotnet` scaffold consumer CLAUDE.md template.
+- **State:** resolved
+- **Repair link:** the scripted-scaffold goal/Slice4 final candidate.
+- **Next action:** none; consumer pointer is corrected and generated host projections are regenerated.
+- **Resolution condition:** root and consumer-template CLAUDE.md files have their AGENTS.md sibling and exact pointer content; generator/parity checks pass.
+- **Verification evidence:** frozen081e831 assertion identified the consumer template while the repository root pair was correct. Parent replaced the authored consumer content with @AGENTS.md and checks both directions/content alongside the exact wrapper and generated parity.
