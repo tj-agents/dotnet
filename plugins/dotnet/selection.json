@@ -75,6 +75,9 @@
     "selected-stack": [
       "libraries-selected"
     ],
+    "single-service": [
+      "structure-single-service"
+    ],
     "skill-routes": [
       "skill-routes"
     ],
@@ -650,6 +653,21 @@
       ],
       "requires": [
         "modular-service-architecture"
+      ],
+      "provenance": [
+        "architecture",
+        "house"
+      ]
+    },
+    {
+      "name": "structure-single-service",
+      "kind": "contract",
+      "profile": "single-service",
+      "applicability": [
+        "single-service architecture"
+      ],
+      "requires": [
+        "single-service-architecture"
       ],
       "provenance": [
         "architecture",
