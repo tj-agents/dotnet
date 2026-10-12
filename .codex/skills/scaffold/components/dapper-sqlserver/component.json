@@ -1,0 +1,11 @@
+{
+  "when": {"data": {"oneOf": ["dapper", "efcore+dapper"]}, "database": "sqlserver"},
+  "requires": {"data": {"oneOf": ["dapper", "efcore+dapper"]}, "database": "sqlserver"},
+  "conflicts": {},
+  "append": {
+    "INFRASTRUCTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Dapper\" />\n    <PackageReference Include=\"Microsoft.Data.SqlClient\" />",
+    "INFRASTRUCTURE_REGISTRATIONS": "services.AddScoped<IDapperConnectionFactory, DapperConnectionFactory>();",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Dapper\" Version=\"2.1.89\" />\n    <PackageVersion Include=\"Microsoft.Data.SqlClient\" Version=\"7.1.1\" />",
+    "SCAFFOLD_GUIDANCE": "The selected persistence profile includes Dapper with SQL Server."
+  }
+}

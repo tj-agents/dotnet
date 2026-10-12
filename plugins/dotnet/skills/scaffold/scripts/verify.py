@@ -16,12 +16,14 @@ def run(command: Sequence[str], cwd: Path) -> None:
     subprocess.run(command, cwd=cwd, check=True)
 
 
-def verify(preset: str) -> None:
-    with tempfile.TemporaryDirectory(prefix=f"dotnet-scaffold-{preset}-") as temporary:
+def verify(name: str, preset: str, overrides: Sequence[str] = ()) -> None:
+    with tempfile.TemporaryDirectory(prefix=f"dotnet-scaffold-{name}-") as temporary:
         destination = Path(temporary)
-        name = "MinimalSample" if preset == "minimal" else "ApiSample"
+        command = [sys.executable, "-B", str(SCAFFOLD), "new", "--name", name, "--destination", str(destination), "--preset", preset]
+        for override in overrides:
+            command.extend(["--set", override])
         run(
-            [sys.executable, "-B", str(SCAFFOLD), "new", "--name", name, "--destination", str(destination), "--preset", preset],
+            command,
             ROOT,
         )
         project = destination / name
@@ -32,8 +34,19 @@ def verify(preset: str) -> None:
 
 
 def main() -> int:
-    for preset in ("minimal", "api"):
-        verify(preset)
+    configurations = (
+        ("MinimalSample", "minimal", ()),
+        ("ApiPostgresSample", "api", ()),
+        ("ApiSqlServerSample", "api", ("database=sqlserver",)),
+        ("DapperSqlServerSample", "dapper-sqlserver", ()),
+        (
+            "CombinedSample",
+            "api",
+            ("data=efcore+dapper", "auth=jwt", "telemetry=opentelemetry", "selected-stack=true"),
+        ),
+    )
+    for name, preset, overrides in configurations:
+        verify(name, preset, overrides)
     return 0
 
 

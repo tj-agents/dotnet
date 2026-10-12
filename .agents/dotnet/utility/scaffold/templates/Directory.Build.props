@@ -6,4 +6,5 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+$SELECTED_STACK_ITEMS$
 </Project>

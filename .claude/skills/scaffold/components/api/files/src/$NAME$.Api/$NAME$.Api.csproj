@@ -3,4 +3,7 @@
     <ProjectReference Include="../$NAME$.Core/$NAME$.Core.csproj" />
 $INFRASTRUCTURE_PROJECT_REFERENCE$
   </ItemGroup>
+  <ItemGroup>
+$API_PACKAGE_REFERENCES$
+  </ItemGroup>
 </Project>

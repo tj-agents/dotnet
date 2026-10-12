@@ -1,0 +1,2 @@
+F:System.DateTime.Now;Use TimeProvider.
+F:System.DateTime.UtcNow;Use TimeProvider.

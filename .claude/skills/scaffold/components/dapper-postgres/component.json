@@ -1,0 +1,11 @@
+{
+  "when": {"data": {"oneOf": ["dapper", "efcore+dapper"]}, "database": "postgres"},
+  "requires": {"data": {"oneOf": ["dapper", "efcore+dapper"]}, "database": "postgres"},
+  "conflicts": {},
+  "append": {
+    "INFRASTRUCTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Dapper\" />\n    <PackageReference Include=\"Npgsql\" />",
+    "INFRASTRUCTURE_REGISTRATIONS": "services.AddScoped<IDapperConnectionFactory, DapperConnectionFactory>();",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Dapper\" Version=\"2.1.89\" />\n    <PackageVersion Include=\"Npgsql\" Version=\"10.0.3\" />",
+    "SCAFFOLD_GUIDANCE": "The selected persistence profile includes Dapper with PostgreSQL."
+  }
+}

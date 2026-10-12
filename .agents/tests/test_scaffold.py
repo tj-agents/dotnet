@@ -33,6 +33,14 @@ class ScaffoldTests(unittest.TestCase):
     def create(self, directory: Path, name: str, preset: str) -> subprocess.CompletedProcess[str]:
         return self.run_cli("new", "--name", name, "--destination", str(directory), "--preset", preset)
 
+    def create_with_options(
+        self, directory: Path, name: str, preset: str, *overrides: str
+    ) -> subprocess.CompletedProcess[str]:
+        arguments = ["new", "--name", name, "--destination", str(directory), "--preset", preset]
+        for override in overrides:
+            arguments.extend(["--set", override])
+        return self.run_cli(*arguments)
+
     def test_config_and_set_precedence_report_provenance(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -73,10 +81,23 @@ class ScaffoldTests(unittest.TestCase):
             root = Path(temporary)
             invalid_name = self.run_cli("new", "--name", "bad-name", "--destination", str(root))
             invalid_type = self.run_cli(
-                "new", "--name", "Example", "--destination", str(root), "--set", "selected-stack=true"
+                "new", "--name", "Example", "--destination", str(root), "--set", 'selected-stack="true"'
             )
             invalid_dependency = self.run_cli(
                 "new", "--name", "Example", "--destination", str(root), "--set", "data=none"
+            )
+            invalid_conflict = self.run_cli(
+                "new",
+                "--name",
+                "Example",
+                "--destination",
+                str(root),
+                "--set",
+                "data=dapper",
+                "--set",
+                "database=sqlserver",
+                "--set",
+                "selected-stack=true",
             )
             invalid_array = self.run_cli(
                 "new", "--name", "Example", "--destination", str(root), "--set", 'hosts=[]'
@@ -88,8 +109,62 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(2, invalid_name.returncode)
             self.assertEqual(2, invalid_type.returncode)
             self.assertEqual(2, invalid_dependency.returncode)
+            self.assertEqual(2, invalid_conflict.returncode)
             self.assertEqual(2, invalid_array.returncode)
             self.assertEqual(2, duplicate_array.returncode)
+
+    def test_program_root_names_are_rejected_without_writing(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name in ("Program", "Program.Example"):
+                result = self.run_cli("new", "--name", name, "--destination", str(root))
+
+                self.assertEqual(2, result.returncode, result.stderr)
+                self.assertFalse((root / name).exists())
+
+            allowed = self.run_cli("new", "--name", "Example.Program", "--destination", str(root), "--dry-run")
+
+            self.assertEqual(0, allowed.returncode, allowed.stderr)
+
+    def test_array_constraint_rules_support_future_host_dependencies(self) -> None:
+        option_schema = {
+            "hosts": {
+                "requires": {},
+                "conflicts": {},
+                "constraints": [
+                    {"when": {"hosts": {"contains": "durable"}}, "requires": {"hosts": {"contains": "functions"}}}
+                ],
+            }
+        }
+
+        SCAFFOLD.validate_constraints({"hosts": ["functions", "durable"]}, option_schema)
+        with self.assertRaises(SCAFFOLD.ValidationError):
+            SCAFFOLD.validate_constraints({"hosts": ["durable"]}, option_schema)
+
+    def test_component_append_and_scalar_collisions_are_rejected(self) -> None:
+        options = {key: definition["default"] for key, definition in SCAFFOLD.schema().items()}
+        api = (
+            "api",
+            SCAFFOLD.read_json(SCAFFOLD.COMPONENTS / "api" / "component.json", "component api"),
+            SCAFFOLD.COMPONENTS / "api",
+        )
+        appended = [
+            api,
+            ("first", {"append": {"API_USINGS": "using First;"}, "projects": []}, ROOT),
+            ("second", {"append": {"API_USINGS": "using Second;"}, "projects": []}, ROOT),
+        ]
+        collisions = [
+            ("first", {"variables": {"OWNER": "first"}, "projects": []}, ROOT),
+            ("second", {"variables": {"OWNER": "second"}, "projects": []}, ROOT),
+        ]
+
+        with mock.patch.object(SCAFFOLD, "selected_components", return_value=appended):
+            files = SCAFFOLD.plan("Example", options, None)
+
+        self.assertIn("using First;\nusing Second;", files["src/Example.Api/Program.cs"])
+        with mock.patch.object(SCAFFOLD, "selected_components", return_value=collisions):
+            with self.assertRaises(SCAFFOLD.ScaffoldError):
+                SCAFFOLD.plan("Example", options, None)
 
     def test_dry_run_does_not_write(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -201,11 +276,34 @@ class ScaffoldTests(unittest.TestCase):
                 "src/Example.Infrastructure/ServiceCollectionExtensions.cs",
                 "tests/Example.UnitTests/Example.UnitTests.csproj",
             ],
+            "dapper-sqlserver": [
+                ".editorconfig",
+                ".gitattributes",
+                ".github/workflows/ci.yml",
+                ".gitignore",
+                ".scaffold.json",
+                "AGENTS.md",
+                "CLAUDE.md",
+                "Directory.Build.props",
+                "Directory.Packages.props",
+                "Example.slnx",
+                "global.json",
+                "src/Example.Api/Example.Api.csproj",
+                "src/Example.Api/Program.cs",
+                "src/Example.Api/appsettings.json",
+                "src/Example.Core/Example.Core.csproj",
+                "src/Example.Infrastructure/DapperConnectionFactory.cs",
+                "src/Example.Infrastructure/Example.Infrastructure.csproj",
+                "src/Example.Infrastructure/IDapperConnectionFactory.cs",
+                "src/Example.Infrastructure/ServiceCollectionExtensions.cs",
+                "tests/Example.UnitTests/Example.UnitTests.csproj",
+            ],
         }
+        names = {"minimal": "Example", "api": "ExampleApi", "dapper-sqlserver": "ExampleDapper"}
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             for preset, expected_files in expected.items():
-                name = "Example" if preset == "minimal" else "ExampleApi"
+                name = names[preset]
                 result = self.create(root, name, preset)
 
                 self.assertEqual(0, result.returncode, result.stderr)
@@ -214,6 +312,84 @@ class ScaffoldTests(unittest.TestCase):
                 )
                 rewritten = [item.replace("Example", name) for item in expected_files]
                 self.assertEqual(rewritten, generated)
+
+    def test_component_combinations_render_selected_wiring(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            sql_server = self.create_with_options(root, "SqlServer", "api", "database=sqlserver")
+            combined = self.create_with_options(
+                root,
+                "Combined",
+                "api",
+                "data=efcore+dapper",
+                "auth=jwt",
+                "telemetry=opentelemetry",
+                "selected-stack=true",
+            )
+
+            self.assertEqual(0, sql_server.returncode, sql_server.stderr)
+            self.assertEqual(0, combined.returncode, combined.stderr)
+            self.assertIn(
+                "UseSqlServer",
+                (root / "SqlServer" / "src" / "SqlServer.Infrastructure" / "ServiceCollectionExtensions.cs").read_text(
+                    encoding="utf-8"
+                ),
+            )
+            combined_root = root / "Combined"
+            program = (combined_root / "src" / "Combined.Api" / "Program.cs").read_text(encoding="utf-8")
+            appsettings = json.loads((combined_root / "src" / "Combined.Api" / "appsettings.json").read_text(encoding="utf-8"))
+
+            self.assertTrue((combined_root / "BannedSymbols.txt").is_file())
+            self.assertIn("AddAuthentication", program)
+            self.assertIn("AddOpenTelemetry", program)
+            self.assertIn("DapperConnectionFactory.cs", {path.name for path in (combined_root / "src" / "Combined.Infrastructure").iterdir()})
+            self.assertEqual("Combined", appsettings["Jwt"]["Audience"])
+
+    def test_component_combinations_render_selected_wiring(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            sql_server = self.create_with_options(root, "SqlServer", "api", "database=sqlserver")
+            combined = self.create_with_options(
+                root,
+                "Combined",
+                "api",
+                "data=efcore+dapper",
+                "auth=jwt",
+                "telemetry=opentelemetry",
+                "selected-stack=true",
+            )
+
+            self.assertEqual(0, sql_server.returncode, sql_server.stderr)
+            self.assertEqual(0, combined.returncode, combined.stderr)
+            self.assertIn(
+                "UseSqlServer",
+                (root / "SqlServer" / "src" / "SqlServer.Infrastructure" / "ServiceCollectionExtensions.cs").read_text(
+                    encoding="utf-8"
+                ),
+            )
+            combined_root = root / "Combined"
+            program = (combined_root / "src" / "Combined.Api" / "Program.cs").read_text(encoding="utf-8")
+            appsettings = json.loads((combined_root / "src" / "Combined.Api" / "appsettings.json").read_text(encoding="utf-8"))
+
+            self.assertTrue((combined_root / "BannedSymbols.txt").is_file())
+            self.assertIn("AddAuthentication", program)
+            self.assertIn("AddOpenTelemetry", program)
+            self.assertIn("DapperConnectionFactory.cs", {path.name for path in (combined_root / "src" / "Combined.Infrastructure").iterdir()})
+            self.assertEqual("Combined", appsettings["Jwt"]["Audience"])
+
+
+    def test_sql_server_outputs_keep_certificate_validation_enabled(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            ef_core = self.create_with_options(root, "EfCoreSqlServer", "api", "database=sqlserver")
+            dapper = self.create(root, "DapperSqlServer", "dapper-sqlserver")
+
+            self.assertEqual(0, ef_core.returncode, ef_core.stderr)
+            self.assertEqual(0, dapper.returncode, dapper.stderr)
+            for name in ("EfCoreSqlServer", "DapperSqlServer"):
+                appsettings_path = root / name / "src" / f"{name}.Api" / "appsettings.json"
+                appsettings = json.loads(appsettings_path.read_text(encoding="utf-8"))
+                self.assertNotIn("TrustServerCertificate", appsettings["ConnectionStrings"]["SqlServer"])
 
 
 if __name__ == "__main__":
