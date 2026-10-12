@@ -1,0 +1,85 @@
+{
+  "architecture": {
+    "type": "string",
+    "allowed": ["single-service"],
+    "default": "single-service",
+    "description": "The generated project layout.",
+    "requires": {},
+    "conflicts": {}
+  },
+  "framework": {
+    "type": "string",
+    "allowed": ["net10.0"],
+    "default": "net10.0",
+    "description": "The target framework.",
+    "requires": {},
+    "conflicts": {}
+  },
+  "data": {
+    "type": "string",
+    "allowed": ["none", "efcore"],
+    "default": "efcore",
+    "description": "The data-access component.",
+    "requires": {
+      "none": {"database": "none"},
+      "efcore": {"database": "postgres"}
+    },
+    "conflicts": {}
+  },
+  "database": {
+    "type": "string",
+    "allowed": ["none", "postgres"],
+    "default": "postgres",
+    "description": "The relational database component.",
+    "requires": {
+      "none": {"data": "none"},
+      "postgres": {"data": "efcore"}
+    },
+    "conflicts": {}
+  },
+  "hosts": {
+    "type": "array",
+    "allowed": ["api"],
+    "items": {"type": "string", "allowed": ["api"]},
+    "default": ["api"],
+    "description": "The process hosts.",
+    "requires": {},
+    "conflicts": {},
+    "minItems": 1,
+    "uniqueItems": true
+  },
+  "auth": {
+    "type": "string",
+    "allowed": ["none"],
+    "default": "none",
+    "description": "The authentication component.",
+    "requires": {},
+    "conflicts": {}
+  },
+  "telemetry": {
+    "type": "string",
+    "allowed": ["none"],
+    "default": "none",
+    "description": "The telemetry component.",
+    "requires": {},
+    "conflicts": {}
+  },
+  "tests": {
+    "type": "array",
+    "allowed": ["unit"],
+    "items": {"type": "string", "allowed": ["unit"]},
+    "default": ["unit"],
+    "description": "The test projects.",
+    "requires": {},
+    "conflicts": {},
+    "uniqueItems": true
+  },
+  "selected-stack": {
+    "type": "boolean",
+    "allowed": [false],
+    "default": false,
+    "description": "Whether to select the optional application stack.",
+    "requires": {},
+    "conflicts": {}
+  }
+}

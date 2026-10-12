@@ -1,0 +1,12 @@
+{
+  "when": {"data": "efcore", "database": "postgres"},
+  "requires": {"data": "efcore", "database": "postgres"},
+  "conflicts": {},
+  "projects": ["src/$NAME$.Infrastructure/$NAME$.Infrastructure.csproj"],
+  "variables": {
+    "INFRASTRUCTURE_PROJECT_REFERENCE": "    <ProjectReference Include=\"../$NAME$.Infrastructure/$NAME$.Infrastructure.csproj\" />",
+    "INFRASTRUCTURE_SETUP": "builder.Services.AddInfrastructure(builder.Configuration);",
+    "INFRASTRUCTURE_USING": "using $NAME$.Infrastructure;",
+    "PERSISTENCE_CONFIGURATION": "  \"ConnectionStrings\": {\n    \"Postgres\": \"Host=localhost;Database=$NAME$;Username=postgres;Password=change-me\"\n  }"
+  }
+}

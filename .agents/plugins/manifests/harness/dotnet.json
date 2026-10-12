@@ -16,8 +16,31 @@
     ],
     "hooks": [],
     "permissions": {
-      "claude_allow": [],
-      "codex_prefix_rules": []
+      "claude_allow": [
+        "Bash(python -B ${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py:*)",
+        "Bash(python3 -B ${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py:*)",
+        "PowerShell(python -B ${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py:*)",
+        "PowerShell(python3 -B ${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py:*)"
+      ],
+      "codex_prefix_rules": [
+        {
+          "pattern": [
+            ["python", "python3"],
+            "-B",
+            "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py",
+            ["new", "options"]
+          ],
+          "justification": "Runs only the packaged .NET scaffold entry point to resolve approved options or create a new selected single-service solution.",
+          "match": [
+            ["python", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "new", "--name", "MyService", "--destination", "C:/source/repos"],
+            ["python3", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "options", "--preset", "api"]
+          ],
+          "not_match": [
+            ["python", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "new"],
+            ["python3", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"]
+          ]
+        }
+      ]
     }
   }
 }

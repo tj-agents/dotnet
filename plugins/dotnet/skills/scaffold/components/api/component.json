@@ -1,0 +1,6 @@
+{
+  "when": {"hosts": {"contains": "api"}},
+  "requires": {"hosts": {"contains": "api"}},
+  "conflicts": {},
+  "projects": ["src/$NAME$.Api/$NAME$.Api.csproj"]
+}
