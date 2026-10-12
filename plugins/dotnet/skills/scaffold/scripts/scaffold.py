@@ -32,6 +32,7 @@ CSHARP_KEYWORDS = {
     "using", "virtual", "void", "volatile", "while"
 }
 WINDOWS_RESERVED = {"CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"}
+CSHARP_INTRINSICS = {"__arglist", "__makeref", "__reftype", "__refvalue"}
 
 
 class ScaffoldError(Exception):
@@ -189,7 +190,7 @@ def validate_name(name: str) -> None:
     if reserved in WINDOWS_RESERVED:
         raise ValidationError(f"invalid project name: {name}")
     parts = name.split(".")
-    if any(not IDENTIFIER.fullmatch(part) or part in CSHARP_KEYWORDS for part in parts):
+    if any(not IDENTIFIER.fullmatch(part) or part in CSHARP_KEYWORDS or part in CSHARP_INTRINSICS for part in parts):
         raise ValidationError(f"project name must be a valid C# namespace: {name}")
 
 
@@ -315,12 +316,13 @@ def output(destination: Path, name: str, files: Mapping[str, str], options: Mapp
 def create(args: argparse.Namespace) -> None:
     validate_name(args.name)
     options, sources, preset = resolve_options(args.preset, args.config, args.set)
-    if not args.destination.is_dir():
-        raise ScaffoldError(f"destination must be an existing directory: {args.destination}")
-    project = args.destination / args.name
+    destination = args.destination.expanduser()
+    if not destination.is_dir():
+        raise ScaffoldError(f"destination must be an existing directory: {destination}")
+    project = destination / args.name
     if project.exists() or project.is_symlink():
         raise ScaffoldError(f"project already exists: {project}")
-    output(args.destination, args.name, plan(args.name, options, preset), options, sources, args.dry_run)
+    output(destination, args.name, plan(args.name, options, preset), options, sources, args.dry_run)
 
 
 def show_options(args: argparse.Namespace) -> None:
