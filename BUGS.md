@@ -24,3 +24,75 @@
 - **Resolution condition:** both names exit2 without output files and existing valid-name/component build gates pass.
 - **Verification evidence:** parent generated the shipped `api` preset with `--name Program` in disposable temporary storage and ran `dotnet build Program.slnx --nologo --verbosity quiet`; build returned1 with both errors and no warnings.
 - **Repair verification:** all13 scaffold regressions passed, including `Program` and `Program.Example` returning2 without writes and `Example.Program` remaining valid. All five real Windows component configurations restored, built and tested with zero build warnings or errors.
+
+
+## B003
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-12. Frozen scaffold head `1a87313b0ae5650bef89825ad501def946523741` fails the Sandbox row of the authored verifier: Functions cannot resolve the WithTracing extension with its generated package references; ApiFixture lacks the ConfigureTestServices import, uses obsolete parameterless PostgreSqlBuilder/MsSqlBuilder constructors and violates the selected ConfigureAwait rule. Fresh branch qualification also exposed repeated provider package pins in Dapper/hybrid integration composition. Diagnostics and rendered central-package entries confirm these defects.
+- **Impact and priority:** P2; the accepted sandbox preset does not compile.
+- **Source owner:** `tj-agents/dotnet` scaffold host/fixture templates and component contributions.
+- **State:** in-progress
+- **Repair link:** the scripted-scaffold goal, Slice4 `Feature/ScaffoldHosts`; bounded corrective branch `Fix/ScaffoldHostsQualification`.
+- **Next action:** repair generated compiler errors and rerun fail-fast verification from the corrected exact source.
+- **Resolution condition:** the full seven-configuration authored verifier passes Windows and Ubuntu at the delivered head, with focused Dapper/hybrid fixture branches compiled.
+- **Verification evidence:** full Python suite passed35 against current core `0d797f568a53b73ff2e8c271c7aaf3f32f29035e`; verifier passed the first five rows then failed Sandbox. Exact diagnostic log: `dotnet-scaffold-hosts-matrix-54e894c3421a41789bf0c07ac372c89e/verify-matrix.log`.
+
+## B004
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-12. Frozen head `1a87313b0ae5650bef89825ad501def946523741` introduces plaintext Functions `local.settings.json` containing storage/database configuration while the consumer .gitignore omits it. Cause confirmed: the new file has no corresponding ignore rule.
+- **Impact and priority:** P2; configuring real local credentials then ordinary git add/publish can disclose secrets. No disclosed real credential was observed.
+- **Source owner:** `tj-agents/dotnet` scaffold consumer .gitignore template.
+- **State:** resolved
+- **Repair link:** Slice4 canonical review SEC3 and the existing scripted-scaffold goal/corrective branch.
+- **Next action:** none; corrected default ignore and generated-output regression are independently verified.
+- **Resolution condition:** generated Functions local settings are ignored by default, focused regression passes and independent incremental security review verifies the corrected candidate.
+- **Verification evidence:** immutable security review matched archive, patch and path identities; 132 in-memory selections preserved auth/container boundaries; sandbox render confirmed plaintext ConnectionStrings__Postgres and absent local-settings ignore rule.
+
+B004 resolution evidence: at d573967, independent L2 security verified generated Git check-ignore matches .gitignore:5:local.settings.json, the focused regression and complete36-test suite passed, and Azure.Functions.Sdk1.0.1 marks the local settings CopyToPublishDirectory=Never. No real credential disclosure was observed.
+
+B003 repair progress: the Functions tracing dependency is explicit, fixture imports/awaits and both image constructors are corrected, and provider package pins have one common owner. Fresh Sandbox passes; the existing bounded writer is qualifying SQL/JWT and Dapper/hybrid fixtures with checked subprocess results. Final seven-row Windows/Ubuntu evidence remains pending.
+
+## B005
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-12. Fresh SQL/JWT fixture solution restores and builds with zero warnings/errors, then dotnet test --no-build emits a fixture-library testhost abort for missing BouncyCastle.Cryptography2.7.0 while returning zero. Cause confirmed: the fixture support library references xunit, whose xunit.core2.9.3 build props set IsTestProject=true, and the generated library had no explicit non-test classification. Its support-library output was therefore passed to test discovery without the actual test-project runtime setup.
+- **Impact and priority:** P2; a successful process exit can conceal aborted test discovery in generated integration configurations.
+- **Source owner:** `tj-agents/dotnet` scaffold integration fixture project and qualification.
+- **State:** in-progress
+- **Repair link:** existing scripted-scaffold goal/Slice4 corrective branch; same bounded L4 writer.
+- **Next action:** inspect evaluated project properties, repair the fixture support-library classification if confirmed, and rerun fresh affected configurations with complete test-output inspection.
+- **Resolution condition:** generated fixture support libraries are excluded from test discovery while actual UnitTests/IntegrationTests retain their runners; the final Windows/Ubuntu matrix has no testhost aborts.
+- **Verification evidence:** checked per-command fresh SQL/JWT restore/build/test output in `dotnet-scaffold-IntegrationSqlServerRepairFinal-_y3_dht6`; test command returned0 but printed an abort. The writer caught the output discrepancy before source release. No live product scenarios were exercised.
+
+B005 repair evidence: the authored fixture csproj now explicitly sets IsTestProject=false; actual integration test projects retain their runners. Parent inspected xunit.core2.9.3/build/xunit.core.props line10 and the complete SQL/JWT final log, which builds with zero warnings/errors and discovers only the IntegrationTests assembly without a testhost abort. Final all-platform qualification remains pending.
+
+B003 final diagnosis: fresh package/reflection probes identify the missing OpenTelemetry namespace import, and rendered line mapping identifies the implicit async disposal await. A configured disposal scope preserves the original lazy Respawner initialization. Original forms reproduce CS1061/MA0004; corrected probes compile. Parent applied the specified disposal correction after the original writer released. Full-host/platform qualification is still required.
+
+## B006
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-12. The inherited consumer CLAUDE.md template contains a title and prose redirect, while the governing paired-instruction contract requires exactly @AGENTS.md. Cause confirmed: the legacy template predates the final paired-content assertion.
+- **Impact and priority:** P3; generated consumer instruction files drift from the shared host contract.
+- **Source owner:** `tj-agents/dotnet` scaffold consumer CLAUDE.md template.
+- **State:** resolved
+- **Repair link:** the scripted-scaffold goal/Slice4 final candidate.
+- **Next action:** none; consumer pointer is corrected and generated host projections are regenerated.
+- **Resolution condition:** root and consumer-template CLAUDE.md files have their AGENTS.md sibling and exact pointer content; generator/parity checks pass.
+- **Verification evidence:** frozen081e831 assertion identified the consumer template while the repository root pair was correct. Parent replaced the authored consumer content with @AGENTS.md and checks both directions/content alongside the exact wrapper and generated parity.
+
+
+## B007
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-12. Independent exact-version Testcontainers4.16.0 assembly inspection confirms that generated bare integration builders use known PostgreSQL/SQL Server administrator passwords and publish random ports without HostIP, exposing them on Docker's default interfaces. Cause confirmed: generated builders omit credential and binding overrides.
+- **Impact and priority:** P2; a network-reachable running temporary test database permits unauthorized administrator access, test-data disclosure/tampering or disruption. No production database or host compromise was demonstrated.
+- **Source owner:** tj-agents/dotnet scaffold integration database components/fixture.
+- **State:** in-progress
+- **Repair link:** scripted-scaffold Slice4 PR47 and canonical review SEC4.
+- **Next action:** generate cryptographically random fixture credentials and local loopback bindings; compile both providers and independently review the corrected candidate.
+- **Resolution condition:** generated PostgreSQL/SQL Server fixtures use fresh strong credentials and explicit loopback publication; regressions and real builds pass, and independent security verifies the corrected exact source.
+- **Verification evidence:** frozen d573967 security lens inspected exact installed assemblies, default credentials and HostPort-only conversion; network exploitability requires a started fixture and reachability. No live containers were started.
+
+B007 corrective evidence: the released four-file manifest3aa364769bc8c17a0381bb99c3a8ac3836c3a8d85732401852185d4c985f1209 matches parent source byte-for-byte after decoding its UTF8 BOM. All20 focused and36 current-core c91b60c9 repository tests pass. Both Dapper/PostgreSQL and hybrid/SQL Server build logs have zero warnings/errors and actual exit0; both offline binding tests pass without starting containers. Exact4.16 IL shows same-key port merge overwrites defaults, the converter emits one qualified binding, and parameter modifiers run after HostConfig conversion. Per-fixture24-byte CSPRNG passwords satisfy SQL complexity and127.0.0.1 limits publication. Final immutable independent review/platform qualification remain pending.
