@@ -26,6 +26,8 @@ the preset, `--config options.json`, then repeated `--set key=value`; `--dry-run
 without writing. The destination must already exist and `<destination>/<name>` must be new.
 Use `--preset dapper-sqlserver` for an API with Dapper and SQL Server. The name must be a C# namespace whose
 root segment is not `Program`.
+Use `--preset sandbox` for API, Functions with Durable support, worker, EF Core/PostgreSQL, OpenTelemetry and
+unit plus integration project wiring.
 
 ```text
 python -B <skill-directory>/scripts/scaffold.py options --preset api
@@ -35,7 +37,16 @@ python -B <skill-directory>/scripts/scaffold.py options --preset api
 
 ## Validation and publication
 
+If the selected hosts include Functions, restore its project before the solution:
+
 ```text
+dotnet restore src/MyService.Functions/MyService.Functions.csproj
+```
+
+Then restore, build and test every generated solution:
+
+```text
+dotnet restore MyService.slnx
 dotnet build MyService.slnx --configuration Release
 dotnet test MyService.slnx --configuration Release
 ```

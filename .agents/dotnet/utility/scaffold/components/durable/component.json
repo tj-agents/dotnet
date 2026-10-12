@@ -1,0 +1,9 @@
+{
+  "when": {"hosts": {"contains": "durable"}},
+  "requires": {"hosts": {"contains": "functions"}},
+  "conflicts": {},
+  "append": {
+    "FUNCTIONS_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.Azure.Functions.Worker.Extensions.DurableTask\" />",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.Azure.Functions.Worker.Extensions.DurableTask\" Version=\"1.19.2\" />"
+  }
+}
