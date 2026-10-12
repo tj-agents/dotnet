@@ -1,0 +1,6 @@
+{
+  "when": {"tests": {"contains": "unit"}},
+  "requires": {"tests": {"contains": "unit"}},
+  "conflicts": {},
+  "projects": ["tests/$NAME$.UnitTests/$NAME$.UnitTests.csproj"]
+}

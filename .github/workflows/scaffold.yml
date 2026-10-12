@@ -1,0 +1,34 @@
+name: Scaffold
+
+on:
+  push:
+    paths:
+      - .agents/dotnet/utility/scaffold/**
+      - .agents/tests/test_scaffold.py
+      - .github/workflows/scaffold.yml
+  pull_request:
+    paths:
+      - .agents/dotnet/utility/scaffold/**
+      - .agents/tests/test_scaffold.py
+      - .github/workflows/scaffold.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+      - run: python -B .agents/tests/test_scaffold.py
+      - run: pwsh .agents/sync-generated.ps1 -Check
+      - run: python -B .agents/dotnet/utility/scaffold/scripts/verify.py
