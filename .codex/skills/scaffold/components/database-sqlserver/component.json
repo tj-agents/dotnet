@@ -1,0 +1,11 @@
+{
+  "when": {"database": "sqlserver"},
+  "requires": {"data": {"oneOf": ["efcore", "dapper", "efcore+dapper"]}},
+  "conflicts": {},
+  "append": {
+    "APPSETTINGS_PROPERTIES": {
+      "value": "  \"ConnectionStrings\": {\n    \"SqlServer\": \"Server=localhost;Database=$NAME$;User Id=sa;Password=Your_password123;TrustServerCertificate=true\"\n  }",
+      "separator": ",\n"
+    }
+  }
+}

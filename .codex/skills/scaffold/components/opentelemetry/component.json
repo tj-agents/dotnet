@@ -1,0 +1,12 @@
+{
+  "when": {"telemetry": "opentelemetry"},
+  "requires": {"hosts": {"contains": "api"}},
+  "conflicts": {},
+  "append": {
+    "API_USINGS": "using OpenTelemetry.Trace;",
+    "API_PACKAGE_REFERENCES": "    <PackageReference Include=\"OpenTelemetry.Extensions.Hosting\" />\n    <PackageReference Include=\"OpenTelemetry.Instrumentation.AspNetCore\" />",
+    "API_SERVICE_REGISTRATIONS": "builder.Services\n    .AddOpenTelemetry()\n    .WithTracing(tracing => tracing.AddAspNetCoreInstrumentation());",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"OpenTelemetry.Extensions.Hosting\" Version=\"1.19.1\" />\n    <PackageVersion Include=\"OpenTelemetry.Instrumentation.AspNetCore\" Version=\"1.19.0\" />",
+    "SCAFFOLD_GUIDANCE": "OpenTelemetry tracing includes ASP.NET Core instrumentation."
+  }
+}

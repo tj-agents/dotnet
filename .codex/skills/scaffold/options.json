@@ -17,25 +17,27 @@
   },
   "data": {
     "type": "string",
-    "allowed": ["none", "efcore"],
+    "allowed": ["none", "efcore", "dapper", "efcore+dapper"],
     "default": "efcore",
     "description": "The data-access component.",
-    "requires": {
-      "none": {"database": "none"},
-      "efcore": {"database": "postgres"}
-    },
-    "conflicts": {}
+    "requires": {},
+    "conflicts": {},
+    "constraints": [
+      {"when": {"data": "none"}, "requires": {"database": "none"}},
+      {"when": {"data": {"oneOf": ["efcore", "dapper", "efcore+dapper"]}}, "requires": {"database": {"oneOf": ["postgres", "sqlserver"]}}}
+    ]
   },
   "database": {
     "type": "string",
-    "allowed": ["none", "postgres"],
+    "allowed": ["none", "postgres", "sqlserver"],
     "default": "postgres",
     "description": "The relational database component.",
-    "requires": {
-      "none": {"data": "none"},
-      "postgres": {"data": "efcore"}
-    },
-    "conflicts": {}
+    "requires": {},
+    "conflicts": {},
+    "constraints": [
+      {"when": {"database": "none"}, "requires": {"data": "none"}},
+      {"when": {"database": {"oneOf": ["postgres", "sqlserver"]}}, "requires": {"data": {"oneOf": ["efcore", "dapper", "efcore+dapper"]}}}
+    ]
   },
   "hosts": {
     "type": "array",
@@ -50,15 +52,18 @@
   },
   "auth": {
     "type": "string",
-    "allowed": ["none"],
+    "allowed": ["none", "jwt"],
     "default": "none",
     "description": "The authentication component.",
     "requires": {},
-    "conflicts": {}
+    "conflicts": {},
+    "constraints": [
+      {"when": {"auth": "jwt"}, "requires": {"hosts": {"contains": "api"}}}
+    ]
   },
   "telemetry": {
     "type": "string",
-    "allowed": ["none"],
+    "allowed": ["none", "opentelemetry"],
     "default": "none",
     "description": "The telemetry component.",
     "requires": {},
@@ -76,10 +81,13 @@
   },
   "selected-stack": {
     "type": "boolean",
-    "allowed": [false],
+    "allowed": [false, true],
     "default": false,
     "description": "Whether to select the optional application stack.",
     "requires": {},
-    "conflicts": {}
+    "conflicts": {},
+    "constraints": [
+      {"when": {"selected-stack": true}, "conflicts": {"data": "dapper"}}
+    ]
   }
 }
