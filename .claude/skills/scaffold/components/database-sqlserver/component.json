@@ -4,7 +4,7 @@
   "conflicts": {},
   "append": {
     "APPSETTINGS_PROPERTIES": {
-      "value": "  \"ConnectionStrings\": {\n    \"SqlServer\": \"Server=localhost;Database=$NAME$;User Id=sa;Password=Your_password123;TrustServerCertificate=true\"\n  }",
+      "value": "  \"ConnectionStrings\": {\n    \"SqlServer\": \"Server=localhost;Database=$NAME$;User Id=sa;Password=Your_password123\"\n  }",
       "separator": ",\n"
     }
   }
