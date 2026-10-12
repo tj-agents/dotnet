@@ -670,6 +670,21 @@ class ScaffoldTests(unittest.TestCase):
                 functions_csproj,
             )
 
+    def test_azure_telemetry_usings_are_present(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.create_with_options(root, "SandboxAzureTelemetry", "sandbox", "cloud=azure")
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            project = root / "SandboxAzureTelemetry"
+            api_program = (project / "src" / "SandboxAzureTelemetry.Api" / "Program.cs").read_text(encoding="utf-8")
+            worker_program = (project / "src" / "SandboxAzureTelemetry.Worker" / "Program.cs").read_text(encoding="utf-8")
+            functions_program = (project / "src" / "SandboxAzureTelemetry.Functions" / "Program.cs").read_text(encoding="utf-8")
+
+            self.assertIn("using Azure.Monitor.OpenTelemetry.AspNetCore;", api_program)
+            self.assertIn("using Azure.Monitor.OpenTelemetry.Exporter;", worker_program)
+            self.assertIn("using Azure.Monitor.OpenTelemetry.Exporter;", functions_program)
+
     def test_cloud_name_derivation_and_override(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

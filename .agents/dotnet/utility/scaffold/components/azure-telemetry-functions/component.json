@@ -3,6 +3,7 @@
   "requires": {},
   "conflicts": {},
   "append": {
+    "FUNCTIONS_TELEMETRY_USING": "using Azure.Monitor.OpenTelemetry.Exporter;",
     "FUNCTIONS_TELEMETRY_REGISTRATION": "var applicationInsightsConnectionString = builder.Configuration[\"APPLICATIONINSIGHTS_CONNECTION_STRING\"];\n\nif (!string.IsNullOrWhiteSpace(applicationInsightsConnectionString))\n{\n    builder.Services\n        .AddOpenTelemetry()\n        .WithTracing(tracing => tracing.AddAzureMonitorTraceExporter());\n}",
     "FUNCTIONS_PACKAGE_REFERENCES": "    <PackageReference Include=\"Azure.Monitor.OpenTelemetry.Exporter\" />",
     "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Azure.Monitor.OpenTelemetry.Exporter\" Version=\"1.10.0\" />"
