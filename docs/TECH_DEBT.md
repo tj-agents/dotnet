@@ -21,3 +21,17 @@
   selected tj-agents repositories without claiming installation merely from source changes.
 - Verification evidence: this goal's original human gate, dotnet:learning's convention procedure,
   .agents/delivery-authorization.json, and Tommy's 2026-10-12 instruction to record debt and continue.
+
+
+## D003: Use focused interim checks and one final full CI run
+
+- Kind: debt.
+- Observed/reported: 2026-10-12. Scripted scaffold delivery spent excessive time and tokens on repeated broad qualification and workflow bookkeeping. Tommy explicitly requires interim tests selected for the changes made, followed by one full CI run at the end of the finished implementation; a small local commit is not a validation boundary.
+- Impact and priority: P1; the delivery took roughly six hours and repeatedly interrupted useful implementation.
+- Source owner: tj-agents/dotnet scaffold workflow for execution cadence; tj-agents/core engineering owns shared test selection, commit/push cadence and final-record choreography.
+- State: in-progress.
+- Repair link: .worktrees/Fix-InertCloseoutCadence/plans/inert-closeout-cadence/GOAL.md (isolated core successor acknowledged pickup); core BUGS.md B008 records the confirmed immediate-doc-commit versus exact-head-closeout policy collision.
+- Next action: preserve focused interim tests for changed behavior; batch small commits locally; run the full matrix once on the finished candidate. Remove bookkeeping-only validation cycles and duplicate push/PR matrix runs. Coordinate shared-source enforcement and consumer adoption without changing installed global settings.
+- Resolution condition: both agent hosts choose tests from affected behavior, avoid full local matrices after small commits, and submit one final full CI candidate after batched implementation; inert notes never invalidate green executable validation or restart its matrix. A genuine failure or later functional change is repaired with targeted checks and validated on the resulting final candidate.
+- Verification evidence: final scaffold head8f22d5d passed36 repository tests and all seven configurations on Windows/Ubuntu. Scaffold push38303051185 and PR38303056095 duplicated the full matrix for one SHA. The contemplated record-only extra push was cancelled before execution. Core remote-validation already prohibits that extra push; agent misapplication and the adjacent conflicting closeout rule require enforcement repair.
+
