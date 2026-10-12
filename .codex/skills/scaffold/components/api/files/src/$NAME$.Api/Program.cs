@@ -9,3 +9,5 @@ var app = builder.Build();
 $API_PIPELINE$
 
 app.Run();
+$API_PROGRAM_DECLARATIONS$
+$API_PROGRAM_DECLARATIONS$

@@ -6,6 +6,11 @@
     "APPSETTINGS_PROPERTIES": {
       "value": "  \"ConnectionStrings\": {\n    \"Postgres\": \"Host=localhost;Database=$NAME$;Username=postgres;Password=change-me\"\n  }",
       "separator": ",\n"
+    },
+    "FUNCTIONS_LOCAL_SETTINGS_PROPERTIES": ",\n    \"ConnectionStrings__Postgres\": \"Host=localhost;Database=$NAME$;Username=postgres;Password=change-me\"",
+    "WORKER_APPSETTINGS_PROPERTIES": {
+      "value": "  \"ConnectionStrings\": {\n    \"Postgres\": \"Host=localhost;Database=$NAME$;Username=postgres;Password=change-me\"\n  }",
+      "separator": ",\n"
     }
   }
 }

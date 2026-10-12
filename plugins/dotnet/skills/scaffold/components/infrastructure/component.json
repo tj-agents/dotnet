@@ -10,6 +10,12 @@
   },
   "append": {
     "INFRASTRUCTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.Extensions.Configuration.Abstractions\" />",
-    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.Extensions.Configuration.Abstractions\" Version=\"10.0.12\" />"
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.Extensions.Configuration.Abstractions\" Version=\"10.0.12\" />",
+    "FUNCTIONS_INFRASTRUCTURE_USING": "using $NAME$.Infrastructure;",
+    "FUNCTIONS_INFRASTRUCTURE_SETUP": "builder.Services.AddInfrastructure(builder.Configuration);",
+    "FUNCTIONS_INFRASTRUCTURE_PROJECT_REFERENCE": "    <ProjectReference Include=\"../$NAME$.Infrastructure/$NAME$.Infrastructure.csproj\" />",
+    "WORKER_INFRASTRUCTURE_USING": "using $NAME$.Infrastructure;",
+    "WORKER_INFRASTRUCTURE_SETUP": "builder.Services.AddInfrastructure(builder.Configuration);",
+    "WORKER_INFRASTRUCTURE_PROJECT_REFERENCE": "    <ProjectReference Include=\"../$NAME$.Infrastructure/$NAME$.Infrastructure.csproj\" />"
   }
 }

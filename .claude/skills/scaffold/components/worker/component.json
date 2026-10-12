@@ -1,0 +1,6 @@
+{
+  "when": {"hosts": {"contains": "worker"}},
+  "requires": {"hosts": {"contains": "worker"}},
+  "conflicts": {},
+  "projects": ["src/$NAME$.Worker/$NAME$.Worker.csproj"]
+}

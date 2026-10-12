@@ -41,14 +41,17 @@
   },
   "hosts": {
     "type": "array",
-    "allowed": ["api"],
-    "items": {"type": "string", "allowed": ["api"]},
+    "allowed": ["api", "functions", "durable", "worker"],
+    "items": {"type": "string", "allowed": ["api", "functions", "durable", "worker"]},
     "default": ["api"],
     "description": "The process hosts.",
     "requires": {},
     "conflicts": {},
     "minItems": 1,
-    "uniqueItems": true
+    "uniqueItems": true,
+    "constraints": [
+      {"when": {"hosts": {"contains": "durable"}}, "requires": {"hosts": {"contains": "functions"}}}
+    ]
   },
   "auth": {
     "type": "string",
@@ -71,13 +74,16 @@
   },
   "tests": {
     "type": "array",
-    "allowed": ["unit"],
-    "items": {"type": "string", "allowed": ["unit"]},
+    "allowed": ["unit", "integration"],
+    "items": {"type": "string", "allowed": ["unit", "integration"]},
     "default": ["unit"],
     "description": "The test projects.",
     "requires": {},
     "conflicts": {},
-    "uniqueItems": true
+    "uniqueItems": true,
+    "constraints": [
+      {"when": {"tests": {"contains": "integration"}}, "requires": {"hosts": {"contains": "api"}, "database": {"oneOf": ["postgres", "sqlserver"]}}}
+    ]
   },
   "selected-stack": {
     "type": "boolean",

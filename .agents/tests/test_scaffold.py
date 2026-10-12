@@ -9,6 +9,8 @@ import tempfile
 import unittest
 from unittest import mock
 from uuid import uuid4
+from xml.etree import ElementTree
+from xml.etree import ElementTree
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -345,38 +347,104 @@ class ScaffoldTests(unittest.TestCase):
             self.assertIn("DapperConnectionFactory.cs", {path.name for path in (combined_root / "src" / "Combined.Infrastructure").iterdir()})
             self.assertEqual("Combined", appsettings["Jwt"]["Audience"])
 
-    def test_component_combinations_render_selected_wiring(self) -> None:
+    def test_functions_only_and_worker_only_generation(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            sql_server = self.create_with_options(root, "SqlServer", "api", "database=sqlserver")
-            combined = self.create_with_options(
+            functions = self.create_with_options(root, "Functions", "minimal", 'hosts=["functions"]')
+            worker = self.create_with_options(root, "Worker", "minimal", 'hosts=["worker"]')
+
+            self.assertEqual(0, functions.returncode, functions.stderr)
+            self.assertEqual(0, worker.returncode, worker.stderr)
+            self.assertTrue((root / "Functions" / "src" / "Functions.Functions" / "Functions.Functions.csproj").is_file())
+            self.assertFalse((root / "Functions" / "src" / "Functions.Api").exists())
+            self.assertTrue((root / "Worker" / "src" / "Worker.Worker" / "Worker.Worker.csproj").is_file())
+            self.assertFalse((root / "Worker" / "src" / "Worker.Api").exists())
+    def test_host_and_integration_constraints_are_enforced(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            durable = self.create_with_options(root, "Durable", "minimal", 'hosts=["durable"]')
+            integration_without_api = self.create_with_options(
                 root,
-                "Combined",
+                "IntegrationWithoutApi",
+                "minimal",
+                'hosts=["worker"]',
+                'tests=["integration"]',
+                "data=efcore",
+                "database=postgres",
+            )
+            jwt_without_api = self.create_with_options(root, "JwtWithoutApi", "minimal", 'hosts=["worker"]', "auth=jwt")
+
+            self.assertEqual(2, durable.returncode)
+            self.assertEqual(2, integration_without_api.returncode)
+            self.assertEqual(2, jwt_without_api.returncode)
+
+    def test_sandbox_hosts_fixture_file_list(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.create(root, "Sandbox", "sandbox")
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            project = root / "Sandbox"
+            generated = sorted(path.relative_to(project).as_posix() for path in project.rglob("*") if path.is_file())
+            self.assertEqual(
+                [
+                    ".editorconfig", ".gitattributes", ".github/workflows/ci.yml", ".gitignore", ".scaffold.json",
+                    "AGENTS.md", "BannedSymbols.txt", "CLAUDE.md", "Directory.Build.props", "Directory.Packages.props",
+                    "Sandbox.slnx", "global.json", "src/Sandbox.Api/Program.cs", "src/Sandbox.Api/Sandbox.Api.csproj",
+                    "src/Sandbox.Api/appsettings.json", "src/Sandbox.Core/Sandbox.Core.csproj",
+                    "src/Sandbox.Functions/Program.cs", "src/Sandbox.Functions/Sandbox.Functions.csproj",
+                    "src/Sandbox.Functions/host.json", "src/Sandbox.Functions/local.settings.json",
+                    "src/Sandbox.Infrastructure/Persistence/ApplicationDbContext.cs",
+                    "src/Sandbox.Infrastructure/Sandbox.Infrastructure.csproj", "src/Sandbox.Infrastructure/ServiceCollectionExtensions.cs",
+                    "src/Sandbox.Worker/Program.cs", "src/Sandbox.Worker/Sandbox.Worker.csproj", "src/Sandbox.Worker/appsettings.json",
+                    "tests/Sandbox.IntegrationTests.Fixtures/ApiFixture.cs",
+                    "tests/Sandbox.IntegrationTests.Fixtures/Sandbox.IntegrationTests.Fixtures.csproj",
+                    "tests/Sandbox.IntegrationTests/Sandbox.IntegrationTests.csproj", "tests/Sandbox.UnitTests/Sandbox.UnitTests.csproj",
+                ],
+                generated,
+            )
+            functions = project / "src" / "Sandbox.Functions"
+            fixture = project / "tests" / "Sandbox.IntegrationTests.Fixtures" / "ApiFixture.cs"
+            self.assertIn("Microsoft.Azure.Functions.Worker.Extensions.DurableTask", (functions / "Sandbox.Functions.csproj").read_text(encoding="utf-8"))
+            self.assertIn("UseFunctionsWorkerDefaults", (functions / "Program.cs").read_text(encoding="utf-8"))
+            self.assertIn("telemetryMode", (functions / "host.json").read_text(encoding="utf-8"))
+            self.assertIn("PostgreSqlContainer", fixture.read_text(encoding="utf-8"))
+            self.assertNotIn("HeaderAuthenticationHandler", fixture.read_text(encoding="utf-8"))
+            packages = ElementTree.parse(project / "Directory.Packages.props").findall(".//PackageVersion")
+            package_names = [package.attrib["Include"] for package in packages]
+            self.assertEqual(len(package_names), len(set(package_names)))
+
+    def test_sql_server_integration_jwt_renders_provider_and_auth_fixture(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.create_with_options(
+                root,
+                "SqlIntegration",
                 "api",
-                "data=efcore+dapper",
+                "database=sqlserver",
+                'tests=["integration"]',
                 "auth=jwt",
-                "telemetry=opentelemetry",
-                "selected-stack=true",
             )
 
-            self.assertEqual(0, sql_server.returncode, sql_server.stderr)
-            self.assertEqual(0, combined.returncode, combined.stderr)
-            self.assertIn(
-                "UseSqlServer",
-                (root / "SqlServer" / "src" / "SqlServer.Infrastructure" / "ServiceCollectionExtensions.cs").read_text(
-                    encoding="utf-8"
-                ),
-            )
-            combined_root = root / "Combined"
-            program = (combined_root / "src" / "Combined.Api" / "Program.cs").read_text(encoding="utf-8")
-            appsettings = json.loads((combined_root / "src" / "Combined.Api" / "appsettings.json").read_text(encoding="utf-8"))
+            self.assertEqual(0, result.returncode, result.stderr)
+            fixture = (root / "SqlIntegration" / "tests" / "SqlIntegration.IntegrationTests.Fixtures" / "ApiFixture.cs").read_text(encoding="utf-8")
 
-            self.assertTrue((combined_root / "BannedSymbols.txt").is_file())
-            self.assertIn("AddAuthentication", program)
-            self.assertIn("AddOpenTelemetry", program)
-            self.assertIn("DapperConnectionFactory.cs", {path.name for path in (combined_root / "src" / "Combined.Infrastructure").iterdir()})
-            self.assertEqual("Combined", appsettings["Jwt"]["Audience"])
+            self.assertIn("MsSqlContainer", fixture)
+            self.assertIn("UseSqlServer(this.container.GetConnectionString())", fixture)
+            self.assertIn("HeaderAuthenticationHandler", fixture)
+            self.assertIn("X-Test-User", fixture)
 
+    def test_hybrid_fixture_replaces_ef_and_dapper(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.create_with_options(root, "Hybrid", "api", "data=efcore+dapper", 'tests=["integration"]')
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            fixture = (root / "Hybrid" / "tests" / "Hybrid.IntegrationTests.Fixtures" / "ApiFixture.cs").read_text(encoding="utf-8")
+
+            self.assertIn("RemoveAll<DbContextOptions<ApplicationDbContext>>", fixture)
+            self.assertIn("RemoveAll<IDapperConnectionFactory>()", fixture)
+            self.assertIn("FixtureDapperConnectionFactory", fixture)
 
     def test_sql_server_outputs_keep_certificate_validation_enabled(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
