@@ -1,6 +1,7 @@
 using System.Data.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Respawn;
@@ -21,18 +22,21 @@ public sealed class ApiFixture : WebApplicationFactory<global::Program>, IAsyncL
 
     public async Task InitializeAsync()
     {
-        await this.container.StartAsync();
+        await this.container.StartAsync().ConfigureAwait(false);
         this.Client = this.CreateClient();
     }
 
     public async Task ResetAsync()
     {
-        await using DbConnection connection = $FIXTURE_CONNECTION_CREATION$;
-        await connection.OpenAsync();
-        this.respawner ??= await Respawner.CreateAsync(
-            connection,
-            new RespawnerOptions { DbAdapter = $FIXTURE_DB_ADAPTER$ });
-        await this.respawner.ResetAsync(connection);
+        DbConnection connection = $FIXTURE_CONNECTION_CREATION$;
+        await using (connection.ConfigureAwait(false))
+        {
+            await connection.OpenAsync().ConfigureAwait(false);
+            this.respawner ??= await Respawner.CreateAsync(
+                connection,
+                new RespawnerOptions { DbAdapter = $FIXTURE_DB_ADAPTER$ }).ConfigureAwait(false);
+            await this.respawner.ResetAsync(connection).ConfigureAwait(false);
+        }
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -46,7 +50,7 @@ $FIXTURE_AUTH_CONFIGURATION$
 
     async Task IAsyncLifetime.DisposeAsync()
     {
-        await this.container.DisposeAsync();
+        await this.container.DisposeAsync().ConfigureAwait(false);
         this.Dispose();
     }
 $FIXTURE_DAPPER_FACTORY$

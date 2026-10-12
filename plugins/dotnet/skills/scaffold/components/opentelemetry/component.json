@@ -6,14 +6,14 @@
     "API_USINGS": "using OpenTelemetry.Trace;",
     "API_PACKAGE_REFERENCES": "    <PackageReference Include=\"OpenTelemetry.Extensions.Hosting\" />\n    <PackageReference Include=\"OpenTelemetry.Exporter.OpenTelemetryProtocol\" />\n    <PackageReference Include=\"OpenTelemetry.Instrumentation.AspNetCore\" />",
     "API_SERVICE_REGISTRATIONS": "builder.Services\n    .AddOpenTelemetry()\n    .WithTracing(tracing => tracing.AddAspNetCoreInstrumentation().AddOtlpExporter());",
-    "FUNCTIONS_TELEMETRY_USING": "using Microsoft.Azure.Functions.Worker.OpenTelemetry;\nusing OpenTelemetry.Trace;",
+    "FUNCTIONS_TELEMETRY_USING": "using Microsoft.Azure.Functions.Worker.OpenTelemetry;\nusing OpenTelemetry;\nusing OpenTelemetry.Trace;",
     "FUNCTIONS_TELEMETRY_REGISTRATION": "builder.Services\n    .AddOpenTelemetry()\n    .UseFunctionsWorkerDefaults()\n    .WithTracing(tracing => tracing.AddOtlpExporter());",
     "FUNCTIONS_HOST_JSON_PROPERTIES": ",\n  \"telemetryMode\": \"OpenTelemetry\"",
     "WORKER_TELEMETRY_USING": "using OpenTelemetry.Trace;",
     "WORKER_TELEMETRY_REGISTRATION": "builder\n    .AddOpenTelemetry()\n    .WithTracing(tracing => tracing.AddOtlpExporter());",
-    "FUNCTIONS_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.Azure.Functions.Worker.OpenTelemetry\" />\n    <PackageReference Include=\"OpenTelemetry.Extensions.Hosting\" />\n    <PackageReference Include=\"OpenTelemetry.Exporter.OpenTelemetryProtocol\" />",
+    "FUNCTIONS_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.Azure.Functions.Worker.OpenTelemetry\" />\n    <PackageReference Include=\"OpenTelemetry\" />\n    <PackageReference Include=\"OpenTelemetry.Extensions.Hosting\" />\n    <PackageReference Include=\"OpenTelemetry.Exporter.OpenTelemetryProtocol\" />",
     "WORKER_PACKAGE_REFERENCES": "    <PackageReference Include=\"OpenTelemetry.Extensions.Hosting\" />\n    <PackageReference Include=\"OpenTelemetry.Exporter.OpenTelemetryProtocol\" />",
-    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.Azure.Functions.Worker.OpenTelemetry\" Version=\"1.2.0\" />\n    <PackageVersion Include=\"OpenTelemetry.Extensions.Hosting\" Version=\"1.19.1\" />\n    <PackageVersion Include=\"OpenTelemetry.Exporter.OpenTelemetryProtocol\" Version=\"1.19.1\" />\n    <PackageVersion Include=\"OpenTelemetry.Instrumentation.AspNetCore\" Version=\"1.19.0\" />",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.Azure.Functions.Worker.OpenTelemetry\" Version=\"1.2.0\" />\n    <PackageVersion Include=\"OpenTelemetry\" Version=\"1.19.1\" />\n    <PackageVersion Include=\"OpenTelemetry.Extensions.Hosting\" Version=\"1.19.1\" />\n    <PackageVersion Include=\"OpenTelemetry.Exporter.OpenTelemetryProtocol\" Version=\"1.19.1\" />\n    <PackageVersion Include=\"OpenTelemetry.Instrumentation.AspNetCore\" Version=\"1.19.0\" />",
     "SCAFFOLD_GUIDANCE": "OpenTelemetry tracing includes selected host instrumentation and OTLP export."
   }
 }

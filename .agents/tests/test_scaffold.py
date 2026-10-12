@@ -10,7 +10,6 @@ import unittest
 from unittest import mock
 from uuid import uuid4
 from xml.etree import ElementTree
-from xml.etree import ElementTree
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -409,7 +408,11 @@ class ScaffoldTests(unittest.TestCase):
             self.assertIn("UseFunctionsWorkerDefaults", (functions / "Program.cs").read_text(encoding="utf-8"))
             self.assertIn("telemetryMode", (functions / "host.json").read_text(encoding="utf-8"))
             self.assertIn("PostgreSqlContainer", fixture.read_text(encoding="utf-8"))
+            self.assertIn('new PostgreSqlBuilder("postgres:17.4")', fixture.read_text(encoding="utf-8"))
             self.assertNotIn("HeaderAuthenticationHandler", fixture.read_text(encoding="utf-8"))
+            self.assertIn("local.settings.json", (project / ".gitignore").read_text(encoding="utf-8"))
+            fixture_project = project / "tests" / "Sandbox.IntegrationTests.Fixtures" / "Sandbox.IntegrationTests.Fixtures.csproj"
+            self.assertIn("<IsTestProject>false</IsTestProject>", fixture_project.read_text(encoding="utf-8"))
             packages = ElementTree.parse(project / "Directory.Packages.props").findall(".//PackageVersion")
             package_names = [package.attrib["Include"] for package in packages]
             self.assertEqual(len(package_names), len(set(package_names)))
@@ -430,6 +433,7 @@ class ScaffoldTests(unittest.TestCase):
             fixture = (root / "SqlIntegration" / "tests" / "SqlIntegration.IntegrationTests.Fixtures" / "ApiFixture.cs").read_text(encoding="utf-8")
 
             self.assertIn("MsSqlContainer", fixture)
+            self.assertIn('new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04")', fixture)
             self.assertIn("UseSqlServer(this.container.GetConnectionString())", fixture)
             self.assertIn("HeaderAuthenticationHandler", fixture)
             self.assertIn("X-Test-User", fixture)
@@ -445,6 +449,19 @@ class ScaffoldTests(unittest.TestCase):
             self.assertIn("RemoveAll<DbContextOptions<ApplicationDbContext>>", fixture)
             self.assertIn("RemoveAll<IDapperConnectionFactory>()", fixture)
             self.assertIn("FixtureDapperConnectionFactory", fixture)
+
+    def test_integration_provider_package_versions_are_unique(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            dapper_postgres = self.create_with_options(root, "DapperPostgres", "api", "data=dapper", 'tests=["integration"]')
+            hybrid_sql = self.create_with_options(root, "HybridSql", "api", "data=efcore+dapper", "database=sqlserver", 'tests=["integration"]')
+
+            self.assertEqual(0, dapper_postgres.returncode, dapper_postgres.stderr)
+            self.assertEqual(0, hybrid_sql.returncode, hybrid_sql.stderr)
+            for name in ("DapperPostgres", "HybridSql"):
+                packages = ElementTree.parse(root / name / "Directory.Packages.props").findall(".//PackageVersion")
+                package_names = [package.attrib["Include"] for package in packages]
+                self.assertEqual(len(package_names), len(set(package_names)))
 
     def test_sql_server_outputs_keep_certificate_validation_enabled(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
