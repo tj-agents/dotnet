@@ -378,5 +378,19 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual("Combined", appsettings["Jwt"]["Audience"])
 
 
+    def test_sql_server_outputs_keep_certificate_validation_enabled(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            ef_core = self.create_with_options(root, "EfCoreSqlServer", "api", "database=sqlserver")
+            dapper = self.create(root, "DapperSqlServer", "dapper-sqlserver")
+
+            self.assertEqual(0, ef_core.returncode, ef_core.stderr)
+            self.assertEqual(0, dapper.returncode, dapper.stderr)
+            for name in ("EfCoreSqlServer", "DapperSqlServer"):
+                appsettings_path = root / name / "src" / f"{name}.Api" / "appsettings.json"
+                appsettings = json.loads(appsettings_path.read_text(encoding="utf-8"))
+                self.assertNotIn("TrustServerCertificate", appsettings["ConnectionStrings"]["SqlServer"])
+
+
 if __name__ == "__main__":
     unittest.main()
