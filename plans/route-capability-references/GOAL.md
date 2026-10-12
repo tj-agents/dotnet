@@ -13,7 +13,7 @@ engineering:session-guidance grants standing standards-defect diagnosis, impleme
 Checkout: C:/Users/TommySeery/source/repos/tj-agents/dotnet/.worktrees/Fix-RouteCapabilityReferences
 Branch: Fix/RouteCapabilityReferences
 Base: origin/main dd937097b7a2e489fc0986119af1ca5320e74fa7
-PR: not opened
+PR: https://github.com/tj-agents/dotnet/pull/44
 L4: a small testable compatibility fix; the concrete failure identifies retired engineering:docs-and-debt references. Resolve correct current narrow owners from current core source evidence before substituting; do not weaken route resolution tests.
 
 ## Evidence and scope
@@ -31,6 +31,28 @@ Own only .agents/dotnet/utility/skill-routes source and directly affected tests,
 
 ## Progress
 
-- 2026-10-12 — Picked up from `C:\Users\TommySeery\source\repos\tj-agents\dotnet\.worktrees\Feature-ScriptedScaffold\plans\scripted-scaffold\route-repair-handoff.md` in the recorded `Fix/RouteCapabilityReferences` checkout. Read repository instructions, lane, plan-execution, bugfix, and problem-record conventions; selected L4 for the specified, focused route repair. Recorded `B001` in root `BUGS.md`. Next action: inspect current core capability identities before editing the route generator.
-- 2026-10-12 — Verified current core `8e7110da37540971be623eabd847618ee32ea04c`: its compatibility map resolves the retired alias to `engineering:docs`, and its `write-debt` convention owns `TECH_DEBT.md`. Replaced the instruction-file route with `engineering:docs` and the debt-file route with `engineering:write-debt`; regenerated projections. Passed `python -B -m unittest discover -s .agents/tests -p "test_*.py"` (16 tests) against that core checkout and `pwsh -NoProfile -File .agents/sync-generated.ps1 -Check` (144 generated outputs current). Next action: remove temporary core materialization, commit the focused repair, then independently review it.
-- 2026-10-12 — Verified current core `8e7110da37540971be623eabd847618ee32ea04c`: its compatibility map resolves the retired alias to `engineering:docs`, and its `write-debt` convention owns `TECH_DEBT.md`. Replaced the instruction-file route with `engineering:docs` and the debt-file route with `engineering:write-debt`; regenerated projections. Passed `python -B -m unittest discover -s .agents/tests -p "test_*.py"` (16 tests) against that core checkout and `pwsh -NoProfile -File .agents/sync-generated.ps1 -Check` (144 generated outputs current). Next action: remove temporary core materialization, commit the focused repair, then independently review it.
+- 2026-10-12 — Picked up from `C:\Users\TommySeery\source\repos\tj-agents\dotnet\.worktrees\Feature-ScriptedScaffold\plans\scripted-scaffold\route-repair-handoff.md` in the recorded `Fix/RouteCapabilityReferences` checkout. Read repository instructions, lane, plan-execution, bugfix, and problem-record conventions; selected L4 for the specified, focused route repair. Recorded `B001` in root `BUGS.md`.
+- 2026-10-12 — Verified current core `8e7110da37540971be623eabd847618ee32ea04c`: its compatibility map resolves the retired alias to `engineering:docs`, and its `write-debt` convention owns `TECH_DEBT.md`. Replaced the instruction-file route with `engineering:docs` and the debt-file route with `engineering:write-debt`; regenerated projections. Passed `python -B -m unittest discover -s .agents/tests -p "test_*.py"` (16 tests) against that core checkout and `pwsh -NoProfile -File .agents/sync-generated.ps1 -Check` (144 generated outputs current).
+- 2026-10-12 — PR #44 at `bf2013e1610017a32d350b0cd3f03c46b8f0bb7f` passed hosts, Ubuntu, and Windows CI; native review returned no actionable findings. It merged as `bd524c3564895e41a79d3ea2605e63eb7173a1a6`. `B001` is resolved. This record notifies the originating scripted-scaffold owner; its goal remains active and this side workstream made no scaffold, core, consumer, or machine-install changes.
+
+```completion
+{
+  "outcome": "Generated .NET service routes resolve current engineering capabilities.",
+  "acceptance": [
+    {
+      "id": "route-capability-resolution",
+      "criterion": "Focused tests and Windows/Ubuntu CI pass for the repaired route references.",
+      "evidence": [
+        {"source": "local validation", "result": "16 focused repository tests and generated-file drift check passed against core 8e7110da37540971be623eabd847618ee32ea04c."},
+        {"source": "PR #44", "result": "hosts, Ubuntu, and Windows checks passed before merge commit bd524c3564895e41a79d3ea2605e63eb7173a1a6."}
+      ],
+      "owner": "route-capability-references side-workstream",
+      "next_action": "None; resolved."
+    }
+  ],
+  "deliveries": [
+    {"repository": "tj-agents/dotnet", "pr": 44, "head": "bf2013e1610017a32d350b0cd3f03c46b8f0bb7f"}
+  ],
+  "open_tasks": []
+}
+```
