@@ -28,6 +28,7 @@
 - `seeding` — contract — ef-core
 - `structure` — contract — core
 - `structure-modules` — contract — modular-services
+- `structure-single-service` — contract — single-service
 - `style` — contract — core
 - `style-comments` — contract — core
 - `testing` — contract — core
