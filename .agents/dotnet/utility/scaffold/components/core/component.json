@@ -1,0 +1,6 @@
+{
+  "when": {},
+  "requires": {},
+  "conflicts": {},
+  "projects": ["src/$NAME$.Core/$NAME$.Core.csproj"]
+}
