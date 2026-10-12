@@ -28,6 +28,9 @@ def verify(name: str, preset: str, overrides: Sequence[str] = ()) -> None:
         )
         project = destination / name
         solution = project / f"{name}.slnx"
+        functions_project = project / "src" / f"{name}.Functions" / f"{name}.Functions.csproj"
+        if functions_project.is_file():
+            run(["dotnet", "restore", str(functions_project)], project)
         run(["dotnet", "restore", str(solution)], project)
         run(["dotnet", "build", str(solution), "--configuration", "Release", "--no-restore"], project)
         run(["dotnet", "test", str(solution), "--configuration", "Release", "--no-build"], project)
@@ -44,6 +47,8 @@ def main() -> int:
             "api",
             ("data=efcore+dapper", "auth=jwt", "telemetry=opentelemetry", "selected-stack=true"),
         ),
+        ("SandboxSample", "sandbox", ()),
+        ("IntegrationSqlServerSample", "api", ("database=sqlserver", 'tests=["integration"]', "auth=jwt")),
     )
     for name, preset, overrides in configurations:
         verify(name, preset, overrides)

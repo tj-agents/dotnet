@@ -1,0 +1,17 @@
+{
+  "when": {"tests": {"contains": "integration"}, "database": "postgres"},
+  "requires": {"tests": {"contains": "integration"}, "database": "postgres"},
+  "conflicts": {},
+  "variables": {
+    "FIXTURE_PROVIDER_USING": "using Npgsql;\nusing Testcontainers.PostgreSql;",
+    "FIXTURE_CONTAINER_TYPE": "PostgreSqlContainer",
+    "FIXTURE_CONTAINER_CREATION": "new PostgreSqlBuilder().Build()",
+    "FIXTURE_CONNECTION_TYPE": "NpgsqlConnection",
+    "FIXTURE_CONNECTION_CREATION": "new NpgsqlConnection(this.container.GetConnectionString())",
+    "FIXTURE_DB_ADAPTER": "DbAdapter.Postgres"
+  },
+  "append": {
+    "FIXTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Testcontainers.PostgreSql\" />\n    <PackageReference Include=\"Npgsql\" />",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Testcontainers.PostgreSql\" Version=\"4.16.0\" />\n    <PackageVersion Include=\"Npgsql\" Version=\"10.0.3\" />"
+  }
+}

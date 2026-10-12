@@ -6,6 +6,11 @@
     "APPSETTINGS_PROPERTIES": {
       "value": "  \"ConnectionStrings\": {\n    \"SqlServer\": \"Server=localhost;Database=$NAME$;User Id=sa;Password=Your_password123\"\n  }",
       "separator": ",\n"
+    },
+    "FUNCTIONS_LOCAL_SETTINGS_PROPERTIES": ",\n    \"ConnectionStrings__SqlServer\": \"Server=localhost;Database=$NAME$;User Id=sa;Password=Your_password123\"",
+    "WORKER_APPSETTINGS_PROPERTIES": {
+      "value": "  \"ConnectionStrings\": {\n    \"SqlServer\": \"Server=localhost;Database=$NAME$;User Id=sa;Password=Your_password123\"\n  }",
+      "separator": ",\n"
     }
   }
 }
