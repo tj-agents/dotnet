@@ -408,7 +408,13 @@ class ScaffoldTests(unittest.TestCase):
             self.assertIn("UseFunctionsWorkerDefaults", (functions / "Program.cs").read_text(encoding="utf-8"))
             self.assertIn("telemetryMode", (functions / "host.json").read_text(encoding="utf-8"))
             self.assertIn("PostgreSqlContainer", fixture.read_text(encoding="utf-8"))
-            self.assertIn('new PostgreSqlBuilder("postgres:17.4")', fixture.read_text(encoding="utf-8"))
+            fixture_content = fixture.read_text(encoding="utf-8")
+            self.assertIn('new PostgreSqlBuilder("postgres:17.4")', fixture_content)
+            self.assertIn("using System.Security.Cryptography;", fixture_content)
+            self.assertIn("RandomNumberGenerator.GetBytes(24)", fixture_content)
+            self.assertIn(".WithPassword(CreatePassword())", fixture_content)
+            self.assertIn(".WithPortBinding(5432, true)", fixture_content)
+            self.assertIn('"5432/tcp"][0].HostIP = "127.0.0.1"', fixture_content)
             self.assertNotIn("HeaderAuthenticationHandler", fixture.read_text(encoding="utf-8"))
             self.assertIn("local.settings.json", (project / ".gitignore").read_text(encoding="utf-8"))
             fixture_project = project / "tests" / "Sandbox.IntegrationTests.Fixtures" / "Sandbox.IntegrationTests.Fixtures.csproj"
@@ -434,6 +440,10 @@ class ScaffoldTests(unittest.TestCase):
 
             self.assertIn("MsSqlContainer", fixture)
             self.assertIn('new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04")', fixture)
+            self.assertIn("RandomNumberGenerator.GetBytes(24)", fixture)
+            self.assertIn(".WithPassword(CreatePassword())", fixture)
+            self.assertIn(".WithPortBinding(1433, true)", fixture)
+            self.assertIn('"1433/tcp"][0].HostIP = "127.0.0.1"', fixture)
             self.assertIn("UseSqlServer(this.container.GetConnectionString())", fixture)
             self.assertIn("HeaderAuthenticationHandler", fixture)
             self.assertIn("X-Test-User", fixture)
@@ -449,6 +459,8 @@ class ScaffoldTests(unittest.TestCase):
             self.assertIn("RemoveAll<DbContextOptions<ApplicationDbContext>>", fixture)
             self.assertIn("RemoveAll<IDapperConnectionFactory>()", fixture)
             self.assertIn("FixtureDapperConnectionFactory", fixture)
+            self.assertIn(".WithPassword(CreatePassword())", fixture)
+            self.assertIn('"5432/tcp"][0].HostIP = "127.0.0.1"', fixture)
 
     def test_integration_provider_package_versions_are_unique(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -462,6 +474,10 @@ class ScaffoldTests(unittest.TestCase):
                 packages = ElementTree.parse(root / name / "Directory.Packages.props").findall(".//PackageVersion")
                 package_names = [package.attrib["Include"] for package in packages]
                 self.assertEqual(len(package_names), len(set(package_names)))
+                fixture = (root / name / "tests" / f"{name}.IntegrationTests.Fixtures" / "ApiFixture.cs").read_text(encoding="utf-8")
+                self.assertIn("RandomNumberGenerator.GetBytes(24)", fixture)
+                self.assertIn(".WithPassword(CreatePassword())", fixture)
+                self.assertIn("HostIP = \"127.0.0.1\"", fixture)
 
     def test_sql_server_outputs_keep_certificate_validation_enabled(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

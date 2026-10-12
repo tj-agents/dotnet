@@ -5,7 +5,7 @@
   "variables": {
     "FIXTURE_PROVIDER_USING": "using Npgsql;\nusing Testcontainers.PostgreSql;",
     "FIXTURE_CONTAINER_TYPE": "PostgreSqlContainer",
-    "FIXTURE_CONTAINER_CREATION": "new PostgreSqlBuilder(\"postgres:17.4\").Build()",
+    "FIXTURE_CONTAINER_CREATION": "new PostgreSqlBuilder(\"postgres:17.4\")\n    .WithPassword(CreatePassword())\n    .WithPortBinding(5432, true)\n    .WithCreateParameterModifier(parameters => parameters.HostConfig!.PortBindings![\"5432/tcp\"][0].HostIP = \"127.0.0.1\")\n    .Build()",
     "FIXTURE_CONNECTION_TYPE": "NpgsqlConnection",
     "FIXTURE_CONNECTION_CREATION": "new NpgsqlConnection(this.container.GetConnectionString())",
     "FIXTURE_DB_ADAPTER": "DbAdapter.Postgres"

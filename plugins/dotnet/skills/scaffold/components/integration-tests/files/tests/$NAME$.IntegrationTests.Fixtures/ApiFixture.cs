@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -15,10 +16,15 @@ namespace $NAME$.IntegrationTests.Fixtures;
 
 public sealed class ApiFixture : WebApplicationFactory<global::Program>, IAsyncLifetime
 {
-    private readonly $FIXTURE_CONTAINER_TYPE$ container = $FIXTURE_CONTAINER_CREATION$;
+    private readonly $FIXTURE_CONTAINER_TYPE$ container;
     private Respawner? respawner;
 
     public HttpClient Client { get; private set; } = null!;
+
+    public ApiFixture()
+    {
+        this.container = $FIXTURE_CONTAINER_CREATION$;
+    }
 
     public async Task InitializeAsync()
     {
@@ -52,6 +58,11 @@ $FIXTURE_AUTH_CONFIGURATION$
     {
         await this.container.DisposeAsync().ConfigureAwait(false);
         this.Dispose();
+    }
+
+    private static string CreatePassword()
+    {
+        return "Aa1!" + Convert.ToHexString(RandomNumberGenerator.GetBytes(24));
     }
 $FIXTURE_DAPPER_FACTORY$
 $FIXTURE_AUTH_HANDLER$
