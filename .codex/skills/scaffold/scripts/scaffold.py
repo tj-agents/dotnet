@@ -3,11 +3,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 import re
+import subprocess
 import sys
+import tempfile
 from string import Template
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 
 PACKAGE = "dotagents/dotnet"
@@ -33,6 +36,9 @@ CSHARP_KEYWORDS = {
 }
 WINDOWS_RESERVED = {"CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"}
 CSHARP_INTRINSICS = {"__arglist", "__makeref", "__reftype", "__refvalue"}
+AZURE_SET_PREFIX = "azure."
+CLOUD_NAME = re.compile(r"^[a-z][a-z0-9]{0,11}$")
+INPUT_FN: Callable[[str], str] = input
 
 
 class ScaffoldError(Exception):
@@ -112,7 +118,7 @@ def validate_value(key: str, value: Any, definition: Mapping[str, Any]) -> None:
     if value_type == "string":
         if not isinstance(value, str):
             raise ValidationError(f"option {key} must be a string")
-        if value not in definition.get("allowed", []):
+        if "allowed" in definition and value not in definition["allowed"]:
             raise ValidationError(f"invalid value for {key}: {value}")
         return
     if value_type == "boolean":
@@ -191,14 +197,41 @@ def validate_constraints(options: Mapping[str, Any], option_schema: Mapping[str,
                 raise ValidationError(f"option {key} conflicts with {json.dumps(forbidden, sort_keys=True)}")
 
 
-def resolve_options(preset: Optional[str], config: Optional[Path], overrides: Sequence[str]) -> Tuple[Dict[str, Any], Dict[str, str], Optional[str]]:
+def split_azure_set_overrides(pairs: Sequence[str]) -> Tuple[List[str], Dict[str, str]]:
+    dotnet_pairs: List[str] = []
+    azure_overrides: Dict[str, str] = {}
+    for pair in pairs:
+        if "=" not in pair or not pair.startswith(AZURE_SET_PREFIX):
+            dotnet_pairs.append(pair)
+            continue
+        key, raw = pair.split("=", 1)
+        azure_key = key[len(AZURE_SET_PREFIX):]
+        if not azure_key:
+            raise ValidationError(f"--set requires a key: {pair}")
+        azure_overrides[azure_key] = raw
+    return dotnet_pairs, azure_overrides
+
+
+def split_config_azure(config: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    remaining = dict(config)
+    azure = remaining.pop("azure", {})
+    if not isinstance(azure, dict):
+        raise ValidationError("config azure must be an object")
+    return remaining, azure
+
+
+def stringify_azure_value(value: Any) -> str:
+    return value if isinstance(value, str) else json.dumps(value)
+
+
+def resolve_options(preset: Optional[str], config: Dict[str, Any], overrides: Sequence[str]) -> Tuple[Dict[str, Any], Dict[str, str], Optional[str]]:
     option_schema = schema()
     resolved = {key: definition["default"] for key, definition in option_schema.items()}
     sources = {key: "options.json" for key in option_schema}
     layers: List[Tuple[str, Dict[str, Any]]] = []
     preset_layer, preset_name = preset_values(preset)
     layers.append((f"preset:{preset_name}", preset_layer))
-    layers.append(("config", config_values(config)))
+    layers.append(("config", config))
     layers.append(("--set", set_values(overrides)))
     for layer, values in layers:
         validate_layer(values, option_schema, layer)
@@ -209,6 +242,69 @@ def resolve_options(preset: Optional[str], config: Optional[Path], overrides: Se
         validate_value(key, resolved[key], definition)
     validate_constraints(resolved, option_schema)
     return resolved, sources, preset_name
+
+
+def prompt_value(key: str, definition: Mapping[str, Any], input_fn: Callable[[str], str]) -> Any:
+    allowed = definition.get("allowed")
+    default = definition["default"]
+    choices = f" ({', '.join(str(item) for item in allowed)})" if allowed is not None else ""
+    label = f"{key}{choices} [{default}]: "
+    while True:
+        raw = input_fn(label).strip()
+        if not raw:
+            return default
+        try:
+            value = json.loads(raw)
+        except json.JSONDecodeError:
+            value = raw
+        try:
+            validate_value(key, value, definition)
+        except ValidationError:
+            continue
+        return value
+
+
+def interactive_options(option_schema: Mapping[str, Any], resolved: Dict[str, Any], sources: Mapping[str, str], input_fn: Callable[[str], str]) -> Dict[str, Any]:
+    updated = dict(resolved)
+    for key in sorted(option_schema):
+        if sources[key] != "options.json":
+            continue
+        updated[key] = prompt_value(key, option_schema[key], input_fn)
+    validate_constraints(updated, option_schema)
+    return updated
+
+
+def interactive_azure_options(azure_script: Path, azure_overrides: Dict[str, str], input_fn: Callable[[str], str]) -> Dict[str, str]:
+    schema_result = run_azure(azure_script, ["options", "--schema"])
+    if schema_result.returncode != 0:
+        raise ScaffoldError(f"azure options --schema failed: {schema_result.stderr.strip() or schema_result.stdout.strip()}")
+    try:
+        azure_schema = json.loads(schema_result.stdout)
+    except json.JSONDecodeError as error:
+        raise ScaffoldError(f"azure options --schema returned invalid JSON: {error}") from error
+    if not isinstance(azure_schema, dict):
+        raise ScaffoldError("azure option schema must be an object")
+
+    command_args = ["options"]
+    for key, value in azure_overrides.items():
+        command_args.extend(["--set", f"{key}={value}"])
+    result = run_azure(azure_script, command_args)
+    if result.returncode != 0:
+        raise ScaffoldError(f"azure options failed: {result.stderr.strip() or result.stdout.strip()}")
+    try:
+        azure_resolved = json.loads(result.stdout)
+    except json.JSONDecodeError as error:
+        raise ScaffoldError(f"azure options returned invalid JSON: {error}") from error
+
+    updated = dict(azure_overrides)
+    for key in sorted(azure_schema):
+        if key in updated:
+            continue
+        source = azure_resolved.get(key, {}).get("source")
+        if source is not None and source != "options.json":
+            continue
+        updated[key] = stringify_azure_value(prompt_value(key, azure_schema[key], input_fn))
+    return updated
 
 
 def validate_name(name: str) -> None:
@@ -294,6 +390,7 @@ def plan(name: str, options: Mapping[str, Any], preset: Optional[str]) -> Dict[s
         "FUNCTIONS_LOCAL_SETTINGS_PROPERTIES": "",
         "FUNCTIONS_DIRECT_RESTORE": "",
         "FUNCTIONS_PACKAGE_REFERENCES": "",
+        "FUNCTIONS_CLOUD_PROPERTIES": "",
         "WORKER_INFRASTRUCTURE_USING": "",
         "WORKER_INFRASTRUCTURE_SETUP": "",
         "WORKER_INFRASTRUCTURE_PROJECT_REFERENCE": "",
@@ -301,6 +398,7 @@ def plan(name: str, options: Mapping[str, Any], preset: Optional[str]) -> Dict[s
         "WORKER_TELEMETRY_REGISTRATION": "",
         "WORKER_APPSETTINGS_PROPERTIES": "",
         "WORKER_PACKAGE_REFERENCES": "",
+        "WORKER_CLOUD_PROPERTIES": "",
         "FIXTURE_PROVIDER_USING": "",
         "FIXTURE_CONTAINER_TYPE": "",
         "FIXTURE_CONTAINER_CREATION": "",
@@ -354,7 +452,17 @@ def plan(name: str, options: Mapping[str, Any], preset: Optional[str]) -> Dict[s
                 raise ScaffoldError(f"component {component_name} project must be a string")
             project_paths.append(substitute(project, variables, f"component {component_name}"))
     for key, values in appended.items():
-        variables[key] = separators[key].join(substitute(value, variables, f"component append {key}") for value in values)
+        rendered = [substitute(value, variables, f"component append {key}") for value in values]
+        if key == "PACKAGE_VERSIONS":
+            seen: set = set()
+            deduplicated = []
+            for item in rendered:
+                if item in seen:
+                    continue
+                seen.add(item)
+                deduplicated.append(item)
+            rendered = deduplicated
+        variables[key] = separators[key].join(rendered)
     variables["SOLUTION_PROJECTS"] = "\n".join(f'  <Project Path="{path}" />' for path in project_paths)
     files: Dict[str, str] = {}
     source_files: List[Tuple[Path, Path]] = []
@@ -371,6 +479,12 @@ def plan(name: str, options: Mapping[str, Any], preset: Optional[str]) -> Dict[s
         if not text.endswith("\n"):
             text += "\n"
         files[relative] = text
+    if options["cloud"] == "azure":
+        if "infra/app.json" in files:
+            raise ScaffoldError("template collision: infra/app.json")
+        cloud_name = derive_cloud_name(name, options["cloud-name"])
+        profile = build_azure_profile(name, cloud_name, options)
+        files["infra/app.json"] = json.dumps(profile, indent=2) + "\n"
     metadata = {
         "package": PACKAGE,
         "skill": SKILL,
@@ -409,20 +523,187 @@ def output(destination: Path, name: str, files: Mapping[str, str], options: Mapp
     print(json.dumps({"project": str(project), "files": list(files)}, indent=2))
 
 
+def derive_cloud_name(name: str, override: str) -> str:
+    if override:
+        return override
+    derived = re.sub(r"[^a-z0-9]", "", name.lower())[:12]
+    if not derived or not derived[0].isalpha():
+        raise ValidationError(f"cannot derive an azure app name from {name!r}; set --set cloud-name=<name>")
+    return derived
+
+
+def azure_build_command(project: str, csproj: str) -> str:
+    return (
+        f"dotnet publish {csproj} -c Release /t:PublishContainer "
+        "-p:ContainerRegistry=$REGISTRY -p:ContainerRepository=$REPOSITORY -p:ContainerImageTag=$TAG"
+    )
+
+
+def azure_package_command(csproj: str, identifier: str) -> str:
+    return (
+        f'dotnet publish {csproj} -c Release -o "$RUNNER_TEMP/{identifier}" '
+        f'&& (cd "$RUNNER_TEMP/{identifier}" && zip -qr "$PACKAGE" .)'
+    )
+
+
+def build_azure_profile(name: str, cloud_name: str, options: Mapping[str, Any]) -> Dict[str, Any]:
+    hosts = options["hosts"]
+    workloads: List[Dict[str, Any]] = []
+    if "api" in hosts:
+        csproj = f"src/{name}.Api/{name}.Api.csproj"
+        workloads.append({
+            "id": "api",
+            "kind": "http",
+            "port": 8080,
+            "probes": {"liveness": "/health/live", "readiness": "/health/ready"},
+            "runtime": {"name": "dotnet", "version": "10.0"},
+            "build": {
+                "image": azure_build_command("api", csproj),
+                "package": azure_package_command(csproj, "api"),
+            },
+            "settings": {"OTEL_SERVICE_NAME": f"{cloud_name}-api"},
+        })
+    if "worker" in hosts:
+        csproj = f"src/{name}.Worker/{name}.Worker.csproj"
+        workloads.append({
+            "id": "worker",
+            "kind": "background",
+            "build": {"image": azure_build_command("worker", csproj)},
+            "settings": {"OTEL_SERVICE_NAME": f"{cloud_name}-worker"},
+        })
+    if "functions" in hosts:
+        csproj = f"src/{name}.Functions/{name}.Functions.csproj"
+        workloads.append({
+            "id": "functions",
+            "kind": "functions",
+            "runtime": {"name": "dotnet-isolated", "version": "10.0"},
+            "build": {
+                "package": azure_package_command(csproj, "functions"),
+                "image": azure_build_command("functions", csproj),
+            },
+            "settings": {"OTEL_SERVICE_NAME": f"{cloud_name}-functions"},
+        })
+    profile: Dict[str, Any] = {"schema_version": 1, "name": cloud_name, "workloads": workloads}
+    settings: Dict[str, str] = {}
+    if options["database"] == "postgres":
+        settings["ConnectionStrings__Postgres"] = (
+            "Host={postgres.host};Database={postgres.database};Username={postgres.user};Ssl Mode=Require"
+        )
+    if options["telemetry"] == "opentelemetry":
+        settings["APPLICATIONINSIGHTS_CONNECTION_STRING"] = "{monitor.connection_string}"
+    settings["AZURE_CLIENT_ID"] = "{identity.client_id}"
+    profile["settings"] = settings
+    if options["database"] == "postgres":
+        database: Dict[str, Any] = {"engine": "postgres"}
+        if options["data"] in ("efcore", "efcore+dapper"):
+            database["migration"] = {
+                "build": {
+                    "image": (
+                        "dotnet tool restore && dotnet ef migrations bundle "
+                        f"--project src/{name}.Infrastructure --startup-project src/{name}.Api "
+                        '-r linux-x64 --self-contained -o "$RUNNER_TEMP/efbundle" --force '
+                        '&& docker build -t "$IMAGE" -f infra/migration.Dockerfile "$RUNNER_TEMP" '
+                        '&& docker push "$IMAGE"'
+                    ),
+                },
+                "command": ["/efbundle"],
+            }
+        profile["database"] = database
+    return profile
+
+
+def resolve_azure_scaffold(args: argparse.Namespace) -> Optional[Path]:
+    if args.azure_scaffold is not None:
+        return args.azure_scaffold.expanduser()
+    env = os.environ.get("AZURE_SCAFFOLD")
+    return Path(env).expanduser() if env else None
+
+
+def run_azure(azure_script: Path, command_args: Sequence[str]) -> subprocess.CompletedProcess:
+    command = [sys.executable, "-B", str(azure_script), *command_args]
+    return subprocess.run(command, capture_output=True, text=True, check=False)
+
+
+def azure_command_line(azure_script: str, project: Path, azure_overrides: Mapping[str, str]) -> str:
+    parts = [
+        sys.executable, "-B", azure_script, "new",
+        "--into", str(project), "--profile", str(project / "infra" / "app.json"),
+    ]
+    for key, value in azure_overrides.items():
+        parts.extend(["--set", f"{key}={value}"])
+    return " ".join(parts)
+
+
 def create(args: argparse.Namespace) -> None:
     validate_name(args.name)
-    options, sources, preset = resolve_options(args.preset, args.config, args.set)
+    dotnet_pairs, cli_azure_overrides = split_azure_set_overrides(args.set)
+    config_dict = config_values(args.config)
+    config_dict, config_azure = split_config_azure(config_dict)
+    options, sources, preset = resolve_options(args.preset, config_dict, dotnet_pairs)
+
+    azure_overrides: Dict[str, str] = {key: stringify_azure_value(value) for key, value in config_azure.items()}
+    azure_overrides.update(cli_azure_overrides)
+    if azure_overrides and options["cloud"] != "azure":
+        raise ValidationError("--set azure.* and config azure require cloud=azure")
+
+    azure_script = resolve_azure_scaffold(args)
+    interactive = sys.stdin.isatty() and not args.no_input and not args.dry_run
+    if interactive:
+        options = interactive_options(schema(), options, sources, INPUT_FN)
+        if options["cloud"] == "azure" and azure_script is not None:
+            azure_overrides = interactive_azure_options(azure_script, azure_overrides, INPUT_FN)
+
     destination = args.destination.expanduser()
     if not destination.is_dir():
         raise ScaffoldError(f"destination must be an existing directory: {destination}")
     project = destination / args.name
     if project.exists() or project.is_symlink():
         raise ScaffoldError(f"project already exists: {project}")
-    output(destination, args.name, plan(args.name, options, preset), options, sources, args.dry_run)
+
+    files = plan(args.name, options, preset)
+
+    if options["cloud"] == "azure" and azure_script is not None and not args.dry_run:
+        with tempfile.TemporaryDirectory(prefix="dotnet-scaffold-azure-dry-") as dry_root:
+            dry_into = Path(dry_root) / "into"
+            dry_into.mkdir()
+            profile_path = Path(dry_root) / "app.json"
+            profile_path.write_text(files["infra/app.json"], encoding="utf-8")
+            dry_run_args = ["new", "--into", str(dry_into), "--profile", str(profile_path), "--dry-run", "--no-input"]
+            for key, value in azure_overrides.items():
+                dry_run_args.extend(["--set", f"{key}={value}"])
+            result = run_azure(azure_script, dry_run_args)
+            if result.returncode != 0:
+                raise ValidationError(f"azure dry run failed: {result.stderr.strip() or result.stdout.strip()}")
+
+    output(destination, args.name, files, options, sources, args.dry_run)
+
+    if args.dry_run:
+        return
+
+    if options["cloud"] != "azure":
+        return
+
+    if azure_script is None:
+        print(azure_command_line("<azure-scaffold>", project, azure_overrides))
+    else:
+        real_run_args = [
+            "new", "--into", str(project), "--profile", str(project / "infra" / "app.json"), "--no-input",
+        ]
+        for key, value in azure_overrides.items():
+            real_run_args.extend(["--set", f"{key}={value}"])
+        result = run_azure(azure_script, real_run_args)
+        if result.returncode != 0:
+            raise ScaffoldError(f"azure failed: {result.stderr.strip() or result.stdout.strip()}")
+
+    scaffold_metadata_path = project / ".scaffold.json"
+    metadata = json.loads(scaffold_metadata_path.read_text(encoding="utf-8"))
+    metadata["azure"] = azure_overrides
+    scaffold_metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
 
 
 def show_options(args: argparse.Namespace) -> None:
-    options, sources, _ = resolve_options(args.preset, args.config, [])
+    config_dict, _ = split_config_azure(config_values(args.config))
+    options, sources, _ = resolve_options(args.preset, config_dict, [])
     print(json.dumps({key: {"value": options[key], "source": sources[key]} for key in options}, indent=2))
 
 
@@ -436,6 +717,8 @@ def parser() -> argparse.ArgumentParser:
     new.add_argument("--config", type=Path)
     new.add_argument("--set", action="append", default=[])
     new.add_argument("--dry-run", action="store_true")
+    new.add_argument("--no-input", action="store_true")
+    new.add_argument("--azure-scaffold", type=Path)
     options = commands.add_parser("options")
     options.add_argument("--preset")
     options.add_argument("--config", type=Path)

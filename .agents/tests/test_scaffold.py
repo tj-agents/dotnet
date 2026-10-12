@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import importlib.util
+import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
+import tarfile
 import tempfile
+import textwrap
 import unittest
 from unittest import mock
 from uuid import uuid4
@@ -21,14 +25,101 @@ SCAFFOLD = importlib.util.module_from_spec(SPECIFICATION)
 SPECIFICATION.loader.exec_module(SCAFFOLD)
 
 
+FAKE_AZURE_OPTIONS = {
+    "http_host": {
+        "type": "string", "allowed": ["container-apps", "app-service"], "default": "container-apps",
+        "description": "The http host.",
+    },
+    "key_vault": {
+        "type": "boolean", "allowed": [False, True], "default": False, "description": "Whether to add a key vault.",
+    },
+}
+
+FAKE_AZURE_SCAFFOLD = textwrap.dedent(
+    """
+    import argparse
+    import json
+    import os
+    import sys
+    from pathlib import Path
+
+    def main():
+        parser = argparse.ArgumentParser()
+        commands = parser.add_subparsers(dest="command", required=True)
+        new = commands.add_parser("new")
+        new.add_argument("--into", required=True)
+        new.add_argument("--profile")
+        new.add_argument("--dry-run", action="store_true")
+        new.add_argument("--no-input", action="store_true")
+        new.add_argument("--set", action="append", default=[])
+        options = commands.add_parser("options")
+        options.add_argument("--preset")
+        options.add_argument("--config")
+        options.add_argument("--set", action="append", default=[])
+        options.add_argument("--schema", action="store_true")
+        args = parser.parse_args()
+
+        log_path = os.environ.get("FAKE_AZURE_LOG")
+        if log_path:
+            with open(log_path, "a", encoding="utf-8") as handle:
+                handle.write(json.dumps(sys.argv[1:]) + "\\n")
+
+        if args.command == "options":
+            schema_path = Path(__file__).resolve().parent.parent / "options.json"
+            schema = json.loads(schema_path.read_text(encoding="utf-8"))
+            if args.schema:
+                print(json.dumps(schema))
+                return 0
+            result = {
+                key: {"value": definition["default"], "source": "options.json"}
+                for key, definition in schema.items()
+            }
+            print(json.dumps(result))
+            return 0
+
+        fail = os.environ.get("FAKE_AZURE_FAIL")
+        if args.dry_run:
+            if fail == "dry":
+                print("fake azure dry run failure", file=sys.stderr)
+                return 2
+            return 0
+
+        if fail == "real":
+            print("fake azure real run failure", file=sys.stderr)
+            return 1
+
+        into = Path(args.into)
+        (into / "infra").mkdir(parents=True, exist_ok=True)
+        (into / "infra" / "FAKE_AZURE_RAN.txt").write_text("ok\\n", encoding="utf-8")
+        return 0
+
+    if __name__ == "__main__":
+        raise SystemExit(main())
+    """
+)
+
+
+def write_fake_azure(root: Path) -> Path:
+    scripts = root / "scripts"
+    scripts.mkdir(parents=True, exist_ok=True)
+    (root / "options.json").write_text(json.dumps(FAKE_AZURE_OPTIONS), encoding="utf-8")
+    script = scripts / "scaffold.py"
+    script.write_text(FAKE_AZURE_SCAFFOLD, encoding="utf-8")
+    return script
+
+
 class ScaffoldTests(unittest.TestCase):
     def run_cli(self, *args: str) -> subprocess.CompletedProcess[str]:
+        arguments = list(args)
+        if arguments[:1] == ["new"] and "--no-input" not in arguments:
+            arguments.append("--no-input")
         return subprocess.run(
-            [sys.executable, "-B", str(SCRIPT), *args],
+            [sys.executable, "-B", str(SCRIPT), *arguments],
             cwd=ROOT,
             capture_output=True,
             text=True,
             check=False,
+            stdin=subprocess.DEVNULL,
         )
 
     def create(self, directory: Path, name: str, preset: str) -> subprocess.CompletedProcess[str]:
@@ -491,6 +582,289 @@ class ScaffoldTests(unittest.TestCase):
                 appsettings_path = root / name / "src" / f"{name}.Api" / "appsettings.json"
                 appsettings = json.loads(appsettings_path.read_text(encoding="utf-8"))
                 self.assertNotIn("TrustServerCertificate", appsettings["ConnectionStrings"]["SqlServer"])
+
+    def test_cloud_azure_rejects_sqlserver(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.create_with_options(root, "AzureSqlServer", "api", "cloud=azure", "database=sqlserver")
+
+            self.assertEqual(2, result.returncode)
+            self.assertFalse((root / "AzureSqlServer").exists())
+
+    def test_azure_passthrough_requires_cloud_azure(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            config = root / "azure-config.json"
+            config.write_text(json.dumps({"azure": {"key_vault": True}}), encoding="utf-8")
+
+            via_set = self.create_with_options(root, "PassthroughSet", "api", "azure.http_host=app-service")
+            via_config = self.run_cli(
+                "new", "--name", "PassthroughConfig", "--destination", str(root), "--preset", "api",
+                "--config", str(config),
+            )
+
+            self.assertEqual(2, via_set.returncode)
+            self.assertEqual(2, via_config.returncode)
+            self.assertFalse((root / "PassthroughSet").exists())
+            self.assertFalse((root / "PassthroughConfig").exists())
+
+    def test_azure_profile_content_for_api_and_sandbox_presets(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            api_result = self.create_with_options(root, "ApiAzure", "api", "cloud=azure")
+            sandbox_result = self.create_with_options(root, "SandboxAzure", "sandbox", "cloud=azure")
+
+            self.assertEqual(0, api_result.returncode, api_result.stderr)
+            self.assertEqual(0, sandbox_result.returncode, sandbox_result.stderr)
+
+            api_profile = json.loads((root / "ApiAzure" / "infra" / "app.json").read_text(encoding="utf-8"))
+            self.assertEqual(1, api_profile["schema_version"])
+            self.assertEqual(["api"], [workload["id"] for workload in api_profile["workloads"]])
+            api_workload = api_profile["workloads"][0]
+            self.assertEqual("http", api_workload["kind"])
+            self.assertEqual(8080, api_workload["port"])
+            self.assertEqual("/health/live", api_workload["probes"]["liveness"])
+            self.assertEqual("/health/ready", api_workload["probes"]["readiness"])
+            self.assertIn("ApiAzure.Api", api_workload["build"]["image"])
+            self.assertIn("$REGISTRY", api_workload["build"]["image"])
+            self.assertIn("ApiAzure.Api", api_workload["build"]["package"])
+            self.assertEqual({"name": "dotnet", "version": "10.0"}, api_workload["runtime"])
+            self.assertEqual("apiazure-api", api_workload["settings"]["OTEL_SERVICE_NAME"])
+            self.assertEqual("postgres", api_profile["database"]["engine"])
+            self.assertIn("efbundle", api_profile["database"]["migration"]["build"]["image"])
+            self.assertEqual(["/efbundle"], api_profile["database"]["migration"]["command"])
+            self.assertEqual(
+                "Host={postgres.host};Database={postgres.database};Username={postgres.user};Ssl Mode=Require",
+                api_profile["settings"]["ConnectionStrings__Postgres"],
+            )
+            self.assertEqual("{identity.client_id}", api_profile["settings"]["AZURE_CLIENT_ID"])
+            self.assertNotIn("APPLICATIONINSIGHTS_CONNECTION_STRING", api_profile["settings"])
+
+            sandbox_profile = json.loads((root / "SandboxAzure" / "infra" / "app.json").read_text(encoding="utf-8"))
+            ids = [workload["id"] for workload in sandbox_profile["workloads"]]
+            self.assertEqual(["api", "worker", "functions"], ids)
+            functions_workload = sandbox_profile["workloads"][2]
+            self.assertEqual("functions", functions_workload["kind"])
+            self.assertEqual({"name": "dotnet-isolated", "version": "10.0"}, functions_workload["runtime"])
+            self.assertIn("image", functions_workload["build"])
+            self.assertIn("package", functions_workload["build"])
+            self.assertEqual(
+                "{monitor.connection_string}", sandbox_profile["settings"]["APPLICATIONINSIGHTS_CONNECTION_STRING"]
+            )
+
+    def test_azure_cloud_container_support_on_worker_and_functions(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.create_with_options(root, "SandboxAzure", "sandbox", "cloud=azure")
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            project = root / "SandboxAzure"
+            worker_csproj = (project / "src" / "SandboxAzure.Worker" / "SandboxAzure.Worker.csproj").read_text(encoding="utf-8")
+            functions_csproj = (project / "src" / "SandboxAzure.Functions" / "SandboxAzure.Functions.csproj").read_text(encoding="utf-8")
+
+            self.assertIn("<EnableSdkContainerSupport>true</EnableSdkContainerSupport>", worker_csproj)
+            self.assertNotIn("ContainerBaseImage", worker_csproj)
+            self.assertIn("<EnableSdkContainerSupport>true</EnableSdkContainerSupport>", functions_csproj)
+            self.assertIn(
+                "<ContainerBaseImage>mcr.microsoft.com/azure-functions/dotnet-isolated:4-dotnet-isolated10.0</ContainerBaseImage>",
+                functions_csproj,
+            )
+
+    def test_cloud_name_derivation_and_override(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            derived = self.create_with_options(root, "ExampleApi", "api", "cloud=azure")
+            overridden = self.create_with_options(root, "ExampleApi2", "api", "cloud=azure", "cloud-name=myappname")
+            invalid = self.create_with_options(root, "123Invalid", "api", "cloud=azure")
+
+            self.assertEqual(0, derived.returncode, derived.stderr)
+            self.assertEqual(0, overridden.returncode, overridden.stderr)
+            self.assertEqual(2, invalid.returncode)
+            self.assertFalse((root / "123Invalid").exists())
+
+            derived_profile = json.loads((root / "ExampleApi" / "infra" / "app.json").read_text(encoding="utf-8"))
+            overridden_profile = json.loads((root / "ExampleApi2" / "infra" / "app.json").read_text(encoding="utf-8"))
+            self.assertEqual("exampleapi", derived_profile["name"])
+            self.assertEqual("myappname", overridden_profile["name"])
+
+    def test_prompt_value_reprompts_on_invalid_input(self) -> None:
+        definition = {"type": "string", "allowed": ["a", "b"], "default": "a"}
+        answers = iter(["z", "b"])
+
+        result = SCAFFOLD.prompt_value("option", definition, lambda prompt: next(answers))
+
+        self.assertEqual("b", result)
+
+    def test_prompt_value_empty_answer_keeps_default(self) -> None:
+        definition = {"type": "string", "allowed": ["a", "b"], "default": "a"}
+
+        result = SCAFFOLD.prompt_value("option", definition, lambda prompt: "")
+
+        self.assertEqual("a", result)
+
+    def test_interactive_options_skips_already_set_values(self) -> None:
+        option_schema = SCAFFOLD.schema()
+        resolved = {key: definition["default"] for key, definition in option_schema.items()}
+        sources = {key: "options.json" for key in option_schema}
+        sources["cloud"] = "--set"
+        resolved["cloud"] = "azure"
+        answers = {key: "" for key in option_schema if key != "cloud"}
+        answers["cloud-name"] = "myapp"
+
+        def fake_input(prompt: str) -> str:
+            key = prompt.split(" (")[0].split(" [")[0]
+            return answers[key]
+
+        updated = SCAFFOLD.interactive_options(option_schema, resolved, sources, fake_input)
+
+        self.assertEqual("azure", updated["cloud"])
+        self.assertEqual("myapp", updated["cloud-name"])
+        self.assertEqual("postgres", updated["database"])
+
+    def test_interactive_azure_options_prompts_unset_values(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            azure_script = write_fake_azure(Path(temporary) / "azure")
+            answers = {"http_host": "app-service", "key_vault": "true"}
+
+            def fake_input(prompt: str) -> str:
+                key = prompt.split(" (")[0].split(" [")[0]
+                return answers[key]
+
+            updated = SCAFFOLD.interactive_azure_options(azure_script, {}, fake_input)
+
+            self.assertEqual("app-service", updated["http_host"])
+            self.assertEqual("true", updated["key_vault"])
+
+    def test_azure_invocation_dry_run_failure_writes_nothing(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            azure_script = write_fake_azure(root / "azure")
+            env = dict(os.environ, FAKE_AZURE_FAIL="dry")
+
+            result = subprocess.run(
+                [
+                    sys.executable, "-B", str(SCRIPT), "new", "--name", "AzureDryFail", "--destination", str(root),
+                    "--preset", "api", "--set", "cloud=azure", "--azure-scaffold", str(azure_script), "--no-input",
+                ],
+                cwd=ROOT, capture_output=True, text=True, env=env,
+            )
+
+            self.assertEqual(2, result.returncode, result.stderr)
+            self.assertFalse((root / "AzureDryFail").exists())
+
+    def test_azure_invocation_real_run_failure_keeps_dotnet_project(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            azure_script = write_fake_azure(root / "azure")
+            env = dict(os.environ, FAKE_AZURE_FAIL="real")
+
+            result = subprocess.run(
+                [
+                    sys.executable, "-B", str(SCRIPT), "new", "--name", "AzureRealFail", "--destination", str(root),
+                    "--preset", "api", "--set", "cloud=azure", "--azure-scaffold", str(azure_script), "--no-input",
+                ],
+                cwd=ROOT, capture_output=True, text=True, env=env,
+            )
+
+            self.assertEqual(1, result.returncode, result.stderr)
+            self.assertTrue((root / "AzureRealFail" / "infra" / "app.json").is_file())
+            self.assertFalse((root / "AzureRealFail" / "infra" / "FAKE_AZURE_RAN.txt").exists())
+
+    def test_azure_invocation_success_runs_dry_then_real_and_records_overrides(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            azure_script = write_fake_azure(root / "azure")
+            log_path = root / "fake-azure.log"
+            env = dict(os.environ, FAKE_AZURE_LOG=str(log_path))
+
+            result = subprocess.run(
+                [
+                    sys.executable, "-B", str(SCRIPT), "new", "--name", "AzureOk", "--destination", str(root),
+                    "--preset", "api", "--set", "cloud=azure", "--set", "azure.http_host=app-service",
+                    "--azure-scaffold", str(azure_script), "--no-input",
+                ],
+                cwd=ROOT, capture_output=True, text=True, env=env,
+            )
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            project = root / "AzureOk"
+            self.assertTrue((project / "infra" / "FAKE_AZURE_RAN.txt").is_file())
+            metadata = json.loads((project / ".scaffold.json").read_text(encoding="utf-8"))
+            self.assertEqual({"http_host": "app-service"}, metadata["azure"])
+            calls = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(2, len(calls))
+            dry_call, real_call = calls
+            self.assertIn("--dry-run", dry_call)
+            self.assertNotIn(str(project), dry_call)
+            self.assertNotIn("--dry-run", real_call)
+            self.assertIn(str(project), real_call)
+
+    def test_missing_azure_path_prints_command_and_succeeds(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.create_with_options(root, "NoAzurePath", "api", "cloud=azure")
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertIn("new --into", result.stdout)
+            self.assertIn(str(root / "NoAzurePath"), result.stdout)
+            self.assertTrue((root / "NoAzurePath" / "infra" / "app.json").is_file())
+
+    def _extract_main_scaffold(self, destination: Path) -> Path:
+        archive = subprocess.run(
+            ["git", "archive", "origin/main", "--", ".agents/dotnet/utility/scaffold"],
+            cwd=ROOT, capture_output=True, check=True,
+        )
+        with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as tar:
+            tar.extractall(destination)
+        return destination / ".agents" / "dotnet" / "utility" / "scaffold" / "scripts" / "scaffold.py"
+
+    def test_cloud_none_output_matches_main_for_existing_presets(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            baseline_root = root / "baseline-src"
+            baseline_root.mkdir()
+            baseline_script = self._extract_main_scaffold(baseline_root)
+            current_out = root / "current"
+            baseline_out = root / "baseline"
+            current_out.mkdir()
+            baseline_out.mkdir()
+            cases = (
+                ("minimal", "Example"),
+                ("api", "ExampleApi"),
+                ("dapper-sqlserver", "ExampleDapper"),
+                ("sandbox", "Sandbox"),
+            )
+
+            for preset, name in cases:
+                current_result = subprocess.run(
+                    [
+                        sys.executable, "-B", str(SCRIPT), "new", "--name", name, "--destination", str(current_out),
+                        "--preset", preset, "--no-input",
+                    ],
+                    cwd=ROOT, capture_output=True, text=True, stdin=subprocess.DEVNULL,
+                )
+                baseline_result = subprocess.run(
+                    [sys.executable, "-B", str(baseline_script), "new", "--name", name, "--destination", str(baseline_out), "--preset", preset],
+                    cwd=baseline_root, capture_output=True, text=True, stdin=subprocess.DEVNULL,
+                )
+
+                self.assertEqual(0, current_result.returncode, current_result.stderr)
+                self.assertEqual(0, baseline_result.returncode, baseline_result.stderr)
+
+                current_project = current_out / name
+                baseline_project = baseline_out / name
+                current_files = {
+                    path.relative_to(current_project).as_posix(): path
+                    for path in current_project.rglob("*") if path.is_file() and path.name != ".scaffold.json"
+                }
+                baseline_files = {
+                    path.relative_to(baseline_project).as_posix(): path
+                    for path in baseline_project.rglob("*") if path.is_file() and path.name != ".scaffold.json"
+                }
+
+                self.assertEqual(sorted(baseline_files), sorted(current_files), preset)
+                for relative, path in current_files.items():
+                    self.assertEqual(baseline_files[relative].read_bytes(), path.read_bytes(), f"{preset}:{relative}")
 
 
 if __name__ == "__main__":

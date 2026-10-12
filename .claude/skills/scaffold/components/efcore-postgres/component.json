@@ -5,7 +5,6 @@
   "append": {
     "INFRASTRUCTURE_USINGS": "using Microsoft.EntityFrameworkCore;\nusing $NAME$.Infrastructure.Persistence;",
     "INFRASTRUCTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.EntityFrameworkCore\" />\n    <PackageReference Include=\"Npgsql.EntityFrameworkCore.PostgreSQL\" />",
-    "INFRASTRUCTURE_REGISTRATIONS": "var connectionString = configuration.GetConnectionString(\"Postgres\");\n\nif (string.IsNullOrWhiteSpace(connectionString))\n    throw new InvalidOperationException(\"Connection string 'Postgres' is required.\");\n\nservices.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));",
     "SCAFFOLD_GUIDANCE": "The selected persistence profile is EF Core with PostgreSQL.",
     "FIXTURE_EF_USING": "using $NAME$.Infrastructure.Persistence;\nusing Microsoft.EntityFrameworkCore;",
     "FIXTURE_SERVICE_CONFIGURATION": "            services.RemoveAll<DbContextOptions<ApplicationDbContext>>();\n            services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(this.container.GetConnectionString()));"
