@@ -10,3 +10,4 @@ indent_style = space
 indent_size = 4
 csharp_style_namespace_declarations = file_scoped:error
 dotnet_style_qualification_for_field = false:error
+dotnet_diagnostic.CA1848.severity = error

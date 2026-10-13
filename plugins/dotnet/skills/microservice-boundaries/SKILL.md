@@ -90,19 +90,22 @@ internal sealed class OrderEventsProcessor : BackgroundService
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        await processor.StopProcessingAsync(cancellationToken);
-        await base.StopAsync(cancellationToken);
+        await processor.StopProcessingAsync(cancellationToken).ConfigureAwait(false);
+        await base.StopAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private async Task HandleMessageAsync(ProcessMessageEventArgs args)
     {
         var integrationEvent = args.Message.Body.ToObjectFromJson<OrderPlacedEvent>();
 
-        await using var scope = scopeFactory.CreateAsyncScope();
-        var handler = scope.ServiceProvider.GetRequiredService<IIntegrationEventHandler<OrderPlacedEvent>>();
-        await handler.HandleAsync(integrationEvent, args.CancellationToken);
+        var scope = scopeFactory.CreateAsyncScope();
+        await using (scope.ConfigureAwait(false))
+        {
+            var handler = scope.ServiceProvider.GetRequiredService<IIntegrationEventHandler<OrderPlacedEvent>>();
+            await handler.HandleAsync(integrationEvent, args.CancellationToken).ConfigureAwait(false);
+        }
 
-        await args.CompleteMessageAsync(args.Message, args.CancellationToken);
+        await args.CompleteMessageAsync(args.Message, args.CancellationToken).ConfigureAwait(false);
     }
 
     private Task HandleErrorAsync(ProcessErrorEventArgs args)
