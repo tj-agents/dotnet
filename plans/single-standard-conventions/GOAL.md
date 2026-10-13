@@ -148,6 +148,25 @@ schema, or a `cloud-db-schemas` option), so the workload grants cover them.
   verify.py configurations build and test, including SandboxAzureSample with Terraform validate.
   Not yet reviewed, PR'd or pushed.
 
+## Decisions pending for Tommy (block merging PR #50)
+
+1. **E2E assertion library.** The branch sets E2E to Shouldly without a recorded decision.
+   - Shouldly reads a value once (`TextContentAsync` then `ShouldBe`), so it races the UI.
+   - Playwright's `Expect(locator).ToHaveTextAsync` retries until the UI matches.
+   - Recommended: Playwright `Expect` for E2E.
+2. **`this.` in constructors versus the build gate.** Items B5 and B7 conflict in Roslyn.
+   - IDE0003 (`dotnet_style_qualification_for_field = false:error`) rejects every `this.` that no parameter
+     shadows, so a parameterless constructor's `this.inventory = new Inventory(...)` (B7's own example
+     shape) fails.
+   - No built-in analyzer can express "`this.` on every constructor assignment, nowhere else".
+   - The gate is also inert today, because the scaffold never sets `EnforceCodeStyleInBuild`.
+   - Option A (recommended): `this.` only where a constructor parameter shadows the field, gated by
+     `false:error` plus `EnforceCodeStyleInBuild`. Constructor-built fields go unqualified.
+   - Option B: `this.` on every constructor assignment. Drop the `false:error` gate, and "no `this.` outside
+     constructors" becomes review-only.
+   - Either way, add the negative-path scaffold tests the review asked for: a stray `Assert.*` in
+     IntegrationTests, and (under A) a stray `this.`, each failing `dotnet build`.
+
 ## Next Steps
 
 1. Slices B and C together, as one conventions PR on `Refactor/OneTestingStyleStandard`. Tommy asked for a
