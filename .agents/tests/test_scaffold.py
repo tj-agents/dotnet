@@ -405,6 +405,7 @@ class ScaffoldTests(unittest.TestCase):
             for caller in (
                 lambda: VERIFY.verify("VerifyCaller", "minimal"),
                 lambda: VERIFY.negative_path_gates("NegativeCaller", "web", ('tests=["integration"]',)),
+                lambda: VERIFY.snippet_compile_gate("SnippetCaller"),
             ):
                 with mock.patch.dict(os.environ, environment, clear=False):
                     with mock.patch.object(VERIFY, "run", side_effect=StopVerification) as run:
@@ -418,6 +419,7 @@ class ScaffoldTests(unittest.TestCase):
         for caller in (
             lambda: VERIFY.verify("VerifyMissing", "minimal"),
             lambda: VERIFY.negative_path_gates("NegativeMissing", "web"),
+            lambda: VERIFY.snippet_compile_gate("SnippetMissing"),
         ):
             with mock.patch.dict(os.environ, {"STANDARDS_ADOPTER": "", "STANDARDS_INPUT": ""}, clear=False):
                 with mock.patch.object(VERIFY, "run") as run:
@@ -426,7 +428,11 @@ class ScaffoldTests(unittest.TestCase):
             run.assert_not_called()
 
     def test_verify_main_uses_supported_azure_workflow_override(self) -> None:
-        with mock.patch.object(VERIFY, "verify") as verify, mock.patch.object(VERIFY, "negative_path_gates"):
+        with (
+            mock.patch.object(VERIFY, "verify") as verify,
+            mock.patch.object(VERIFY, "snippet_compile_gate"),
+            mock.patch.object(VERIFY, "negative_path_gates"),
+        ):
             self.assertEqual(0, VERIFY.main())
 
         verify.assert_any_call("SandboxAzureSample", "sandbox", ("cloud=azure", "azure.workflows=false"), True)
