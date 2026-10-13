@@ -194,10 +194,7 @@ def _add_package_reference(csproj: Path, package: str, private_assets: str | Non
 def snippet_compile_gate(name: str) -> None:
     with tempfile.TemporaryDirectory(prefix=f"dotnet-scaffold-{name}-") as temporary:
         destination = Path(temporary)
-        command = [
-            sys.executable, "-B", str(SCAFFOLD), "new",
-            "--name", name, "--destination", str(destination), "--preset", "sandbox", "--no-input",
-        ]
+        command = scaffold_command(destination, name, "sandbox")
         run(command, ROOT)
         project = destination / name
         solution = project / f"{name}.slnx"
