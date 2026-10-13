@@ -1,6 +1,6 @@
 {
   "when": {"auth": "jwt"},
-  "requires": {"hosts": {"contains": "api"}},
+  "requires": {"hosts": {"contains": "web"}},
   "conflicts": {},
   "append": {
     "API_USINGS": "using Microsoft.AspNetCore.Authentication.JwtBearer;",

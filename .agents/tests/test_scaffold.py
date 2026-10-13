@@ -194,7 +194,7 @@ class ScaffoldTests(unittest.TestCase):
                 "new", "--name", "Example", "--destination", str(root), "--set", 'hosts=[]'
             )
             duplicate_array = self.run_cli(
-                "new", "--name", "Example", "--destination", str(root), "--set", "hosts=[api,api]"
+                "new", "--name", "Example", "--destination", str(root), "--set", "hosts=[web,web]"
             )
 
             self.assertEqual(2, invalid_name.returncode)
@@ -252,7 +252,7 @@ class ScaffoldTests(unittest.TestCase):
         with mock.patch.object(SCAFFOLD, "selected_components", return_value=appended):
             files = SCAFFOLD.plan("Example", options, None)
 
-        self.assertIn("using First;\nusing Second;", files["src/Example.Api/Program.cs"])
+        self.assertIn("using First;\nusing Second;", files["src/Example.Web/Program.cs"])
         with mock.patch.object(SCAFFOLD, "selected_components", return_value=collisions):
             with self.assertRaises(SCAFFOLD.ScaffoldError):
                 SCAFFOLD.plan("Example", options, None)
@@ -267,7 +267,7 @@ class ScaffoldTests(unittest.TestCase):
 
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertFalse((root / "Example").exists())
-            self.assertIn("src/Example.Api/Program.cs", json.loads(result.stdout)["files"])
+            self.assertIn("src/Example.Web/Program.cs", json.loads(result.stdout)["files"])
 
     def test_literal_home_destination_expands_without_writing(self) -> None:
         name = f"ScaffoldHome{uuid4().hex}"
@@ -341,10 +341,11 @@ class ScaffoldTests(unittest.TestCase):
                 "Directory.Packages.props",
                 "Example.slnx",
                 "global.json",
-                "src/Example.Api/Example.Api.csproj",
-                "src/Example.Api/Program.cs",
-                "src/Example.Api/appsettings.json",
-                "src/Example.Core/Example.Core.csproj",
+                "src/Example.Application/Example.Application.csproj",
+                "src/Example.Domain/Example.Domain.csproj",
+                "src/Example.Web/Example.Web.csproj",
+                "src/Example.Web/Program.cs",
+                "src/Example.Web/appsettings.json",
             ],
             "api": [
                 ".editorconfig",
@@ -358,13 +359,14 @@ class ScaffoldTests(unittest.TestCase):
                 "Directory.Packages.props",
                 "Example.slnx",
                 "global.json",
-                "src/Example.Api/Example.Api.csproj",
-                "src/Example.Api/Program.cs",
-                "src/Example.Api/appsettings.json",
-                "src/Example.Core/Example.Core.csproj",
+                "src/Example.Application/Example.Application.csproj",
+                "src/Example.Domain/Example.Domain.csproj",
                 "src/Example.Infrastructure/Example.Infrastructure.csproj",
                 "src/Example.Infrastructure/Persistence/ApplicationDbContext.cs",
                 "src/Example.Infrastructure/ServiceCollectionExtensions.cs",
+                "src/Example.Web/Example.Web.csproj",
+                "src/Example.Web/Program.cs",
+                "src/Example.Web/appsettings.json",
                 "tests/Example.UnitTests/Example.UnitTests.csproj",
             ],
             "dapper-sqlserver": [
@@ -379,14 +381,15 @@ class ScaffoldTests(unittest.TestCase):
                 "Directory.Packages.props",
                 "Example.slnx",
                 "global.json",
-                "src/Example.Api/Example.Api.csproj",
-                "src/Example.Api/Program.cs",
-                "src/Example.Api/appsettings.json",
-                "src/Example.Core/Example.Core.csproj",
+                "src/Example.Application/Example.Application.csproj",
+                "src/Example.Domain/Example.Domain.csproj",
                 "src/Example.Infrastructure/DapperConnectionFactory.cs",
                 "src/Example.Infrastructure/Example.Infrastructure.csproj",
                 "src/Example.Infrastructure/IDapperConnectionFactory.cs",
                 "src/Example.Infrastructure/ServiceCollectionExtensions.cs",
+                "src/Example.Web/Example.Web.csproj",
+                "src/Example.Web/Program.cs",
+                "src/Example.Web/appsettings.json",
                 "tests/Example.UnitTests/Example.UnitTests.csproj",
             ],
         }
@@ -427,8 +430,8 @@ class ScaffoldTests(unittest.TestCase):
                 ),
             )
             combined_root = root / "Combined"
-            program = (combined_root / "src" / "Combined.Api" / "Program.cs").read_text(encoding="utf-8")
-            appsettings = json.loads((combined_root / "src" / "Combined.Api" / "appsettings.json").read_text(encoding="utf-8"))
+            program = (combined_root / "src" / "Combined.Web" / "Program.cs").read_text(encoding="utf-8")
+            appsettings = json.loads((combined_root / "src" / "Combined.Web" / "appsettings.json").read_text(encoding="utf-8"))
 
             self.assertTrue((combined_root / "BannedSymbols.txt").is_file())
             self.assertIn("AddAuthentication", program)
@@ -445,9 +448,9 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(0, functions.returncode, functions.stderr)
             self.assertEqual(0, worker.returncode, worker.stderr)
             self.assertTrue((root / "Functions" / "src" / "Functions.Functions" / "Functions.Functions.csproj").is_file())
-            self.assertFalse((root / "Functions" / "src" / "Functions.Api").exists())
+            self.assertFalse((root / "Functions" / "src" / "Functions.Web").exists())
             self.assertTrue((root / "Worker" / "src" / "Worker.Worker" / "Worker.Worker.csproj").is_file())
-            self.assertFalse((root / "Worker" / "src" / "Worker.Api").exists())
+            self.assertFalse((root / "Worker" / "src" / "Worker.Web").exists())
     def test_host_and_integration_constraints_are_enforced(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -479,12 +482,13 @@ class ScaffoldTests(unittest.TestCase):
                 [
                     ".editorconfig", ".gitattributes", ".github/workflows/ci.yml", ".gitignore", ".scaffold.json",
                     "AGENTS.md", "BannedSymbols.txt", "CLAUDE.md", "Directory.Build.props", "Directory.Packages.props",
-                    "Sandbox.slnx", "global.json", "src/Sandbox.Api/Program.cs", "src/Sandbox.Api/Sandbox.Api.csproj",
-                    "src/Sandbox.Api/appsettings.json", "src/Sandbox.Core/Sandbox.Core.csproj",
+                    "Sandbox.slnx", "global.json",
+                    "src/Sandbox.Application/Sandbox.Application.csproj", "src/Sandbox.Domain/Sandbox.Domain.csproj",
                     "src/Sandbox.Functions/Program.cs", "src/Sandbox.Functions/Sandbox.Functions.csproj",
                     "src/Sandbox.Functions/host.json", "src/Sandbox.Functions/local.settings.json",
                     "src/Sandbox.Infrastructure/Persistence/ApplicationDbContext.cs",
                     "src/Sandbox.Infrastructure/Sandbox.Infrastructure.csproj", "src/Sandbox.Infrastructure/ServiceCollectionExtensions.cs",
+                    "src/Sandbox.Web/Program.cs", "src/Sandbox.Web/Sandbox.Web.csproj", "src/Sandbox.Web/appsettings.json",
                     "src/Sandbox.Worker/Program.cs", "src/Sandbox.Worker/Sandbox.Worker.csproj", "src/Sandbox.Worker/appsettings.json",
                     "tests/Sandbox.IntegrationTests.Fixtures/ApiFixture.cs",
                     "tests/Sandbox.IntegrationTests.Fixtures/Sandbox.IntegrationTests.Fixtures.csproj",
@@ -578,7 +582,7 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(0, ef_core.returncode, ef_core.stderr)
             self.assertEqual(0, dapper.returncode, dapper.stderr)
             for name in ("EfCoreSqlServer", "DapperSqlServer"):
-                appsettings_path = root / name / "src" / f"{name}.Api" / "appsettings.json"
+                appsettings_path = root / name / "src" / f"{name}.Web" / "appsettings.json"
                 appsettings = json.loads(appsettings_path.read_text(encoding="utf-8"))
                 self.assertNotIn("TrustServerCertificate", appsettings["ConnectionStrings"]["SqlServer"])
 
@@ -618,17 +622,17 @@ class ScaffoldTests(unittest.TestCase):
 
             api_profile = json.loads((root / "ApiAzure" / "infra" / "app.json").read_text(encoding="utf-8"))
             self.assertEqual(1, api_profile["schema_version"])
-            self.assertEqual(["api"], [workload["id"] for workload in api_profile["workloads"]])
+            self.assertEqual(["web"], [workload["id"] for workload in api_profile["workloads"]])
             api_workload = api_profile["workloads"][0]
             self.assertEqual("http", api_workload["kind"])
             self.assertEqual(8080, api_workload["port"])
             self.assertEqual("/health/live", api_workload["probes"]["liveness"])
             self.assertEqual("/health/ready", api_workload["probes"]["readiness"])
-            self.assertIn("ApiAzure.Api", api_workload["build"]["image"])
+            self.assertIn("ApiAzure.Web", api_workload["build"]["image"])
             self.assertIn("$REGISTRY", api_workload["build"]["image"])
-            self.assertIn("ApiAzure.Api", api_workload["build"]["package"])
+            self.assertIn("ApiAzure.Web", api_workload["build"]["package"])
             self.assertEqual({"name": "dotnet", "version": "10.0"}, api_workload["runtime"])
-            self.assertEqual("apiazure-api", api_workload["settings"]["OTEL_SERVICE_NAME"])
+            self.assertEqual("apiazure-web", api_workload["settings"]["OTEL_SERVICE_NAME"])
             self.assertEqual("postgres", api_profile["database"]["engine"])
             self.assertIn("efbundle", api_profile["database"]["migration"]["build"]["image"])
             self.assertEqual(["/efbundle"], api_profile["database"]["migration"]["command"])
@@ -641,7 +645,7 @@ class ScaffoldTests(unittest.TestCase):
 
             sandbox_profile = json.loads((root / "SandboxAzure" / "infra" / "app.json").read_text(encoding="utf-8"))
             ids = [workload["id"] for workload in sandbox_profile["workloads"]]
-            self.assertEqual(["api", "worker", "functions"], ids)
+            self.assertEqual(["web", "worker", "functions"], ids)
             functions_workload = sandbox_profile["workloads"][2]
             self.assertEqual("functions", functions_workload["kind"])
             self.assertEqual({"name": "dotnet-isolated", "version": "10.0"}, functions_workload["runtime"])
@@ -676,7 +680,7 @@ class ScaffoldTests(unittest.TestCase):
 
             self.assertEqual(0, result.returncode, result.stderr)
             project = root / "SandboxAzureTelemetry"
-            api_program = (project / "src" / "SandboxAzureTelemetry.Api" / "Program.cs").read_text(encoding="utf-8")
+            api_program = (project / "src" / "SandboxAzureTelemetry.Web" / "Program.cs").read_text(encoding="utf-8")
             worker_program = (project / "src" / "SandboxAzureTelemetry.Worker" / "Program.cs").read_text(encoding="utf-8")
             functions_program = (project / "src" / "SandboxAzureTelemetry.Functions" / "Program.cs").read_text(encoding="utf-8")
 
@@ -690,7 +694,7 @@ class ScaffoldTests(unittest.TestCase):
             result = self.create_with_options(root, "AzureHealthChecks", "api", "cloud=azure")
 
             self.assertEqual(0, result.returncode, result.stderr)
-            program = (root / "AzureHealthChecks" / "src" / "AzureHealthChecks.Api" / "Program.cs").read_text(encoding="utf-8")
+            program = (root / "AzureHealthChecks" / "src" / "AzureHealthChecks.Web" / "Program.cs").read_text(encoding="utf-8")
 
             self.assertEqual(1, program.count("AddHealthChecks()"))
             self.assertIn("var healthChecks = builder.Services.AddHealthChecks();", program)

@@ -550,19 +550,19 @@ def azure_package_command(csproj: str, identifier: str) -> str:
 def build_azure_profile(name: str, cloud_name: str, options: Mapping[str, Any]) -> Dict[str, Any]:
     hosts = options["hosts"]
     workloads: List[Dict[str, Any]] = []
-    if "api" in hosts:
-        csproj = f"src/{name}.Api/{name}.Api.csproj"
+    if "web" in hosts:
+        csproj = f"src/{name}.Web/{name}.Web.csproj"
         workloads.append({
-            "id": "api",
+            "id": "web",
             "kind": "http",
             "port": 8080,
             "probes": {"liveness": "/health/live", "readiness": "/health/ready"},
             "runtime": {"name": "dotnet", "version": "10.0"},
             "build": {
-                "image": azure_build_command("api", csproj),
-                "package": azure_package_command(csproj, "api"),
+                "image": azure_build_command("web", csproj),
+                "package": azure_package_command(csproj, "web"),
             },
-            "settings": {"OTEL_SERVICE_NAME": f"{cloud_name}-api"},
+            "settings": {"OTEL_SERVICE_NAME": f"{cloud_name}-web"},
         })
     if "worker" in hosts:
         csproj = f"src/{name}.Worker/{name}.Worker.csproj"
@@ -601,7 +601,7 @@ def build_azure_profile(name: str, cloud_name: str, options: Mapping[str, Any]) 
                 "build": {
                     "image": (
                         "dotnet tool restore && dotnet ef migrations bundle "
-                        f"--project src/{name}.Infrastructure --startup-project src/{name}.Api "
+                        f"--project src/{name}.Infrastructure --startup-project src/{name}.Web "
                         '-r linux-x64 --self-contained -o "$RUNNER_TEMP/efbundle" --force '
                         '&& docker build -t "$IMAGE" -f infra/migration.Dockerfile "$RUNNER_TEMP" '
                         '&& docker push "$IMAGE"'

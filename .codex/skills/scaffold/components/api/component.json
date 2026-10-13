@@ -1,6 +1,6 @@
 {
-  "when": {"hosts": {"contains": "api"}},
-  "requires": {"hosts": {"contains": "api"}},
+  "when": {"hosts": {"contains": "web"}},
+  "requires": {"hosts": {"contains": "web"}},
   "conflicts": {},
-  "projects": ["src/$NAME$.Api/$NAME$.Api.csproj"]
+  "projects": ["src/$NAME$.Web/$NAME$.Web.csproj"]
 }
