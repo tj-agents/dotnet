@@ -1,5 +1,5 @@
 {
-  "when": {"cloud": "azure", "hosts": {"contains": "api"}, "database": "postgres", "data": {"oneOf": ["efcore", "efcore+dapper"]}},
+  "when": {"cloud": "azure", "hosts": {"contains": "web"}, "database": "postgres", "data": {"oneOf": ["efcore", "efcore+dapper"]}},
   "requires": {},
   "conflicts": {},
   "append": {

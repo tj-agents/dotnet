@@ -1,5 +1,5 @@
 {
-  "when": {"cloud": "azure", "hosts": {"contains": "api"}},
+  "when": {"cloud": "azure", "hosts": {"contains": "web"}},
   "requires": {},
   "conflicts": {},
   "append": {

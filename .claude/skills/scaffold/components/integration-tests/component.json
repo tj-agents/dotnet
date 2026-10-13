@@ -1,6 +1,6 @@
 {
   "when": {"tests": {"contains": "integration"}},
-  "requires": {"hosts": {"contains": "api"}, "database": {"oneOf": ["postgres", "sqlserver"]}},
+  "requires": {"hosts": {"contains": "web"}, "database": {"oneOf": ["postgres", "sqlserver"]}},
   "conflicts": {},
   "projects": [
     "tests/$NAME$.IntegrationTests/$NAME$.IntegrationTests.csproj",
