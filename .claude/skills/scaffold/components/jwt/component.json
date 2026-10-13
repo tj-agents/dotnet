@@ -3,10 +3,10 @@
   "requires": {"hosts": {"contains": "web"}},
   "conflicts": {},
   "append": {
-    "API_USINGS": "using Microsoft.AspNetCore.Authentication.JwtBearer;",
-    "API_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.AspNetCore.Authentication.JwtBearer\" />",
-    "API_SERVICE_REGISTRATIONS": "builder.Services\n    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)\n    .AddJwtBearer(options =>\n    {\n        options.Authority = builder.Configuration[\"Jwt:Authority\"];\n        options.Audience = builder.Configuration[\"Jwt:Audience\"];\n    });\nbuilder.Services.AddAuthorization();",
-    "API_PIPELINE": "app.UseAuthentication();\napp.UseAuthorization();",
+    "WEB_USINGS": "using Microsoft.AspNetCore.Authentication.JwtBearer;",
+    "WEB_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.AspNetCore.Authentication.JwtBearer\" />",
+    "WEB_SERVICE_REGISTRATIONS": "builder.Services\n    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)\n    .AddJwtBearer(options =>\n    {\n        options.Authority = builder.Configuration[\"Jwt:Authority\"];\n        options.Audience = builder.Configuration[\"Jwt:Audience\"];\n    });\nbuilder.Services.AddAuthorization();",
+    "WEB_PIPELINE": "app.UseAuthentication();\napp.UseAuthorization();",
     "APPSETTINGS_PROPERTIES": {
       "value": "  \"Jwt\": {\n    \"Authority\": \"https://localhost:5001\",\n    \"Audience\": \"$NAME$\"\n  }",
       "separator": ",\n"

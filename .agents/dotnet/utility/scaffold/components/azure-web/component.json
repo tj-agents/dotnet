@@ -1,0 +1,10 @@
+{
+  "when": {"cloud": "azure", "hosts": {"contains": "web"}},
+  "requires": {},
+  "conflicts": {},
+  "append": {
+    "WEB_USINGS": "using Microsoft.AspNetCore.Diagnostics.HealthChecks;",
+    "WEB_SERVICE_REGISTRATIONS": "var healthChecks = builder.Services.AddHealthChecks();",
+    "WEB_PIPELINE": "app.MapHealthChecks(\"/health/live\", new HealthCheckOptions { Predicate = _ => false });\napp.MapHealthChecks(\"/health/ready\");"
+  }
+}

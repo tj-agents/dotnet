@@ -234,15 +234,15 @@ class ScaffoldTests(unittest.TestCase):
 
     def test_component_append_and_scalar_collisions_are_rejected(self) -> None:
         options = {key: definition["default"] for key, definition in SCAFFOLD.schema().items()}
-        api = (
-            "api",
-            SCAFFOLD.read_json(SCAFFOLD.COMPONENTS / "api" / "component.json", "component api"),
-            SCAFFOLD.COMPONENTS / "api",
+        web = (
+            "web",
+            SCAFFOLD.read_json(SCAFFOLD.COMPONENTS / "web" / "component.json", "component web"),
+            SCAFFOLD.COMPONENTS / "web",
         )
         appended = [
-            api,
-            ("first", {"append": {"API_USINGS": "using First;"}, "projects": []}, ROOT),
-            ("second", {"append": {"API_USINGS": "using Second;"}, "projects": []}, ROOT),
+            web,
+            ("first", {"append": {"WEB_USINGS": "using First;"}, "projects": []}, ROOT),
+            ("second", {"append": {"WEB_USINGS": "using Second;"}, "projects": []}, ROOT),
         ]
         collisions = [
             ("first", {"variables": {"OWNER": "first"}, "projects": []}, ROOT),
@@ -688,7 +688,7 @@ class ScaffoldTests(unittest.TestCase):
             self.assertIn("using Azure.Monitor.OpenTelemetry.Exporter;", worker_program)
             self.assertIn("using Azure.Monitor.OpenTelemetry.Exporter;", functions_program)
 
-    def test_azure_api_postgres_ef_emits_a_single_add_health_checks_call(self) -> None:
+    def test_azure_web_postgres_ef_emits_a_single_add_health_checks_call(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             result = self.create_with_options(root, "AzureHealthChecks", "api", "cloud=azure")
