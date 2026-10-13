@@ -1,0 +1,10 @@
+{
+  "when": {"cloud": "azure", "database": "postgres", "data": {"oneOf": ["dapper", "efcore+dapper"]}},
+  "requires": {},
+  "conflicts": {},
+  "append": {
+    "INFRASTRUCTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Dapper\" />\n    <PackageReference Include=\"Npgsql\" />",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Dapper\" Version=\"2.1.89\" />",
+    "SCAFFOLD_GUIDANCE": "The selected persistence profile includes Dapper with PostgreSQL."
+  }
+}

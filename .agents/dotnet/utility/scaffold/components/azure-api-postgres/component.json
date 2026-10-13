@@ -1,0 +1,11 @@
+{
+  "when": {"cloud": "azure", "hosts": {"contains": "api"}, "database": "postgres", "data": {"oneOf": ["efcore", "efcore+dapper"]}},
+  "requires": {},
+  "conflicts": {},
+  "append": {
+    "API_USINGS": "using $NAME$.Infrastructure.Persistence;",
+    "API_SERVICE_REGISTRATIONS": "healthChecks.AddDbContextCheck<ApplicationDbContext>(\"database\");",
+    "API_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore\" />",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore\" Version=\"10.0.12\" />"
+  }
+}

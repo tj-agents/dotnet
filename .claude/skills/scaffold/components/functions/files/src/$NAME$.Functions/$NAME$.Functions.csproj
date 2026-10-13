@@ -1,6 +1,6 @@
 <Project Sdk="Azure.Functions.Sdk/1.0.1">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Exe</OutputType>$FUNCTIONS_CLOUD_PROPERTIES$
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../$NAME$.Core/$NAME$.Core.csproj" />

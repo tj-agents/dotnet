@@ -1,0 +1,11 @@
+{
+  "when": {"cloud": "azure", "telemetry": "opentelemetry", "hosts": {"contains": "worker"}},
+  "requires": {},
+  "conflicts": {},
+  "append": {
+    "WORKER_TELEMETRY_USING": "using Azure.Monitor.OpenTelemetry.Exporter;",
+    "WORKER_TELEMETRY_REGISTRATION": "var applicationInsightsConnectionString = builder.Configuration[\"APPLICATIONINSIGHTS_CONNECTION_STRING\"];\n\nif (!string.IsNullOrWhiteSpace(applicationInsightsConnectionString))\n{\n    builder\n        .AddOpenTelemetry()\n        .WithTracing(tracing => tracing.AddAzureMonitorTraceExporter());\n}",
+    "WORKER_PACKAGE_REFERENCES": "    <PackageReference Include=\"Azure.Monitor.OpenTelemetry.Exporter\" />",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Azure.Monitor.OpenTelemetry.Exporter\" Version=\"1.10.0\" />"
+  }
+}
