@@ -16,21 +16,21 @@ Creates a .NET 10 `single-service` solution in the File structure `dotnet:struct
 ## Create a project
 
 ```text
-python -B <skill-directory>/scripts/scaffold.py new --name MyService --destination ~/source/repos --preset api
+python -B <skill-directory>/scripts/scaffold.py new --name MyService --destination ~/source/repos --preset web
 ```
 
 ## Build and adapt
 
-Use `--preset minimal` for an API with no persistence or test project. Configuration layers are defaults,
+Use `--preset minimal` for a Web host with no persistence or test project. Configuration layers are defaults,
 the preset, `--config options.json`, then repeated `--set key=value`; `--dry-run` prints the resolved result
 without writing. The destination must already exist and `<destination>/<name>` must be new.
-Use `--preset dapper-sqlserver` for an API with Dapper and SQL Server. The name must be a C# namespace whose
+Use `--preset dapper-sqlserver` for a Web host with Dapper and SQL Server. The name must be a C# namespace whose
 root segment is not `Program`.
-Use `--preset sandbox` for API, Functions with Durable support, worker, EF Core/PostgreSQL, OpenTelemetry and
+Use `--preset sandbox` for Web, Functions with Durable support, worker, EF Core/PostgreSQL, OpenTelemetry and
 unit plus integration project wiring.
 
 ```text
-python -B <skill-directory>/scripts/scaffold.py options --preset api
+python -B <skill-directory>/scripts/scaffold.py options --preset web
 ```
 
 `add` is pending until the new-project workflow is stable.
