@@ -16,7 +16,7 @@ Creates a .NET 10 `single-service` solution in the File structure `dotnet:struct
 ## Create a project
 
 ```text
-python -B <skill-directory>/scripts/scaffold.py new --name MyService --destination ~/source/repos --preset web
+python -B <skill-directory>/scripts/scaffold.py new --name MyService --destination ~/source/repos --preset web --standards-adopter <machine-bootstrap-skill-directory>/scripts/adopt_repository.py --standards-input /path/to/sources.json
 ```
 
 ## Build and adapt
@@ -28,6 +28,12 @@ Use `--preset dapper-sqlserver` for a Web host with Dapper and SQL Server. The n
 root segment is not `Program`.
 Use `--preset sandbox` for Web, Functions with Durable support, worker, EF Core/PostgreSQL, OpenTelemetry and
 unit plus integration project wiring.
+
+Create the composition input with `machine:bootstrap-capabilities`. It must select `base-agents/base`,
+`base-agents/engineering`, `base-agents/machine`, and `dotagents/dotnet`; include `azure-agents/azure` when
+`cloud=azure` is selected. `new` runs its `adopt_repository.py` before creating the destination, validates the
+prepared lock and host settings, then writes the catalog, lock, Claude settings, Codex settings, and any generated
+rules with the scaffolded solution. A failed adoption or preflight leaves the destination absent.
 
 ```text
 python -B <skill-directory>/scripts/scaffold.py options --preset web
@@ -53,7 +59,7 @@ command prints the exact azure invocation instead of running it. On a TTY, with 
 azure's own unset options).
 
 ```text
-python -B <skill-directory>/scripts/scaffold.py new --name Sandbox --destination ~/source/repos --preset sandbox --set cloud=azure --azure-scaffold ~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py
+python -B <skill-directory>/scripts/scaffold.py new --name Sandbox --destination ~/source/repos --preset sandbox --set cloud=azure --azure-scaffold ~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py --standards-adopter <machine-bootstrap-skill-directory>/scripts/adopt_repository.py --standards-input /path/to/sources.json
 ```
 
 ## Validation and publication
