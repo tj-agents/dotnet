@@ -140,6 +140,13 @@ schema, or a `cloud-db-schemas` option), so the workload grants cover them.
 - 2026-10-13: B9 added — `naming-collaborators` gained the Publisher and Processor roles, `domain-events`'
   handler snippet now injects `IIntegrationEventPublisher`, and the route table sends publisher/processor/
   handler code to `naming-collaborators` and `domain-events`.
+- 2026-10-13: **slices B and C implemented** in `985fb68`, including B9. The repo-wide searches are clean
+  (no second test-naming rule, no two-segment names, no `Assert.*` in the integration example, no `this.`
+  outside a constructor in any example or template), `test_scaffold.py`/`test_route_cli.py`/
+  `test_source_layout.py` pass (the `engineering:docs` failure in `test_route_cli.py` is the same
+  pre-existing one reported on main), `sync-generated.ps1 -Check` and `kit:check` pass, and all 8
+  verify.py configurations build and test, including SandboxAzureSample with Terraform validate.
+  Not yet reviewed, PR'd or pushed.
 
 ## Next Steps
 
