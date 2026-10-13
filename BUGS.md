@@ -145,3 +145,15 @@ B007 corrective evidence: the released four-file manifest3aa364769bc8c17a0381bb9
 - **Next action:** parent completes independent incremental review, full exact-head CI and delivery.
 - **Resolution condition:** these three wrappers use explicit private readonly fields assigned in ordinary constructors, with `this.` only on shadowed constructor assignments; their snippet regions remain byte-identical to the contract fences. Shared support types use bare field reads, `string.Empty` for actual empty strings, C# 14 extension blocks, explicit readonly repository dependency fields and one file-scoped namespace per support file.
 - **Verification evidence:** corrected wrappers and shared support types are regenerated across all four layouts. Eight snippet tests pass, including per-fence identity and complete host asset/setup checks; source layout, kit 1.2.1 and generated freshness checks pass. Actual compiler validation and delivery remain pending.
+
+## B012
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-13. Exact-head Scaffold PR run `38437895854` at `565a6eddb306c2f705a544e68d3fb856e2cbf871` reaches snippet compilation and reports five E2E diagnostics: MA0002 on the seed dictionary constructor and MA0004 on four `ClockSteps` awaits. Cause confirmed: the E2E support dictionary omits a string comparer and the actual source contract example omits `ConfigureAwait(false)` under the existing analyzer policy.
+- **Impact and priority:** P2; the contract snippet gate fails and blocks delivery of this standards branch.
+- **Source owner:** `tj-agents/dotnet` `testing/e2e` contract and scaffold E2E snippet support.
+- **State:** in-progress
+- **Repair link:** `plans/single-standard-conventions/GOAL.md`, branch `Fix/SnippetsCompileUnderScaffold`, and the CI repair boundary in `reviews/Fix-SnippetsCompileUnderScaffold.md`.
+- **Next action:** parent runs full exact-head Scaffold CI, completes independent incremental review and delivers the corrected candidate.
+- **Resolution condition:** the four awaits in the actual contract use `ConfigureAwait(false)`, the support dictionary uses `StringComparer.Ordinal`, regenerated fixtures remain verbatim with an empty manifest header, and full exact-head compilation passes without analyzer suppression.
+- **Verification evidence:** the archived CI log `6edcc2377fa126d3-repair-scaffold-ci-failure.log` identifies E2E.Stubs.cs line 13 and ClockSteps fixture lines 30, 31, 32 and 38. All eight snippet tests and three source-layout tests pass after repair; both generators and freshness checks pass for all 585 generated outputs. The affected-source check verifies all five corrected expressions and the empty header/no-skip entry. No local dotnet or Terraform process ran; actual compiler qualification and delivery remain pending.
