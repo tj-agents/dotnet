@@ -12,7 +12,7 @@ from unittest import mock
 from xml.etree import ElementTree
 
 ROOT = Path(__file__).resolve().parents[2]
-SNIPPETS_DIR = ROOT / ".agents" / "tests" / "snippets"
+SNIPPETS_DIR = ROOT / ".agents" / "dotnet" / "utility" / "scaffold" / "snippets"
 CONTRACTS_ROOT = ROOT / ".agents" / "dotnet" / "contract"
 
 sys.path.insert(0, str(SNIPPETS_DIR))
@@ -20,11 +20,21 @@ from manifest import SNIPPETS  # noqa: E402
 import gen_snippets  # noqa: E402
 
 VERIFY_PATH = ROOT / ".agents" / "dotnet" / "utility" / "scaffold" / "scripts" / "verify.py"
-SPECIFICATION = importlib.util.spec_from_file_location("snippet_verify", VERIFY_PATH)
-if SPECIFICATION is None or SPECIFICATION.loader is None:
-    raise RuntimeError("cannot load scaffold verification gate")
-VERIFY = importlib.util.module_from_spec(SPECIFICATION)
-SPECIFICATION.loader.exec_module(VERIFY)
+GENERATED_VERIFY_PATHS = (
+    ROOT / ".claude" / "skills" / "scaffold" / "scripts" / "verify.py",
+    ROOT / ".codex" / "skills" / "scaffold" / "scripts" / "verify.py",
+    ROOT / "plugins" / "dotnet" / "skills" / "scaffold" / "scripts" / "verify.py",
+)
+
+
+def load_verify(path: Path):
+    specification = importlib.util.spec_from_file_location("snippet_verify", path)
+    if specification is None or specification.loader is None:
+        raise RuntimeError(f"cannot load scaffold verification gate: {path}")
+    verifier = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(verifier)
+    return verifier
+
 
 FENCE = re.compile(r"```csharp\n(.*?)\n```", re.DOTALL)
 
@@ -57,6 +67,23 @@ class SnippetFixtureTests(unittest.TestCase):
 
     def test_fixtures_are_not_stale(self) -> None:
         self.assertEqual(0, gen_snippets.write_or_check(check=True))
+
+    def test_generated_verifiers_resolve_the_complete_shipped_snippet_assets(self) -> None:
+        expected_files = {
+            path.relative_to(SNIPPETS_DIR): path.read_bytes()
+            for path in SNIPPETS_DIR.rglob("*")
+            if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
+        }
+        for path in GENERATED_VERIFY_PATHS:
+            with self.subTest(verifier=path):
+                verifier = load_verify(path)
+                self.assertEqual(path.parents[1] / "snippets", verifier.SNIPPETS_DIR)
+                actual_files = {
+                    item.relative_to(verifier.SNIPPETS_DIR): item.read_bytes()
+                    for item in verifier.SNIPPETS_DIR.rglob("*")
+                    if item.is_file() and "__pycache__" not in item.parts and item.suffix != ".pyc"
+                }
+                self.assertEqual(expected_files, actual_files)
 
     def test_compile_gate_adds_the_e2e_project_with_pinned_dependencies_and_verbatim_fixture(self) -> None:
         name = "SnippetHarnessSample"
@@ -95,12 +122,15 @@ class SnippetFixtureTests(unittest.TestCase):
             for snippet in SNIPPETS:
                 if snippet["skip"]:
                     continue
-                top, suffix = VERIFY.SNIPPET_PROJECT_FOLDERS[snippet["project"]]
+                top, suffix = verifier.SNIPPET_PROJECT_FOLDERS[snippet["project"]]
                 self.assertTrue((project / top / f"{name}.{suffix}" / "Snippets" / f"{snippet['id']}.Snippet.cs").is_file())
 
-        with mock.patch.object(VERIFY, "run", side_effect=run), redirect_stdout(io.StringIO()):
-            VERIFY.snippet_compile_gate(name)
-        self.assertEqual(1, build_count)
+        for path in (VERIFY_PATH, *GENERATED_VERIFY_PATHS):
+            with self.subTest(verifier=path):
+                verifier = load_verify(path)
+                with mock.patch.object(verifier, "run", side_effect=run), redirect_stdout(io.StringIO()):
+                    verifier.snippet_compile_gate(name)
+        self.assertEqual(4, build_count)
 
     def test_skipped_snippets_each_carry_a_reason(self) -> None:
         for snippet in SNIPPETS:

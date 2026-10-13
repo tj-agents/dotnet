@@ -96,3 +96,52 @@ B003 final diagnosis: fresh package/reflection probes identify the missing OpenT
 - **Verification evidence:** frozen d573967 security lens inspected exact installed assemblies, default credentials and HostPort-only conversion; network exploitability requires a started fixture and reachability. No live containers were started.
 
 B007 corrective evidence: the released four-file manifest3aa364769bc8c17a0381bb99c3a8ac3836c3a8d85732401852185d4c985f1209 matches parent source byte-for-byte after decoding its UTF8 BOM. All20 focused and36 current-core c91b60c9 repository tests pass. Both Dapper/PostgreSQL and hybrid/SQL Server build logs have zero warnings/errors and actual exit0; both offline binding tests pass without starting containers. Exact4.16 IL shows same-key port merge overwrites defaults, the converter emits one qualified binding, and parameter modifiers run after HostConfig conversion. Per-fixture24-byte CSPRNG passwords satisfy SQL complexity and127.0.0.1 limits publication. Final immutable independent review/platform qualification remain pending.
+
+## B008
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-13. The .NET-to-Azure scaffold writes two competing CI workflows. Real `new --preset minimal --set cloud=azure --azure-scaffold <Azure script>` produced the .NET project, then Azure failed with `already exists: .github/workflows/ci.yml`. Cause confirmed: .NET writes that file and the default Azure workflows=true plan also owns it; the isolated Azure dry-run uses an empty directory and misses this integration collision.
+- **Impact and priority:** P2; default chained cloud scaffolding fails after partial project creation. Repository standards injection succeeded before this independent component failure.
+- **Source owner:** tj-agents/dotnet scaffold Azure invocation/preflight; Azure owns its workflow generator.
+- **State:** in-progress
+- **Repair link:** `plans/single-standard-conventions/GOAL.md`, branch `Fix/SnippetsCompileUnderScaffold`, and the CI repair boundary in `reviews/Fix-SnippetsCompileUnderScaffold.md`; first observed during the docs standards-injection acceptance goal.
+- **Next action:** qualify the repaired exact head through full Linux/Windows Scaffold CI, then complete independent incremental review and delivery.
+- **Resolution condition:** real default .NET cloud=azure scaffolding with the released Azure command completes, emits one intended CI workflow and passes an integration regression; collision failures occur before project publication.
+- **Verification evidence:** native disposable proof at C:/Users/TOMMYS~1/AppData/Local/Temp/never-again-real-snapshots-b3il2268/StandardsProof reproduces the failure. The separate supported azure.workflows=false case at StandardsTerraformProof completes with 46 files, required standards lock/catalog and both host settings, and real Azure Terraform files. That option qualifies this injection test, not a repair of the default workflow collision.
+- **Repair verification (2026-10-13):** full Scaffold run `38433756313` reproduced the collision on Linux and Windows at `9559be3`. The dotnet plan now omits its placeholder `ci.yml` for existing `cloud=azure` selections before writing any file. The fake-provider regression rejects an occupied path and writes its own CI. All 43 scaffold tests pass; a real primary Azure scaffold composition of `SandboxAzureInterop` completes and emits the six Azure-owned workflows, including `ci-complete`. No dotnet or Terraform process ran locally. Full exact-head CI and delivery remain pending.
+
+## B009
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-13. Independent frozen review of `9559be3` found that `verify.py` resolves snippet assets only from the authored layout. Generated Claude/Codex hosts and the packaged scaffold resolve nonexistent fixture paths. Cause confirmed: the canonical assets lived outside the scaffold skill and were not shipped with its newly permitted verification command.
+- **Impact and priority:** P2; the supported packaged verification command fails before contract snippet compilation.
+- **Source owner:** `tj-agents/dotnet` scaffold verification script and snippet assets.
+- **State:** resolved
+- **Repair link:** `plans/single-standard-conventions/GOAL.md`, branch `Fix/SnippetsCompileUnderScaffold`, and `reviews/Fix-SnippetsCompileUnderScaffold.md` finding SSN-1.
+- **Next action:** parent completes independent incremental review, full exact-head CI and delivery.
+- **Resolution condition:** one canonical asset directory is shipped beside every verifier; authored, Claude, Codex and packaged paths resolve complete, byte-identical fixtures and pass per-fence identity plus scaffold-setup smoke checks.
+- **Verification evidence:** all assets moved under `.agents/dotnet/utility/scaffold/snippets`, with no old canonical directory. The verifier uses `ROOT / "snippets"`; its authoring generator resolves the source contract owner. Eight snippet tests pass, including all three actual generated host inventories and four real scaffold-setup runs with dotnet calls mocked. All 585 generated outputs are current; kit 1.2.1, source layout and tier/harness checks pass. Runtime C# compilation and delivery remain pending.
+
+## B010
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-13. Independent frozen review of `9559be3` found that `keyed-strategies-04-call-site` is skipped as having no named types, although its source block fully declares `Fulfilment` and `CourierFulfilment` with no missing dependencies. Cause confirmed: an inaccurate manifest exemption hides a compilable contract fence.
+- **Impact and priority:** P2; the compile gate omits a complete contract example it promises to cover.
+- **Source owner:** `tj-agents/dotnet` scaffold snippet manifest.
+- **State:** resolved
+- **Repair link:** `plans/single-standard-conventions/GOAL.md`, branch `Fix/SnippetsCompileUnderScaffold`, and `reviews/Fix-SnippetsCompileUnderScaffold.md` finding SSN-2.
+- **Next action:** parent verifies the new fixture through full exact-head CI and delivers the reviewed candidate.
+- **Resolution condition:** block 4 has no skip, its fixture exactly matches the source fence, and all four verifier layouts copy it into Infrastructure for compilation.
+- **Verification evidence:** byte-identity, complete manifest coverage and authored/Claude/Codex/package gate-setup tests pass. The manifest now selects 47 fences for compilation and retains 11 explicit skips. Block 2 remains skipped with a corrected reason naming its missing builder API and leaf contracts; no registration implementation was invented. Actual compiler validation and delivery remain pending.
+
+## B011
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-13. Independent frozen review of `9559be3` found captured primary-constructor parameters in the checkout, seeder and `Scoped<T>` manifest support wrappers. Cause confirmed: their methods read constructor parameters without the explicit readonly dependency fields required by the applicable style contract. Parent support inspection also found shadowing output parameters that forced non-constructor `this.` reads, empty runtime string literals, legacy extension syntax and primary-constructor repository dependency initializers.
+- **Impact and priority:** P2; the standards verification support code violates the dependency-field convention it claims to demonstrate.
+- **Source owner:** `tj-agents/dotnet` scaffold snippet manifest headers and shared support types.
+- **State:** resolved
+- **Repair link:** `plans/single-standard-conventions/GOAL.md`, branch `Fix/SnippetsCompileUnderScaffold`, and `reviews/Fix-SnippetsCompileUnderScaffold.md` finding SSN-3.
+- **Next action:** parent completes independent incremental review, full exact-head CI and delivery.
+- **Resolution condition:** these three wrappers use explicit private readonly fields assigned in ordinary constructors, with `this.` only on shadowed constructor assignments; their snippet regions remain byte-identical to the contract fences. Shared support types use bare field reads, `string.Empty` for actual empty strings, C# 14 extension blocks, explicit readonly repository dependency fields and one file-scoped namespace per support file.
+- **Verification evidence:** corrected wrappers and shared support types are regenerated across all four layouts. Eight snippet tests pass, including per-fence identity and complete host asset/setup checks; source layout, kit 1.2.1 and generated freshness checks pass. Actual compiler validation and delivery remain pending.

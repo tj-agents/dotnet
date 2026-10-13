@@ -12,7 +12,7 @@ from typing import Sequence
 
 ROOT = Path(__file__).resolve().parent.parent
 SCAFFOLD = ROOT / "scripts" / "scaffold.py"
-SNIPPETS_DIR = ROOT.parent.parent.parent / "tests" / "snippets"
+SNIPPETS_DIR = ROOT / "snippets"
 DUNET_VERSION = "1.16.2"
 
 SNIPPET_PROJECT_FOLDERS = {
@@ -26,8 +26,9 @@ SNIPPET_PROJECT_FOLDERS = {
 SNIPPET_SHARED_FILES = {
     "infrastructure": (
         "GlobalUsings.cs", "SharedGlobalUsing.cs", "EventContracts.Stubs.cs", "Reunion.Stubs.cs",
-        "DataAccess.Stubs.cs", "DataAccessUnitOfWork.Stubs.cs", "AzureServiceBus.Stubs.cs",
-        "Hosting.Stubs.cs", "Grpc.Stubs.cs",
+        "DataAccess.Stubs.cs", "DataAccessUnitOfWork.Stubs.cs", "DataAccessUnitOfWorkInfrastructure.Stubs.cs",
+        "AzureServiceBus.Stubs.cs",
+        "Hosting.Stubs.cs", "Grpc.Stubs.cs", "GrpcCore.Stubs.cs", "GrpcClientFactory.Stubs.cs",
     ),
     "web": ("GlobalUsings.cs", "SharedGlobalUsing.cs"),
     "unit-tests": ("GlobalUsings.cs", "SharedGlobalUsing.cs", "DataAccess.Stubs.cs"),
