@@ -1,8 +1,8 @@
 # One standard for the dotnet conventions
 
 Status: in progress (2026-10-13). Decided by Tommy on 2026-10-13 and relayed by the sandbox-dotnet session
-from `tomjseery/sandbox-dotnet` wiring evidence. Owner: the Claude session that delivered the azure
-app-profile goal (`tj-agents/azure` `plans/app-profile/GOAL.md`, complete).
+from `tomjseery/sandbox-dotnet` wiring evidence. Owner: the standards-finish Codex session; canonical handoff at
+`C:\Users\TommySeery\.claude\plans\tj-agents\HANDOFF_STANDARDS_REMAINING.md`.
 
 ## Rule for every slice
 
@@ -117,13 +117,12 @@ its one-line why and the date, under `dotnet:learning`'s convention procedure.
    release identities. If the change would break published installs or needs a core release-catalog
    change, ask Tommy one line before merging.
 
-### E: hand workflows to the deploy-target owner (after azure `Feature/ActionsConformance` merges)
+### E: folded into scaffold boilerplate item 0b (Tommy, 2026-10-13)
 
-With `cloud=azure`, the dotnet scaffold writes its restore, build and test commands into the profile's
-`verify` list and stops emitting `.github/workflows/ci.yml`. azure then owns the workflow tree, per
-`github-actions:structure`. Goal: tj-agents/azure `plans/actions-conformance/GOAL.md`.
-It also writes `database.schemas` into the profile from the EF model's schemas (the scaffold's default
-schema, or a `cloud-db-schemas` option), so the workload grants cover them.
+Slice E is superseded by item 0b in the canonical standards handoff. After this snippet-gate fix
+merges, the dotnet scaffold will generate one Web API shape and always write its boilerplate app
+profile, including `verify` and `database.schemas`. It will emit no workflow and have no cloud switch.
+Azure remains a separate scaffold step, with workflows owned by the github-actions writer in item 0.
 
 ## Lanes
 
@@ -240,11 +239,43 @@ schema, or a `cloud-db-schemas` option), so the workload grants cover them.
 
 ## Next Steps
 
-1. Slices B and C merge as one conventions PR, tj-agents/dotnet#50. Then notify `sandbox-dotnet-17` for
-   the B9 renames.
-2. Pending Tommy: enforce "no stray `this.`" with a scaffold-shipped source-scan test, or keep it
+1. Finish and merge `Fix/SnippetsCompileUnderScaffold`, then notify the sandbox-dotnet owner (Codex;
+   goal at `C:\Users\TommySeery\source\repos\sandbox-dotnet\plans\sandbox\GOAL.md`). Slices B/C
+   already merged as tj-agents/dotnet#50; Azure sticky/B001 merged as tj-agents/azure#7 at
+   `881ac901118a953b6d6ef0d5651f483e02823bf8`.
+2. Item 0: move whole workflow ownership to github-actions. Item 0b follows the snippet-gate merge and
+   folds slice E into one Web API boilerplate shape; it is outside this branch's scope.
+3. Pending Tommy: enforce "no stray `this.`" with a scaffold-shipped source-scan test, or keep it
    review-only. The scan test would parse the solution's `.cs` files with
    `Microsoft.CodeAnalysis.CSharp` syntax and fail on a `this.` that isn't a constructor assignment
    shadowed by its parameter. IDE0003 can't gate it on SDK 10.0.301.
-3. Slice E, once azure `Feature/ActionsConformance` (tj-agents/azure#5) merges.
 4. Slice D waits on the kit core-dependency release.
+
+## Codex pickup - 2026-10-13
+
+The handoff successor verified this branch at `5c52d9e`. The earlier configured-model capacity gate
+is resolved: Tommy authorized whichever available models work for implementation and independent
+review. The bounded implementation remains L4, with one in-session writer and no additional native
+CLI sessions. The canonical handoff remains
+`C:\Users\TommySeery\.claude\plans\tj-agents\HANDOFF_STANDARDS_REMAINING.md`.
+
+- Added a temporary E2ETests project only to the snippet compile gate, with Reqnroll/Reqnroll.xUnit
+  3.3.4, Microsoft.Playwright 1.63.0 and Shouldly 4.3.0. `testing-e2e-01-clock` now has no skip and
+  retains an empty header; fixture seed types and global usings provide its dependencies.
+- Recorded Tommy's integration-event decision in `domain-events`, with the domain record,
+  constructor-assigned pre-commit translator and flat integration record compiled as one verbatim
+  example. `naming-collaborators` links this owner.
+- Validation and delivery evidence follows below; the parent retains review, exact-head CI and delivery.
+
+- Local validation: 7 snippet tests (including byte identity, complete manifest coverage and a real
+  temporary scaffold whose E2E project/package/solution/fixture artifacts are inspected with dotnet
+  calls mocked), 43 scaffold tests and 3 source-layout tests pass. The snippet and host generators run
+  with `python -B`; their freshness checks pass. Pinned kit 1.2.1 conformance and tier/harness validation
+  pass. The shipped source harness now grants the packaged `verify.py` command separately from
+  scaffold `new`/`options`.
+- Full compile/build validation remains pending exact-head CI. Local free disk is approximately
+  253 MB, so no dotnet or Terraform process was launched. `.github/workflows/scaffold.yml` runs the
+  unchanged full verification sequence on Linux and Windows with `AZURE_SCAFFOLD` pointing to its
+  Azure checkout; this branch's `verify.py` edit triggers both jobs. The gate covers all eight positive
+  configurations, the 46 compilable snippets (12 explicit skips), negative paths and both Azure
+  Terraform roots. Parent owns pushing this candidate, independent review and those CI results.

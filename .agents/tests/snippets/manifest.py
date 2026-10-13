@@ -90,10 +90,9 @@ SNIPPETS: list[Snippet] = [
     entry("domain-events-02-handler", "domain/events/SKILL.md", 2, "infrastructure", "SnippetFixtures.DomainEvents02",
           header=(
               ""
-              "internal sealed record OrderCancelledDomainEvent(Order Order) : IDomainEvent;\n"
-              "internal sealed class Order\n{\n"
+              "public sealed class OrderEntity\n{\n"
               "    public Guid Id { get; init; }\n    public Guid CustomerId { get; init; }\n    public DateTimeOffset CancelledAt { get; init; }\n}\n"
-              "internal sealed record OrderCancelledEvent(Guid Id, Guid CustomerId, DateTimeOffset CancelledAt) : IIntegrationEvent;\n\n"
+              "\n"
           )),
     entry("domain-events-03-registration", "domain/events/SKILL.md", 3, "infrastructure", "SnippetFixtures.DomainEvents03",
           header=(
@@ -321,7 +320,7 @@ SNIPPETS: list[Snippet] = [
           )),
 
     entry("testing-e2e-01-clock", "testing/e2e/SKILL.md", 1, "e2e-tests", "SnippetFixtures.TestingE2E01",
-          skip="the scaffold has no e2e/Reqnroll+Playwright test project kind to copy this snippet into (tests only supports unit/integration tiers)."),
+          header=""),
 
     entry("persistence-01-alias", "persistence/SKILL.md", 1, "infrastructure", "SnippetFixtures.Persistence01",
           header=(
