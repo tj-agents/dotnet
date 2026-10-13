@@ -97,6 +97,64 @@ FAKE_AZURE_SCAFFOLD = textwrap.dedent(
     """
 )
 
+FAKE_STANDARDS_ADOPTER = textwrap.dedent(
+    """
+    import argparse
+    import json
+    import os
+    import sys
+    from pathlib import Path
+
+    def main():
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--root", required=True)
+        parser.add_argument("--input", required=True)
+        parser.add_argument("--plugin", action="append", default=[])
+        parser.add_argument("--mode", required=True)
+        args = parser.parse_args()
+        log_path = os.environ.get("FAKE_STANDARDS_LOG")
+        if log_path:
+            with open(log_path, "a", encoding="utf-8") as handle:
+                handle.write(json.dumps(sys.argv[1:]) + "\\n")
+        if os.environ.get("FAKE_STANDARDS_FAIL"):
+            print("fake standards failure", file=sys.stderr)
+            return 9
+        root = Path(args.root)
+        plugins = ["base-agents/base", "base-agents/engineering", "base-agents/machine", *args.plugin]
+        omitted = os.environ.get("FAKE_STANDARDS_OMIT_PLUGIN")
+        if omitted:
+            plugins = [plugin for plugin in plugins if plugin != omitted]
+        files = {
+            ".agents/capabilities.lock.json": json.dumps({"schema_version": int(os.environ.get("FAKE_STANDARDS_SCHEMA_VERSION", "1")), "plugins": [{"id": plugin} for plugin in plugins]}) + "\\n",
+            ".agents/catalog/catalog.json": "{}\\n",
+            ".claude/settings.json": "{}\\n",
+            ".codex/config.toml": "[plugins]\\n",
+            ".codex/rules/agent-harness.rules": "allow\\n",
+            "standards/manifest.txt": "prepared\\n",
+        }
+        missing = os.environ.get("FAKE_STANDARDS_MISSING")
+        for relative, content in files.items():
+            if relative == missing:
+                continue
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(content, encoding="utf-8")
+        return 0
+
+    if __name__ == "__main__":
+        raise SystemExit(main())
+    """
+)
+
+FAKE_STANDARD_FILES = [
+    ".agents/capabilities.lock.json",
+    ".agents/catalog/catalog.json",
+    ".claude/settings.json",
+    ".codex/config.toml",
+    ".codex/rules/agent-harness.rules",
+    "standards/manifest.txt",
+]
+
 
 def write_fake_azure(root: Path) -> Path:
     scripts = root / "scripts"
@@ -107,11 +165,32 @@ def write_fake_azure(root: Path) -> Path:
     return script
 
 
+def write_fake_standards_adopter(root: Path) -> tuple[Path, Path]:
+    root.mkdir(parents=True, exist_ok=True)
+    adopter = root / "adopt_repository.py"
+    standards_input = root / "composition.json"
+    adopter.write_text(FAKE_STANDARDS_ADOPTER, encoding="utf-8")
+    standards_input.write_text("{}\\n", encoding="utf-8")
+    return adopter, standards_input
+
+
 class ScaffoldTests(unittest.TestCase):
-    def run_cli(self, *args: str) -> subprocess.CompletedProcess[str]:
+    def setUp(self) -> None:
+        self.standards_temporary = tempfile.TemporaryDirectory()
+        self.standards_adopter, self.standards_input = write_fake_standards_adopter(Path(self.standards_temporary.name))
+
+    def tearDown(self) -> None:
+        self.standards_temporary.cleanup()
+
+    def standards_arguments(self) -> list[str]:
+        return ["--standards-adopter", str(self.standards_adopter), "--standards-input", str(self.standards_input)]
+
+    def run_cli(self, *args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
         arguments = list(args)
         if arguments[:1] == ["new"] and "--no-input" not in arguments:
             arguments.append("--no-input")
+        if arguments[:1] == ["new"] and "--standards-adopter" not in arguments:
+            arguments.extend(self.standards_arguments())
         return subprocess.run(
             [sys.executable, "-B", str(SCRIPT), *arguments],
             cwd=ROOT,
@@ -119,6 +198,7 @@ class ScaffoldTests(unittest.TestCase):
             text=True,
             check=False,
             stdin=subprocess.DEVNULL,
+            env=env,
         )
 
     def create(self, directory: Path, name: str, preset: str) -> subprocess.CompletedProcess[str]:
@@ -269,6 +349,98 @@ class ScaffoldTests(unittest.TestCase):
             self.assertFalse((root / "Example").exists())
             self.assertIn("src/Example.Web/Program.cs", json.loads(result.stdout)["files"])
 
+    def test_new_requires_standards_adopter_and_input_before_creating_project(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            missing_flags = subprocess.run(
+                [sys.executable, "-B", str(SCRIPT), "new", "--name", "Missing", "--destination", str(root), "--no-input"],
+                cwd=ROOT, capture_output=True, text=True,
+            )
+            missing_adopter = self.run_cli(
+                "new", "--name", "MissingAdopter", "--destination", str(root), "--no-input",
+                "--standards-adopter", str(root / "missing.py"), "--standards-input", str(self.standards_input),
+            )
+            missing_input = self.run_cli(
+                "new", "--name", "MissingInput", "--destination", str(root), "--no-input",
+                "--standards-adopter", str(self.standards_adopter), "--standards-input", str(root / "missing.json"),
+            )
+
+            self.assertEqual(2, missing_flags.returncode)
+            self.assertEqual(1, missing_adopter.returncode)
+            self.assertEqual(1, missing_input.returncode)
+            self.assertFalse((root / "Missing").exists())
+            self.assertFalse((root / "MissingAdopter").exists())
+            self.assertFalse((root / "MissingInput").exists())
+
+    def test_standards_adopter_receives_dotnet_and_azure_when_selected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            log_path = root / "standards.log"
+            env = dict(os.environ, FAKE_STANDARDS_LOG=str(log_path))
+            standard = self.run_cli(
+                "new", "--name", "Standard", "--destination", str(root), "--preset", "minimal", env=env,
+            )
+            azure = self.run_cli(
+                "new", "--name", "Azure", "--destination", str(root), "--preset", "web", "--set", "cloud=azure", env=env,
+            )
+
+            self.assertEqual(0, standard.returncode, standard.stderr)
+            self.assertEqual(0, azure.returncode, azure.stderr)
+            calls = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
+            standard_plugins = [calls[0][index + 1] for index, item in enumerate(calls[0]) if item == "--plugin"]
+            azure_plugins = [calls[1][index + 1] for index, item in enumerate(calls[1]) if item == "--plugin"]
+            self.assertEqual(["dotagents/dotnet"], standard_plugins)
+            self.assertEqual(["dotagents/dotnet", "azure-agents/azure"], azure_plugins)
+
+    def test_standards_files_are_copied_and_listed_by_dry_run(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            created = self.create(root, "Prepared", "minimal")
+            preview = self.run_cli(
+                "new", "--name", "Preview", "--destination", str(root), "--preset", "minimal", "--dry-run",
+            )
+
+            self.assertEqual(0, created.returncode, created.stderr)
+            self.assertEqual(0, preview.returncode, preview.stderr)
+            for relative in FAKE_STANDARD_FILES:
+                self.assertTrue((root / "Prepared" / relative).is_file(), relative)
+                self.assertIn(relative, json.loads(preview.stdout)["files"])
+            self.assertFalse((root / "Preview").exists())
+
+    def test_standards_adopter_failure_prevents_project_creation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.run_cli(
+                "new", "--name", "Failure", "--destination", str(root), "--preset", "minimal",
+                env=dict(os.environ, FAKE_STANDARDS_FAIL="1"),
+            )
+
+            self.assertEqual(1, result.returncode)
+            self.assertFalse((root / "Failure").exists())
+
+    def test_standards_required_outputs_and_selected_plugins_are_validated(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            missing_output = self.run_cli(
+                "new", "--name", "MissingOutput", "--destination", str(root), "--preset", "minimal",
+                env=dict(os.environ, FAKE_STANDARDS_MISSING=".codex/config.toml"),
+            )
+            missing_plugin = self.run_cli(
+                "new", "--name", "MissingPlugin", "--destination", str(root), "--preset", "minimal",
+                env=dict(os.environ, FAKE_STANDARDS_OMIT_PLUGIN="dotagents/dotnet"),
+            )
+            invalid_schema = self.run_cli(
+                "new", "--name", "InvalidSchema", "--destination", str(root), "--preset", "minimal",
+                env=dict(os.environ, FAKE_STANDARDS_SCHEMA_VERSION="0"),
+            )
+
+            self.assertEqual(1, missing_output.returncode)
+            self.assertEqual(1, missing_plugin.returncode)
+            self.assertEqual(1, invalid_schema.returncode)
+            self.assertFalse((root / "MissingOutput").exists())
+            self.assertFalse((root / "MissingPlugin").exists())
+            self.assertFalse((root / "InvalidSchema").exists())
+
     def test_literal_home_destination_expands_without_writing(self) -> None:
         name = f"ScaffoldHome{uuid4().hex}"
         project = Path.home() / name
@@ -408,7 +580,7 @@ class ScaffoldTests(unittest.TestCase):
                     path.relative_to(root / name).as_posix() for path in (root / name).rglob("*") if path.is_file()
                 )
                 rewritten = [item.replace("Example", name) for item in expected_files]
-                self.assertEqual(rewritten, generated)
+                self.assertEqual(sorted([*rewritten, *FAKE_STANDARD_FILES]), generated)
 
     def test_component_combinations_render_selected_wiring(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -482,7 +654,7 @@ class ScaffoldTests(unittest.TestCase):
             project = root / "Sandbox"
             generated = sorted(path.relative_to(project).as_posix() for path in project.rglob("*") if path.is_file())
             self.assertEqual(
-                [
+                sorted([
                     ".agents/skill-routes.json",
                     ".editorconfig", ".gitattributes", ".github/workflows/ci.yml", ".gitignore", ".scaffold.json",
                     "AGENTS.md", "BannedSymbols.txt", "CLAUDE.md", "Directory.Build.props", "Directory.Packages.props",
@@ -498,7 +670,8 @@ class ScaffoldTests(unittest.TestCase):
                     "tests/Sandbox.IntegrationTests.Fixtures/Sandbox.IntegrationTests.Fixtures.csproj",
                     "tests/Sandbox.IntegrationTests/BannedSymbols.txt",
                     "tests/Sandbox.IntegrationTests/Sandbox.IntegrationTests.csproj", "tests/Sandbox.UnitTests/Sandbox.UnitTests.csproj",
-                ],
+                    *FAKE_STANDARD_FILES,
+                ]),
                 generated,
             )
             functions = project / "src" / "Sandbox.Functions"
@@ -780,6 +953,7 @@ class ScaffoldTests(unittest.TestCase):
                 [
                     sys.executable, "-B", str(SCRIPT), "new", "--name", "AzureDryFail", "--destination", str(root),
                     "--preset", "web", "--set", "cloud=azure", "--azure-scaffold", str(azure_script), "--no-input",
+                    *self.standards_arguments(),
                 ],
                 cwd=ROOT, capture_output=True, text=True, env=env,
             )
@@ -797,6 +971,7 @@ class ScaffoldTests(unittest.TestCase):
                 [
                     sys.executable, "-B", str(SCRIPT), "new", "--name", "AzureRealFail", "--destination", str(root),
                     "--preset", "web", "--set", "cloud=azure", "--azure-scaffold", str(azure_script), "--no-input",
+                    *self.standards_arguments(),
                 ],
                 cwd=ROOT, capture_output=True, text=True, env=env,
             )
@@ -816,7 +991,7 @@ class ScaffoldTests(unittest.TestCase):
                 [
                     sys.executable, "-B", str(SCRIPT), "new", "--name", "AzureOk", "--destination", str(root),
                     "--preset", "web", "--set", "cloud=azure", "--set", "azure.http_host=app-service",
-                    "--azure-scaffold", str(azure_script), "--no-input",
+                    "--azure-scaffold", str(azure_script), "--no-input", *self.standards_arguments(),
                 ],
                 cwd=ROOT, capture_output=True, text=True, env=env,
             )
