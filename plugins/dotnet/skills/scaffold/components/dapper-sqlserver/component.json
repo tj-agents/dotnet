@@ -7,7 +7,7 @@
     "INFRASTRUCTURE_REGISTRATIONS": "services.AddScoped<IDapperConnectionFactory, DapperConnectionFactory>();",
     "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Dapper\" Version=\"2.1.89\" />",
     "SCAFFOLD_GUIDANCE": "The selected persistence profile includes Dapper with SQL Server.",
-    "FIXTURE_SERVICE_CONFIGURATION": "            services.RemoveAll<IDapperConnectionFactory>();\n            services.AddScoped<IDapperConnectionFactory>(_ => new FixtureDapperConnectionFactory(this.container.GetConnectionString()));",
-    "FIXTURE_DAPPER_FACTORY": "\n    private sealed class FixtureDapperConnectionFactory : IDapperConnectionFactory\n    {\n        private readonly string connectionString;\n\n        public FixtureDapperConnectionFactory(string connectionString)\n        {\n            this.connectionString = connectionString;\n        }\n\n        public DbConnection CreateConnection() => new SqlConnection(this.connectionString);\n    }"
+    "FIXTURE_SERVICE_CONFIGURATION": "            services.RemoveAll<IDapperConnectionFactory>();\n            services.AddScoped<IDapperConnectionFactory>(_ => new FixtureDapperConnectionFactory(container.GetConnectionString()));",
+    "FIXTURE_DAPPER_FACTORY": "\n    private sealed class FixtureDapperConnectionFactory : IDapperConnectionFactory\n    {\n        private readonly string connectionString;\n\n        public FixtureDapperConnectionFactory(string connectionString)\n        {\n            this.connectionString = connectionString;\n        }\n\n        public DbConnection CreateConnection() => new SqlConnection(connectionString);\n    }"
   }
 }

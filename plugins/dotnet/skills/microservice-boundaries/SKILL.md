@@ -64,6 +64,46 @@ your control dictates the wire format.
   service the rest of the platform uses.
 - **Do not use gRPC-Web to reach a service from a browser.** Frontends go through that service's HTTP edge.
 
+## Message-bus subscription: the Processor pumps it, the Handler reacts to it
+
+```csharp
+internal sealed class OrderEventsProcessor : BackgroundService
+{
+    private readonly IServiceScopeFactory scopeFactory;
+    private readonly ServiceBusProcessor processor;
+
+    public OrderEventsProcessor(IServiceScopeFactory scopeFactory, ServiceBusProcessor processor)
+    {
+        this.scopeFactory = scopeFactory;
+        this.processor = processor;
+        this.processor.ProcessMessageAsync += HandleMessageAsync;
+        this.processor.ProcessErrorAsync += HandleErrorAsync;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        await processor.StartProcessingAsync(stoppingToken);
+        await Task.Delay(Timeout.Infinite, stoppingToken).ConfigureAwait(false);
+    }
+
+    private async Task HandleMessageAsync(ProcessMessageEventArgs args)
+    {
+        await using var scope = scopeFactory.CreateAsyncScope();
+        await args.Message.DispatchAsync(scope.ServiceProvider);
+        await args.CompleteMessageAsync(args.Message);
+    }
+
+    private Task HandleErrorAsync(ProcessErrorEventArgs args) => Task.CompletedTask;
+}
+```
+
+2026-10-13: `<Subscription>Processor` is the one role for the hosted loop that pumps a broker
+subscription — see `dotnet:naming-collaborators` for the role decision and its rejected names. It takes
+explicit `private readonly` fields assigned with `this.` in the constructor, never a primary-constructor
+capture, and uses the broker SDK's own type (`ServiceBusProcessor` above) as the receive source rather
+than inventing a receiver role. It dispatches each message to its `<Event>Handler` and settles the
+message itself; the Handler owns only the business reaction, never the settlement.
+
 ## HTTP surfaces
 
 - **New endpoints** — minimal APIs. Webhooks and any net-new edge endpoint.

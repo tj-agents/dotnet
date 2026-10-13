@@ -23,7 +23,7 @@ Style rules an analyzer can express belong in `.editorconfig`, not here. Configu
 | Rule | Setting |
 |---|---|
 | No underscore prefix on private instance fields | `dotnet_naming_rule` + a camelCase-only style |
-| `this.` on field access | `dotnet_style_qualification_for_field = true:error` |
+| No `this.` qualification outside a constructor | `dotnet_style_qualification_for_field = false:error` |
 | No braces on a single statement | `csharp_prefer_braces = when_multiline:error` |
 | File-scoped namespaces | `csharp_style_namespace_declarations = file_scoped:error` |
 | Seal what isn't inherited from | `MA0053` |
@@ -61,6 +61,11 @@ member is a surfaced public auto-property, still write `this.Property = param`. 
 the member-vs-parameter split obvious at a glance instead of depending on the reader knowing which
 identifiers are members.
 
+**`this.` appears only in a constructor assignment — nowhere else.** 2026-10-13: a constructor
+parameter named after the member it fills shadows that member, so `this.` there disambiguates a real
+name collision rather than following a style preference; `dotnet_style_qualification_for_field =
+false:error` removes it everywhere a reader relies on code style alone, and leaves it where removing it
+would rebind the assignment to the parameter instead of the field.
 ## Test variables directly for null
 
 Use `is null` or `is not null` when the expression is already a local variable or parameter. Do not

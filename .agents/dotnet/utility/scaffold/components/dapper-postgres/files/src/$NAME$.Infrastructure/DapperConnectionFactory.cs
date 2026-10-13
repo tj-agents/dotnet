@@ -14,5 +14,5 @@ internal sealed class DapperConnectionFactory : IDapperConnectionFactory
             ?? throw new InvalidOperationException("Connection string 'Postgres' is required.");
     }
 
-    public DbConnection CreateConnection() => new NpgsqlConnection(this.connectionString);
+    public DbConnection CreateConnection() => new NpgsqlConnection(connectionString);
 }

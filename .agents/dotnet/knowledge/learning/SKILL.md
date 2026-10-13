@@ -1,6 +1,6 @@
 ---
 name: learning
-description: How to work with Tommy on .NET — learning mode by default (Tommy writes the code; you explain, review and unblock), delivery mode only when asked, teach anything absent from `dotnet:knowledge` before relying on it, and the procedure by which a .NET convention is agreed and recorded. Use for any .NET task, explanation, review or handoff, and whenever a .NET convention is proposed or changed.
+description: How to work with Tommy on .NET — learning mode by default (Tommy writes the code; you explain, review and unblock), delivery mode only when asked, Tommy is .NET-fluent by default so teach only a concept `dotnet:knowledge` records as shaky or where he otherwise shows a gap, and the procedure by which a .NET convention is agreed and recorded. Use for any .NET task, explanation, review or handoff, and whenever a .NET convention is proposed or changed.
 kind: knowledge
 domain: dotnet
 profile: knowledge
@@ -26,9 +26,12 @@ they are headed and the references to teach from. Read both before teaching or h
 
 - It is the only record of what Tommy knows. Existing code, a doc, a past session or experience with
   another tool is not evidence of .NET knowledge.
-- Before handing over a task, check every concept it needs against it and teach the gaps first.
-- Teach an absent or 🟡 concept before using it: name it, show a short standalone example, then use it. A
-  one-line aside is enough for a small gap.
+- 2026-10-13: Tommy is .NET-fluent by default. An unplaced or empty `dotnet:knowledge` records that no
+  gap has been found yet, not that he is a beginner — it is not itself a reason to teach basics.
+- Before handing over a task, check every concept it needs against `dotnet:knowledge` and teach only the
+  concepts it records as 🟡 or where Tommy otherwise shows a gap (asks, struggles, or gets it wrong).
+- Teach a 🟡 concept, or one Tommy shows a gap in, before using it: name it, show a short standalone
+  example, then use it. A one-line aside is enough for a small gap.
 - When a compiler or tool error appears, help read the diagnostic before giving the fix.
 
 ## Working rules
@@ -64,3 +67,5 @@ and grow only from decisions made in real projects.
    regenerate, commit and push.
 4. Code relies on a convention only after it is recorded. Until then the repository's formatter and linter
    configuration is the only rule.
+5. 2026-10-13: a rule's example leads with its code snippet; prose follows only to carry what the snippet
+   can't show. Every contract touched by this rule follows it too.

@@ -47,6 +47,32 @@ its one-line why and the date, under `dotnet:learning`'s convention procedure.
    <project>`), with a test. The route table sends every test tier to the single test-naming owner. Without
    it, scaffolded repositories are born ungated, which is the root cause of the sandbox agent not loading
    the standards.
+7. Tommy, 2026-10-13: every test tier's contract (unit, integration, e2e) opens with a full, generic,
+   domain-neutral example test class (no product context such as VAT) that demonstrates the conventions
+   by itself, without prose:
+   - `Method_Scenario_ExpectedBehaviour` names;
+   - constructor-built `private readonly` fields assigned with `this.`, and no `this.` inside test methods;
+   - Arrange/Act/Assert separated by blank lines;
+   - the tier's assertion library (Shouldly for integration);
+   - `[Theory]` with the expected value last;
+   - a `#region` per method under test.
+   The same rule applies to every contract's snippet: the code is the explanation.
+8. Tommy, 2026-10-13: record M002 in `MISTAKES.md`: a sandbox .NET slice was written without loading the
+   dotnet contracts. Item 6's route table must route by concern as well as by path (events,
+   publishers/consumers, logging, validation, errors, DI, endpoints, persistence, collaborators), so every
+   applicable contract is required before the write.
+9. Tommy, 2026-10-13 (relayed by sandbox-dotnet-17, proposal at
+   `C:\Users\TommySeery\.claude\plans\tj-agents\DOTNET_MESSAGING_ROLES_PROPOSAL.md`): `dotnet:naming-collaborators`
+   gains two canonical roles — publishing an integration event (`IIntegrationEventPublisher`, one per
+   solution, generic over the event) and pumping a broker subscription (`<Subscription>Processor :
+   BackgroundService`, dispatching to the existing Handler role and settling the message) — because the
+   sandbox invented `INoteEventPublisher` and a `HostedService` for exactly these with no role to reuse.
+   Each role gets a full, generic, domain-neutral snippet obeying every other contract; the Processor's
+   uses explicit `private readonly` fields assigned with `this.` in the constructor, never a
+   primary-constructor capture, and the receive source is the broker SDK's own type, not an invented
+   receiver role. `domain-events`' handler snippet drops `bus` for a constructor-assigned
+   `integrationEventPublisher` field. Item 8's concern routing sends publisher, processor and handler code
+   to `naming-collaborators` plus `domain-events`.
 
 ### C: learning defaults and snippet-led conventions (lower priority)
 
@@ -106,7 +132,18 @@ schema, or a `cloud-db-schemas` option), so the workload grants cover them.
     unrelated.
   - Next: rename the `api` preset and the `Api*Sample` verify names to Web.
 
+- 2026-10-13: **slice A merged** as tj-agents/dotnet#49 → `b5e395c`.
+  - It covers `59308cd` (component and placeholder renames) and `93eb064` (the preset and samples).
+  - The review approved with no findings, and CI was green, including the azure end-to-end run.
+  - sandbox-dotnet was notified.
+- 2026-10-13: slice B started on `Refactor/OneTestingStyleStandard` from `b5e395c`.
+- 2026-10-13: B9 added — `naming-collaborators` gained the Publisher and Processor roles, `domain-events`'
+  handler snippet now injects `IIntegrationEventPublisher`, and the route table sends publisher/processor/
+  handler code to `naming-collaborators` and `domain-events`.
+
 ## Next Steps
 
-1. Slice A: implement, search-verify, build the presets, review, PR and merge. Then notify
-   `sandbox-dotnet-17`.
+1. Slices B and C together, as one conventions PR on `Refactor/OneTestingStyleStandard`. Tommy asked for a
+   single conventions PR, and new branches or PRs are opt-in for him, so no further split. Implement,
+   search-verify, build, review, PR and merge. Then notify `sandbox-dotnet-17`. Slice D (the identity fix)
+   waits on the kit core-dependency release; slice E waits on azure Actions conformance.

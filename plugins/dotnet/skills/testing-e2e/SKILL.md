@@ -11,11 +11,72 @@ provenance: library, house
 
 # E2E scenario authoring
 
-Owns browser E2E scenario authoring — fast-forward setup, baseline discipline and readiness gates.
+Owns browser E2E scenario authoring — fast-forward setup, baseline discipline and readiness gates. Naming
+and the assertion library are owned by `dotnet:testing`.
 
 ## Applicability
 
 This contract applies only to browser end-to-end suites using Gherkin and Playwright. It requires `reqnroll, playwright`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+
+```gherkin
+Feature: Clock
+
+  Scenario Outline: Elapsed_PastStart_ReturnsDuration
+    Given the clock started at "<start>"
+    When the clock advances to "<now>"
+    Then the elapsed time reads "<expected>"
+
+    Examples:
+      | start    | now      | expected |
+      | 09:00:00 | 09:30:00 | 00:30:00 |
+      | 09:00:00 | 09:00:00 | 00:00:00 |
+```
+
+```csharp
+[Binding]
+public sealed class ClockSteps
+{
+    private readonly IPage page;
+
+    public ClockSteps(IPage page)
+    {
+        this.page = page;
+    }
+
+    #region Elapsed
+
+    [Given(@"the clock started at ""(.*)""")]
+    public async Task GivenTheClockStartedAt(string start)
+    {
+        await page.GotoAsync($"/clock?start={start}");
+    }
+
+    [When(@"the clock advances to ""(.*)""")]
+    public async Task WhenTheClockAdvancesTo(string now)
+    {
+        await page.FillAsync("#now", now);
+        await page.ClickAsync("#advance");
+    }
+
+    [Then(@"the elapsed time reads ""(.*)""")]
+    public async Task ThenTheElapsedTimeReads(string expected)
+    {
+        var elapsed = await page.TextContentAsync("#elapsed");
+
+        elapsed.ShouldBe(expected);
+    }
+
+    #endregion
+}
+```
+
+The Scenario Outline title carries the same `Method_Scenario_ExpectedBehaviour` shape as every other
+tier — `Elapsed` the behaviour under test, `PastStart` the input state, `ReturnsDuration` the outcome —
+and its `Examples` table keeps `expected` as the last column, exactly like a `[Theory]`'s last parameter.
+`ClockSteps` builds its `IPage` as a constructor-assigned `private readonly` field with `this.`, uses no
+`this.` inside a step method, reads with Shouldly, and groups its `Given`/`When`/`Then` steps under one
+`#region` per behaviour under test. Tommy, 2026-10-13: a generic opening example, not a product-named one,
+carries every convention a Gherkin/Reqnroll suite can show, without prose.
 
 Gherkin feature files bound to step definitions with **Reqnroll**, driving the browser through
 **Playwright**. These rules are the same for every UI suite in a solution, so they live in one place; a
