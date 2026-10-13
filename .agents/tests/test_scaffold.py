@@ -853,6 +853,16 @@ class ScaffoldTests(unittest.TestCase):
 
         self.assertIn('"root=C:\\\\"', line)
 
+    def test_azure_command_line_escapes_a_backslash_before_a_quote(self) -> None:
+        line = SCAFFOLD.azure_command_line("scaffold.py", Path("project"), {"key": 'a\\"'})
+
+        self.assertIn('"key=a\\\\\\""', line)
+
+    def test_azure_command_line_keeps_interior_backslashes_single(self) -> None:
+        line = SCAFFOLD.azure_command_line("scaffold.py", Path("project"), {"path": "C:\\Program Files\\x"})
+
+        self.assertIn('"path=C:\\Program Files\\x"', line)
+
     def test_cloud_none_output_has_no_azure_markers_or_unresolved_tokens(self) -> None:
         markers = (
             "Azure.Identity",
