@@ -1,7 +1,7 @@
 # Code review — Refactor/OneTestingStyleStandard
 
 **Review status:** `complete`
-**Reviewed up to commit:** `1952e91b9893106217a6764e2ab0060b5d210c29`  `(2026-10-13)`
+**Reviewed up to commit:** `9a62dbd4750f22fbd3e6586f2f4ed1bad2d57026`  `(2026-10-13)`
 **Judgment:** `approved`
 
 ## Review pass 1 — 2026-10-13 — full, at `af2e298`
@@ -31,5 +31,6 @@ cross-cutting contracts. No P1 or P2 findings: all snippets PASS, the decisions 
 - [x] P3: the elision comment in keyed/strategies' registration snippet predates this branch (it's on
   main). Left as is.
 
-`1952e91` (the verify.py byte writes for Python 3.9) was reviewed by the coordinator. CI is green on
+`1952e91` (the verify.py byte writes for Python 3.9) and `9a62dbd` (GOAL.md next steps) were reviewed by
+the coordinator. CI is green on
 `1952e91`: both scaffold verify configurations on ubuntu and windows, plus kit verify.
