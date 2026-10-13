@@ -684,6 +684,18 @@ class ScaffoldTests(unittest.TestCase):
             self.assertIn("using Azure.Monitor.OpenTelemetry.Exporter;", worker_program)
             self.assertIn("using Azure.Monitor.OpenTelemetry.Exporter;", functions_program)
 
+    def test_azure_api_postgres_ef_emits_a_single_add_health_checks_call(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            result = self.create_with_options(root, "AzureHealthChecks", "api", "cloud=azure")
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            program = (root / "AzureHealthChecks" / "src" / "AzureHealthChecks.Api" / "Program.cs").read_text(encoding="utf-8")
+
+            self.assertEqual(1, program.count("AddHealthChecks()"))
+            self.assertIn("var healthChecks = builder.Services.AddHealthChecks();", program)
+            self.assertIn('healthChecks.AddDbContextCheck<ApplicationDbContext>("database");', program)
+
     def test_cloud_name_derivation_and_override(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -822,6 +834,19 @@ class ScaffoldTests(unittest.TestCase):
             self.assertIn("new --into", result.stdout)
             self.assertIn(str(root / "NoAzurePath"), result.stdout)
             self.assertTrue((root / "NoAzurePath" / "infra" / "app.json").is_file())
+
+    def test_azure_command_line_quotes_values_with_spaces(self) -> None:
+        line = SCAFFOLD.azure_command_line(
+            "C:/Program Files/azure/scaffold.py", Path("C:/tmp/My Project"), {"topics": "a b"}
+        )
+
+        self.assertIn('"C:/Program Files/azure/scaffold.py"', line)
+        self.assertIn('--set "topics=a b"', line)
+
+    def test_azure_command_line_escapes_embedded_quotes(self) -> None:
+        line = SCAFFOLD.azure_command_line("scaffold.py", Path("project"), {"key": 'va"lue'})
+
+        self.assertIn('"key=va\\"lue"', line)
 
     def test_cloud_none_output_has_no_azure_markers_or_unresolved_tokens(self) -> None:
         markers = (

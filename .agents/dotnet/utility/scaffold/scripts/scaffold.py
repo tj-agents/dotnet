@@ -38,6 +38,7 @@ WINDOWS_RESERVED = {"CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", 
 CSHARP_INTRINSICS = {"__arglist", "__makeref", "__reftype", "__refvalue"}
 AZURE_SET_PREFIX = "azure."
 CLOUD_NAME = re.compile(r"^[a-z][a-z0-9]{0,11}$")
+SHELL_SPECIAL = re.compile(r"""[\s"'\\$`|&;<>()\[\]{}*?!~#%^]""")
 INPUT_FN: Callable[[str], str] = input
 
 
@@ -624,6 +625,12 @@ def run_azure(azure_script: Path, command_args: Sequence[str]) -> subprocess.Com
     return subprocess.run(command, capture_output=True, text=True, check=False)
 
 
+def quote_for_display(value: str) -> str:
+    if value == "" or SHELL_SPECIAL.search(value):
+        return '"' + value.replace('"', '\\"') + '"'
+    return value
+
+
 def azure_command_line(azure_script: str, project: Path, azure_overrides: Mapping[str, str]) -> str:
     parts = [
         sys.executable, "-B", azure_script, "new",
@@ -631,7 +638,7 @@ def azure_command_line(azure_script: str, project: Path, azure_overrides: Mappin
     ]
     for key, value in azure_overrides.items():
         parts.extend(["--set", f"{key}={value}"])
-    return " ".join(parts)
+    return " ".join(quote_for_display(part) for part in parts)
 
 
 def create(args: argparse.Namespace) -> None:
