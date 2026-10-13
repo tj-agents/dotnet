@@ -19,11 +19,17 @@ from xml.etree import ElementTree
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / ".agents" / "dotnet" / "utility" / "scaffold" / "scripts" / "scaffold.py"
 SCAFFOLD_SKILL = SCRIPT.parent.parent / "SKILL.md"
+VERIFY_SCRIPT = SCRIPT.parent / "verify.py"
 SPECIFICATION = importlib.util.spec_from_file_location("dotnet_scaffold", SCRIPT)
 if SPECIFICATION is None or SPECIFICATION.loader is None:
     raise RuntimeError("cannot load dotnet scaffold")
 SCAFFOLD = importlib.util.module_from_spec(SPECIFICATION)
 SPECIFICATION.loader.exec_module(SCAFFOLD)
+VERIFY_SPECIFICATION = importlib.util.spec_from_file_location("dotnet_scaffold_verify", VERIFY_SCRIPT)
+if VERIFY_SPECIFICATION is None or VERIFY_SPECIFICATION.loader is None:
+    raise RuntimeError("cannot load dotnet scaffold verification")
+VERIFY = importlib.util.module_from_spec(VERIFY_SPECIFICATION)
+VERIFY_SPECIFICATION.loader.exec_module(VERIFY)
 
 
 FAKE_AZURE_OPTIONS = {
@@ -374,6 +380,46 @@ class ScaffoldTests(unittest.TestCase):
             self.assertFalse((root / "MissingAdopter").exists())
             self.assertFalse((root / "MissingInput").exists())
 
+    def test_verify_callers_pass_required_standards_arguments_before_builds(self) -> None:
+        class StopVerification(Exception):
+            pass
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            adopter = root / "adopt_repository.py"
+            standards_input = root / "sources.json"
+            adopter.write_text("", encoding="utf-8")
+            standards_input.write_text("{}", encoding="utf-8")
+            environment = {"STANDARDS_ADOPTER": str(adopter), "STANDARDS_INPUT": str(standards_input)}
+            for caller in (
+                lambda: VERIFY.verify("VerifyCaller", "minimal"),
+                lambda: VERIFY.negative_path_gates("NegativeCaller", "web", ('tests=["integration"]',)),
+            ):
+                with mock.patch.dict(os.environ, environment, clear=False):
+                    with mock.patch.object(VERIFY, "run", side_effect=StopVerification) as run:
+                        with self.assertRaises(StopVerification):
+                            caller()
+                command = run.call_args.args[0]
+                self.assertEqual(str(adopter), command[command.index("--standards-adopter") + 1])
+                self.assertEqual(str(standards_input), command[command.index("--standards-input") + 1])
+
+    def test_verify_callers_reject_missing_standards_before_commands(self) -> None:
+        for caller in (
+            lambda: VERIFY.verify("VerifyMissing", "minimal"),
+            lambda: VERIFY.negative_path_gates("NegativeMissing", "web"),
+        ):
+            with mock.patch.dict(os.environ, {"STANDARDS_ADOPTER": "", "STANDARDS_INPUT": ""}, clear=False):
+                with mock.patch.object(VERIFY, "run") as run:
+                    with self.assertRaises(RuntimeError):
+                        caller()
+            run.assert_not_called()
+
+    def test_verify_main_uses_supported_azure_workflow_override(self) -> None:
+        with mock.patch.object(VERIFY, "verify") as verify, mock.patch.object(VERIFY, "negative_path_gates"):
+            self.assertEqual(0, VERIFY.main())
+
+        verify.assert_any_call("SandboxAzureSample", "sandbox", ("cloud=azure", "azure.workflows=false"), True)
+
     def test_documented_new_examples_execute_with_fixture_substitutions(self) -> None:
         standard_flags = (
             " --standards-adopter <machine-bootstrap-skill-directory>/scripts/adopt_repository.py"
@@ -410,7 +456,7 @@ class ScaffoldTests(unittest.TestCase):
                         rendered = rendered.replace(source, replacement)
                     arguments = shlex.split(rendered)
                     arguments[0] = sys.executable
-                    results.append(subprocess.run(arguments, cwd=ROOT, capture_output=True, text=True, stdin=subprocess.DEVNULL))
+                    results.append(subprocess.run(arguments, cwd=ROOT, capture_output=True, text=True, stdin=subprocess.PIPE))
                 return results
 
             previous_results = run_documented_commands(previous_skill)

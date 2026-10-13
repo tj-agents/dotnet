@@ -17,6 +17,29 @@ def run(command: Sequence[str], cwd: Path) -> None:
     subprocess.run(command, cwd=cwd, check=True)
 
 
+def standards_arguments() -> list[str]:
+    adopter = os.environ.get("STANDARDS_ADOPTER")
+    standards_input = os.environ.get("STANDARDS_INPUT")
+    if not adopter or not standards_input:
+        raise RuntimeError("STANDARDS_ADOPTER and STANDARDS_INPUT are required")
+    adopter_path = Path(adopter)
+    input_path = Path(standards_input)
+    if not adopter_path.is_file() or not input_path.is_file():
+        raise RuntimeError("STANDARDS_ADOPTER and STANDARDS_INPUT must be files")
+    return ["--standards-adopter", str(adopter_path), "--standards-input", str(input_path)]
+
+
+def scaffold_command(destination: Path, name: str, preset: str, overrides: Sequence[str] = ()) -> list[str]:
+    command = [
+        sys.executable, "-B", str(SCAFFOLD), "new",
+        "--name", name, "--destination", str(destination), "--preset", preset, "--no-input",
+        *standards_arguments(),
+    ]
+    for override in overrides:
+        command.extend(["--set", override])
+    return command
+
+
 def terraform_gate(project: Path) -> None:
     for root_name in ("foundation", "instance"):
         root = project / "infra" / root_name
@@ -31,12 +54,7 @@ def verify(name: str, preset: str, overrides: Sequence[str] = (), azure: bool = 
     azure_scaffold = os.environ.get("AZURE_SCAFFOLD")
     with tempfile.TemporaryDirectory(prefix=f"dotnet-scaffold-{name}-") as temporary:
         destination = Path(temporary)
-        command = [
-            sys.executable, "-B", str(SCAFFOLD), "new",
-            "--name", name, "--destination", str(destination), "--preset", preset, "--no-input",
-        ]
-        for override in overrides:
-            command.extend(["--set", override])
+        command = scaffold_command(destination, name, preset, overrides)
         if azure and azure_scaffold:
             command.extend(["--azure-scaffold", azure_scaffold])
         run(
@@ -65,12 +83,7 @@ def build_result(project: Path, solution: Path) -> subprocess.CompletedProcess:
 def negative_path_gates(name: str, preset: str, overrides: Sequence[str] = ()) -> None:
     with tempfile.TemporaryDirectory(prefix=f"dotnet-scaffold-{name}-") as temporary:
         destination = Path(temporary)
-        command = [
-            sys.executable, "-B", str(SCAFFOLD), "new",
-            "--name", name, "--destination", str(destination), "--preset", preset, "--no-input",
-        ]
-        for override in overrides:
-            command.extend(["--set", override])
+        command = scaffold_command(destination, name, preset, overrides)
         run(command, ROOT)
         project = destination / name
         solution = project / f"{name}.slnx"
@@ -145,7 +158,7 @@ def main() -> int:
         ),
         ("SandboxSample", "sandbox", (), False),
         ("IntegrationSqlServerSample", "web", ("database=sqlserver", 'tests=["integration"]', "auth=jwt"), False),
-        ("SandboxAzureSample", "sandbox", ("cloud=azure",), True),
+        ("SandboxAzureSample", "sandbox", ("cloud=azure", "azure.workflows=false"), True),
     )
     for name, preset, overrides, azure in configurations:
         verify(name, preset, overrides, azure)

@@ -64,6 +64,8 @@ python -B <skill-directory>/scripts/scaffold.py new --name Sandbox --destination
 
 ## Validation and publication
 
+The Core adoption helper requires Python 3.11 or later.
+
 If the selected hosts include Functions, restore its project before the solution:
 
 ```text
