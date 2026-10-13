@@ -4,12 +4,12 @@ namespace Shared;
 
 public interface IDbContext;
 
-public interface IReadDbContext : IDbContext
+public interface IReadDbContext
 {
     IQueryable<TEntity> Query<TEntity>() where TEntity : class;
 }
 
-public interface IWriteDbContext : IDbContext;
+public interface IWriteDbContext;
 
 public interface IReadRepository<TEntity, TKey> where TEntity : class;
 
@@ -55,17 +55,21 @@ public interface ITenantContext
 }
 
 public abstract class TenantScopedDbContext(
-    object options, object provider, ITenantContext tenantContext, string schema) : DbContext
+    object options, object provider, ITenantContext tenantContext, string schema) : DbContext, IDbContext
 {
     protected virtual void ApplyTenantFilters(ModelBuilder modelBuilder) { }
 }
 
-public abstract class ReadDbContext(object options, object provider, string schema) : DbContext
+public abstract class ReadDbContext(object options, object provider, string schema) : DbContext, IReadDbContext
 {
     public IQueryable<TEntity> Query<TEntity>() where TEntity : class => Set<TEntity>();
+
+    public override int SaveChanges() => throw new InvalidOperationException();
+    public override Task<int> SaveChangesAsync(CancellationToken ct = default) =>
+        throw new InvalidOperationException();
 }
 
-public abstract class PrivilegedDbContext(object options, object provider, string schema) : DbContext;
+public abstract class PrivilegedDbContext(object options, object provider, string schema) : DbContext, IDbContext;
 
 public interface IPagination<out T>
 {
