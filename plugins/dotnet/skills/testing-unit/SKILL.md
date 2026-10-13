@@ -1,6 +1,6 @@
 ---
 name: testing-unit
-description: Unit-test standard for .NET — integration is the default for application services, handlers, controllers, repositories, DI, adapters and collaborator orchestration; unit tests are reserved for substantial deterministic core logic such as calculations, validators, decision tables, value objects and domain transitions, never mock-interaction coverage of guard clauses or delegation. Also owns xUnit shape and naming, constructor-built SUTs, real collaborators, assertion-library consistency and self-verifying architecture allowlists. Use when adding or reviewing a test or deciding between the unit and integration tiers.
+description: Unit-test standard for .NET — integration is the default for application services, handlers, controllers, repositories, DI, adapters and collaborator orchestration; unit tests are reserved for substantial deterministic core logic such as calculations, validators, decision tables, value objects and domain transitions, never mock-interaction coverage of guard clauses or delegation. Also owns xUnit shape, constructor-built SUTs, real collaborators and self-verifying architecture allowlists; test naming and the assertion library are owned by `dotnet:testing`. Use when adding or reviewing a test or deciding between the unit and integration tiers.
 kind: contract
 domain: dotnet
 profile: unit-testing
@@ -11,11 +11,48 @@ provenance: library, house
 
 # Unit tests
 
-Owns when a test belongs at the unit tier, plus xUnit shape, naming and SUT construction.
+Owns when a test belongs at the unit tier, plus xUnit shape and SUT construction. Naming and the
+assertion library are owned by `dotnet:testing`.
 
 ## Applicability
 
 This contract applies only to projects using xUnit for deterministic core logic. It requires `xunit`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+
+```csharp
+public sealed class InventoryTests
+{
+    private readonly Inventory inventory;
+
+    public InventoryTests()
+    {
+        inventory = new Inventory(new StockCatalog());
+    }
+
+    #region Receive
+
+    [Theory]
+    [InlineData(5, 3, 8)]
+    [InlineData(0, 4, 4)]
+    public void Receive_PositiveQuantity_IncreasesStock(int initialStock, int quantity, int expected)
+    {
+        inventory.Receive("sku-1", initialStock);
+
+        inventory.Receive("sku-1", quantity);
+
+        Assert.Equal(expected, inventory.StockOf("sku-1"));
+    }
+
+    #endregion
+}
+```
+
+`InventoryTests` is the whole standard in one place: `Method_Scenario_ExpectedBehaviour` naming, a
+constructor-built `private readonly` field, Arrange/Act/Assert separated by blank lines, xUnit's
+`Assert.*`, a `[Theory]` with the expected value last, and a `#region` per method under test. Tommy,
+2026-10-13: a generic opening example, not a product-named one, demonstrates every convention without
+prose and without a second vocabulary. Its parameterless constructor assigns `inventory` unqualified —
+per `dotnet:style`'s Option A, `this.` appears only where a constructor parameter shadows the field it
+fills, and nothing here does.
 
 A unit test is a pure in-memory test of substantial, deterministic core logic with **no** database, HTTP,
 fixtures, or `WebApplicationFactory`/`TestServer` host, and no `Testcontainers` container. Good candidates
@@ -52,67 +89,30 @@ exactly as in production code.
 - The test class is `public sealed class XTests`, in the test project's root namespace.
 - **Arrange / Act / Assert separated by blank lines, with no `// Arrange` comments** — the blank lines carry it.
 
-```csharp
-public sealed class VatPolicyTests
-{
-    private readonly VatPolicy policy;
+## Naming and assertions
 
-    public VatPolicyTests()
-    {
-        this.policy = new VatPolicy(new UkVatCalculator());
-    }
-
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    public void Apply_UnregisteredSupplier_ReturnsNone(string? supplierVatNumber)
-    {
-        var result = this.policy.Apply(120m, supplierVatNumber);
-
-        Assert.Equal(120m, result.Net);
-    }
-}
-```
-
-## Naming
-
-`Method_Scenario_ExpectedBehaviour` — `Apply_RegisteredSupplier_DecomposesInclusiveGross`,
-`Create_RateOutsideRange_ThrowsDomainException`. The scenario segment names the input state; the last segment
-names the observable outcome. A terser `Method_ShouldXxx` form in older tests is legacy, not a second style to
-choose from.
+Test naming (`Method_Scenario_ExpectedBehaviour`) and the per-tier assertion library are owned by
+`dotnet:testing`; this tier's library is xUnit's `Assert.*`.
 
 ## SUT construction
 
 ### Test constructor
 
 xUnit creates a fresh test-class instance for every test, so the constructor is the per-test reset boundary.
-As in the `VatPolicyTests` example above, declare mocks, collaborators, and the SUT as `private readonly`
+As in the `InventoryTests` example above, declare mocks, collaborators, and the SUT as `private readonly`
 fields without initializers. Construct each dependency explicitly in the constructor, then construct the SUT
 from those fields.
 
 - **Never a per-test `CreateSut()`/`CreateService()` factory method.** A private method rebuilt on every
   call is the constructor's job wearing a disguise — it buys nothing the constructor doesn't already give
   every test, and it's the tell that mocks are being re-declared as local variables per test instead of
-  living as constructor-built `this.`-qualified fields. If you're about to write one, put its body in the
-  constructor instead and reference the fields directly.
-- **Prefer real collaborators over mocks** where they are cheap and deterministic — `new VatPolicy(new
-  UkVatCalculator())`, not a mocked calculator. Reach for a test double only at a genuine boundary: I/O, time,
+  living as constructor-built fields. If you're about to write one, put its body in the constructor
+  instead and reference the fields directly.
+- **Prefer real collaborators over mocks** where they are cheap and deterministic — `new Inventory(new
+  StockCatalog())`, not a mocked catalog. Reach for a test double only at a genuine boundary: I/O, time,
   randomness, or an expensive/nondeterministic dependency, and only when the SUT still owns substantial
   isolated logic. Several mocked collaborators are a strong signal that the test belongs in the integration
   tier.
-
-## Assertions
-
-Pick **one** assertion library per test tier and use it consistently. Mixing two inside a tier means two failure
-message formats and two idioms for the same assertion, for no benefit.
-
-The usual assignment: **unit tests use xUnit's built-in `Assert.*`** (`Assert.Equal`, `Assert.True`,
-…), **integration tests use Shouldly `ShouldBe`**, whose failure message carries the URL, status and response
-body — which is worth far more at that tier than at this one.
-
-**Whichever assignment a repo picks, enforce it in the build rather than at review.** A per-tier assertion
-library is exactly the kind of rule a reviewer stops noticing: gate it from the test project's tier so a
-reference to the wrong library fails compilation, and the choice stops being re-litigated per PR.
 
 ## Grouping a large test class
 

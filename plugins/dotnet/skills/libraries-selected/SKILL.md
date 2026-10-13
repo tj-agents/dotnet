@@ -34,6 +34,7 @@ Each row has a skill covering *how* to use it well; this file only decides *what
 | Logging | **`Microsoft.Extensions.Logging`** with `[LoggerMessage]` | `logging` |
 | Telemetry | **OpenTelemetry** | — |
 | Tests | **xUnit** | `testing-unit` |
+| Assertions | xUnit `Assert.*` (unit); **Shouldly** (integration, and an e2e value read outside the page); Playwright `Expect` (e2e page state) | `testing` |
 | Mocking, at a genuine boundary only | **Moq** | `testing-unit` |
 | Integration database | **Testcontainers** + **Respawn** | `testing-integration` |
 | Browser end-to-end | **Reqnroll** + **Playwright** | `testing-e2e` |
@@ -46,6 +47,10 @@ Each row has a skill covering *how* to use it well; this file only decides *what
 | API description | **Swashbuckle** | `http-api` |
 | Package versioning | **MinVer**, from the tag | — |
 | Analyzers | **Meziantou.Analyzer** + **BannedApiAnalyzers** | `style` |
+
+2026-10-13: the stack selected xUnit, Reqnroll and Playwright without ever recording which library proves
+an assertion, so this table is the one place that decision lives — `dotnet:testing` owns the per-tier
+split, this row only points there.
 
 ## Prefer the platform to a package
 

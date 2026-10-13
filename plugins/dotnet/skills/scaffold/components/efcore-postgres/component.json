@@ -7,6 +7,6 @@
     "INFRASTRUCTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.EntityFrameworkCore\" />\n    <PackageReference Include=\"Npgsql.EntityFrameworkCore.PostgreSQL\" />",
     "SCAFFOLD_GUIDANCE": "The selected persistence profile is EF Core with PostgreSQL.",
     "FIXTURE_EF_USING": "using $NAME$.Infrastructure.Persistence;\nusing Microsoft.EntityFrameworkCore;",
-    "FIXTURE_SERVICE_CONFIGURATION": "            services.RemoveAll<DbContextOptions<ApplicationDbContext>>();\n            services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(this.container.GetConnectionString()));"
+    "FIXTURE_SERVICE_CONFIGURATION": "            services.RemoveAll<DbContextOptions<ApplicationDbContext>>();\n            services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(container.GetConnectionString()));"
   }
 }

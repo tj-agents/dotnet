@@ -9,6 +9,6 @@
     "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.EntityFrameworkCore.SqlServer\" Version=\"10.0.12\" />",
     "SCAFFOLD_GUIDANCE": "The selected persistence profile is EF Core with SQL Server.",
     "FIXTURE_EF_USING": "using $NAME$.Infrastructure.Persistence;\nusing Microsoft.EntityFrameworkCore;",
-    "FIXTURE_SERVICE_CONFIGURATION": "            services.RemoveAll<DbContextOptions<ApplicationDbContext>>();\n            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(this.container.GetConnectionString()));"
+    "FIXTURE_SERVICE_CONFIGURATION": "            services.RemoveAll<DbContextOptions<ApplicationDbContext>>();\n            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(container.GetConnectionString()));"
   }
 }
