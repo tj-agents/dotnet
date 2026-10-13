@@ -33,7 +33,7 @@
           "justification": "Runs only the packaged .NET scaffold entry point to resolve approved options or create a new selected single-service solution.",
           "match": [
             ["python", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "new", "--name", "MyService", "--destination", "C:/source/repos"],
-            ["python3", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "options", "--preset", "api"]
+            ["python3", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "options", "--preset", "web"]
           ],
           "not_match": [
             ["python", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "new"],
