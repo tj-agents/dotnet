@@ -41,20 +41,63 @@ its one-line why and the date, under `dotnet:learning`'s convention procedure.
    the contract says.
 4. The `testing-integration` example uses explicit `private readonly` fields, not a primary-constructor
    fixture capture, per `dotnet:style`.
-5. `this.` appears only in constructor assignments. Drop the every-field-access rule, and set the scaffold
-   `.editorconfig` to `dotnet_style_qualification_for_field = false:error`.
+5. Tommy, 2026-10-13 (Option A): `this.` appears only where a constructor parameter shadows the field or
+   property it fills. Drop the every-field-access rule, set the scaffold `.editorconfig` to
+   `dotnet_style_qualification_for_field = false:error`, and add `EnforceCodeStyleInBuild` so the setting
+   actually runs at build time. Verified during implementation: this only gates the "add missing `this.`"
+   direction (IDE0009) — IDE0003 ("remove this.") does not fire as a build diagnostic in this SDK under
+   any configuration tried, so a stray `this.` outside a constructor is still caught by review and example,
+   not by `dotnet build`.
 6. The scaffold emits `.agents/skill-routes.json` (`gen_skill_routes.py --kind dotnet-service --into
    <project>`), with a test. The route table sends every test tier to the single test-naming owner. Without
    it, scaffolded repositories are born ungated, which is the root cause of the sandbox agent not loading
    the standards.
+7. Tommy, 2026-10-13: every test tier's contract (unit, integration, e2e) opens with a full, generic,
+   domain-neutral example test class (no product context such as VAT) that demonstrates the conventions
+   by itself, without prose:
+   - `Method_Scenario_ExpectedBehaviour` names;
+   - constructor-built `private readonly` fields, `this.` only where a constructor parameter shadows one
+     (Option A, item 5), and no `this.` inside test methods;
+   - Arrange/Act/Assert separated by blank lines;
+   - the tier's assertion library (xUnit for unit, Shouldly for integration, Playwright `Expect` for e2e
+     page state and Shouldly for a value read outside the page);
+   - `[Theory]` with the expected value last;
+   - a `#region` per method under test.
+   The same rule applies to every contract's snippet: the code is the explanation, and it must obey every
+   contract that applies to it, including the one it sits in (M003: an earlier e2e example broke its own
+   contract's fast-forward and assertion rules).
+8. Tommy, 2026-10-13: record M002 in `MISTAKES.md`: a sandbox .NET slice was written without loading the
+   dotnet contracts. Item 6's route table must route by concern as well as by path (events,
+   publishers/consumers, logging, validation, errors, DI, endpoints, persistence, collaborators), so every
+   applicable contract is required before the write.
+9. Tommy, 2026-10-13 (relayed by sandbox-dotnet-17, proposal at
+   `C:\Users\TommySeery\.claude\plans\tj-agents\DOTNET_MESSAGING_ROLES_PROPOSAL.md`): `dotnet:naming-collaborators`
+   gains two canonical roles — publishing an integration event (`IIntegrationEventPublisher`, one per
+   solution, generic over the event) and pumping a broker subscription (`<Subscription>Processor :
+   BackgroundService`, dispatching to the existing Handler role and settling the message) — because the
+   sandbox invented `INoteEventPublisher` and a `HostedService` for exactly these with no role to reuse.
+   Each role gets a full, generic, domain-neutral snippet obeying every contract that applies to it; the Processor's
+   uses explicit `private readonly` fields assigned with `this.` in the constructor, never a
+   primary-constructor capture, and the receive source is the broker SDK's own type, not an invented
+   receiver role. `domain-events`' handler snippet drops `bus` for a constructor-assigned
+   `integrationEventPublisher` field. Item 8's concern routing sends publisher, processor and handler code
+   to `naming-collaborators` plus `domain-events`.
+10. Tommy, 2026-10-13: `dotnet:libraries-selected`'s table lists xUnit, Reqnroll and Playwright but no
+    assertion library, so it gains an Assertions row pointing to `dotnet:testing` — the one owner for
+    which library each tier uses — so no agent is ever asked this again.
+11. Negative-path scaffold gates: `verify.py` scaffolds one IntegrationTests configuration and asserts
+    `dotnet build` FAILS for a stray `Assert.*` in an integration test (`BannedApiAnalyzers`/RS0030),
+    restoring the file after. It also injects a stray `this.field` read outside a constructor and reports
+    the result either way: in the current SDK this one does not fail the build (see item 5's finding), so
+    it prints the finding rather than failing `verify.py` on a gate the toolchain doesn't support yet.
 
 ### C: learning defaults and snippet-led conventions (lower priority)
 
 1. `dotnet:learning` must not default to treating Tommy as a .NET beginner, because he knows .NET well.
    Correct the default.
 2. Conventions lead with code-snippet examples showing the rule, not prose, and every example obeys every
-   other contract. Record this in the convention procedure, and apply it to the contracts slices A and B
-   touch.
+   contract that applies to it, including the one it sits in. Record this in the convention procedure, and
+   apply it to the contracts slices A and B touch.
 
 ### D: packaging identity and the core dependency (Tommy, 2026-10-13)
 
@@ -106,7 +149,64 @@ schema, or a `cloud-db-schemas` option), so the workload grants cover them.
     unrelated.
   - Next: rename the `api` preset and the `Api*Sample` verify names to Web.
 
+- 2026-10-13: **slice A merged** as tj-agents/dotnet#49 → `b5e395c`.
+  - It covers `59308cd` (component and placeholder renames) and `93eb064` (the preset and samples).
+  - The review approved with no findings, and CI was green, including the azure end-to-end run.
+  - sandbox-dotnet was notified.
+- 2026-10-13: slice B started on `Refactor/OneTestingStyleStandard` from `b5e395c`.
+- 2026-10-13: B9 added — `naming-collaborators` gained the Publisher and Processor roles, `domain-events`'
+  handler snippet now injects `IIntegrationEventPublisher`, and the route table sends publisher/processor/
+  handler code to `naming-collaborators` and `domain-events`.
+- 2026-10-13: **slices B and C implemented** in `985fb68`, including B9. The repo-wide searches are clean
+  (no second test-naming rule, no two-segment names, no `Assert.*` in the integration example, no `this.`
+  outside a constructor in any example or template), `test_scaffold.py`/`test_route_cli.py`/
+  `test_source_layout.py` pass (the `engineering:docs` failure in `test_route_cli.py` is the same
+  pre-existing one reported on main), `sync-generated.ps1 -Check` and `kit:check` pass, and all 8
+  verify.py configurations build and test, including SandboxAzureSample with Terraform validate.
+  Not yet reviewed, PR'd or pushed.
+- 2026-10-13: PR #50 opened from `985fb68`/`22bc92b`; three follow-up commits landed directly on the PR
+  branch (`af2e298` real-SDK Processor dispatch, `3d8276d` the publisher/handler-vs-processor routing
+  split, `b65312d` recording the two decisions below as pending), then the two decisions were made and
+  implemented:
+  - **`this.` versus the build gate (items B5/B7):** Option A — `this.` only where a constructor parameter
+    shadows the field or property it fills. Every non-shadowed `this.` across the contracts and scaffold
+    is fixed (`testing-unit`'s `InventoryTests`, `ApiFixture`'s `container`, two `DapperConnectionFactory`
+    variants' `connectionString`, `dependency-injection`'s `Reserve`/`Charge`/`Dispatch`), and the scaffold's
+    `Directory.Build.props` gains `EnforceCodeStyleInBuild` so `false:error` actually runs at build time.
+  - **E2E assertions (item 10):** both, split by what's being asserted — Playwright `Expect(locator)` for
+    page state, Shouldly for a value read outside the page. `dotnet:testing`'s table and `testing-e2e`'s
+    example both record it, and `dotnet:libraries-selected` gains the Assertions row pointing to
+    `dotnet:testing` so the split is never re-asked.
+  - M003 recorded in `MISTAKES.md`: the first E2E rewrite broke its own contract's fast-forward and
+    assertion rules, because the checklist and the convention procedure both said "every **other**
+    contract". The example is rewritten to fast-forward from seeded fixture state with no browser call in
+    its `Given`, and the procedure wording now says "every contract that applies to it, including the one
+    it sits in".
+  - Negative-path scaffold gates (item 11) added to `verify.py`.
+  - M003 and item 6's own checklist exposed the same gap a layer up: re-checking every snippet this branch
+    touches against its own host contract found testing-e2e's rewrite needed the fast-forward/assertion fix
+    above; unit, integration, naming-collaborators, domain-events, microservice-boundaries and style were
+    already each consistent with their own rules.
+  - Finding, not fixed: IDE0003 ("remove this qualification") does not fire as a build diagnostic in the
+    SDK in use, verified by isolated repro across field/property/method access, `dotnet_diagnostic.IDE0003.severity`,
+    `dotnet format`, and with `Meziantou.Analyzer` added — only IDE0009 ("add this qualification") fires.
+    `verify.py`'s negative-path gate for a stray `this.field` outside a constructor therefore reports this
+    rather than asserting a build failure that the toolchain doesn't produce; "this. only where shadowed"
+    is enforced by review/example today for that direction, not by the build. Left for Tommy to decide an
+    alternative mechanism, or to accept it as a review-only rule.
+  - Repo-wide searches re-run clean: no non-shadowed `this.` anywhere in `.agents/dotnet`, no
+    `TextContentAsync`-then-`ShouldBe` left in the e2e example. `test_scaffold.py`/`test_route_cli.py`
+    (same pre-existing `engineering:docs` failure)/`test_source_layout.py`, `sync-generated.ps1 -Check` and
+    `kit:check` pass, and all 8 verify.py configurations plus the new negative-path gates ran sequentially
+    and passed (0 warnings/0 errors on every config, both Terraform roots validated).
+
 ## Next Steps
 
-1. Slice A: implement, search-verify, build the presets, review, PR and merge. Then notify
-   `sandbox-dotnet-17`.
+1. Slices B and C merge as one conventions PR, tj-agents/dotnet#50. Then notify `sandbox-dotnet-17` for
+   the B9 renames.
+2. Pending Tommy: enforce "no stray `this.`" with a scaffold-shipped source-scan test, or keep it
+   review-only. The scan test would parse the solution's `.cs` files with
+   `Microsoft.CodeAnalysis.CSharp` syntax and fail on a `this.` that isn't a constructor assignment
+   shadowed by its parameter. IDE0003 can't gate it on SDK 10.0.301.
+3. Slice E, once azure `Feature/ActionsConformance` (tj-agents/azure#5) merges.
+4. Slice D waits on the kit core-dependency release.

@@ -11,11 +11,69 @@ provenance: framework, library, house
 
 # Integration tests
 
-Owns the ASP.NET Core integration-test fixture, its shared setup and its test-class shape.
+Owns the ASP.NET Core integration-test fixture, its shared setup and its test-class shape. Naming and
+the assertion library are owned by `dotnet:testing`.
 
 ## Applicability
 
 This contract applies only to ASP.NET Core integration suites with a real database reset between tests. It requires `aspnet-core, xunit, testcontainers, respawn`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+
+```csharp
+[Collection(IntegrationCollection.Name)]
+public sealed class CalculatorApiTests
+{
+    private readonly ApiFixture fixture;
+
+    public CalculatorApiTests(ApiFixture fixture)
+    {
+        this.fixture = fixture;
+    }
+
+    #region Add
+
+    [Theory]
+    [InlineData(2, 3, 5)]
+    [InlineData(-1, 1, 0)]
+    public async Task Add_TwoOperands_ReturnsTheirSum(int left, int right, int expected)
+    {
+        var client = fixture.CreateClient(fixture.SeedState.StandardUser);
+
+        var response = await client.PostAsJsonAsync("/api/calculator/add", new { left, right });
+
+        await response.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content.ReadAsync<CalculationResult>();
+        result!.Total.ShouldBe(expected);
+    }
+
+    #endregion
+
+    #region Clear
+
+    [Fact]
+    public async Task Clear_AfterAnOperation_ResetsTheRunningTotal()
+    {
+        var client = fixture.CreateClient(fixture.SeedState.StandardUser);
+        await client.PostAsJsonAsync("/api/calculator/add", new { left = 4, right = 6 });
+
+        var response = await client.PostAsync("/api/calculator/clear", null);
+
+        await response.ShouldBe(HttpStatusCode.OK);
+        var total = await fixture.Scoped<ICalculatorReadDbContext>()
+            .RunAsync(db => db.RunningTotals.SingleAsync(item => item.UserId == fixture.SeedState.StandardUser.Id));
+        total.Value.ShouldBe(0m);
+    }
+
+    #endregion
+}
+```
+
+`CalculatorApiTests` is the whole standard in one place: the `<Resource>ApiTests` class name, a
+constructor-built `private readonly` fixture field assigned with `this.` rather than a primary-constructor
+capture, no `this.` inside a test method, `Method_Scenario_ExpectedBehaviour` naming, Arrange/Act/Assert
+separated by blank lines, Shouldly throughout, a `[Theory]` with the expected value last, and a `#region`
+per operation. Tommy, 2026-10-13: a generic opening example, not a product-named one, demonstrates every
+convention without prose, and the fixture is an explicit field — the prior `ShipmentApiTests(ShipmentApiFixture
+fixture)` primary-constructor capture and its mixed `Assert.*`/`ShouldBe` are gone.
 
 An integration test boots the service's **real `Program`** through `WebApplicationFactory<Program>`
 (`Microsoft.AspNetCore.Mvc.Testing`) and exercises it over HTTP against a real database. For pure in-memory
@@ -100,14 +158,15 @@ dependency from the ambient scope instead, so its `DbContext` and transaction st
 
 A service or module integration project is organized by the **public resource its API exposes**. Every
 operation on one resource lives in one `<Resource><Qualifier>ApiTests` class — resource or controller first,
-then any qualifier, then the fixed `ApiTests` suffix, which is never dropped. A courier slice of the Shipment
-controller is `ShipmentCourierApiTests`, never `CourierShipmentApiTests`. `Api` rather than `Endpoints` or
-`Controller`, because these drive the real HTTP surface through the Api assembly, not a controller class in
-isolation.
+then any qualifier, then the fixed `ApiTests` suffix, which is never dropped, as in the opening
+`CalculatorApiTests` example. A courier slice of a Shipment controller is `ShipmentCourierApiTests`, never
+`CourierShipmentApiTests`. `Api` rather than `Endpoints` or `Controller`, because these drive the real HTTP
+surface through the Api assembly, not a controller class in isolation.
 
-Once a resource carries a substantial set of operations, group them with a `#region` per operation — `#region
-Get`, `#region Create`, `#region Accept` — or per behaviour cluster where that is not a single operation
-(`#region Cancel from payment failure`). Group with `#region`, **never** `// ---- X ----` dividers.
+Once a resource carries a substantial set of operations, group them with a `#region` per operation — as
+`CalculatorApiTests` does with `#region Add` and `#region Clear` — or per behaviour cluster where that is
+not a single operation (`#region Cancel from payment failure`). Group with `#region`, **never** `// ---- X
+----` dividers.
 
 **A new class needs a reason of its own.** One operation currently having a single test is not one: it goes in
 its resource's class under its own region, and that class absorbs the next operation without a rename. Split
@@ -115,48 +174,6 @@ only where the new class is a genuinely distinct **resource**, a distinct **publ
 **fixture**, or one **coherent process** worth reading end to end. A class per variant — per deal type, per
 status, per request shape — scatters one resource's contract across a directory and hides which operations are
 covered at all.
-
-```csharp
-[Collection(IntegrationCollection.Name)]
-public sealed class ShipmentApiTests(ShipmentApiFixture fixture)
-{
-    #region Get
-
-    [Fact]
-    public async Task Get_ReturnsOnlyTheOwningTenantsShipments()
-    {
-        var client = fixture.CreateClient(fixture.SeedState.WarehouseManager);
-
-        var response = await client.GetAsync("/api/shipments");
-
-        await response.ShouldBe(HttpStatusCode.OK);
-        var shipments = await response.Content.ReadAsync<IReadOnlyList<ShipmentSummary>>();
-        Assert.Contains(shipments!, item => item.Id == fixture.SeedState.PendingShipment.Id);
-        Assert.All(shipments, item => Assert.Equal(fixture.SeedState.Warehouse.TenantId, item.TenantId));
-    }
-
-    #endregion
-
-    #region Dispatch
-
-    [Fact]
-    public async Task Dispatch_MarksTheShipmentDispatchedAndQueuesTheCourierHandover()
-    {
-        var shipment = fixture.SeedState.PendingShipment;
-        var client = fixture.CreateClient(fixture.SeedState.WarehouseManager);
-
-        var response = await client.PostAsync($"/api/shipments/{shipment.Id}/dispatch", null);
-
-        await response.ShouldBe(HttpStatusCode.OK);
-        var dispatched = await fixture.Scoped<IShipmentReadDbContext>()
-            .RunAsync(db => db.Shipments.SingleAsync(item => item.Id == shipment.Id));
-        Assert.Equal(ShipmentStatus.Dispatched, dispatched.Status);
-        Assert.Single(fixture.CourierHandovers, handover => handover.ShipmentId == shipment.Id);
-    }
-
-    #endregion
-}
-```
 
 ## Each endpoint test proves its own contract
 

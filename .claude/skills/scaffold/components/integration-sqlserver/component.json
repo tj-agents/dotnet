@@ -7,7 +7,7 @@
     "FIXTURE_CONTAINER_TYPE": "MsSqlContainer",
     "FIXTURE_CONTAINER_CREATION": "new MsSqlBuilder(\"mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04\")\n    .WithPassword(CreatePassword())\n    .WithPortBinding(1433, true)\n    .WithCreateParameterModifier(parameters => parameters.HostConfig!.PortBindings![\"1433/tcp\"][0].HostIP = \"127.0.0.1\")\n    .Build()",
     "FIXTURE_CONNECTION_TYPE": "SqlConnection",
-    "FIXTURE_CONNECTION_CREATION": "new SqlConnection(this.container.GetConnectionString())",
+    "FIXTURE_CONNECTION_CREATION": "new SqlConnection(container.GetConnectionString())",
     "FIXTURE_DB_ADAPTER": "DbAdapter.SqlServer"
   },
   "append": {

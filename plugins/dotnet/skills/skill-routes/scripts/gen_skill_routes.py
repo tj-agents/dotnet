@@ -34,6 +34,13 @@ VALIDATOR_PATH = r"(?i:validators?\.cs$)"
 MAPPER_PATH = r"(?i:mappers?\.cs$)"
 SEEDING_PATH = r"(?i:seeders?\.cs$|(^|/)seeding/.*\.cs$)"
 PROTO_PATH = r"(?i:\.proto$)"
+DOMAIN_EVENTS_CS_PATH = r"(?i:\.c(s)$)"
+DOMAIN_EVENTS_CONTENT = r"(?i:\bidomainevent\b|\bieventraiser\b|domaineventhandler|integrationeventhandler)"
+PUBLISHER_CONSUMER_PATH = r"(?i:(publisher|consumer|handler)s?\.cs$)"
+PROCESSOR_PATH = r"(?i:processors?\.cs$)"
+DEPENDENCY_INJECTION_CS_PATH = r"(?i:(\.c)s$)"
+DEPENDENCY_INJECTION_CONTENT = r"(?i:\biservicecollection\b|\.add(scoped|singleton|transient)\b)"
+COLLABORATOR_PATH = r"(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|committer)s?\.cs$)"
 KINDS = ("dotnet-service",)
 REGISTRY = {
     "infonetica/cris-authz": "dotnet-service",
@@ -70,6 +77,11 @@ def routes(kind: str) -> dict:
         {"path": MAPPER_PATH, "skills": ["dotnet:naming-mapping"]},
         {"path": SEEDING_PATH, "skills": ["dotnet:seeding"]},
         {"path": PROTO_PATH, "skills": ["dotnet:proto"]},
+        {"path": DOMAIN_EVENTS_CS_PATH, "content_requires": DOMAIN_EVENTS_CONTENT, "skills": ["dotnet:domain-events"]},
+        {"path": PUBLISHER_CONSUMER_PATH, "skills": ["dotnet:naming-collaborators", "dotnet:domain-events"]},
+        {"path": PROCESSOR_PATH, "skills": ["dotnet:naming-collaborators", "dotnet:microservice-boundaries"]},
+        {"path": DEPENDENCY_INJECTION_CS_PATH, "content_requires": DEPENDENCY_INJECTION_CONTENT, "skills": ["dotnet:dependency-injection"]},
+        {"path": COLLABORATOR_PATH, "skills": ["dotnet:naming-collaborators"]},
     ]
     return {
         "_comment": [

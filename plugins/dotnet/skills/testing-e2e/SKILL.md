@@ -11,11 +11,80 @@ provenance: library, house
 
 # E2E scenario authoring
 
-Owns browser E2E scenario authoring — fast-forward setup, baseline discipline and readiness gates.
+Owns browser E2E scenario authoring — fast-forward setup, baseline discipline and readiness gates. Naming
+and the assertion library are owned by `dotnet:testing`.
 
 ## Applicability
 
 This contract applies only to browser end-to-end suites using Gherkin and Playwright. It requires `reqnroll, playwright`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+
+```gherkin
+Feature: Clock
+
+  Scenario Outline: Elapsed_PastStart_ReturnsDuration
+    Given a clock already started at "<start>"
+    When the clock advances to "<now>"
+    Then the elapsed time reads "<expected>"
+
+    Examples:
+      | start    | now      | expected |
+      | 09:00:00 | 09:30:00 | 00:30:00 |
+      | 09:00:00 | 09:00:00 | 00:00:00 |
+```
+
+```csharp
+using static Microsoft.Playwright.Assertions;
+
+[Binding]
+public sealed class ClockSteps
+{
+    private readonly IPage page;
+    private readonly ClockFixture fixture;
+    private Guid clockId;
+
+    public ClockSteps(IPage page, ClockFixture fixture)
+    {
+        this.page = page;
+        this.fixture = fixture;
+    }
+
+    #region Elapsed
+
+    [Given(@"a clock already started at ""(.*)""")]
+    public void GivenAClockAlreadyStartedAt(string start)
+    {
+        clockId = fixture.SeedState.Clocks[start].Id;
+    }
+
+    [When(@"the clock advances to ""(.*)""")]
+    public async Task WhenTheClockAdvancesTo(string now)
+    {
+        await page.GotoAsync($"/clocks/{clockId}");
+        await page.FillAsync("#now", now);
+        await page.ClickAsync("#advance");
+    }
+
+    [Then(@"the elapsed time reads ""(.*)""")]
+    public async Task ThenTheElapsedTimeReads(string expected)
+    {
+        await Expect(page.Locator("#elapsed")).ToHaveTextAsync(expected);
+    }
+
+    #endregion
+}
+```
+
+The Scenario Outline title carries the same `Method_Scenario_ExpectedBehaviour` shape as every other
+tier — `Elapsed` the behaviour under test, `PastStart` the input state, `ReturnsDuration` the outcome —
+and its `Examples` table keeps `expected` as the last column, exactly like a `[Theory]`'s last parameter.
+`ClockSteps` builds its `IPage` and fixture as constructor-assigned `private readonly` fields with
+`this.` (both parameters shadow their fields), uses no `this.` inside a step method, and groups its
+`Given`/`When`/`Then` steps under one `#region` per behaviour under test. Tommy, 2026-10-13: a generic
+opening example, not a product-named one, carries every convention a Gherkin/Reqnroll suite can show,
+without prose — and obeys this contract's own rules, not only the others': the `Given` fast-forwards by
+reading the already-seeded clock's id off the fixture onto scenario state, with no navigation or clicks;
+only the `When` drives the browser, for the behaviour the scenario titles as under test; and the `Then`
+asserts page state with Playwright's auto-retrying `Expect`, never a one-shot read.
 
 Gherkin feature files bound to step definitions with **Reqnroll**, driving the browser through
 **Playwright**. These rules are the same for every UI suite in a solution, so they live in one place; a

@@ -36,7 +36,10 @@ owner for the task at hand; load the relevant owner when its concern and prerequ
 | Name typed application errors | `dotnet:errors-results` |
 | Define validator names, methods and results when the validation profile is selected | `dotnet:validation` |
 | Name keyed strategy families | `dotnet:keyed-strategies` |
-| Name unit tests | `dotnet:testing-unit` |
+| Name a test method, any tier | `dotnet:testing` |
+
+2026-10-13: test naming moved here from `dotnet:testing-unit` — one owner for every tier, not a
+per-tier naming rule each test contract restated on its own.
 
 ## Reuse the domain language and responsibility owner
 
