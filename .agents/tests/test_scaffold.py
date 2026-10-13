@@ -127,6 +127,11 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
         if os.environ.get("FAKE_STANDARDS_FAIL"):
             print("fake standards failure", file=sys.stderr)
             return 9
+        if args.mode == "check" and os.environ.get("FAKE_STANDARDS_CHECK_FAIL"):
+            print("fake standards check failure", file=sys.stderr)
+            return 8
+        if args.mode == "check":
+            return 0
         root = Path(args.root)
         plugins = ["base-agents/base", "base-agents/engineering", "base-agents/machine", *args.plugin]
         omitted = os.environ.get("FAKE_STANDARDS_OMIT_PLUGIN")
@@ -487,10 +492,11 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(0, standard.returncode, standard.stderr)
             self.assertEqual(0, azure.returncode, azure.stderr)
             calls = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
-            standard_plugins = [calls[0][index + 1] for index, item in enumerate(calls[0]) if item == "--plugin"]
-            azure_plugins = [calls[1][index + 1] for index, item in enumerate(calls[1]) if item == "--plugin"]
-            self.assertEqual(["dotagents/dotnet"], standard_plugins)
-            self.assertEqual(["dotagents/dotnet", "azure-agents/azure"], azure_plugins)
+            self.assertEqual(["write", "check", "write", "check"], [call[call.index("--mode") + 1] for call in calls])
+            standard_plugins = [[call[index + 1] for index, item in enumerate(call) if item == "--plugin"] for call in calls[:2]]
+            azure_plugins = [[call[index + 1] for index, item in enumerate(call) if item == "--plugin"] for call in calls[2:]]
+            self.assertEqual([["dotagents/dotnet"], ["dotagents/dotnet"]], standard_plugins)
+            self.assertEqual([["dotagents/dotnet", "azure-agents/azure"], ["dotagents/dotnet", "azure-agents/azure"]], azure_plugins)
 
     def test_standards_files_are_copied_and_listed_by_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -517,6 +523,25 @@ class ScaffoldTests(unittest.TestCase):
 
             self.assertEqual(1, result.returncode)
             self.assertFalse((root / "Failure").exists())
+
+    def test_standards_adopter_check_failure_prevents_project_creation_and_dry_run_output(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            log_path = root / "standards.log"
+            env = dict(os.environ, FAKE_STANDARDS_CHECK_FAIL="1", FAKE_STANDARDS_LOG=str(log_path))
+            created = self.run_cli(
+                "new", "--name", "CheckFailure", "--destination", str(root), "--preset", "minimal", env=env,
+            )
+            preview = self.run_cli(
+                "new", "--name", "CheckFailurePreview", "--destination", str(root), "--preset", "minimal", "--dry-run", env=env,
+            )
+
+            self.assertEqual(1, created.returncode)
+            self.assertEqual(1, preview.returncode)
+            self.assertFalse((root / "CheckFailure").exists())
+            self.assertFalse((root / "CheckFailurePreview").exists())
+            calls = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(["write", "check", "write", "check"], [call[call.index("--mode") + 1] for call in calls])
 
     def test_standards_required_outputs_and_selected_plugins_are_validated(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
