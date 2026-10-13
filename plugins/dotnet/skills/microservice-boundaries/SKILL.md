@@ -69,31 +69,47 @@ your control dictates the wire format.
 ```csharp
 internal sealed class OrderEventsProcessor : BackgroundService
 {
-    private readonly IServiceScopeFactory scopeFactory;
     private readonly ServiceBusProcessor processor;
+    private readonly IServiceScopeFactory scopeFactory;
+    private readonly ILogger<OrderEventsProcessor> logger;
 
-    public OrderEventsProcessor(IServiceScopeFactory scopeFactory, ServiceBusProcessor processor)
+    public OrderEventsProcessor(
+        ServiceBusProcessor processor,
+        IServiceScopeFactory scopeFactory,
+        ILogger<OrderEventsProcessor> logger)
     {
-        this.scopeFactory = scopeFactory;
         this.processor = processor;
-        this.processor.ProcessMessageAsync += HandleMessageAsync;
-        this.processor.ProcessErrorAsync += HandleErrorAsync;
+        this.scopeFactory = scopeFactory;
+        this.logger = logger;
+        processor.ProcessMessageAsync += HandleMessageAsync;
+        processor.ProcessErrorAsync += HandleErrorAsync;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
+        processor.StartProcessingAsync(stoppingToken);
+
+    public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        await processor.StartProcessingAsync(stoppingToken);
-        await Task.Delay(Timeout.Infinite, stoppingToken).ConfigureAwait(false);
+        await processor.StopProcessingAsync(cancellationToken);
+        await base.StopAsync(cancellationToken);
     }
 
     private async Task HandleMessageAsync(ProcessMessageEventArgs args)
     {
+        var integrationEvent = args.Message.Body.ToObjectFromJson<OrderPlacedEvent>();
+
         await using var scope = scopeFactory.CreateAsyncScope();
-        await args.Message.DispatchAsync(scope.ServiceProvider);
-        await args.CompleteMessageAsync(args.Message);
+        var handler = scope.ServiceProvider.GetRequiredService<IIntegrationEventHandler<OrderPlacedEvent>>();
+        await handler.HandleAsync(integrationEvent, args.CancellationToken);
+
+        await args.CompleteMessageAsync(args.Message, args.CancellationToken);
     }
 
-    private Task HandleErrorAsync(ProcessErrorEventArgs args) => Task.CompletedTask;
+    private Task HandleErrorAsync(ProcessErrorEventArgs args)
+    {
+        logger.SubscriptionProcessingFailed(args.EntityPath, args.Exception);
+        return Task.CompletedTask;
+    }
 }
 ```
 
@@ -101,8 +117,11 @@ internal sealed class OrderEventsProcessor : BackgroundService
 subscription — see `dotnet:naming-collaborators` for the role decision and its rejected names. It takes
 explicit `private readonly` fields assigned with `this.` in the constructor, never a primary-constructor
 capture, and uses the broker SDK's own type (`ServiceBusProcessor` above) as the receive source rather
-than inventing a receiver role. It dispatches each message to its `<Event>Handler` and settles the
-message itself; the Handler owns only the business reaction, never the settlement.
+than inventing a receiver role. It dispatches each message to its `<Event>Handler` in a fresh DI scope, because the processor is a
+singleton and handlers are scoped, then settles the message itself: the Handler owns only the business
+reaction, never the settlement. A handler that throws leaves the message unsettled, so the broker
+redelivers it and dead-letters it after its maximum delivery count. Register the `ServiceBusProcessor`
+with `AutoCompleteMessages = false`.
 
 ## HTTP surfaces
 
