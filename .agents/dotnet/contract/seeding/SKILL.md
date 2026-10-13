@@ -114,9 +114,9 @@ Seeders read from seed state and persist. They never assign to it:
 ```csharp
 public async Task SeedAsync(CancellationToken ct)
 {
-    if (await context.Warehouses.AnyAsync(ct)) return;
+    if (await context.Warehouses.AnyAsync(ct).ConfigureAwait(false)) return;
     context.Warehouses.AddRange(seedData.Warehouses);
-    await context.SaveChangesAsync(ct);
+    await context.SaveChangesAsync(ct).ConfigureAwait(false);
 }
 ```
 

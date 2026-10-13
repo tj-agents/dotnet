@@ -52,6 +52,14 @@ public OrderService(OrderDbContext context)
     this.context = context;
 }
 
+// WRONG
+private readonly OrderDbContext _context;
+```
+
+A constructor with no same-named parameter has nothing to disambiguate, so the assignment stays
+unqualified:
+
+```csharp
 // CORRECT — no parameter shares the field's name, so there is nothing to disambiguate
 private readonly Inventory inventory;
 
@@ -59,9 +67,6 @@ public InventoryTests()
 {
     inventory = new Inventory(new StockCatalog());
 }
-
-// WRONG
-private readonly OrderDbContext _context;
 ```
 
 2026-10-13: `this.` appears only where a constructor parameter is named after the member it fills and
@@ -162,10 +167,10 @@ await client.PostAsync($"/api/orders/{cartId}", new { buyer = "Ada" });
 
 ```csharp
 // CORRECT — CurrentScope is defined on the base, not here
-return await base.CurrentScope.Where(x => x.IsActive).ToListAsync(ct);
+return await base.CurrentScope.Where(x => x.IsActive).ToListAsync(ct).ConfigureAwait(false);
 
 // WRONG — reads like a local member
-return await CurrentScope.Where(x => x.IsActive).ToListAsync(ct);
+return await CurrentScope.Where(x => x.IsActive).ToListAsync(ct).ConfigureAwait(false);
 ```
 
 It tells the reader the member lives on the base so they don't hunt for a definition that isn't in

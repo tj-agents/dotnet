@@ -485,6 +485,8 @@ def plan(name: str, options: Mapping[str, Any], preset: Optional[str]) -> Dict[s
             source_files.extend((path, files_root) for path in sorted(files_root.rglob("*")) if path.is_file())
     for source, source_root in source_files:
         relative = safe_relative(substitute(source.relative_to(source_root).as_posix(), variables, str(source)))
+        if options["cloud"] == "azure" and relative == ".github/workflows/ci.yml":
+            continue
         if relative in files:
             raise ScaffoldError(f"template collision: {relative}")
         text = substitute(source.read_text(encoding="utf-8"), variables, str(source))

@@ -88,6 +88,12 @@ FAKE_AZURE_SCAFFOLD = textwrap.dedent(
             return 1
 
         into = Path(args.into)
+        workflow = into / ".github" / "workflows" / "ci.yml"
+        if workflow.exists():
+            print("ci.yml already exists at Azure handoff", file=sys.stderr)
+            return 1
+        workflow.parent.mkdir(parents=True, exist_ok=True)
+        workflow.write_text("name: Azure CI\\n", encoding="utf-8")
         (into / "infra").mkdir(parents=True, exist_ok=True)
         (into / "infra" / "FAKE_AZURE_RAN.txt").write_text("ok\\n", encoding="utf-8")
         return 0
@@ -824,6 +830,7 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(0, result.returncode, result.stderr)
             project = root / "AzureOk"
             self.assertTrue((project / "infra" / "FAKE_AZURE_RAN.txt").is_file())
+            self.assertEqual("name: Azure CI\n", (project / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8"))
             metadata = json.loads((project / ".scaffold.json").read_text(encoding="utf-8"))
             self.assertEqual({"http_host": "app-service"}, metadata["azure"])
             calls = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
@@ -843,6 +850,7 @@ class ScaffoldTests(unittest.TestCase):
             self.assertIn("new --into", result.stdout)
             self.assertIn(str(root / "NoAzurePath"), result.stdout)
             self.assertTrue((root / "NoAzurePath" / "infra" / "app.json").is_file())
+            self.assertFalse((root / "NoAzurePath" / ".github" / "workflows" / "ci.yml").exists())
 
     def test_azure_command_line_quotes_values_with_spaces(self) -> None:
         line = SCAFFOLD.azure_command_line(

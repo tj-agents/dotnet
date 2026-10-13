@@ -20,7 +20,11 @@
         "Bash(python -B ${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py:*)",
         "Bash(python3 -B ${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py:*)",
         "PowerShell(python -B ${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py:*)",
-        "PowerShell(python3 -B ${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py:*)"
+        "PowerShell(python3 -B ${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py:*)",
+        "Bash(python -B ${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py)",
+        "Bash(python3 -B ${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py)",
+        "PowerShell(python -B ${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py)",
+        "PowerShell(python3 -B ${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py)"
       ],
       "codex_prefix_rules": [
         {
@@ -38,6 +42,22 @@
           "not_match": [
             ["python", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "new"],
             ["python3", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"]
+          ]
+        },
+        {
+          "pattern": [
+            ["python", "python3"],
+            "-B",
+            "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"
+          ],
+          "justification": "Runs only the packaged scaffold verification gate, including contract snippet compilation under the scaffold analyzers.",
+          "match": [
+            ["python", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"],
+            ["python3", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"]
+          ],
+          "not_match": [
+            ["python", "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"],
+            ["python", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "new"]
           ]
         }
       ]
