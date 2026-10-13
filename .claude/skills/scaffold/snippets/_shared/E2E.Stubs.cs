@@ -10,7 +10,7 @@ public sealed class ClockFixture
 
 public sealed class ClockSeedState
 {
-    public IReadOnlyDictionary<string, ClockSeed> Clocks { get; } = new Dictionary<string, ClockSeed>();
+    public IReadOnlyDictionary<string, ClockSeed> Clocks { get; } = new Dictionary<string, ClockSeed>(StringComparer.Ordinal);
 }
 
 public sealed record ClockSeed(Guid Id);

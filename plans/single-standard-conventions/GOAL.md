@@ -305,3 +305,17 @@ full-CI Azure workflow collision already recorded in the primary shared register
   validation and freshness of all 585 generated outputs pass. Local real Azure composition runs only
   Python generation; no dotnet or Terraform process was launched. Full exact-head CI, fresh independent
   incremental review and delivery remain with the parent.
+
+## E2E snippet CI repair - 2026-10-13
+
+Independent incremental review of `565a6ed` completed with all five lenses clear and approved. The
+exact-head Scaffold PR run `38437895854` passed the repaired Azure composition and reached the snippet
+compiler, which reported the five E2E diagnostics tracked in `BUGS.md#B012`: MA0002 on the seed
+support dictionary and MA0004 on four awaits in the actual ClockSteps contract example.
+
+The source example now configures all four awaits with `ConfigureAwait(false)`; the support dictionary
+uses `StringComparer.Ordinal`. Both generators refreshed the exact fixture and all host layouts. The
+manifest header stays empty, the fence remains selected for compilation, and analyzer policy is unchanged.
+Eight snippet tests, three source-layout tests, the affected-source/header check and freshness of all 585
+generated outputs pass. No local dotnet or Terraform process ran. Full exact-head compiler validation,
+fresh independent incremental review and delivery remain with the parent.
