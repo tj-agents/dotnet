@@ -29,7 +29,7 @@ SNIPPET_SHARED_FILES = {
         "Hosting.Stubs.cs", "Grpc.Stubs.cs",
     ),
     "web": ("GlobalUsings.cs", "SharedGlobalUsing.cs"),
-    "unit-tests": ("GlobalUsings.cs",),
+    "unit-tests": ("GlobalUsings.cs", "SharedGlobalUsing.cs", "DataAccess.Stubs.cs"),
     "integration-tests": ("GlobalUsings.cs",),
 }
 
@@ -152,23 +152,27 @@ def negative_path_gates(name: str, preset: str, overrides: Sequence[str] = ()) -
             )
 
 
-def _add_dunet_reference(project: Path, infra_csproj: Path) -> None:
-    packages_props = project / "Directory.Packages.props"
+def _add_package_version(packages_props: Path, package: str, version: str) -> None:
     text = packages_props.read_text(encoding="utf-8")
-    if "Dunet" not in text:
-        anchor = "</Project>"
-        addition = f'  <ItemGroup>\n    <PackageVersion Include="Dunet" Version="{DUNET_VERSION}" />\n  </ItemGroup>\n'
-        if anchor not in text:
-            raise AssertionError("snippet gate: Directory.Packages.props has no </Project> to anchor on")
-        packages_props.write_text(text.replace(anchor, addition + anchor, 1), encoding="utf-8")
+    if package in text:
+        return
+    anchor = "</Project>"
+    if anchor not in text:
+        raise AssertionError(f"snippet gate: {packages_props} has no </Project> to anchor on")
+    addition = f'  <ItemGroup>\n    <PackageVersion Include="{package}" Version="{version}" />\n  </ItemGroup>\n'
+    packages_props.write_text(text.replace(anchor, addition + anchor, 1), encoding="utf-8")
 
-    csproj_text = infra_csproj.read_text(encoding="utf-8")
-    if "Dunet" not in csproj_text:
-        anchor = "</Project>"
-        addition = '  <ItemGroup>\n    <PackageReference Include="Dunet" PrivateAssets="all" />\n  </ItemGroup>\n'
-        if anchor not in csproj_text:
-            raise AssertionError(f"snippet gate: {infra_csproj} has no </Project> to anchor on")
-        infra_csproj.write_text(csproj_text.replace(anchor, addition + anchor, 1), encoding="utf-8")
+
+def _add_package_reference(csproj: Path, package: str, private_assets: str | None = None) -> None:
+    text = csproj.read_text(encoding="utf-8")
+    if package in text:
+        return
+    anchor = "</Project>"
+    if anchor not in text:
+        raise AssertionError(f"snippet gate: {csproj} has no </Project> to anchor on")
+    attribute = f' PrivateAssets="{private_assets}"' if private_assets else ""
+    addition = f'  <ItemGroup>\n    <PackageReference Include="{package}"{attribute} />\n  </ItemGroup>\n'
+    csproj.write_text(text.replace(anchor, addition + anchor, 1), encoding="utf-8")
 
 
 def snippet_compile_gate(name: str) -> None:
@@ -182,8 +186,13 @@ def snippet_compile_gate(name: str) -> None:
         project = destination / name
         solution = project / f"{name}.slnx"
 
+        packages_props = project / "Directory.Packages.props"
         infra_csproj = project / "src" / f"{name}.Infrastructure" / f"{name}.Infrastructure.csproj"
-        _add_dunet_reference(project, infra_csproj)
+        _add_package_version(packages_props, "Dunet", DUNET_VERSION)
+        _add_package_reference(infra_csproj, "Dunet", private_assets="all")
+
+        unit_tests_csproj = project / "tests" / f"{name}.UnitTests" / f"{name}.UnitTests.csproj"
+        _add_package_reference(unit_tests_csproj, "Microsoft.EntityFrameworkCore")
 
         for project_kind, (top, suffix) in SNIPPET_PROJECT_FOLDERS.items():
             target = project / top / f"{name}.{suffix}" / "Snippets"

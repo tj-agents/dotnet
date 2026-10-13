@@ -418,7 +418,14 @@ SNIPPETS: list[Snippet] = [
           ),
           footer="\n    }\n}\n"),
     entry("multitenancy-05-stance-test", "multitenancy/SKILL.md", 5, "unit-tests", "SnippetFixtures.Multitenancy05",
-          skip="needs EF Core's DbContext/ModelBuilder/QueryTrackingBehavior to assert the model, and the scaffold's UnitTests project has no EF Core package reference (only Infrastructure references EF Core)."),
+          header=(
+              "using Microsoft.EntityFrameworkCore;\nusing Xunit;\n\n"
+              "#pragma warning disable MA0004\n\n"
+              "internal static class Example\n{\n"
+              "    private static readonly Type[] TenantFilteredTypes = [];\n\n"
+              "    public static async Task Run(ReadDbContext readContext, TenantScopedDbContext tenantContext)\n    {\n"
+          ),
+          footer="\n    }\n}\n\n#pragma warning restore MA0004\n"),
 
     entry("seeding-01-seed-async", "seeding/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding01",
           header=(

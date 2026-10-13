@@ -226,6 +226,17 @@ schema, or a `cloud-db-schemas` option), so the workload grants cover them.
     Shouldly/`System.Net.Http.Json` calls.
   - 6 new unittests, sync and kit check pass, and the full verify.py (including the new snippet compile
     gate) runs sequentially and passes.
+  - Tommy: close 2 of the 14 skips, the rest are legitimate. `multitenancy-05-stance-test` closed —
+    decoupled `IReadDbContext`/`IWriteDbContext` from `IDbContext` in the shared stub (they were wrongly
+    extending it; the contract's own repository-capability table treats them as independent rows), made
+    `ReadDbContext` throw on `SaveChanges` per its own "read-only by construction" rule, and added a
+    temporary `Microsoft.EntityFrameworkCore` reference to the gate's UnitTests project only (not the
+    shipped scaffold). `testing-e2e-01-clock` (the M003 example) not yet closed — still needs a temporary
+    E2E project (Reqnroll/Reqnroll.xUnit/Microsoft.Playwright/Shouldly) added to the gate's scaffolded
+    sandbox, an `e2e-tests` manifest project kind, and `ClockFixture`/seed-state stubs. Also pending: the
+    integration-event definition in `domain-events`/`naming-collaborators` (with its own snippet) and the
+    GOAL.md Next Steps notify-target edit (sandbox-dotnet-17 → the Codex owner at
+    `sandbox-dotnet/plans/sandbox/GOAL.md`). Checkpointed here for a Codex handoff.
 
 ## Next Steps
 
