@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -17,6 +18,7 @@ from xml.etree import ElementTree
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / ".agents" / "dotnet" / "utility" / "scaffold" / "scripts" / "scaffold.py"
+SCAFFOLD_SKILL = SCRIPT.parent.parent / "SKILL.md"
 SPECIFICATION = importlib.util.spec_from_file_location("dotnet_scaffold", SCRIPT)
 if SPECIFICATION is None or SPECIFICATION.loader is None:
     raise RuntimeError("cannot load dotnet scaffold")
@@ -371,6 +373,58 @@ class ScaffoldTests(unittest.TestCase):
             self.assertFalse((root / "Missing").exists())
             self.assertFalse((root / "MissingAdopter").exists())
             self.assertFalse((root / "MissingInput").exists())
+
+    def test_documented_new_examples_execute_with_fixture_substitutions(self) -> None:
+        standard_flags = (
+            " --standards-adopter <machine-bootstrap-skill-directory>/scripts/adopt_repository.py"
+            " --standards-input /path/to/sources.json"
+        )
+        updated = SCAFFOLD_SKILL.read_text(encoding="utf-8")
+        previous = updated.replace(standard_flags, "")
+        self.assertNotEqual(updated, previous)
+        with tempfile.TemporaryDirectory() as temporary:
+            destination = Path(temporary)
+            azure_script = write_fake_azure(destination / "azure")
+            previous_skill = destination / "previous-SKILL.md"
+            updated_skill = destination / "updated-SKILL.md"
+            previous_skill.write_text(previous, encoding="utf-8")
+            updated_skill.write_text(updated, encoding="utf-8")
+            replacements = (
+                ("<skill-directory>/scripts/scaffold.py", SCRIPT.as_posix()),
+                ("<machine-bootstrap-skill-directory>/scripts/adopt_repository.py", self.standards_adopter.as_posix()),
+                ("/path/to/sources.json", self.standards_input.as_posix()),
+                ("~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py", azure_script.as_posix()),
+                ("~/source/repos", destination.as_posix()),
+            )
+            def run_documented_commands(path: Path) -> list[subprocess.CompletedProcess[str]]:
+                commands = re.findall(
+                    r"^python -B <skill-directory>/scripts/scaffold\.py new .+$",
+                    path.read_text(encoding="utf-8"),
+                    flags=re.MULTILINE,
+                )
+                self.assertEqual(2, len(commands))
+                results = []
+                for command in commands:
+                    rendered = command
+                    for source, replacement in replacements:
+                        rendered = rendered.replace(source, replacement)
+                    arguments = shlex.split(rendered)
+                    arguments[0] = sys.executable
+                    results.append(subprocess.run(arguments, cwd=ROOT, capture_output=True, text=True, stdin=subprocess.DEVNULL))
+                return results
+
+            previous_results = run_documented_commands(previous_skill)
+            for result in previous_results:
+                self.assertEqual(2, result.returncode)
+            self.assertFalse((destination / "MyService").exists())
+            self.assertFalse((destination / "Sandbox").exists())
+
+            updated_results = run_documented_commands(updated_skill)
+            for result in updated_results:
+                self.assertEqual(0, result.returncode, result.stderr)
+            self.assertTrue((destination / "MyService" / ".agents" / "capabilities.lock.json").is_file())
+            self.assertTrue((destination / "Sandbox" / ".agents" / "capabilities.lock.json").is_file())
+            self.assertTrue((destination / "Sandbox" / "infra" / "FAKE_AZURE_RAN.txt").is_file())
 
     def test_standards_adopter_receives_dotnet_and_azure_when_selected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
