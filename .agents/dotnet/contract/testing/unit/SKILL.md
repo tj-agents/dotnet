@@ -25,7 +25,7 @@ public sealed class InventoryTests
 
     public InventoryTests()
     {
-        this.inventory = new Inventory(new StockCatalog());
+        inventory = new Inventory(new StockCatalog());
     }
 
     #region Receive
@@ -47,10 +47,12 @@ public sealed class InventoryTests
 ```
 
 `InventoryTests` is the whole standard in one place: `Method_Scenario_ExpectedBehaviour` naming, a
-constructor-built `private readonly` field assigned with `this.`, no `this.` inside the test method,
-Arrange/Act/Assert separated by blank lines, xUnit's `Assert.*`, a `[Theory]` with the expected value
-last, and a `#region` per method under test. Tommy, 2026-10-13: a generic opening example, not a
-product-named one, demonstrates every convention without prose and without a second vocabulary.
+constructor-built `private readonly` field, Arrange/Act/Assert separated by blank lines, xUnit's
+`Assert.*`, a `[Theory]` with the expected value last, and a `#region` per method under test. Tommy,
+2026-10-13: a generic opening example, not a product-named one, demonstrates every convention without
+prose and without a second vocabulary. Its parameterless constructor assigns `inventory` unqualified —
+per `dotnet:style`'s Option A, `this.` appears only where a constructor parameter shadows the field it
+fills, and nothing here does.
 
 A unit test is a pure in-memory test of substantial, deterministic core logic with **no** database, HTTP,
 fixtures, or `WebApplicationFactory`/`TestServer` host, and no `Testcontainers` container. Good candidates
@@ -104,8 +106,8 @@ from those fields.
 - **Never a per-test `CreateSut()`/`CreateService()` factory method.** A private method rebuilt on every
   call is the constructor's job wearing a disguise — it buys nothing the constructor doesn't already give
   every test, and it's the tell that mocks are being re-declared as local variables per test instead of
-  living as constructor-built `this.`-qualified fields. If you're about to write one, put its body in the
-  constructor instead and reference the fields directly.
+  living as constructor-built fields. If you're about to write one, put its body in the constructor
+  instead and reference the fields directly.
 - **Prefer real collaborators over mocks** where they are cheap and deterministic — `new Inventory(new
   StockCatalog())`, not a mocked catalog. Reach for a test double only at a genuine boundary: I/O, time,
   randomness, or an expensive/nondeterministic dependency, and only when the SUT still owns substantial

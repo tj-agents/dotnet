@@ -10,7 +10,7 @@ internal sealed class DapperConnectionFactory : IDapperConnectionFactory
 
     public DapperConnectionFactory(IConfiguration configuration)
     {
-        this.connectionString = configuration.GetConnectionString("Postgres")
+        connectionString = configuration.GetConnectionString("Postgres")
             ?? throw new InvalidOperationException("Connection string 'Postgres' is required.");
     }
 

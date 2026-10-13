@@ -23,7 +23,7 @@ public sealed class ApiFixture : WebApplicationFactory<global::Program>, IAsyncL
 
     public ApiFixture()
     {
-        this.container = $FIXTURE_CONTAINER_CREATION$;
+        container = $FIXTURE_CONTAINER_CREATION$;
     }
 
     public async Task InitializeAsync()

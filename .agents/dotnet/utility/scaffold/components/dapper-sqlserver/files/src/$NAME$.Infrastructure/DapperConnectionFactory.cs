@@ -10,7 +10,7 @@ internal sealed class DapperConnectionFactory : IDapperConnectionFactory
 
     public DapperConnectionFactory(IConfiguration configuration)
     {
-        this.connectionString = configuration.GetConnectionString("SqlServer")
+        connectionString = configuration.GetConnectionString("SqlServer")
             ?? throw new InvalidOperationException("Connection string 'SqlServer' is required.");
     }
 

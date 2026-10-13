@@ -53,9 +53,9 @@ internal sealed class StandardFulfilmentFlow : IFulfilmentFlow
         ChargeCardStep chargeCardStep,
         DispatchStep dispatchStep)
     {
-        this.Reserve = reserveStockStep;
-        this.Charge = chargeCardStep;
-        this.Dispatch = dispatchStep;
+        Reserve = reserveStockStep;
+        Charge = chargeCardStep;
+        Dispatch = dispatchStep;
     }
 
     public IReserveStep Reserve { get; }
@@ -65,8 +65,9 @@ internal sealed class StandardFulfilmentFlow : IFulfilmentFlow
 ```
 
 The parameters stay **concrete** so DI resolves the registered concrete step, while the properties are
-**interface-typed** — the contract consumers see. The implicit conversion happens at assignment, and the
-assignments are `this.`-qualified like any other constructor assignment.
+**interface-typed** — the contract consumers see. The implicit conversion happens at assignment. Per
+`dotnet:style`, the assignment stays unqualified here: the property name (`Reserve`) differs from the
+parameter it's assigned from (`reserveStockStep`), so there is no shadowing for `this.` to disambiguate.
 
 **This is not a licence to drop `private readonly` fields elsewhere.** It applies only where the member is
 a genuine public part of the type's contract that passes the dependency straight through. A dependency the
