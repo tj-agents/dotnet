@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Exe</OutputType>$WORKER_CLOUD_PROPERTIES$
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../$NAME$.Core/$NAME$.Core.csproj" />

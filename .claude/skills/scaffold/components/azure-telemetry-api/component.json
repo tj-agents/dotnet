@@ -1,0 +1,11 @@
+{
+  "when": {"cloud": "azure", "telemetry": "opentelemetry"},
+  "requires": {},
+  "conflicts": {},
+  "append": {
+    "API_USINGS": "using Azure.Monitor.OpenTelemetry.AspNetCore;",
+    "API_SERVICE_REGISTRATIONS": "var applicationInsightsConnectionString = builder.Configuration[\"APPLICATIONINSIGHTS_CONNECTION_STRING\"];\n\nif (!string.IsNullOrWhiteSpace(applicationInsightsConnectionString))\n    builder.Services.AddOpenTelemetry().UseAzureMonitor();",
+    "API_PACKAGE_REFERENCES": "    <PackageReference Include=\"Azure.Monitor.OpenTelemetry.AspNetCore\" />",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Azure.Monitor.OpenTelemetry.AspNetCore\" Version=\"1.6.0\" />"
+  }
+}

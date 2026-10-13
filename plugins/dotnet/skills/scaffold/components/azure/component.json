@@ -1,0 +1,8 @@
+{
+  "when": {"cloud": "azure"},
+  "requires": {},
+  "conflicts": {},
+  "append": {
+    "SCAFFOLD_GUIDANCE": "Azure wiring is enabled: health checks, Postgres Entra authentication where selected, and Azure Monitor telemetry where selected are configured, and infra/app.json drives azure:scaffold."
+  }
+}
