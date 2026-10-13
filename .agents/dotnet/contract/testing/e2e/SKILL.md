@@ -59,15 +59,15 @@ public sealed class ClockSteps
     [When(@"the clock advances to ""(.*)""")]
     public async Task WhenTheClockAdvancesTo(string now)
     {
-        await page.GotoAsync($"/clocks/{clockId}");
-        await page.FillAsync("#now", now);
-        await page.ClickAsync("#advance");
+        await page.GotoAsync($"/clocks/{clockId}").ConfigureAwait(false);
+        await page.FillAsync("#now", now).ConfigureAwait(false);
+        await page.ClickAsync("#advance").ConfigureAwait(false);
     }
 
     [Then(@"the elapsed time reads ""(.*)""")]
     public async Task ThenTheElapsedTimeReads(string expected)
     {
-        await Expect(page.Locator("#elapsed")).ToHaveTextAsync(expected);
+        await Expect(page.Locator("#elapsed")).ToHaveTextAsync(expected).ConfigureAwait(false);
     }
 
     #endregion

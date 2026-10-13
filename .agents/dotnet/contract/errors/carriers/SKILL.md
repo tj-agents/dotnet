@@ -234,7 +234,8 @@ Prefer the Reunion operation that states the caller's policy over open-coding or
 ```csharp
 Result<WarehouseDetails, GetWarehouseError> warehouse = await warehouseService
     .GetDetailsByIdAsync(id)
-    .OrFailure(new GetWarehouseError.WarehouseNotFound());
+    .OrFailure<WarehouseDetails, GetWarehouseError>(new GetWarehouseError.WarehouseNotFound())
+    .ConfigureAwait(false);
 
 Task<string> ResolveRedirectAsync(Task<Option<string>> redirect) =>
     redirect.ValueOr("/");

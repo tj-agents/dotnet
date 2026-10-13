@@ -96,7 +96,7 @@ expires mid-process is refreshed by the token service rather than frozen into th
 services.AddGrpcClient<Proto.Escrow.EscrowClient>(o => o.Address = new Uri(address))
     .AddCallCredentials(async (_, metadata, sp) =>
     {
-        var token = await sp.GetRequiredService<ITokenService>().GetTokenAsync("payments:write");
+        var token = await sp.GetRequiredService<ITokenService>().GetTokenAsync("payments:write").ConfigureAwait(false);
         metadata.Add("Authorization", $"Bearer {token}");
     });
 ```
