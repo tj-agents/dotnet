@@ -40,8 +40,8 @@ public sealed class CalculatorApiTests
 
         var response = await client.PostAsJsonAsync("/api/calculator/add", new { left, right });
 
-        await response.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadAsync<CalculationResult>();
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content.ReadFromJsonAsync<CalculationResult>();
         result!.Total.ShouldBe(expected);
     }
 
@@ -57,7 +57,7 @@ public sealed class CalculatorApiTests
 
         var response = await client.PostAsync("/api/calculator/clear", null);
 
-        await response.ShouldBe(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var total = await fixture.Scoped<ICalculatorReadDbContext>()
             .RunAsync(db => db.RunningTotals.SingleAsync(item => item.UserId == fixture.SeedState.StandardUser.Id));
         total.Value.ShouldBe(0m);
