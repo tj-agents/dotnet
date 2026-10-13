@@ -75,6 +75,18 @@ A `Domain`-declared `IClock` is warranted only when a domain service consumes it
 - Tests reach internals through `InternalsVisibleTo` for the unit and integration test assemblies, declared on
   the owning project.
 
+## Host naming
+
+"Api" is a module's endpoint layer; "Web" is the process host that serves the whole web API
+(`dotnet:structure-single-service`).
+
+```text
+<Service>.Web/           the process host — serves the whole web API
+  <Service>.Web.csproj
+<Product>.<Service>.<Module>.Api/   a module's endpoint layer
+  <Product>.<Service>.<Module>.Api.csproj
+```
+
 ## Folder and project naming
 
 A module's project names include the owning service segment; genuinely cross-service shared libraries are

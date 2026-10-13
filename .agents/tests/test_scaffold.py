@@ -148,7 +148,7 @@ class ScaffoldTests(unittest.TestCase):
                 "--destination",
                 str(root),
                 "--preset",
-                "api",
+                "web",
                 "--config",
                 str(config),
                 "--set",
@@ -194,7 +194,7 @@ class ScaffoldTests(unittest.TestCase):
                 "new", "--name", "Example", "--destination", str(root), "--set", 'hosts=[]'
             )
             duplicate_array = self.run_cli(
-                "new", "--name", "Example", "--destination", str(root), "--set", "hosts=[api,api]"
+                "new", "--name", "Example", "--destination", str(root), "--set", "hosts=[web,web]"
             )
 
             self.assertEqual(2, invalid_name.returncode)
@@ -234,15 +234,15 @@ class ScaffoldTests(unittest.TestCase):
 
     def test_component_append_and_scalar_collisions_are_rejected(self) -> None:
         options = {key: definition["default"] for key, definition in SCAFFOLD.schema().items()}
-        api = (
-            "api",
-            SCAFFOLD.read_json(SCAFFOLD.COMPONENTS / "api" / "component.json", "component api"),
-            SCAFFOLD.COMPONENTS / "api",
+        web = (
+            "web",
+            SCAFFOLD.read_json(SCAFFOLD.COMPONENTS / "web" / "component.json", "component web"),
+            SCAFFOLD.COMPONENTS / "web",
         )
         appended = [
-            api,
-            ("first", {"append": {"API_USINGS": "using First;"}, "projects": []}, ROOT),
-            ("second", {"append": {"API_USINGS": "using Second;"}, "projects": []}, ROOT),
+            web,
+            ("first", {"append": {"WEB_USINGS": "using First;"}, "projects": []}, ROOT),
+            ("second", {"append": {"WEB_USINGS": "using Second;"}, "projects": []}, ROOT),
         ]
         collisions = [
             ("first", {"variables": {"OWNER": "first"}, "projects": []}, ROOT),
@@ -252,7 +252,7 @@ class ScaffoldTests(unittest.TestCase):
         with mock.patch.object(SCAFFOLD, "selected_components", return_value=appended):
             files = SCAFFOLD.plan("Example", options, None)
 
-        self.assertIn("using First;\nusing Second;", files["src/Example.Api/Program.cs"])
+        self.assertIn("using First;\nusing Second;", files["src/Example.Web/Program.cs"])
         with mock.patch.object(SCAFFOLD, "selected_components", return_value=collisions):
             with self.assertRaises(SCAFFOLD.ScaffoldError):
                 SCAFFOLD.plan("Example", options, None)
@@ -267,7 +267,7 @@ class ScaffoldTests(unittest.TestCase):
 
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertFalse((root / "Example").exists())
-            self.assertIn("src/Example.Api/Program.cs", json.loads(result.stdout)["files"])
+            self.assertIn("src/Example.Web/Program.cs", json.loads(result.stdout)["files"])
 
     def test_literal_home_destination_expands_without_writing(self) -> None:
         name = f"ScaffoldHome{uuid4().hex}"
@@ -316,7 +316,7 @@ class ScaffoldTests(unittest.TestCase):
     def test_generated_files_use_lf_and_resolve_tokens(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            result = self.create(root, "Example", "api")
+            result = self.create(root, "Example", "web")
 
             self.assertEqual(0, result.returncode, result.stderr)
             for path in (root / "Example").rglob("*"):
@@ -341,12 +341,13 @@ class ScaffoldTests(unittest.TestCase):
                 "Directory.Packages.props",
                 "Example.slnx",
                 "global.json",
-                "src/Example.Api/Example.Api.csproj",
-                "src/Example.Api/Program.cs",
-                "src/Example.Api/appsettings.json",
-                "src/Example.Core/Example.Core.csproj",
+                "src/Example.Application/Example.Application.csproj",
+                "src/Example.Domain/Example.Domain.csproj",
+                "src/Example.Web/Example.Web.csproj",
+                "src/Example.Web/Program.cs",
+                "src/Example.Web/appsettings.json",
             ],
-            "api": [
+            "web": [
                 ".editorconfig",
                 ".gitattributes",
                 ".github/workflows/ci.yml",
@@ -358,13 +359,14 @@ class ScaffoldTests(unittest.TestCase):
                 "Directory.Packages.props",
                 "Example.slnx",
                 "global.json",
-                "src/Example.Api/Example.Api.csproj",
-                "src/Example.Api/Program.cs",
-                "src/Example.Api/appsettings.json",
-                "src/Example.Core/Example.Core.csproj",
+                "src/Example.Application/Example.Application.csproj",
+                "src/Example.Domain/Example.Domain.csproj",
                 "src/Example.Infrastructure/Example.Infrastructure.csproj",
                 "src/Example.Infrastructure/Persistence/ApplicationDbContext.cs",
                 "src/Example.Infrastructure/ServiceCollectionExtensions.cs",
+                "src/Example.Web/Example.Web.csproj",
+                "src/Example.Web/Program.cs",
+                "src/Example.Web/appsettings.json",
                 "tests/Example.UnitTests/Example.UnitTests.csproj",
             ],
             "dapper-sqlserver": [
@@ -379,18 +381,19 @@ class ScaffoldTests(unittest.TestCase):
                 "Directory.Packages.props",
                 "Example.slnx",
                 "global.json",
-                "src/Example.Api/Example.Api.csproj",
-                "src/Example.Api/Program.cs",
-                "src/Example.Api/appsettings.json",
-                "src/Example.Core/Example.Core.csproj",
+                "src/Example.Application/Example.Application.csproj",
+                "src/Example.Domain/Example.Domain.csproj",
                 "src/Example.Infrastructure/DapperConnectionFactory.cs",
                 "src/Example.Infrastructure/Example.Infrastructure.csproj",
                 "src/Example.Infrastructure/IDapperConnectionFactory.cs",
                 "src/Example.Infrastructure/ServiceCollectionExtensions.cs",
+                "src/Example.Web/Example.Web.csproj",
+                "src/Example.Web/Program.cs",
+                "src/Example.Web/appsettings.json",
                 "tests/Example.UnitTests/Example.UnitTests.csproj",
             ],
         }
-        names = {"minimal": "Example", "api": "ExampleApi", "dapper-sqlserver": "ExampleDapper"}
+        names = {"minimal": "Example", "web": "ExampleWeb", "dapper-sqlserver": "ExampleDapper"}
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             for preset, expected_files in expected.items():
@@ -407,11 +410,11 @@ class ScaffoldTests(unittest.TestCase):
     def test_component_combinations_render_selected_wiring(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            sql_server = self.create_with_options(root, "SqlServer", "api", "database=sqlserver")
+            sql_server = self.create_with_options(root, "SqlServer", "web", "database=sqlserver")
             combined = self.create_with_options(
                 root,
                 "Combined",
-                "api",
+                "web",
                 "data=efcore+dapper",
                 "auth=jwt",
                 "telemetry=opentelemetry",
@@ -427,8 +430,8 @@ class ScaffoldTests(unittest.TestCase):
                 ),
             )
             combined_root = root / "Combined"
-            program = (combined_root / "src" / "Combined.Api" / "Program.cs").read_text(encoding="utf-8")
-            appsettings = json.loads((combined_root / "src" / "Combined.Api" / "appsettings.json").read_text(encoding="utf-8"))
+            program = (combined_root / "src" / "Combined.Web" / "Program.cs").read_text(encoding="utf-8")
+            appsettings = json.loads((combined_root / "src" / "Combined.Web" / "appsettings.json").read_text(encoding="utf-8"))
 
             self.assertTrue((combined_root / "BannedSymbols.txt").is_file())
             self.assertIn("AddAuthentication", program)
@@ -445,9 +448,9 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(0, functions.returncode, functions.stderr)
             self.assertEqual(0, worker.returncode, worker.stderr)
             self.assertTrue((root / "Functions" / "src" / "Functions.Functions" / "Functions.Functions.csproj").is_file())
-            self.assertFalse((root / "Functions" / "src" / "Functions.Api").exists())
+            self.assertFalse((root / "Functions" / "src" / "Functions.Web").exists())
             self.assertTrue((root / "Worker" / "src" / "Worker.Worker" / "Worker.Worker.csproj").is_file())
-            self.assertFalse((root / "Worker" / "src" / "Worker.Api").exists())
+            self.assertFalse((root / "Worker" / "src" / "Worker.Web").exists())
     def test_host_and_integration_constraints_are_enforced(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -479,12 +482,13 @@ class ScaffoldTests(unittest.TestCase):
                 [
                     ".editorconfig", ".gitattributes", ".github/workflows/ci.yml", ".gitignore", ".scaffold.json",
                     "AGENTS.md", "BannedSymbols.txt", "CLAUDE.md", "Directory.Build.props", "Directory.Packages.props",
-                    "Sandbox.slnx", "global.json", "src/Sandbox.Api/Program.cs", "src/Sandbox.Api/Sandbox.Api.csproj",
-                    "src/Sandbox.Api/appsettings.json", "src/Sandbox.Core/Sandbox.Core.csproj",
+                    "Sandbox.slnx", "global.json",
+                    "src/Sandbox.Application/Sandbox.Application.csproj", "src/Sandbox.Domain/Sandbox.Domain.csproj",
                     "src/Sandbox.Functions/Program.cs", "src/Sandbox.Functions/Sandbox.Functions.csproj",
                     "src/Sandbox.Functions/host.json", "src/Sandbox.Functions/local.settings.json",
                     "src/Sandbox.Infrastructure/Persistence/ApplicationDbContext.cs",
                     "src/Sandbox.Infrastructure/Sandbox.Infrastructure.csproj", "src/Sandbox.Infrastructure/ServiceCollectionExtensions.cs",
+                    "src/Sandbox.Web/Program.cs", "src/Sandbox.Web/Sandbox.Web.csproj", "src/Sandbox.Web/appsettings.json",
                     "src/Sandbox.Worker/Program.cs", "src/Sandbox.Worker/Sandbox.Worker.csproj", "src/Sandbox.Worker/appsettings.json",
                     "tests/Sandbox.IntegrationTests.Fixtures/ApiFixture.cs",
                     "tests/Sandbox.IntegrationTests.Fixtures/Sandbox.IntegrationTests.Fixtures.csproj",
@@ -519,7 +523,7 @@ class ScaffoldTests(unittest.TestCase):
             result = self.create_with_options(
                 root,
                 "SqlIntegration",
-                "api",
+                "web",
                 "database=sqlserver",
                 'tests=["integration"]',
                 "auth=jwt",
@@ -541,7 +545,7 @@ class ScaffoldTests(unittest.TestCase):
     def test_hybrid_fixture_replaces_ef_and_dapper(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            result = self.create_with_options(root, "Hybrid", "api", "data=efcore+dapper", 'tests=["integration"]')
+            result = self.create_with_options(root, "Hybrid", "web", "data=efcore+dapper", 'tests=["integration"]')
 
             self.assertEqual(0, result.returncode, result.stderr)
             fixture = (root / "Hybrid" / "tests" / "Hybrid.IntegrationTests.Fixtures" / "ApiFixture.cs").read_text(encoding="utf-8")
@@ -555,8 +559,8 @@ class ScaffoldTests(unittest.TestCase):
     def test_integration_provider_package_versions_are_unique(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            dapper_postgres = self.create_with_options(root, "DapperPostgres", "api", "data=dapper", 'tests=["integration"]')
-            hybrid_sql = self.create_with_options(root, "HybridSql", "api", "data=efcore+dapper", "database=sqlserver", 'tests=["integration"]')
+            dapper_postgres = self.create_with_options(root, "DapperPostgres", "web", "data=dapper", 'tests=["integration"]')
+            hybrid_sql = self.create_with_options(root, "HybridSql", "web", "data=efcore+dapper", "database=sqlserver", 'tests=["integration"]')
 
             self.assertEqual(0, dapper_postgres.returncode, dapper_postgres.stderr)
             self.assertEqual(0, hybrid_sql.returncode, hybrid_sql.stderr)
@@ -572,20 +576,20 @@ class ScaffoldTests(unittest.TestCase):
     def test_sql_server_outputs_keep_certificate_validation_enabled(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            ef_core = self.create_with_options(root, "EfCoreSqlServer", "api", "database=sqlserver")
+            ef_core = self.create_with_options(root, "EfCoreSqlServer", "web", "database=sqlserver")
             dapper = self.create(root, "DapperSqlServer", "dapper-sqlserver")
 
             self.assertEqual(0, ef_core.returncode, ef_core.stderr)
             self.assertEqual(0, dapper.returncode, dapper.stderr)
             for name in ("EfCoreSqlServer", "DapperSqlServer"):
-                appsettings_path = root / name / "src" / f"{name}.Api" / "appsettings.json"
+                appsettings_path = root / name / "src" / f"{name}.Web" / "appsettings.json"
                 appsettings = json.loads(appsettings_path.read_text(encoding="utf-8"))
                 self.assertNotIn("TrustServerCertificate", appsettings["ConnectionStrings"]["SqlServer"])
 
     def test_cloud_azure_rejects_sqlserver(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            result = self.create_with_options(root, "AzureSqlServer", "api", "cloud=azure", "database=sqlserver")
+            result = self.create_with_options(root, "AzureSqlServer", "web", "cloud=azure", "database=sqlserver")
 
             self.assertEqual(2, result.returncode)
             self.assertFalse((root / "AzureSqlServer").exists())
@@ -596,9 +600,9 @@ class ScaffoldTests(unittest.TestCase):
             config = root / "azure-config.json"
             config.write_text(json.dumps({"azure": {"key_vault": True}}), encoding="utf-8")
 
-            via_set = self.create_with_options(root, "PassthroughSet", "api", "azure.http_host=app-service")
+            via_set = self.create_with_options(root, "PassthroughSet", "web", "azure.http_host=app-service")
             via_config = self.run_cli(
-                "new", "--name", "PassthroughConfig", "--destination", str(root), "--preset", "api",
+                "new", "--name", "PassthroughConfig", "--destination", str(root), "--preset", "web",
                 "--config", str(config),
             )
 
@@ -607,41 +611,41 @@ class ScaffoldTests(unittest.TestCase):
             self.assertFalse((root / "PassthroughSet").exists())
             self.assertFalse((root / "PassthroughConfig").exists())
 
-    def test_azure_profile_content_for_api_and_sandbox_presets(self) -> None:
+    def test_azure_profile_content_for_web_and_sandbox_presets(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            api_result = self.create_with_options(root, "ApiAzure", "api", "cloud=azure")
+            web_result = self.create_with_options(root, "WebAzure", "web", "cloud=azure")
             sandbox_result = self.create_with_options(root, "SandboxAzure", "sandbox", "cloud=azure")
 
-            self.assertEqual(0, api_result.returncode, api_result.stderr)
+            self.assertEqual(0, web_result.returncode, web_result.stderr)
             self.assertEqual(0, sandbox_result.returncode, sandbox_result.stderr)
 
-            api_profile = json.loads((root / "ApiAzure" / "infra" / "app.json").read_text(encoding="utf-8"))
-            self.assertEqual(1, api_profile["schema_version"])
-            self.assertEqual(["api"], [workload["id"] for workload in api_profile["workloads"]])
-            api_workload = api_profile["workloads"][0]
-            self.assertEqual("http", api_workload["kind"])
-            self.assertEqual(8080, api_workload["port"])
-            self.assertEqual("/health/live", api_workload["probes"]["liveness"])
-            self.assertEqual("/health/ready", api_workload["probes"]["readiness"])
-            self.assertIn("ApiAzure.Api", api_workload["build"]["image"])
-            self.assertIn("$REGISTRY", api_workload["build"]["image"])
-            self.assertIn("ApiAzure.Api", api_workload["build"]["package"])
-            self.assertEqual({"name": "dotnet", "version": "10.0"}, api_workload["runtime"])
-            self.assertEqual("apiazure-api", api_workload["settings"]["OTEL_SERVICE_NAME"])
-            self.assertEqual("postgres", api_profile["database"]["engine"])
-            self.assertIn("efbundle", api_profile["database"]["migration"]["build"]["image"])
-            self.assertEqual(["/efbundle"], api_profile["database"]["migration"]["command"])
+            web_profile = json.loads((root / "WebAzure" / "infra" / "app.json").read_text(encoding="utf-8"))
+            self.assertEqual(1, web_profile["schema_version"])
+            self.assertEqual(["web"], [workload["id"] for workload in web_profile["workloads"]])
+            web_workload = web_profile["workloads"][0]
+            self.assertEqual("http", web_workload["kind"])
+            self.assertEqual(8080, web_workload["port"])
+            self.assertEqual("/health/live", web_workload["probes"]["liveness"])
+            self.assertEqual("/health/ready", web_workload["probes"]["readiness"])
+            self.assertIn("WebAzure.Web", web_workload["build"]["image"])
+            self.assertIn("$REGISTRY", web_workload["build"]["image"])
+            self.assertIn("WebAzure.Web", web_workload["build"]["package"])
+            self.assertEqual({"name": "dotnet", "version": "10.0"}, web_workload["runtime"])
+            self.assertEqual("webazure-web", web_workload["settings"]["OTEL_SERVICE_NAME"])
+            self.assertEqual("postgres", web_profile["database"]["engine"])
+            self.assertIn("efbundle", web_profile["database"]["migration"]["build"]["image"])
+            self.assertEqual(["/efbundle"], web_profile["database"]["migration"]["command"])
             self.assertEqual(
                 "Host={postgres.host};Database={postgres.database};Username={postgres.user};Ssl Mode=Require",
-                api_profile["settings"]["ConnectionStrings__Postgres"],
+                web_profile["settings"]["ConnectionStrings__Postgres"],
             )
-            self.assertEqual("{identity.client_id}", api_profile["settings"]["AZURE_CLIENT_ID"])
-            self.assertNotIn("APPLICATIONINSIGHTS_CONNECTION_STRING", api_profile["settings"])
+            self.assertEqual("{identity.client_id}", web_profile["settings"]["AZURE_CLIENT_ID"])
+            self.assertNotIn("APPLICATIONINSIGHTS_CONNECTION_STRING", web_profile["settings"])
 
             sandbox_profile = json.loads((root / "SandboxAzure" / "infra" / "app.json").read_text(encoding="utf-8"))
             ids = [workload["id"] for workload in sandbox_profile["workloads"]]
-            self.assertEqual(["api", "worker", "functions"], ids)
+            self.assertEqual(["web", "worker", "functions"], ids)
             functions_workload = sandbox_profile["workloads"][2]
             self.assertEqual("functions", functions_workload["kind"])
             self.assertEqual({"name": "dotnet-isolated", "version": "10.0"}, functions_workload["runtime"])
@@ -676,21 +680,21 @@ class ScaffoldTests(unittest.TestCase):
 
             self.assertEqual(0, result.returncode, result.stderr)
             project = root / "SandboxAzureTelemetry"
-            api_program = (project / "src" / "SandboxAzureTelemetry.Api" / "Program.cs").read_text(encoding="utf-8")
+            web_program = (project / "src" / "SandboxAzureTelemetry.Web" / "Program.cs").read_text(encoding="utf-8")
             worker_program = (project / "src" / "SandboxAzureTelemetry.Worker" / "Program.cs").read_text(encoding="utf-8")
             functions_program = (project / "src" / "SandboxAzureTelemetry.Functions" / "Program.cs").read_text(encoding="utf-8")
 
-            self.assertIn("using Azure.Monitor.OpenTelemetry.AspNetCore;", api_program)
+            self.assertIn("using Azure.Monitor.OpenTelemetry.AspNetCore;", web_program)
             self.assertIn("using Azure.Monitor.OpenTelemetry.Exporter;", worker_program)
             self.assertIn("using Azure.Monitor.OpenTelemetry.Exporter;", functions_program)
 
-    def test_azure_api_postgres_ef_emits_a_single_add_health_checks_call(self) -> None:
+    def test_azure_web_postgres_ef_emits_a_single_add_health_checks_call(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            result = self.create_with_options(root, "AzureHealthChecks", "api", "cloud=azure")
+            result = self.create_with_options(root, "AzureHealthChecks", "web", "cloud=azure")
 
             self.assertEqual(0, result.returncode, result.stderr)
-            program = (root / "AzureHealthChecks" / "src" / "AzureHealthChecks.Api" / "Program.cs").read_text(encoding="utf-8")
+            program = (root / "AzureHealthChecks" / "src" / "AzureHealthChecks.Web" / "Program.cs").read_text(encoding="utf-8")
 
             self.assertEqual(1, program.count("AddHealthChecks()"))
             self.assertIn("var healthChecks = builder.Services.AddHealthChecks();", program)
@@ -699,18 +703,18 @@ class ScaffoldTests(unittest.TestCase):
     def test_cloud_name_derivation_and_override(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            derived = self.create_with_options(root, "ExampleApi", "api", "cloud=azure")
-            overridden = self.create_with_options(root, "ExampleApi2", "api", "cloud=azure", "cloud-name=myappname")
-            invalid = self.create_with_options(root, "123Invalid", "api", "cloud=azure")
+            derived = self.create_with_options(root, "ExampleWeb", "web", "cloud=azure")
+            overridden = self.create_with_options(root, "ExampleWeb2", "web", "cloud=azure", "cloud-name=myappname")
+            invalid = self.create_with_options(root, "123Invalid", "web", "cloud=azure")
 
             self.assertEqual(0, derived.returncode, derived.stderr)
             self.assertEqual(0, overridden.returncode, overridden.stderr)
             self.assertEqual(2, invalid.returncode)
             self.assertFalse((root / "123Invalid").exists())
 
-            derived_profile = json.loads((root / "ExampleApi" / "infra" / "app.json").read_text(encoding="utf-8"))
-            overridden_profile = json.loads((root / "ExampleApi2" / "infra" / "app.json").read_text(encoding="utf-8"))
-            self.assertEqual("exampleapi", derived_profile["name"])
+            derived_profile = json.loads((root / "ExampleWeb" / "infra" / "app.json").read_text(encoding="utf-8"))
+            overridden_profile = json.loads((root / "ExampleWeb2" / "infra" / "app.json").read_text(encoding="utf-8"))
+            self.assertEqual("exampleweb", derived_profile["name"])
             self.assertEqual("myappname", overridden_profile["name"])
 
     def test_prompt_value_reprompts_on_invalid_input(self) -> None:
@@ -770,7 +774,7 @@ class ScaffoldTests(unittest.TestCase):
             result = subprocess.run(
                 [
                     sys.executable, "-B", str(SCRIPT), "new", "--name", "AzureDryFail", "--destination", str(root),
-                    "--preset", "api", "--set", "cloud=azure", "--azure-scaffold", str(azure_script), "--no-input",
+                    "--preset", "web", "--set", "cloud=azure", "--azure-scaffold", str(azure_script), "--no-input",
                 ],
                 cwd=ROOT, capture_output=True, text=True, env=env,
             )
@@ -787,7 +791,7 @@ class ScaffoldTests(unittest.TestCase):
             result = subprocess.run(
                 [
                     sys.executable, "-B", str(SCRIPT), "new", "--name", "AzureRealFail", "--destination", str(root),
-                    "--preset", "api", "--set", "cloud=azure", "--azure-scaffold", str(azure_script), "--no-input",
+                    "--preset", "web", "--set", "cloud=azure", "--azure-scaffold", str(azure_script), "--no-input",
                 ],
                 cwd=ROOT, capture_output=True, text=True, env=env,
             )
@@ -806,7 +810,7 @@ class ScaffoldTests(unittest.TestCase):
             result = subprocess.run(
                 [
                     sys.executable, "-B", str(SCRIPT), "new", "--name", "AzureOk", "--destination", str(root),
-                    "--preset", "api", "--set", "cloud=azure", "--set", "azure.http_host=app-service",
+                    "--preset", "web", "--set", "cloud=azure", "--set", "azure.http_host=app-service",
                     "--azure-scaffold", str(azure_script), "--no-input",
                 ],
                 cwd=ROOT, capture_output=True, text=True, env=env,
@@ -828,7 +832,7 @@ class ScaffoldTests(unittest.TestCase):
     def test_missing_azure_path_prints_command_and_succeeds(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            result = self.create_with_options(root, "NoAzurePath", "api", "cloud=azure")
+            result = self.create_with_options(root, "NoAzurePath", "web", "cloud=azure")
 
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertIn("new --into", result.stdout)
@@ -878,7 +882,7 @@ class ScaffoldTests(unittest.TestCase):
         )
         cases = (
             ("minimal", "Example"),
-            ("api", "ExampleApi"),
+            ("web", "ExampleWeb"),
             ("dapper-sqlserver", "ExampleDapper"),
             ("sandbox", "Sandbox"),
         )

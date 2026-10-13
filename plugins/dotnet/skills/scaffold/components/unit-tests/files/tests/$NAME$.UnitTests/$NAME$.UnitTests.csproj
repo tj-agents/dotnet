@@ -8,6 +8,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/$NAME$.Core/$NAME$.Core.csproj" />
+    <ProjectReference Include="../../src/$NAME$.Domain/$NAME$.Domain.csproj" />
+    <ProjectReference Include="../../src/$NAME$.Application/$NAME$.Application.csproj" />
   </ItemGroup>
 </Project>

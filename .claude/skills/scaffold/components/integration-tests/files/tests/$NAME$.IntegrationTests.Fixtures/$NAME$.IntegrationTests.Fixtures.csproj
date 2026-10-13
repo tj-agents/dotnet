@@ -3,7 +3,7 @@
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/$NAME$.Api/$NAME$.Api.csproj" />
+    <ProjectReference Include="../../src/$NAME$.Web/$NAME$.Web.csproj" />
     <ProjectReference Include="../../src/$NAME$.Infrastructure/$NAME$.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
