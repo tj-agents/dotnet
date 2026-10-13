@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import re
+import stat
 import subprocess
 import sys
 import tempfile
@@ -50,6 +51,13 @@ CSHARP_INTRINSICS = {"__arglist", "__makeref", "__reftype", "__refvalue"}
 AZURE_SET_PREFIX = "azure."
 CLOUD_NAME = re.compile(r"^[a-z][a-z0-9]{0,11}$")
 SHELL_SPECIAL = re.compile(r"""[\s"'\\$`|&;<>()\[\]{}*?!~#%^]""")
+CORE_PLUGIN_IDS = ("base-agents/base", "base-agents/engineering", "base-agents/machine")
+REQUIRED_STANDARDS_OUTPUTS = (
+    ".agents/capabilities.lock.json",
+    ".agents/catalog/catalog.json",
+    ".claude/settings.json",
+    ".codex/config.toml",
+)
 INPUT_FN: Callable[[str], str] = input
 
 
@@ -639,6 +647,80 @@ def run_azure(azure_script: Path, command_args: Sequence[str]) -> subprocess.Com
     return subprocess.run(command, capture_output=True, text=True, check=False)
 
 
+def standards_plugin_ids(options: Mapping[str, Any]) -> List[str]:
+    plugins = [PACKAGE]
+    if options["cloud"] == "azure":
+        plugins.append("azure-agents/azure")
+    return plugins
+
+
+def lock_plugin_ids(lock: Any) -> set[str]:
+    if not isinstance(lock, dict) or lock.get("schema_version") != 1:
+        raise ScaffoldError("standards adopter lock must have schema_version 1")
+    plugins = lock.get("plugins")
+    if not isinstance(plugins, list):
+        raise ScaffoldError("standards adopter lock must have plugin selections")
+    identifiers: set[str] = set()
+    for plugin in plugins:
+        if not isinstance(plugin, dict) or not isinstance(plugin.get("id"), str):
+            raise ScaffoldError("standards adopter lock has invalid plugin selection")
+        identifiers.add(plugin["id"])
+    return identifiers
+
+
+def prepared_standard_files(stage: Path, required_plugins: Sequence[str]) -> Dict[str, str]:
+    files: Dict[str, str] = {}
+    try:
+        for path in sorted(stage.rglob("*")):
+            if path.is_symlink():
+                raise ScaffoldError(f"standards adopter produced symlink: {path.relative_to(stage).as_posix()}")
+            if not path.is_file():
+                continue
+            if not stat.S_ISREG(path.stat().st_mode):
+                raise ScaffoldError(f"standards adopter produced non-regular file: {path.relative_to(stage).as_posix()}")
+            relative = safe_relative(path.relative_to(stage).as_posix())
+            files[relative] = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as error:
+        raise ScaffoldError("cannot read standards adopter output") from error
+    missing = [relative for relative in REQUIRED_STANDARDS_OUTPUTS if relative not in files]
+    if missing:
+        raise ScaffoldError(f"standards adopter did not prepare required output: {missing[0]}")
+    try:
+        lock = json.loads(files[".agents/capabilities.lock.json"])
+    except (TypeError, json.JSONDecodeError) as error:
+        raise ScaffoldError("standards adopter produced invalid capabilities lock") from error
+    missing_plugins = sorted(set((*CORE_PLUGIN_IDS, *required_plugins)) - lock_plugin_ids(lock))
+    if missing_plugins:
+        raise ScaffoldError(f"standards adopter lock does not select required plugin: {missing_plugins[0]}")
+    return files
+
+
+def prepare_standards(adopter: Path, standards_input: Path, options: Mapping[str, Any]) -> Dict[str, str]:
+    if not adopter.is_file():
+        raise ScaffoldError(f"standards adopter must be a file: {adopter}")
+    if not standards_input.is_file():
+        raise ScaffoldError(f"standards input must be a file: {standards_input}")
+    required_plugins = standards_plugin_ids(options)
+    with tempfile.TemporaryDirectory(prefix="dotnet-scaffold-standards-") as temporary:
+        stage = Path(temporary)
+        command = [
+            sys.executable, "-B", str(adopter), "--root", str(stage), "--input", str(standards_input),
+        ]
+        for plugin in required_plugins:
+            command.extend(["--plugin", plugin])
+        command.extend(["--mode", "write"])
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, check=False, timeout=60)
+        except subprocess.TimeoutExpired as error:
+            raise ScaffoldError("standards adopter timed out") from error
+        except OSError as error:
+            raise ScaffoldError("cannot run standards adopter") from error
+        if result.returncode != 0:
+            detail = result.stderr.strip() or result.stdout.strip()
+            raise ScaffoldError(f"standards adopter failed: {detail or result.returncode}")
+        return prepared_standard_files(stage, required_plugins)
+
+
 def quote_for_display(value: str) -> str:
     if value and not SHELL_SPECIAL.search(value):
         return value
@@ -694,6 +776,11 @@ def create(args: argparse.Namespace) -> None:
         raise ScaffoldError(f"project already exists: {project}")
 
     files = plan(args.name, options, preset)
+    standards = prepare_standards(args.standards_adopter.expanduser(), args.standards_input.expanduser(), options)
+    collisions = sorted(set(files).intersection(standards))
+    if collisions:
+        raise ScaffoldError(f"standards output collides with scaffold file: {collisions[0]}")
+    files = {**standards, **files}
 
     if options["cloud"] == "azure" and azure_script is not None and not args.dry_run:
         with tempfile.TemporaryDirectory(prefix="dotnet-scaffold-azure-dry-") as dry_root:
@@ -752,6 +839,8 @@ def parser() -> argparse.ArgumentParser:
     new.add_argument("--dry-run", action="store_true")
     new.add_argument("--no-input", action="store_true")
     new.add_argument("--azure-scaffold", type=Path)
+    new.add_argument("--standards-adopter", type=Path, required=True)
+    new.add_argument("--standards-input", type=Path, required=True)
     options = commands.add_parser("options")
     options.add_argument("--preset")
     options.add_argument("--config", type=Path)
