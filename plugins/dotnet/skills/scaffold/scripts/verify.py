@@ -77,7 +77,7 @@ def negative_path_gates(name: str, preset: str, overrides: Sequence[str] = ()) -
         run(["dotnet", "restore", str(solution)], project)
 
         assert_test = project / "tests" / f"{name}.IntegrationTests" / "NegativePathAssertTests.cs"
-        assert_test.write_text(
+        assert_test.write_bytes((
             "using Xunit;\n\n"
             f"namespace {name}.IntegrationTests;\n\n"
             "public sealed class NegativePathAssertTests\n"
@@ -87,9 +87,8 @@ def negative_path_gates(name: str, preset: str, overrides: Sequence[str] = ()) -
             "    {\n"
             "        Assert.True(true);\n"
             "    }\n"
-            "}\n",
-            encoding="utf-8", newline="\n",
-        )
+            "}\n"
+        ).encode("utf-8"))
         try:
             result = build_result(project, solution)
         finally:
@@ -102,7 +101,7 @@ def negative_path_gates(name: str, preset: str, overrides: Sequence[str] = ()) -
         print("negative-path gate confirmed: a stray Assert.* in an integration test fails the build")
 
         fixture_path = project / "tests" / f"{name}.IntegrationTests.Fixtures" / "ApiFixture.cs"
-        original = fixture_path.read_text(encoding="utf-8")
+        original = fixture_path.read_bytes().decode("utf-8")
         marker = "    public async Task InitializeAsync()"
         mutated = original.replace(
             marker,
@@ -111,11 +110,11 @@ def negative_path_gates(name: str, preset: str, overrides: Sequence[str] = ()) -
         )
         if mutated == original:
             raise AssertionError("could not inject a stray this.field read into ApiFixture.cs")
-        fixture_path.write_text(mutated, encoding="utf-8", newline="\n")
+        fixture_path.write_bytes(mutated.encode("utf-8"))
         try:
             result = build_result(project, solution)
         finally:
-            fixture_path.write_text(original, encoding="utf-8", newline="\n")
+            fixture_path.write_bytes(original.encode("utf-8"))
         if result.returncode != 0:
             print("negative-path gate confirmed: a stray this.field read outside a constructor fails the build")
         else:
