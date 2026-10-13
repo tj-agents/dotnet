@@ -86,8 +86,8 @@ internal sealed class OrderCancelledDomainEventHandler : IPreCommitDomainEventHa
 ```
 
 `IIntegrationEventPublisher` is the one broker-abstraction role per solution; see
-`dotnet:naming-collaborators`. Tommy, 2026-10-13: the bare `bus` field is gone — a sandbox had nowhere to
-look up the publisher's role and invented a per-subject `INoteEventPublisher` instead.
+`dotnet:naming-collaborators`. Tommy, 2026-10-13: one named publisher role, so no repository invents a
+per-subject publisher.
 
 Because the publisher is a transactional outbox, that publish stages a row on the caller's context — so
 the state change and the promise to tell the world commit or roll back together. Publishing after the
