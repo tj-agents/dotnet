@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="../$NAME$.Core/$NAME$.Core.csproj" />
+    <ProjectReference Include="../$NAME$.Domain/$NAME$.Domain.csproj" />
+    <ProjectReference Include="../$NAME$.Application/$NAME$.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
 $INFRASTRUCTURE_PACKAGE_REFERENCES$

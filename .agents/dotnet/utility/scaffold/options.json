@@ -41,9 +41,9 @@
   },
   "hosts": {
     "type": "array",
-    "allowed": ["api", "functions", "durable", "worker"],
-    "items": {"type": "string", "allowed": ["api", "functions", "durable", "worker"]},
-    "default": ["api"],
+    "allowed": ["web", "functions", "durable", "worker"],
+    "items": {"type": "string", "allowed": ["web", "functions", "durable", "worker"]},
+    "default": ["web"],
     "description": "The process hosts.",
     "requires": {},
     "conflicts": {},
@@ -61,7 +61,7 @@
     "requires": {},
     "conflicts": {},
     "constraints": [
-      {"when": {"auth": "jwt"}, "requires": {"hosts": {"contains": "api"}}}
+      {"when": {"auth": "jwt"}, "requires": {"hosts": {"contains": "web"}}}
     ]
   },
   "telemetry": {
@@ -82,7 +82,7 @@
     "conflicts": {},
     "uniqueItems": true,
     "constraints": [
-      {"when": {"tests": {"contains": "integration"}}, "requires": {"hosts": {"contains": "api"}, "database": {"oneOf": ["postgres", "sqlserver"]}}}
+      {"when": {"tests": {"contains": "integration"}}, "requires": {"hosts": {"contains": "web"}, "database": {"oneOf": ["postgres", "sqlserver"]}}}
     ]
   },
   "selected-stack": {

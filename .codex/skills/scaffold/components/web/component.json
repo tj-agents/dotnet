@@ -1,0 +1,6 @@
+{
+  "when": {"hosts": {"contains": "web"}},
+  "requires": {"hosts": {"contains": "web"}},
+  "conflicts": {},
+  "projects": ["src/$NAME$.Web/$NAME$.Web.csproj"]
+}

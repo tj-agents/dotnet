@@ -58,17 +58,17 @@ def verify(name: str, preset: str, overrides: Sequence[str] = (), azure: bool = 
 def main() -> int:
     configurations = (
         ("MinimalSample", "minimal", (), False),
-        ("ApiPostgresSample", "api", (), False),
-        ("ApiSqlServerSample", "api", ("database=sqlserver",), False),
+        ("WebPostgresSample", "web", (), False),
+        ("WebSqlServerSample", "web", ("database=sqlserver",), False),
         ("DapperSqlServerSample", "dapper-sqlserver", (), False),
         (
             "CombinedSample",
-            "api",
+            "web",
             ("data=efcore+dapper", "auth=jwt", "telemetry=opentelemetry", "selected-stack=true"),
             False,
         ),
         ("SandboxSample", "sandbox", (), False),
-        ("IntegrationSqlServerSample", "api", ("database=sqlserver", 'tests=["integration"]', "auth=jwt"), False),
+        ("IntegrationSqlServerSample", "web", ("database=sqlserver", 'tests=["integration"]', "auth=jwt"), False),
         ("SandboxAzureSample", "sandbox", ("cloud=azure",), True),
     )
     for name, preset, overrides, azure in configurations:

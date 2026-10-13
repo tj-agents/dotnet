@@ -1,7 +1,7 @@
 {
   "data": "efcore",
   "database": "postgres",
-  "hosts": ["api", "functions", "durable", "worker"],
+  "hosts": ["web", "functions", "durable", "worker"],
   "telemetry": "opentelemetry",
   "tests": ["unit", "integration"],
   "selected-stack": true

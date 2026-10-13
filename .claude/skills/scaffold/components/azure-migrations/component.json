@@ -3,7 +3,7 @@
   "requires": {},
   "conflicts": {},
   "append": {
-    "API_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.EntityFrameworkCore.Design\" PrivateAssets=\"all\" />",
+    "WEB_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.EntityFrameworkCore.Design\" PrivateAssets=\"all\" />",
     "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.EntityFrameworkCore.Design\" Version=\"10.0.12\" />"
   }
 }
