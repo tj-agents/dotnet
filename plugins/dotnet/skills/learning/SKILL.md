@@ -68,4 +68,7 @@ and grow only from decisions made in real projects.
 4. Code relies on a convention only after it is recorded. Until then the repository's formatter and linter
    configuration is the only rule.
 5. 2026-10-13: a rule's example leads with its code snippet; prose follows only to carry what the snippet
-   can't show. Every contract touched by this rule follows it too.
+   can't show.
+6. 2026-10-13: an example must obey every contract that applies to it, including the one it sits in — not
+   only "every other contract". A testing-e2e example that broke testing-e2e's own fast-forward and
+   assertion rules shipped because the checklist and this procedure both said "other" (M003).

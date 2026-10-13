@@ -25,3 +25,15 @@ The corrective worker repeated a Sandbox pass report that complete retained outp
 - **Next action:** Tommy will work through the full why later.
 - **Resolution condition:** a freshly scaffolded .NET repo can't accept its first write of a concern until that concern's owning contracts are loaded.
 - **Verification evidence:** the breaches above, read directly off the generated sandbox repo's diff.
+
+## M003: The testing-e2e opening example broke its own contract
+
+- **Kind:** mistake
+- **Observed/reported:** 2026-10-13. The testing-e2e opening example written to the item-7 checklist broke testing-e2e's own fast-forward rule — its setup `Given` called `page.GotoAsync(...)`, which the contract's "Fast-forward without UI replay" rule forbids a setup `Given` from doing — and its assertion rule, reading the page once with `TextContentAsync` then asserting with Shouldly instead of an auto-retrying `Expect`.
+- **Impact and priority:** P2; the contract's own opening example, meant to demonstrate every one of its rules by itself, demonstrated a violation of two of them instead.
+- **Source owner:** the item-7 dispatch listed only the generic cross-tier checklist (naming, fields, AAA, assertion library, Theory, region), not the host contract's own rules; the convention procedure said an example must obey "every **other** contract", which by its wording excludes the one it sits in; and the review that followed was scoped to cross-contract rules, not the host contract.
+- **State:** resolved
+- **Repair link:** this PR. The example now fast-forwards from seeded fixture state with no browser call in its `Given`, drives the browser only in its `When`, and asserts with Playwright `Expect(...)` in its `Then`.
+- **Next action:** none; the procedure wording and the example are both fixed.
+- **Resolution condition:** the convention procedure's wording includes the host contract, and every snippet this branch touches has been checked against its own host contract's rules before merge.
+- **Verification evidence:** the rewritten `testing-e2e` example and its re-check against the contract's "One behaviour, starting at the nearest already-verified state" and "Fast-forward without UI replay" sections, below in this session's report.

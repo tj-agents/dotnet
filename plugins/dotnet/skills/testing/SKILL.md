@@ -36,7 +36,12 @@ keeping its own naming rule.
 |---|---|
 | Unit | xUnit `Assert.*` |
 | Integration | Shouldly |
-| E2E | Shouldly |
+| E2E — page state | Playwright `Expect(locator)` (`Microsoft.Playwright.Assertions`) |
+| E2E — a value read outside the page | Shouldly |
 
 2026-10-13: a tier mixing two assertion libraries produces two failure-message formats and two idioms
-for the same check, for no benefit. Gate the choice in the build rather than at review.
+for the same check, for no benefit. Gate the choice in the build rather than at review. E2E is the one
+exception, and it is a library split rather than a mix: `Expect` auto-retries until the page matches, so
+a scenario checking what the browser renders never races the UI the way a one-shot
+`TextContentAsync`-then-`ShouldBe` read would; Shouldly still owns a value the step reads from outside
+the page, such as an API response used to seed or verify state.
