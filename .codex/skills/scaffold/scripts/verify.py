@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -11,6 +12,26 @@ from typing import Sequence
 
 ROOT = Path(__file__).resolve().parent.parent
 SCAFFOLD = ROOT / "scripts" / "scaffold.py"
+SNIPPETS_DIR = ROOT.parent.parent.parent / "tests" / "snippets"
+DUNET_VERSION = "1.16.2"
+
+SNIPPET_PROJECT_FOLDERS = {
+    "infrastructure": ("src", "Infrastructure"),
+    "web": ("src", "Web"),
+    "unit-tests": ("tests", "UnitTests"),
+    "integration-tests": ("tests", "IntegrationTests"),
+}
+
+SNIPPET_SHARED_FILES = {
+    "infrastructure": (
+        "GlobalUsings.cs", "SharedGlobalUsing.cs", "EventContracts.Stubs.cs", "Reunion.Stubs.cs",
+        "DataAccess.Stubs.cs", "DataAccessUnitOfWork.Stubs.cs", "AzureServiceBus.Stubs.cs",
+        "Hosting.Stubs.cs", "Grpc.Stubs.cs",
+    ),
+    "web": ("GlobalUsings.cs", "SharedGlobalUsing.cs"),
+    "unit-tests": ("GlobalUsings.cs",),
+    "integration-tests": ("GlobalUsings.cs",),
+}
 
 
 def run(command: Sequence[str], cwd: Path) -> None:
@@ -131,6 +152,57 @@ def negative_path_gates(name: str, preset: str, overrides: Sequence[str] = ()) -
             )
 
 
+def _add_dunet_reference(project: Path, infra_csproj: Path) -> None:
+    packages_props = project / "Directory.Packages.props"
+    text = packages_props.read_text(encoding="utf-8")
+    if "Dunet" not in text:
+        anchor = "</Project>"
+        addition = f'  <ItemGroup>\n    <PackageVersion Include="Dunet" Version="{DUNET_VERSION}" />\n  </ItemGroup>\n'
+        if anchor not in text:
+            raise AssertionError("snippet gate: Directory.Packages.props has no </Project> to anchor on")
+        packages_props.write_text(text.replace(anchor, addition + anchor, 1), encoding="utf-8")
+
+    csproj_text = infra_csproj.read_text(encoding="utf-8")
+    if "Dunet" not in csproj_text:
+        anchor = "</Project>"
+        addition = '  <ItemGroup>\n    <PackageReference Include="Dunet" PrivateAssets="all" />\n  </ItemGroup>\n'
+        if anchor not in csproj_text:
+            raise AssertionError(f"snippet gate: {infra_csproj} has no </Project> to anchor on")
+        infra_csproj.write_text(csproj_text.replace(anchor, addition + anchor, 1), encoding="utf-8")
+
+
+def snippet_compile_gate(name: str) -> None:
+    with tempfile.TemporaryDirectory(prefix=f"dotnet-scaffold-{name}-") as temporary:
+        destination = Path(temporary)
+        command = [
+            sys.executable, "-B", str(SCAFFOLD), "new",
+            "--name", name, "--destination", str(destination), "--preset", "sandbox", "--no-input",
+        ]
+        run(command, ROOT)
+        project = destination / name
+        solution = project / f"{name}.slnx"
+
+        infra_csproj = project / "src" / f"{name}.Infrastructure" / f"{name}.Infrastructure.csproj"
+        _add_dunet_reference(project, infra_csproj)
+
+        for project_kind, (top, suffix) in SNIPPET_PROJECT_FOLDERS.items():
+            target = project / top / f"{name}.{suffix}" / "Snippets"
+            target.mkdir(parents=True, exist_ok=True)
+            for filename in SNIPPET_SHARED_FILES[project_kind]:
+                shutil.copy2(SNIPPETS_DIR / "_shared" / filename, target / filename)
+            shutil.copy2(SNIPPETS_DIR / "_shared" / "Snippets.editorconfig", target / ".editorconfig")
+            source_dir = SNIPPETS_DIR / project_kind
+            for item in sorted(source_dir.glob("*.cs")):
+                shutil.copy2(item, target / item.name)
+
+        functions_project = project / "src" / f"{name}.Functions" / f"{name}.Functions.csproj"
+        if functions_project.is_file():
+            run(["dotnet", "restore", str(functions_project)], project)
+        run(["dotnet", "restore", str(solution)], project)
+        run(["dotnet", "build", str(solution), "--configuration", "Release", "--no-restore"], project)
+        print("snippet compile gate confirmed: every compilable contract snippet builds under the scaffold's own analyzers")
+
+
 def main() -> int:
     configurations = (
         ("MinimalSample", "minimal", (), False),
@@ -149,6 +221,7 @@ def main() -> int:
     )
     for name, preset, overrides, azure in configurations:
         verify(name, preset, overrides, azure)
+    snippet_compile_gate("SnippetGateSample")
     negative_path_gates("NegativeGateSample", "web", ('tests=["integration"]',))
     return 0
 

@@ -39,8 +39,8 @@ The key goes in and a capability comes out. Business code names the capability a
 ```csharp
 var result = fulfilmentFactory.Create(order.Mode) switch
 {
-    Fulfil.Fulfil(var fulfil) => fulfil.Fulfil(parcel, order),
-    Fulfil.FulfilToAddress(var fulfil) => fulfil.Fulfil(parcel, order, request.Address)
+    Fulfilment.Fulfil(var fulfil) => fulfil.Fulfil(parcel, order),
+    Fulfilment.FulfilToAddress(var fulfil) => fulfil.Fulfil(parcel, order, request.Address)
 };
 ```
 
@@ -49,17 +49,21 @@ The key therefore crosses exactly one boundary — registration into the factory
 covers the strategy half too: a `mode` in a handler, mapper, service, or `when` guard means the capability did
 not reach far enough.
 
+2026-10-13: the union is named `Fulfilment`, not `Fulfil` — a case cannot share its enclosing union's name
+(`Fulfil.Fulfil` does not compile, CS0542), which is exactly the `Operation.Operation` shape this document's
+own naming rule says to avoid.
+
 ## The registration block is the partition
 
 It is the only place a key and a capability appear together, so it is the readable declaration of how the
 concern partitions the key:
 
 ```csharp
-union.Case<IFulfil>(fulfil => new Fulfil.Fulfil(fulfil))
+union.Case<IFulfil>(fulfil => new Fulfilment.Fulfil(fulfil))
     .Use<DigitalFulfil>(FulfilmentMode.Digital)
     .Use<CollectionFulfil>(FulfilmentMode.Collection);
 
-union.Case<IFulfilToAddress>(fulfil => new Fulfil.FulfilToAddress(fulfil))
+union.Case<IFulfilToAddress>(fulfil => new Fulfilment.FulfilToAddress(fulfil))
     .Use<CourierFulfil>(FulfilmentMode.Courier, FulfilmentMode.Freight);
 ```
 

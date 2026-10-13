@@ -34,6 +34,7 @@ public sealed class OrderEntity : IEventRaiser
 {
     private readonly EventRaiser events = new();
 
+    public OrderStatus Status { get; private set; }
     public IReadOnlyList<IDomainEvent> DomainEvents => events.DomainEvents;
     public void ClearDomainEvents() => events.Clear();
 

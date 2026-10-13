@@ -199,6 +199,33 @@ schema, or a `cloud-db-schemas` option), so the workload grants cover them.
     (same pre-existing `engineering:docs` failure)/`test_source_layout.py`, `sync-generated.ps1 -Check` and
     `kit:check` pass, and all 8 verify.py configurations plus the new negative-path gates ran sequentially
     and passed (0 warnings/0 errors on every config, both Terraform roots validated).
+- 2026-10-13: slice B/C **PR #50 merged** as `4cb90a2`.
+
+- 2026-10-13: **Follow-up fixes** — `Fix/SnippetsCompileUnderScaffold`, from sandbox-dotnet applying #50
+  and finding two defects the review missed: the scaffold template `.editorconfig` had no
+  `dotnet_diagnostic.CA1848.severity = error` though `dotnet:logging` requires it, and the
+  microservice-boundaries Processor snippet awaited without `.ConfigureAwait(false)` and used
+  `await using var scope = …`, which the selected stack's Meziantou MA0004 rejects under
+  `TreatWarningsAsErrors` (M004 in `MISTAKES.md`).
+  - Fixed both instances, then built a snippet compile gate so the class of defect can't recur: a
+    compilable fixture plus a byte-identity unittest per `.agents/dotnet/contract/**/SKILL.md` csharp
+    block, under `.agents/tests/snippets/`. `verify.py` scaffolds the sandbox preset after the positive
+    configurations, adds a temporary Dunet reference for the Infrastructure project's union snippets, copies
+    each fixture into its target project (Infrastructure for production snippets, the matching test project
+    for test-tier snippets), and builds under `TreatWarningsAsErrors`.
+  - A block that is a deliberate counter-example or otherwise can't compile (a prose fragment, a
+    net11.0-only feature, a scope-colliding multi-example fence) gets a dedicated `skip` field with a
+    required, specific reason — a new explicit marker, not the doc's existing `// CORRECT`/`// WRONG`
+    comments, since those mark intent inside a block rather than exempting a whole block from the gate
+    without touching its verbatim text.
+  - The gate found and this PR fixed further genuine snippet defects beyond the two reported: a
+    `Fulfil.Fulfil` CS0542 self-naming bug in `keyed/unions` (the union must be named `Fulfilment`), a
+    missing `Status` property in `domain/events`, missing `.ConfigureAwait(false)` in five further
+    production-tier snippets (`errors/carriers`, `persistence` ×2, `proto`, `seeding`, `style`), and
+    non-functional `ShouldBe`/`ReadAsync` placeholder calls in `testing/integration` replaced with real
+    Shouldly/`System.Net.Http.Json` calls.
+  - 6 new unittests, sync and kit check pass, and the full verify.py (including the new snippet compile
+    gate) runs sequentially and passes.
 
 ## Next Steps
 

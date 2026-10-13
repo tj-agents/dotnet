@@ -116,7 +116,7 @@ a constants class.
 ## Project a page with `Map`
 
 ```csharp
-return (await reportRepository.GetQueueAsync(pageParams)).Map(r => r.ToDto());
+return (await reportRepository.GetQueueAsync(pageParams).ConfigureAwait(false)).Map(r => r.ToDto());
 ```
 
 `Map` carries `TotalCount`/`PageNumber`/`PageSize` across, so hand-writing `new Pagination<T>(...)` restates
@@ -129,7 +129,7 @@ one batch, not because projecting a row is asynchronous. Await the batch first, 
 the result:
 
 ```csharp
-var deals = await DealsByIdAsync(page.Data);
+var deals = await DealsByIdAsync(page.Data).ConfigureAwait(false);
 return page.Map(item => ToDto(item, deals));
 ```
 
