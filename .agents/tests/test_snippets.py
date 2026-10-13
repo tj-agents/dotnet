@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import importlib.util
 import io
+import os
 import re
 import subprocess
 import sys
+import tempfile
+import textwrap
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -37,6 +40,34 @@ def load_verify(path: Path):
 
 
 FENCE = re.compile(r"```csharp\n(.*?)\n```", re.DOTALL)
+
+FAKE_STANDARDS_ADOPTER = textwrap.dedent(
+    """
+    import argparse
+    import json
+    from pathlib import Path
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--root", required=True)
+    parser.add_argument("--input", required=True)
+    parser.add_argument("--plugin", action="append", default=[])
+    parser.add_argument("--mode", required=True)
+    args = parser.parse_args()
+    root = Path(args.root)
+    plugins = ["base-agents/base", "base-agents/engineering", "base-agents/machine", *args.plugin]
+    files = {
+        ".agents/capabilities.lock.json": json.dumps({"schema_version": 1, "plugins": [{"id": plugin} for plugin in plugins]}) + "\\n",
+        ".agents/catalog/catalog.json": "{}\\n",
+        ".claude/settings.json": "{}\\n",
+        ".codex/config.toml": "[plugins]\\n",
+    }
+    if args.mode == "write":
+        for relative, content in files.items():
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(content, encoding="utf-8")
+    """
+)
 
 
 class SnippetFixtureTests(unittest.TestCase):
@@ -125,11 +156,22 @@ class SnippetFixtureTests(unittest.TestCase):
                 top, suffix = verifier.SNIPPET_PROJECT_FOLDERS[snippet["project"]]
                 self.assertTrue((project / top / f"{name}.{suffix}" / "Snippets" / f"{snippet['id']}.Snippet.cs").is_file())
 
-        for path in (VERIFY_PATH, *GENERATED_VERIFY_PATHS):
-            with self.subTest(verifier=path):
-                verifier = load_verify(path)
-                with mock.patch.object(verifier, "run", side_effect=run), redirect_stdout(io.StringIO()):
-                    verifier.snippet_compile_gate(name)
+        with tempfile.TemporaryDirectory() as temporary:
+            standards_root = Path(temporary)
+            adopter = standards_root / "adopt_repository.py"
+            standards_input = standards_root / "sources.json"
+            adopter.write_text(FAKE_STANDARDS_ADOPTER, encoding="utf-8")
+            standards_input.write_text("{}\\n", encoding="utf-8")
+            environment = {"STANDARDS_ADOPTER": str(adopter), "STANDARDS_INPUT": str(standards_input)}
+            for path in (VERIFY_PATH, *GENERATED_VERIFY_PATHS):
+                with self.subTest(verifier=path):
+                    verifier = load_verify(path)
+                    with (
+                        mock.patch.dict(os.environ, environment, clear=False),
+                        mock.patch.object(verifier, "run", side_effect=run),
+                        redirect_stdout(io.StringIO()),
+                    ):
+                        verifier.snippet_compile_gate(name)
         self.assertEqual(4, build_count)
 
     def test_skipped_snippets_each_carry_a_reason(self) -> None:
