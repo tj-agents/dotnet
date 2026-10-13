@@ -708,16 +708,16 @@ def prepare_standards(adopter: Path, standards_input: Path, options: Mapping[str
         ]
         for plugin in required_plugins:
             command.extend(["--plugin", plugin])
-        command.extend(["--mode", "write"])
-        try:
-            result = subprocess.run(command, capture_output=True, text=True, check=False, timeout=60)
-        except subprocess.TimeoutExpired as error:
-            raise ScaffoldError("standards adopter timed out") from error
-        except OSError as error:
-            raise ScaffoldError("cannot run standards adopter") from error
-        if result.returncode != 0:
-            detail = result.stderr.strip() or result.stdout.strip()
-            raise ScaffoldError(f"standards adopter failed: {detail or result.returncode}")
+        for mode in ("write", "check"):
+            try:
+                result = subprocess.run([*command, "--mode", mode], capture_output=True, text=True, check=False, timeout=60)
+            except subprocess.TimeoutExpired as error:
+                raise ScaffoldError("standards adopter timed out") from error
+            except OSError as error:
+                raise ScaffoldError("cannot run standards adopter") from error
+            if result.returncode != 0:
+                detail = result.stderr.strip() or result.stdout.strip()
+                raise ScaffoldError(f"standards adopter failed: {detail or result.returncode}")
         return prepared_standard_files(stage, required_plugins)
 
 
