@@ -20,6 +20,7 @@ SNIPPET_PROJECT_FOLDERS = {
     "web": ("src", "Web"),
     "unit-tests": ("tests", "UnitTests"),
     "integration-tests": ("tests", "IntegrationTests"),
+    "e2e-tests": ("tests", "E2ETests"),
 }
 
 SNIPPET_SHARED_FILES = {
@@ -31,6 +32,7 @@ SNIPPET_SHARED_FILES = {
     "web": ("GlobalUsings.cs", "SharedGlobalUsing.cs"),
     "unit-tests": ("GlobalUsings.cs", "SharedGlobalUsing.cs", "DataAccess.Stubs.cs"),
     "integration-tests": ("GlobalUsings.cs",),
+    "e2e-tests": ("GlobalUsings.cs", "E2E.Stubs.cs"),
 }
 
 
@@ -193,6 +195,35 @@ def snippet_compile_gate(name: str) -> None:
 
         unit_tests_csproj = project / "tests" / f"{name}.UnitTests" / f"{name}.UnitTests.csproj"
         _add_package_reference(unit_tests_csproj, "Microsoft.EntityFrameworkCore")
+
+        e2e_tests_dir = project / "tests" / f"{name}.E2ETests"
+        e2e_tests_dir.mkdir(parents=True)
+        e2e_tests_csproj = e2e_tests_dir / f"{name}.E2ETests.csproj"
+        e2e_tests_csproj.write_text(
+            '<Project Sdk="Microsoft.NET.Sdk">\n'
+            '  <PropertyGroup>\n    <IsTestProject>true</IsTestProject>\n  </PropertyGroup>\n'
+            '</Project>\n',
+            encoding="utf-8",
+        )
+        for package, version in (
+            ("Reqnroll", "3.3.4"),
+            ("Reqnroll.xUnit", "3.3.4"),
+            ("Microsoft.Playwright", "1.63.0"),
+            ("Shouldly", "4.3.0"),
+        ):
+            _add_package_version(packages_props, package, version)
+            _add_package_reference(e2e_tests_csproj, package)
+        _add_package_reference(e2e_tests_csproj, "Microsoft.NET.Test.Sdk")
+        _add_package_reference(e2e_tests_csproj, "xunit.runner.visualstudio", private_assets="all")
+        solution_text = solution.read_text(encoding="utf-8")
+        solution.write_text(
+            solution_text.replace(
+                "</Solution>",
+                f'  <Project Path="tests/{name}.E2ETests/{name}.E2ETests.csproj" />\n</Solution>',
+                1,
+            ),
+            encoding="utf-8",
+        )
 
         for project_kind, (top, suffix) in SNIPPET_PROJECT_FOLDERS.items():
             target = project / top / f"{name}.{suffix}" / "Snippets"
