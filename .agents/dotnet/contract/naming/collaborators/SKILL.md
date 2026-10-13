@@ -171,6 +171,9 @@ public interface IIntegrationEventPublisher
 the event type, never per subject (`INoteEventPublisher` names the subject, not the role). A field or
 parameter holding it is `integrationEventPublisher`, per the subject+role naming rule above.
 
+`dotnet:domain-events` owns the domain-event/integration-event boundary and the pre-commit translation,
+including broker events consumed by the same service's own worker.
+
 The role that pumps a broker subscription is `<Subscription>Processor` — `OrderEventsProcessor`, a
 `BackgroundService` in Infrastructure that owns one subscription, dispatches each received message to
 its `<Event>Handler` (the Handler role above), then settles the message. Rejected names: `HostedService`

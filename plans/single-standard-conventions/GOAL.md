@@ -1,8 +1,8 @@
 # One standard for the dotnet conventions
 
 Status: in progress (2026-10-13). Decided by Tommy on 2026-10-13 and relayed by the sandbox-dotnet session
-from `tomjseery/sandbox-dotnet` wiring evidence. Owner: the Claude session that delivered the azure
-app-profile goal (`tj-agents/azure` `plans/app-profile/GOAL.md`, complete).
+from `tomjseery/sandbox-dotnet` wiring evidence. Owner: the standards-finish Codex session; canonical handoff at
+`C:\Users\TommySeery\.claude\plans\tj-agents\HANDOFF_STANDARDS_REMAINING.md`.
 
 ## Rule for every slice
 
@@ -117,13 +117,12 @@ its one-line why and the date, under `dotnet:learning`'s convention procedure.
    release identities. If the change would break published installs or needs a core release-catalog
    change, ask Tommy one line before merging.
 
-### E: hand workflows to the deploy-target owner (after azure `Feature/ActionsConformance` merges)
+### E: folded into scaffold boilerplate item 0b (Tommy, 2026-10-13)
 
-With `cloud=azure`, the dotnet scaffold writes its restore, build and test commands into the profile's
-`verify` list and stops emitting `.github/workflows/ci.yml`. azure then owns the workflow tree, per
-`github-actions:structure`. Goal: tj-agents/azure `plans/actions-conformance/GOAL.md`.
-It also writes `database.schemas` into the profile from the EF model's schemas (the scaffold's default
-schema, or a `cloud-db-schemas` option), so the workload grants cover them.
+Slice E is superseded by item 0b in the canonical standards handoff. After this snippet-gate fix
+merges, the dotnet scaffold will generate one Web API shape and always write its boilerplate app
+profile, including `verify` and `database.schemas`. It will emit no workflow and have no cloud switch.
+Azure remains a separate scaffold step, with workflows owned by the github-actions writer in item 0.
 
 ## Lanes
 
@@ -199,14 +198,124 @@ schema, or a `cloud-db-schemas` option), so the workload grants cover them.
     (same pre-existing `engineering:docs` failure)/`test_source_layout.py`, `sync-generated.ps1 -Check` and
     `kit:check` pass, and all 8 verify.py configurations plus the new negative-path gates ran sequentially
     and passed (0 warnings/0 errors on every config, both Terraform roots validated).
+- 2026-10-13: slice B/C **PR #50 merged** as `4cb90a2`.
+
+- 2026-10-13: **Follow-up fixes** — `Fix/SnippetsCompileUnderScaffold`, from sandbox-dotnet applying #50
+  and finding two defects the review missed: the scaffold template `.editorconfig` had no
+  `dotnet_diagnostic.CA1848.severity = error` though `dotnet:logging` requires it, and the
+  microservice-boundaries Processor snippet awaited without `.ConfigureAwait(false)` and used
+  `await using var scope = …`, which the selected stack's Meziantou MA0004 rejects under
+  `TreatWarningsAsErrors` (M004 in `MISTAKES.md`).
+  - Fixed both instances, then built a snippet compile gate so the class of defect can't recur: a
+    compilable fixture plus a byte-identity unittest per `.agents/dotnet/contract/**/SKILL.md` csharp
+    block, under `.agents/tests/snippets/`. `verify.py` scaffolds the sandbox preset after the positive
+    configurations, adds a temporary Dunet reference for the Infrastructure project's union snippets, copies
+    each fixture into its target project (Infrastructure for production snippets, the matching test project
+    for test-tier snippets), and builds under `TreatWarningsAsErrors`.
+  - A block that is a deliberate counter-example or otherwise can't compile (a prose fragment, a
+    net11.0-only feature, a scope-colliding multi-example fence) gets a dedicated `skip` field with a
+    required, specific reason — a new explicit marker, not the doc's existing `// CORRECT`/`// WRONG`
+    comments, since those mark intent inside a block rather than exempting a whole block from the gate
+    without touching its verbatim text.
+  - The gate found and this PR fixed further genuine snippet defects beyond the two reported: a
+    `Fulfil.Fulfil` CS0542 self-naming bug in `keyed/unions` (the union must be named `Fulfilment`), a
+    missing `Status` property in `domain/events`, missing `.ConfigureAwait(false)` in five further
+    production-tier snippets (`errors/carriers`, `persistence` ×2, `proto`, `seeding`, `style`), and
+    non-functional `ShouldBe`/`ReadAsync` placeholder calls in `testing/integration` replaced with real
+    Shouldly/`System.Net.Http.Json` calls.
+  - 6 new unittests, sync and kit check pass, and the full verify.py (including the new snippet compile
+    gate) runs sequentially and passes.
+  - Tommy: close 2 of the 14 skips, the rest are legitimate. `multitenancy-05-stance-test` closed —
+    decoupled `IReadDbContext`/`IWriteDbContext` from `IDbContext` in the shared stub (they were wrongly
+    extending it; the contract's own repository-capability table treats them as independent rows), made
+    `ReadDbContext` throw on `SaveChanges` per its own "read-only by construction" rule, and added a
+    temporary `Microsoft.EntityFrameworkCore` reference to the gate's UnitTests project only (not the
+    shipped scaffold). `testing-e2e-01-clock` (the M003 example) not yet closed — still needs a temporary
+    E2E project (Reqnroll/Reqnroll.xUnit/Microsoft.Playwright/Shouldly) added to the gate's scaffolded
+    sandbox, an `e2e-tests` manifest project kind, and `ClockFixture`/seed-state stubs. Also pending: the
+    integration-event definition in `domain-events`/`naming-collaborators` (with its own snippet) and the
+    GOAL.md Next Steps notify-target edit (sandbox-dotnet-17 → the Codex owner at
+    `sandbox-dotnet/plans/sandbox/GOAL.md`). Checkpointed here for a Codex handoff.
 
 ## Next Steps
 
-1. Slices B and C merge as one conventions PR, tj-agents/dotnet#50. Then notify `sandbox-dotnet-17` for
-   the B9 renames.
-2. Pending Tommy: enforce "no stray `this.`" with a scaffold-shipped source-scan test, or keep it
+1. Finish and merge `Fix/SnippetsCompileUnderScaffold`, then notify the sandbox-dotnet owner (Codex;
+   goal at `C:\Users\TommySeery\source\repos\sandbox-dotnet\plans\sandbox\GOAL.md`). Slices B/C
+   already merged as tj-agents/dotnet#50; Azure sticky/B001 merged as tj-agents/azure#7 at
+   `881ac901118a953b6d6ef0d5651f483e02823bf8`.
+2. Item 0: move whole workflow ownership to github-actions. Item 0b follows the snippet-gate merge and
+   folds slice E into one Web API boilerplate shape; it is outside this branch's scope.
+3. Pending Tommy: enforce "no stray `this.`" with a scaffold-shipped source-scan test, or keep it
    review-only. The scan test would parse the solution's `.cs` files with
    `Microsoft.CodeAnalysis.CSharp` syntax and fail on a `this.` that isn't a constructor assignment
    shadowed by its parameter. IDE0003 can't gate it on SDK 10.0.301.
-3. Slice E, once azure `Feature/ActionsConformance` (tj-agents/azure#5) merges.
 4. Slice D waits on the kit core-dependency release.
+
+## Codex pickup - 2026-10-13
+
+The handoff successor verified this branch at `5c52d9e`. The earlier configured-model capacity gate
+is resolved: Tommy authorized whichever available models work for implementation and independent
+review. The bounded implementation remains L4, with one in-session writer and no additional native
+CLI sessions. The canonical handoff remains
+`C:\Users\TommySeery\.claude\plans\tj-agents\HANDOFF_STANDARDS_REMAINING.md`.
+
+- Added a temporary E2ETests project only to the snippet compile gate, with Reqnroll/Reqnroll.xUnit
+  3.3.4, Microsoft.Playwright 1.63.0 and Shouldly 4.3.0. `testing-e2e-01-clock` now has no skip and
+  retains an empty header; fixture seed types and global usings provide its dependencies.
+- Recorded Tommy's integration-event decision in `domain-events`, with the domain record,
+  constructor-assigned pre-commit translator and flat integration record compiled as one verbatim
+  example. `naming-collaborators` links this owner.
+- Validation and delivery evidence follows below; the parent retains review, exact-head CI and delivery.
+
+- Local validation: 7 snippet tests (including byte identity, complete manifest coverage and a real
+  temporary scaffold whose E2E project/package/solution/fixture artifacts are inspected with dotnet
+  calls mocked), 43 scaffold tests and 3 source-layout tests pass. The snippet and host generators run
+  with `python -B`; their freshness checks pass. Pinned kit 1.2.1 conformance and tier/harness validation
+  pass. The shipped source harness now grants the packaged `verify.py` command separately from
+  scaffold `new`/`options`.
+- Full compile/build validation remains pending exact-head CI. Local free disk is approximately
+  253 MB, so no dotnet or Terraform process was launched. `.github/workflows/scaffold.yml` runs the
+  unchanged full verification sequence on Linux and Windows with `AZURE_SCAFFOLD` pointing to its
+  Azure checkout; this branch's `verify.py` edit triggers both jobs. The gate covers all eight positive
+  configurations, the 46 compilable snippets (12 explicit skips), negative paths and both Azure
+  Terraform roots. Parent owns pushing this candidate, independent review and those CI results.
+
+## Snippet review repairs - 2026-10-13
+
+The completed independent review is frozen at `9559be3` with changes required. This bounded repair
+addresses SSN-1 (`BUGS.md#B009`), SSN-2 (`BUGS.md#B010`) and SSN-3 (`BUGS.md#B011`), plus the
+full-CI Azure workflow collision already recorded in the primary shared register as `BUGS.md#B008`.
+
+- Moved the complete canonical snippet asset directory beside the scaffold and changed every verifier
+  to resolve `ROOT / "snippets"`. The old authored directory is gone. The authoring generator still
+  extracts exact source contract fences. All three generated host inventories match the canonical
+  assets, and the real authored/Claude/Codex/package scaffold-setup paths copy every fixture.
+- Closed only the false keyed-strategies block 4 skip, corrected block 2's explanation without
+  inventing its missing builder, and kept the other exemptions. Coverage is now 47 compilable fences
+  and 11 explicit skips across 58 blocks.
+- Replaced primary-constructor captures in the checkout, seeder and scoped support wrappers with
+  explicit readonly fields and constructor assignments. The bounded shared-support audit also fixes
+  shadowing out parameters, empty runtime string literals, legacy extension containers, repository
+  dependency initializers, the inherited `base.Set` call and file-scoped namespaces for each
+  emulated library namespace. Every contract snippet region stays exact.
+- Existing `cloud=azure` planning now leaves `ci.yml` for Azure before files are written. The fake
+  provider rejects an occupied handoff path; real primary Azure composition succeeds with all six
+  workflows. This repair does not implement item 0b or the rest of slice E.
+- Verification: 8 snippet tests, 43 scaffold tests, 3 source-layout tests, pinned kit 1.2.1, tier/harness
+  validation and freshness of all 585 generated outputs pass. Local real Azure composition runs only
+  Python generation; no dotnet or Terraform process was launched. Full exact-head CI, fresh independent
+  incremental review and delivery remain with the parent.
+
+## E2E snippet CI repair - 2026-10-13
+
+Independent incremental review of `565a6ed` completed with all five lenses clear and approved. The
+exact-head Scaffold PR run `38437895854` passed the repaired Azure composition and reached the snippet
+compiler, which reported the five E2E diagnostics tracked in `BUGS.md#B012`: MA0002 on the seed
+support dictionary and MA0004 on four awaits in the actual ClockSteps contract example.
+
+The source example now configures all four awaits with `ConfigureAwait(false)`; the support dictionary
+uses `StringComparer.Ordinal`. Both generators refreshed the exact fixture and all host layouts. The
+manifest header stays empty, the fence remains selected for compilation, and analyzer policy is unchanged.
+Eight snippet tests, three source-layout tests, the affected-source/header check and freshness of all 585
+generated outputs pass. No local dotnet or Terraform process ran. Full exact-head compiler validation,
+fresh independent incremental review and delivery remain with the parent.

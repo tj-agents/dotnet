@@ -34,6 +34,7 @@ public sealed class OrderEntity : IEventRaiser
 {
     private readonly EventRaiser events = new();
 
+    public OrderStatus Status { get; private set; }
     public IReadOnlyList<IDomainEvent> DomainEvents => events.DomainEvents;
     public void ClearDomainEvents() => events.Clear();
 
@@ -66,11 +67,9 @@ thing that must be atomic.
 
 ## A pre-commit handler is where a domain event becomes an integration event
 
-The domain event is internal to the service and carries the entity. The integration event is the
-published contract and carries a flat payload. One pre-commit handler per domain event does the
-translation and nothing else:
-
 ```csharp
+public sealed record OrderCancelledDomainEvent(OrderEntity Order) : IDomainEvent;
+
 internal sealed class OrderCancelledDomainEventHandler : IPreCommitDomainEventHandler<OrderCancelledDomainEvent>
 {
     private readonly IIntegrationEventPublisher integrationEventPublisher;
@@ -83,7 +82,17 @@ internal sealed class OrderCancelledDomainEventHandler : IPreCommitDomainEventHa
     public Task HandleAsync(OrderCancelledDomainEvent e, CancellationToken ct = default) =>
         integrationEventPublisher.PublishAsync(new OrderCancelledEvent(e.Order.Id, e.Order.CustomerId, e.Order.CancelledAt), ct);
 }
+
+public sealed record OrderCancelledEvent(Guid Id, Guid CustomerId, DateTimeOffset CancelledAt) : IIntegrationEvent;
 ```
+
+The domain event stays in-process and carries the entity. Any event published out of process through
+the broker is an integration event, including one consumed by the same service's own worker. It carries
+a flat payload and implements `IIntegrationEvent`. One pre-commit handler per domain event translates
+it into the integration event and does nothing else.
+
+Tommy, 2026-10-13: the process boundary defines an integration event, because a service's own worker
+needs the same broker contract and atomic outbox guarantee as another service.
 
 `IIntegrationEventPublisher` is the one broker-abstraction role per solution; see
 `dotnet:naming-collaborators`. Tommy, 2026-10-13: one named publisher role, so no repository invents a
@@ -93,8 +102,8 @@ Because the publisher is a transactional outbox, that publish stages a row on th
 the state change and the promise to tell the world commit or roll back together. Publishing after the
 commit instead is the classic lost-message bug.
 
-**Never let a domain event cross a service boundary.** It is a type in the domain project, holding a
-live entity; the thing another service subscribes to is the integration event.
+**Never let a domain event leave the process.** It is a type in the domain project, holding a live
+entity; every broker subscriber receives the integration event.
 
 ## Handlers are registered per closed event type
 
