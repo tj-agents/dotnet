@@ -202,7 +202,11 @@ schema, or a `cloud-db-schemas` option), so the workload grants cover them.
 
 ## Next Steps
 
-1. Slices B and C together, as one conventions PR on `Refactor/OneTestingStyleStandard`. Tommy asked for a
-   single conventions PR, and new branches or PRs are opt-in for him, so no further split. Implement,
-   search-verify, build, review, PR and merge. Then notify `sandbox-dotnet-17`. Slice D (the identity fix)
-   waits on the kit core-dependency release; slice E waits on azure Actions conformance.
+1. Slices B and C merge as one conventions PR, tj-agents/dotnet#50. Then notify `sandbox-dotnet-17` for
+   the B9 renames.
+2. Pending Tommy: enforce "no stray `this.`" with a scaffold-shipped source-scan test, or keep it
+   review-only. The scan test would parse the solution's `.cs` files with
+   `Microsoft.CodeAnalysis.CSharp` syntax and fail on a `this.` that isn't a constructor assignment
+   shadowed by its parameter. IDE0003 can't gate it on SDK 10.0.301.
+3. Slice E, once azure `Feature/ActionsConformance` (tj-agents/azure#5) merges.
+4. Slice D waits on the kit core-dependency release.
