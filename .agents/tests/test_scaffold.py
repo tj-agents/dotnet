@@ -848,6 +848,11 @@ class ScaffoldTests(unittest.TestCase):
 
         self.assertIn('"key=va\\"lue"', line)
 
+    def test_azure_command_line_doubles_a_trailing_backslash(self) -> None:
+        line = SCAFFOLD.azure_command_line("scaffold.py", Path("project"), {"root": "C:\\"})
+
+        self.assertIn('"root=C:\\\\"', line)
+
     def test_cloud_none_output_has_no_azure_markers_or_unresolved_tokens(self) -> None:
         markers = (
             "Azure.Identity",
