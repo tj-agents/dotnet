@@ -627,7 +627,9 @@ def run_azure(azure_script: Path, command_args: Sequence[str]) -> subprocess.Com
 
 def quote_for_display(value: str) -> str:
     if value == "" or SHELL_SPECIAL.search(value):
-        return '"' + value.replace('"', '\\"') + '"'
+        escaped = value.replace('"', '\\"')
+        trailing = len(escaped) - len(escaped.rstrip("\\"))
+        return '"' + escaped + "\\" * trailing + '"'
     return value
 
 
