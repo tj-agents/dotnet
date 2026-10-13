@@ -12,5 +12,5 @@ internal sealed class DapperConnectionFactory : IDapperConnectionFactory
         this.dataSource = dataSource;
     }
 
-    public DbConnection CreateConnection() => this.dataSource.CreateConnection();
+    public DbConnection CreateConnection() => dataSource.CreateConnection();
 }

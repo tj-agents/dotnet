@@ -73,13 +73,24 @@ translation and nothing else:
 ```csharp
 internal sealed class OrderCancelledDomainEventHandler : IPreCommitDomainEventHandler<OrderCancelledDomainEvent>
 {
+    private readonly IIntegrationEventPublisher integrationEventPublisher;
+
+    public OrderCancelledDomainEventHandler(IIntegrationEventPublisher integrationEventPublisher)
+    {
+        this.integrationEventPublisher = integrationEventPublisher;
+    }
+
     public Task HandleAsync(OrderCancelledDomainEvent e, CancellationToken ct = default) =>
-        bus.PublishAsync(new OrderCancelledEvent(e.Order.Id, e.Order.CustomerId, e.Order.CancelledAt), ct);
+        integrationEventPublisher.PublishAsync(new OrderCancelledEvent(e.Order.Id, e.Order.CustomerId, e.Order.CancelledAt), ct);
 }
 ```
 
-Because the bus is a transactional outbox, that publish stages a row on the caller's context — so the
-state change and the promise to tell the world commit or roll back together. Publishing after the
+`IIntegrationEventPublisher` is the one broker-abstraction role per solution; see
+`dotnet:naming-collaborators`. Tommy, 2026-10-13: the bare `bus` field is gone — a sandbox had nowhere to
+look up the publisher's role and invented a per-subject `INoteEventPublisher` instead.
+
+Because the publisher is a transactional outbox, that publish stages a row on the caller's context — so
+the state change and the promise to tell the world commit or roll back together. Publishing after the
 commit instead is the classic lost-message bug.
 
 **Never let a domain event cross a service boundary.** It is a type in the domain project, holding a

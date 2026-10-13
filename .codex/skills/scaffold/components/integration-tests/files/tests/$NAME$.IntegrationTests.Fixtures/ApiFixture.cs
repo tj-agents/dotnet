@@ -28,8 +28,8 @@ public sealed class ApiFixture : WebApplicationFactory<global::Program>, IAsyncL
 
     public async Task InitializeAsync()
     {
-        await this.container.StartAsync().ConfigureAwait(false);
-        this.Client = this.CreateClient();
+        await container.StartAsync().ConfigureAwait(false);
+        Client = CreateClient();
     }
 
     public async Task ResetAsync()
@@ -38,10 +38,10 @@ public sealed class ApiFixture : WebApplicationFactory<global::Program>, IAsyncL
         await using (connection.ConfigureAwait(false))
         {
             await connection.OpenAsync().ConfigureAwait(false);
-            this.respawner ??= await Respawner.CreateAsync(
+            respawner ??= await Respawner.CreateAsync(
                 connection,
                 new RespawnerOptions { DbAdapter = $FIXTURE_DB_ADAPTER$ }).ConfigureAwait(false);
-            await this.respawner.ResetAsync(connection).ConfigureAwait(false);
+            await respawner.ResetAsync(connection).ConfigureAwait(false);
         }
     }
 
@@ -56,8 +56,8 @@ $FIXTURE_AUTH_CONFIGURATION$
 
     async Task IAsyncLifetime.DisposeAsync()
     {
-        await this.container.DisposeAsync().ConfigureAwait(false);
-        this.Dispose();
+        await container.DisposeAsync().ConfigureAwait(false);
+        Dispose();
     }
 
     private static string CreatePassword()

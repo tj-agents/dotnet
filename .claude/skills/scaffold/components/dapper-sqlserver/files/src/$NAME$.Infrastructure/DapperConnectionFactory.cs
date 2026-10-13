@@ -14,5 +14,5 @@ internal sealed class DapperConnectionFactory : IDapperConnectionFactory
             ?? throw new InvalidOperationException("Connection string 'SqlServer' is required.");
     }
 
-    public DbConnection CreateConnection() => new SqlConnection(this.connectionString);
+    public DbConnection CreateConnection() => new SqlConnection(connectionString);
 }
