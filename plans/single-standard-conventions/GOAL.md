@@ -279,3 +279,29 @@ CLI sessions. The canonical handoff remains
   Azure checkout; this branch's `verify.py` edit triggers both jobs. The gate covers all eight positive
   configurations, the 46 compilable snippets (12 explicit skips), negative paths and both Azure
   Terraform roots. Parent owns pushing this candidate, independent review and those CI results.
+
+## Snippet review repairs - 2026-10-13
+
+The completed independent review is frozen at `9559be3` with changes required. This bounded repair
+addresses SSN-1 (`BUGS.md#B009`), SSN-2 (`BUGS.md#B010`) and SSN-3 (`BUGS.md#B011`), plus the
+full-CI Azure workflow collision already recorded in the primary shared register as `BUGS.md#B008`.
+
+- Moved the complete canonical snippet asset directory beside the scaffold and changed every verifier
+  to resolve `ROOT / "snippets"`. The old authored directory is gone. The authoring generator still
+  extracts exact source contract fences. All three generated host inventories match the canonical
+  assets, and the real authored/Claude/Codex/package scaffold-setup paths copy every fixture.
+- Closed only the false keyed-strategies block 4 skip, corrected block 2's explanation without
+  inventing its missing builder, and kept the other exemptions. Coverage is now 47 compilable fences
+  and 11 explicit skips across 58 blocks.
+- Replaced primary-constructor captures in the checkout, seeder and scoped support wrappers with
+  explicit readonly fields and constructor assignments. The bounded shared-support audit also fixes
+  shadowing out parameters, empty runtime string literals, legacy extension containers, repository
+  dependency initializers, the inherited `base.Set` call and file-scoped namespaces for each
+  emulated library namespace. Every contract snippet region stays exact.
+- Existing `cloud=azure` planning now leaves `ci.yml` for Azure before files are written. The fake
+  provider rejects an occupied handoff path; real primary Azure composition succeeds with all six
+  workflows. This repair does not implement item 0b or the rest of slice E.
+- Verification: 8 snippet tests, 43 scaffold tests, 3 source-layout tests, pinned kit 1.2.1, tier/harness
+  validation and freshness of all 585 generated outputs pass. Local real Azure composition runs only
+  Python generation; no dotnet or Terraform process was launched. Full exact-head CI, fresh independent
+  incremental review and delivery remain with the parent.
