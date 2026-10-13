@@ -626,11 +626,21 @@ def run_azure(azure_script: Path, command_args: Sequence[str]) -> subprocess.Com
 
 
 def quote_for_display(value: str) -> str:
-    if value == "" or SHELL_SPECIAL.search(value):
-        escaped = value.replace('"', '\\"')
-        trailing = len(escaped) - len(escaped.rstrip("\\"))
-        return '"' + escaped + "\\" * trailing + '"'
-    return value
+    if value and not SHELL_SPECIAL.search(value):
+        return value
+    quoted = ['"']
+    backslashes = 0
+    for character in value:
+        if character == "\\":
+            backslashes += 1
+            continue
+        if character == '"':
+            quoted.append("\\" * (backslashes * 2 + 1) + '"')
+        else:
+            quoted.append("\\" * backslashes + character)
+        backslashes = 0
+    quoted.append("\\" * (backslashes * 2) + '"')
+    return "".join(quoted)
 
 
 def azure_command_line(azure_script: str, project: Path, azure_overrides: Mapping[str, str]) -> str:
