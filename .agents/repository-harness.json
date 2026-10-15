@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "requires": {
+    "marketplaces": [],
+    "plugins": [],
+    "hooks": [],
+    "permissions": {
+      "claude_allow": [
+        "Bash(git worktree:*)",
+        "Bash(git fetch:*)",
+        "Bash(git branch:*)",
+        "Bash(mkdir:*)"
+      ],
+      "codex_prefix_rules": []
+    }
+  }
+}
