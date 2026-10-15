@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "marketplace": {
+    "repository": "tj-agents/marketplace",
+    "revision": "v1.0.0"
+  },
+  "plugins": [
+    "base",
+    "engineering",
+    "kit",
+    "machine"
+  ]
+}

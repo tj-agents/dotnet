@@ -1,69 +1,26 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(git worktree:*)",
-      "Bash(git fetch:*)",
-      "Bash(git branch:*)",
-      "Bash(mkdir:*)"
-    ],
-    "defaultMode": "auto"
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"C:\\Users\\TommySeery\\cli-session-hook.ps1\" -Tool claude",
-            "timeout": 120,
-            "async": true
-          },
-          {
-            "type": "command",
-            "command": "b=$(git branch --show-current 2>/dev/null); [ -z \"$b\" ] && exit 0; ctx=\"Current git branch: $b\"; u=$(git diff --name-only --diff-filter=U 2>/dev/null | head -5 | paste -sd, -); [ -n \"$u\" ] && ctx=\"$ctx | UNRESOLVED CONFLICT (merge or stash pop) in: $u -- resolve before trusting any build or hook\"; m=$(grep -rl \"^<<<<<<< \" .agents/hooks .claude/hooks .codex 2>/dev/null | head -3 | paste -sd, -); [ -n \"$m\" ] && ctx=\"$ctx | CONFLICT MARKERS IN HOOK FILES: $m -- every session fails here until fixed\"; printf '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"%s\"}}' \"$ctx\"",
-            "shell": "bash",
-            "timeout": 15
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "p=$(cat); n=$(printf '%s' \"$p\" | grep -oE 'AB#[0-9]+' | head -1 | sed 's/AB#//'); [ -z \"$n\" ] && exit 0; cur=$(git branch --show-current 2>/dev/null); case \"$cur\" in *\"$n\"*) exit 0;; esac; m=$(git branch --format='%(refname:short)' 2>/dev/null | grep -F -- \"$n\" | tr '\\n' ' ' | sed 's/ *$//'); [ -z \"$m\" ] && exit 0; printf '{\"systemMessage\":\"WRONG BRANCH: AB#%s has branch(es) [%s] but you are on %s\",\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"BRANCH CHECK FAILED. This prompt references AB#%s. These local branches already exist for that story: %s. The current branch is %s. Do NOT edit, write or create any file until you switch to the story branch or the user explicitly confirms working elsewhere. Tell the user about this mismatch before doing anything else.\"}}' \"$n\" \"$m\" \"$cur\" \"$n\" \"$m\" \"$cur\"",
-            "shell": "bash",
-            "timeout": 15
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"C:\\Users\\TommySeery\\cli-session-hook.ps1\" -Tool claude",
-            "timeout": 120,
-            "async": true
-          }
-        ]
-      }
-    ]
+  "extraKnownMarketplaces": {
+    "tj-agents": {
+      "source": {
+        "source": "github",
+        "repo": "tj-agents/marketplace",
+        "ref": "v1.0.0"
+      },
+      "autoUpdate": false
+    }
   },
   "enabledPlugins": {
-    "clangd-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "base@tj-agents": true,
+    "engineering@tj-agents": true,
+    "kit@tj-agents": true,
+    "machine@tj-agents": true
   },
-  "effortLevel": "xhigh",
-  "autoUpdatesChannel": "latest",
-  "voice": {
-    "enabled": true,
-    "mode": "hold"
-  },
-  "skipWorkflowUsageWarning": true,
-  "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true,
-  "model": "opusplan"
+  "permissions": {
+    "allow": [
+      "Bash(git branch:*)",
+      "Bash(git fetch:*)",
+      "Bash(git worktree:*)",
+      "Bash(mkdir:*)"
+    ]
+  }
 }
