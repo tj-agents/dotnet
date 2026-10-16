@@ -1,0 +1,8 @@
+{
+  "when": {"data": {"oneOf": ["efcore", "efcore+dapper"]}, "database": "postgres", "cloud": "none"},
+  "requires": {"data": {"oneOf": ["efcore", "efcore+dapper"]}, "database": "postgres", "cloud": "none"},
+  "conflicts": {},
+  "append": {
+    "INFRASTRUCTURE_REGISTRATIONS": "var connectionString = configuration.GetConnectionString(\"Postgres\");\n\nif (string.IsNullOrWhiteSpace(connectionString))\n    throw new InvalidOperationException(\"Connection string 'Postgres' is required.\");\n\nservices.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));"
+  }
+}

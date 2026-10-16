@@ -1,6 +1,6 @@
-# Migration to kit 1.1.0
+# Plugin layout migration
 
-The repository now uses [kit](https://github.com/tj-agents/kit)'s layout: skills live under
+The repository now uses [Template](https://github.com/tj-agents/template)'s layout: skills live under
 `.agents/dotnet/<kind>/`, related skills share a family folder, family first, and a skill's name is its folder
 path joined by hyphens. Each required standard contract is a stack-free `core` skill; the opinionated guidance
 it replaces is a family member that keeps its original profile and prerequisite.

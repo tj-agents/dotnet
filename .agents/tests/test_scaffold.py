@@ -122,8 +122,8 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
     def main():
         parser = argparse.ArgumentParser()
         parser.add_argument("--root", required=True)
-        parser.add_argument("--input", required=True)
-        parser.add_argument("--plugin", action="append", default=[])
+        parser.add_argument("--marketplace-revision", required=True)
+        parser.add_argument("--stack", required=True)
         parser.add_argument("--mode", required=True)
         args = parser.parse_args()
         log_path = os.environ.get("FAKE_STANDARDS_LOG")
@@ -139,13 +139,14 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
         if args.mode == "check":
             return 0
         root = Path(args.root)
-        plugins = ["base-agents/base", "base-agents/engineering", "base-agents/machine", *args.plugin]
+        plugins = ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents", "dotnet@tj-agents"]
+        if args.stack == "azure":
+            plugins.append("azure@tj-agents")
         omitted = os.environ.get("FAKE_STANDARDS_OMIT_PLUGIN")
         if omitted:
             plugins = [plugin for plugin in plugins if plugin != omitted]
         files = {
-            ".agents/capabilities.lock.json": json.dumps({"schema_version": int(os.environ.get("FAKE_STANDARDS_SCHEMA_VERSION", "1")), "plugins": [{"id": plugin} for plugin in plugins]}) + "\\n",
-            ".agents/catalog/catalog.json": "{}\\n",
+            ".agents/plugins.lock.json": json.dumps({"schema_version": int(os.environ.get("FAKE_STANDARDS_SCHEMA_VERSION", "3")), "marketplaces": {"tj-agents": {"repository": "tj-agents/marketplace", "revision": args.marketplace_revision}}, "plugins": plugins}) + "\\n",
             ".claude/settings.json": "{}\\n",
             ".codex/config.toml": "[plugins]\\n",
             ".codex/rules/agent-harness.rules": "allow\\n",
@@ -166,8 +167,7 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
 )
 
 FAKE_STANDARD_FILES = [
-    ".agents/capabilities.lock.json",
-    ".agents/catalog/catalog.json",
+    ".agents/plugins.lock.json",
     ".claude/settings.json",
     ".codex/config.toml",
     ".codex/rules/agent-harness.rules",
@@ -187,28 +187,26 @@ def write_fake_azure(root: Path) -> Path:
 def write_fake_standards_adopter(root: Path) -> tuple[Path, Path]:
     root.mkdir(parents=True, exist_ok=True)
     adopter = root / "adopt_repository.py"
-    standards_input = root / "composition.json"
     adopter.write_text(FAKE_STANDARDS_ADOPTER, encoding="utf-8")
-    standards_input.write_text("{}\\n", encoding="utf-8")
-    return adopter, standards_input
+    return adopter, "a807aa3d3b5e791e318c3c8b44d3eb56eaa308dd"
 
 
 class ScaffoldTests(unittest.TestCase):
     def setUp(self) -> None:
         self.standards_temporary = tempfile.TemporaryDirectory()
-        self.standards_adopter, self.standards_input = write_fake_standards_adopter(Path(self.standards_temporary.name))
+        self.standards_adopter, self.marketplace_revision = write_fake_standards_adopter(Path(self.standards_temporary.name))
 
     def tearDown(self) -> None:
         self.standards_temporary.cleanup()
 
     def standards_arguments(self) -> list[str]:
-        return ["--standards-adopter", str(self.standards_adopter), "--standards-input", str(self.standards_input)]
+        return ["--plugin-lock-adopter", str(self.standards_adopter), "--marketplace-revision", self.marketplace_revision]
 
     def run_cli(self, *args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
         arguments = list(args)
         if arguments[:1] == ["new"] and "--no-input" not in arguments:
             arguments.append("--no-input")
-        if arguments[:1] == ["new"] and "--standards-adopter" not in arguments:
+        if arguments[:1] == ["new"] and "--plugin-lock-adopter" not in arguments:
             arguments.extend(self.standards_arguments())
         return subprocess.run(
             [sys.executable, "-B", str(SCRIPT), *arguments],
@@ -377,16 +375,16 @@ class ScaffoldTests(unittest.TestCase):
             )
             missing_adopter = self.run_cli(
                 "new", "--name", "MissingAdopter", "--destination", str(root), "--no-input",
-                "--standards-adopter", str(root / "missing.py"), "--standards-input", str(self.standards_input),
+                "--plugin-lock-adopter", str(root / "missing.py"), "--marketplace-revision", self.marketplace_revision,
             )
             missing_input = self.run_cli(
                 "new", "--name", "MissingInput", "--destination", str(root), "--no-input",
-                "--standards-adopter", str(self.standards_adopter), "--standards-input", str(root / "missing.json"),
+                "--plugin-lock-adopter", str(self.standards_adopter), "--marketplace-revision", "invalid-revision",
             )
 
             self.assertEqual(2, missing_flags.returncode)
             self.assertEqual(1, missing_adopter.returncode)
-            self.assertEqual(1, missing_input.returncode)
+            self.assertEqual(2, missing_input.returncode)
             self.assertFalse((root / "Missing").exists())
             self.assertFalse((root / "MissingAdopter").exists())
             self.assertFalse((root / "MissingInput").exists())
@@ -398,10 +396,9 @@ class ScaffoldTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             adopter = root / "adopt_repository.py"
-            standards_input = root / "sources.json"
+            marketplace_revision = self.marketplace_revision
             adopter.write_text("", encoding="utf-8")
-            standards_input.write_text("{}", encoding="utf-8")
-            environment = {"STANDARDS_ADOPTER": str(adopter), "STANDARDS_INPUT": str(standards_input)}
+            environment = {"PLUGIN_LOCK_ADOPTER": str(adopter), "MARKETPLACE_REVISION": marketplace_revision}
             for caller in (
                 lambda: VERIFY.verify("VerifyCaller", "minimal"),
                 lambda: VERIFY.negative_path_gates("NegativeCaller", "web", ('tests=["integration"]',)),
@@ -412,8 +409,8 @@ class ScaffoldTests(unittest.TestCase):
                         with self.assertRaises(StopVerification):
                             caller()
                 command = run.call_args.args[0]
-                self.assertEqual(str(adopter), command[command.index("--standards-adopter") + 1])
-                self.assertEqual(str(standards_input), command[command.index("--standards-input") + 1])
+                self.assertEqual(str(adopter), command[command.index("--plugin-lock-adopter") + 1])
+                self.assertEqual(marketplace_revision, command[command.index("--marketplace-revision") + 1])
 
     def test_verify_callers_reject_missing_standards_before_commands(self) -> None:
         for caller in (
@@ -421,7 +418,7 @@ class ScaffoldTests(unittest.TestCase):
             lambda: VERIFY.negative_path_gates("NegativeMissing", "web"),
             lambda: VERIFY.snippet_compile_gate("SnippetMissing"),
         ):
-            with mock.patch.dict(os.environ, {"STANDARDS_ADOPTER": "", "STANDARDS_INPUT": ""}, clear=False):
+            with mock.patch.dict(os.environ, {"PLUGIN_LOCK_ADOPTER": "", "MARKETPLACE_REVISION": ""}, clear=False):
                 with mock.patch.object(VERIFY, "run") as run:
                     with self.assertRaises(RuntimeError):
                         caller()
@@ -439,8 +436,8 @@ class ScaffoldTests(unittest.TestCase):
 
     def test_documented_new_examples_execute_with_fixture_substitutions(self) -> None:
         standard_flags = (
-            " --standards-adopter <machine-bootstrap-skill-directory>/scripts/adopt_repository.py"
-            " --standards-input /path/to/sources.json"
+            " --plugin-lock-adopter <machine-plugin-lock-skill-directory>/scripts/adopt_plugins.py"
+            " --marketplace-revision <marketplace-commit>"
         )
         updated = SCAFFOLD_SKILL.read_text(encoding="utf-8")
         previous = updated.replace(standard_flags, "")
@@ -454,8 +451,8 @@ class ScaffoldTests(unittest.TestCase):
             updated_skill.write_text(updated, encoding="utf-8")
             replacements = (
                 ("<skill-directory>/scripts/scaffold.py", SCRIPT.as_posix()),
-                ("<machine-bootstrap-skill-directory>/scripts/adopt_repository.py", self.standards_adopter.as_posix()),
-                ("/path/to/sources.json", self.standards_input.as_posix()),
+                ("<machine-plugin-lock-skill-directory>/scripts/adopt_plugins.py", self.standards_adopter.as_posix()),
+                ("<marketplace-commit>", self.marketplace_revision),
                 ("~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py", azure_script.as_posix()),
                 ("~/source/repos", destination.as_posix()),
             )
@@ -485,8 +482,8 @@ class ScaffoldTests(unittest.TestCase):
             updated_results = run_documented_commands(updated_skill)
             for result in updated_results:
                 self.assertEqual(0, result.returncode, result.stderr)
-            self.assertTrue((destination / "MyService" / ".agents" / "capabilities.lock.json").is_file())
-            self.assertTrue((destination / "Sandbox" / ".agents" / "capabilities.lock.json").is_file())
+            self.assertTrue((destination / "MyService" / ".agents" / "plugins.lock.json").is_file())
+            self.assertTrue((destination / "Sandbox" / ".agents" / "plugins.lock.json").is_file())
             self.assertTrue((destination / "Sandbox" / "infra" / "FAKE_AZURE_RAN.txt").is_file())
 
     def test_standards_adopter_receives_dotnet_and_azure_when_selected(self) -> None:
@@ -505,10 +502,8 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(0, azure.returncode, azure.stderr)
             calls = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
             self.assertEqual(["write", "check", "write", "check"], [call[call.index("--mode") + 1] for call in calls])
-            standard_plugins = [[call[index + 1] for index, item in enumerate(call) if item == "--plugin"] for call in calls[:2]]
-            azure_plugins = [[call[index + 1] for index, item in enumerate(call) if item == "--plugin"] for call in calls[2:]]
-            self.assertEqual([["dotagents/dotnet"], ["dotagents/dotnet"]], standard_plugins)
-            self.assertEqual([["dotagents/dotnet", "azure-agents/azure"], ["dotagents/dotnet", "azure-agents/azure"]], azure_plugins)
+            self.assertEqual(["dotnet", "dotnet", "azure", "azure"], [call[call.index("--stack") + 1] for call in calls])
+            self.assertTrue(all(call[call.index("--marketplace-revision") + 1] == self.marketplace_revision for call in calls))
 
     def test_standards_files_are_copied_and_listed_by_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -564,7 +559,7 @@ class ScaffoldTests(unittest.TestCase):
             )
             missing_plugin = self.run_cli(
                 "new", "--name", "MissingPlugin", "--destination", str(root), "--preset", "minimal",
-                env=dict(os.environ, FAKE_STANDARDS_OMIT_PLUGIN="dotagents/dotnet"),
+                env=dict(os.environ, FAKE_STANDARDS_OMIT_PLUGIN="dotnet@tj-agents"),
             )
             invalid_schema = self.run_cli(
                 "new", "--name", "InvalidSchema", "--destination", str(root), "--preset", "minimal",

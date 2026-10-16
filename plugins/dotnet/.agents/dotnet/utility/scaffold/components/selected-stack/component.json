@@ -1,0 +1,10 @@
+{
+  "when": {"selected-stack": true},
+  "requires": {},
+  "conflicts": {"data": "dapper"},
+  "append": {
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Meziantou.Analyzer\" Version=\"3.0.299\" />",
+    "SELECTED_STACK_ITEMS": "  <PropertyGroup>\n    <BannedApiAnalyzersReferenced>true</BannedApiAnalyzersReferenced>\n  </PropertyGroup>\n  <ItemGroup>\n    <PackageReference Include=\"Meziantou.Analyzer\" PrivateAssets=\"all\" />\n    <PackageReference Include=\"Microsoft.CodeAnalysis.BannedApiAnalyzers\" PrivateAssets=\"all\" />\n    <AdditionalFiles Include=\"$$(MSBuildThisFileDirectory)BannedSymbols.txt\" Condition=\"Exists('$$(MSBuildThisFileDirectory)BannedSymbols.txt')\" />\n  </ItemGroup>",
+    "SCAFFOLD_GUIDANCE": "The selected-stack profile enables Meziantou and banned API analyzers."
+  }
+}
