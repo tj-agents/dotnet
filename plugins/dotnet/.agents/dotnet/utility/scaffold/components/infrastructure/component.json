@@ -1,0 +1,21 @@
+{
+  "when": {"data": {"oneOf": ["efcore", "dapper", "efcore+dapper"]}},
+  "requires": {"database": {"oneOf": ["postgres", "sqlserver"]}},
+  "conflicts": {},
+  "projects": ["src/$NAME$.Infrastructure/$NAME$.Infrastructure.csproj"],
+  "variables": {
+    "INFRASTRUCTURE_PROJECT_REFERENCE": "    <ProjectReference Include=\"../$NAME$.Infrastructure/$NAME$.Infrastructure.csproj\" />",
+    "INFRASTRUCTURE_SETUP": "builder.Services.AddInfrastructure(builder.Configuration);",
+    "INFRASTRUCTURE_USING": "using $NAME$.Infrastructure;"
+  },
+  "append": {
+    "INFRASTRUCTURE_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.Extensions.Configuration.Abstractions\" />",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.Extensions.Configuration.Abstractions\" Version=\"10.0.12\" />",
+    "FUNCTIONS_INFRASTRUCTURE_USING": "using $NAME$.Infrastructure;",
+    "FUNCTIONS_INFRASTRUCTURE_SETUP": "builder.Services.AddInfrastructure(builder.Configuration);",
+    "FUNCTIONS_INFRASTRUCTURE_PROJECT_REFERENCE": "    <ProjectReference Include=\"../$NAME$.Infrastructure/$NAME$.Infrastructure.csproj\" />",
+    "WORKER_INFRASTRUCTURE_USING": "using $NAME$.Infrastructure;",
+    "WORKER_INFRASTRUCTURE_SETUP": "builder.Services.AddInfrastructure(builder.Configuration);",
+    "WORKER_INFRASTRUCTURE_PROJECT_REFERENCE": "    <ProjectReference Include=\"../$NAME$.Infrastructure/$NAME$.Infrastructure.csproj\" />"
+  }
+}

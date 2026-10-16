@@ -1,0 +1,20 @@
+{
+  "when": {"auth": "jwt"},
+  "requires": {"hosts": {"contains": "web"}},
+  "conflicts": {},
+  "append": {
+    "WEB_USINGS": "using Microsoft.AspNetCore.Authentication.JwtBearer;",
+    "WEB_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.AspNetCore.Authentication.JwtBearer\" />",
+    "WEB_SERVICE_REGISTRATIONS": "builder.Services\n    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)\n    .AddJwtBearer(options =>\n    {\n        options.Authority = builder.Configuration[\"Jwt:Authority\"];\n        options.Audience = builder.Configuration[\"Jwt:Audience\"];\n    });\nbuilder.Services.AddAuthorization();",
+    "WEB_PIPELINE": "app.UseAuthentication();\napp.UseAuthorization();",
+    "APPSETTINGS_PROPERTIES": {
+      "value": "  \"Jwt\": {\n    \"Authority\": \"https://localhost:5001\",\n    \"Audience\": \"$NAME$\"\n  }",
+      "separator": ",\n"
+    },
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.AspNetCore.Authentication.JwtBearer\" Version=\"10.0.12\" />",
+    "SCAFFOLD_GUIDANCE": "Configure Jwt:Authority and Jwt:Audience before accepting traffic.",
+    "FIXTURE_AUTH_USINGS": "using System.Security.Claims;\nusing System.Text.Encodings.Web;\nusing Microsoft.AspNetCore.Authentication;\nusing Microsoft.Extensions.Logging;\nusing Microsoft.Extensions.Options;",
+    "FIXTURE_AUTH_CONFIGURATION": "            services.AddAuthentication(options =>\n            {\n                options.DefaultAuthenticateScheme = \"Test\";\n                options.DefaultChallengeScheme = \"Test\";\n            }).AddScheme<AuthenticationSchemeOptions, HeaderAuthenticationHandler>(\"Test\", _ => { });",
+    "FIXTURE_AUTH_HANDLER": "\n    private sealed class HeaderAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>\n    {\n        public HeaderAuthenticationHandler(\n            IOptionsMonitor<AuthenticationSchemeOptions> options,\n            ILoggerFactory logger,\n            UrlEncoder encoder)\n            : base(options, logger, encoder)\n        {\n        }\n\n        protected override Task<AuthenticateResult> HandleAuthenticateAsync()\n        {\n            if (!Request.Headers.TryGetValue(\"X-Test-User\", out var user))\n                return Task.FromResult(AuthenticateResult.NoResult());\n\n            var identity = new ClaimsIdentity([new Claim(ClaimTypes.Name, user.ToString())], Scheme.Name);\n            var principal = new ClaimsPrincipal(identity);\n            var ticket = new AuthenticationTicket(principal, Scheme.Name);\n\n            return Task.FromResult(AuthenticateResult.Success(ticket));\n        }\n    }"
+  }
+}

@@ -11,12 +11,5 @@ provenance: house
 
 # Domain design
 
-Owns domain-model design — entities, values, aggregates and domain services.
-
-DDD's building-block vocabulary is `dotnet:domain-ddd` when a project selects that
-architecture; value construction is `dotnet:domain-values`; domain events raised
-through an EF Core save boundary are `dotnet:domain-events`.
-
-## Agreed
-
-_Nothing yet further._ Propose a rule through `dotnet:learning`'s convention procedure.
+Read and follow the [canonical definition](../../.agents/dotnet/contract/domain/design/SKILL.md) in full.
+This discovery entry is generated; edit the referenced `.agents/` definition.
