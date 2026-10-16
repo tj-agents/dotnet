@@ -1,0 +1,117 @@
+{
+  "architecture": {
+    "type": "string",
+    "allowed": ["single-service"],
+    "default": "single-service",
+    "description": "The generated project layout.",
+    "requires": {},
+    "conflicts": {}
+  },
+  "framework": {
+    "type": "string",
+    "allowed": ["net10.0"],
+    "default": "net10.0",
+    "description": "The target framework.",
+    "requires": {},
+    "conflicts": {}
+  },
+  "data": {
+    "type": "string",
+    "allowed": ["none", "efcore", "dapper", "efcore+dapper"],
+    "default": "efcore",
+    "description": "The data-access component.",
+    "requires": {},
+    "conflicts": {},
+    "constraints": [
+      {"when": {"data": "none"}, "requires": {"database": "none"}},
+      {"when": {"data": {"oneOf": ["efcore", "dapper", "efcore+dapper"]}}, "requires": {"database": {"oneOf": ["postgres", "sqlserver"]}}}
+    ]
+  },
+  "database": {
+    "type": "string",
+    "allowed": ["none", "postgres", "sqlserver"],
+    "default": "postgres",
+    "description": "The relational database component.",
+    "requires": {},
+    "conflicts": {},
+    "constraints": [
+      {"when": {"database": "none"}, "requires": {"data": "none"}},
+      {"when": {"database": {"oneOf": ["postgres", "sqlserver"]}}, "requires": {"data": {"oneOf": ["efcore", "dapper", "efcore+dapper"]}}}
+    ]
+  },
+  "hosts": {
+    "type": "array",
+    "allowed": ["web", "functions", "durable", "worker"],
+    "items": {"type": "string", "allowed": ["web", "functions", "durable", "worker"]},
+    "default": ["web"],
+    "description": "The process hosts.",
+    "requires": {},
+    "conflicts": {},
+    "minItems": 1,
+    "uniqueItems": true,
+    "constraints": [
+      {"when": {"hosts": {"contains": "durable"}}, "requires": {"hosts": {"contains": "functions"}}}
+    ]
+  },
+  "auth": {
+    "type": "string",
+    "allowed": ["none", "jwt"],
+    "default": "none",
+    "description": "The authentication component.",
+    "requires": {},
+    "conflicts": {},
+    "constraints": [
+      {"when": {"auth": "jwt"}, "requires": {"hosts": {"contains": "web"}}}
+    ]
+  },
+  "telemetry": {
+    "type": "string",
+    "allowed": ["none", "opentelemetry"],
+    "default": "none",
+    "description": "The telemetry component.",
+    "requires": {},
+    "conflicts": {}
+  },
+  "tests": {
+    "type": "array",
+    "allowed": ["unit", "integration"],
+    "items": {"type": "string", "allowed": ["unit", "integration"]},
+    "default": ["unit"],
+    "description": "The test projects.",
+    "requires": {},
+    "conflicts": {},
+    "uniqueItems": true,
+    "constraints": [
+      {"when": {"tests": {"contains": "integration"}}, "requires": {"hosts": {"contains": "web"}, "database": {"oneOf": ["postgres", "sqlserver"]}}}
+    ]
+  },
+  "selected-stack": {
+    "type": "boolean",
+    "allowed": [false, true],
+    "default": false,
+    "description": "Whether to select the optional application stack.",
+    "requires": {},
+    "conflicts": {},
+    "constraints": [
+      {"when": {"selected-stack": true}, "conflicts": {"data": "dapper"}}
+    ]
+  },
+  "cloud": {
+    "type": "string",
+    "allowed": ["none", "azure"],
+    "default": "none",
+    "description": "The target cloud for generated infrastructure.",
+    "requires": {},
+    "conflicts": {},
+    "constraints": [
+      {"when": {"cloud": "azure"}, "requires": {"database": {"oneOf": ["none", "postgres"]}}}
+    ]
+  },
+  "cloud-name": {
+    "type": "string",
+    "default": "",
+    "description": "Overrides the derived azure app profile name.",
+    "requires": {},
+    "conflicts": {}
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "when": {"hosts": {"contains": "functions"}},
+  "requires": {"hosts": {"contains": "functions"}},
+  "conflicts": {},
+  "projects": ["src/$NAME$.Functions/$NAME$.Functions.csproj"],
+  "append": {
+    "FUNCTIONS_DIRECT_RESTORE": "      - run: dotnet restore src/$NAME$.Functions/$NAME$.Functions.csproj",
+    "FUNCTIONS_PACKAGE_REFERENCES": "    <PackageReference Include=\"Microsoft.Azure.Functions.Worker\" />",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.Azure.Functions.Worker\" Version=\"2.52.0\" />"
+  }
+}

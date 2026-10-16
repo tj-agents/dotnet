@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime;build;native;contentfiles;analyzers;buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="all" Condition="'$$(BannedApiAnalyzersReferenced)' != 'true'" />
+    <AdditionalFiles Include="BannedSymbols.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../$NAME$.IntegrationTests.Fixtures/$NAME$.IntegrationTests.Fixtures.csproj" />
+  </ItemGroup>
+</Project>
