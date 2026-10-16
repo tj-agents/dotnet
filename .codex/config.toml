@@ -2,8 +2,7 @@
 [marketplaces.tj-agents]
 source_type = "git"
 source = "https://github.com/tj-agents/marketplace.git"
-ref = "v1.1.0"
-sparse_paths = [".agents/plugins", ".claude-plugin"]
+sparse_paths = [".agents/plugins", ".claude-plugin", "plugins"]
 
 [plugins."base@tj-agents"]
 enabled = true
@@ -11,10 +10,10 @@ enabled = true
 [plugins."engineering@tj-agents"]
 enabled = true
 
-[plugins."kit@tj-agents"]
+[plugins."machine@tj-agents"]
 enabled = true
 
-[plugins."machine@tj-agents"]
+[plugins."template@tj-agents"]
 enabled = true
 
 # END repo-declared agent capabilities

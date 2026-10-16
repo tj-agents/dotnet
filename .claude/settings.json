@@ -3,17 +3,16 @@
     "tj-agents": {
       "source": {
         "source": "github",
-        "repo": "tj-agents/marketplace",
-        "ref": "v1.1.0"
+        "repo": "tj-agents/marketplace"
       },
-      "autoUpdate": false
+      "autoUpdate": true
     }
   },
   "enabledPlugins": {
     "base@tj-agents": true,
     "engineering@tj-agents": true,
-    "kit@tj-agents": true,
-    "machine@tj-agents": true
+    "machine@tj-agents": true,
+    "template@tj-agents": true
   },
   "permissions": {
     "allow": [
