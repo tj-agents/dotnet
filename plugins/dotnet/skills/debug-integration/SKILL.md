@@ -11,23 +11,5 @@ provenance: framework, library, operation
 
 # Debugging a .NET integration suite
 
-Owns reproducing and repairing a failing ASP.NET Core integration test down to its cause.
-
-## Applicability
-
-This operation applies only when the repository provides an ASP.NET Core integration tier with its own
-supported entrypoint, real test database, and reset mechanism. Discover those commands and fixture names
-from the consuming repository; this capability does not supply a product harness or roster.
-
-## Procedure
-
-1. Read the repository's test instructions and list the supported integration scopes. Never guess a project path.
-2. Check only the prerequisites declared by that harness, such as Docker for Testcontainers.
-3. Reproduce the narrowest failing test or project and retain its complete assertion, server output, and stack trace.
-4. Read failures in that order: assertion or exception, server-side output for the request, then the stack trace.
-5. Distinguish environment startup, fixture/reset ordering, seed state, application behavior, and assertion failures.
-6. Fix the cause. Do not skip a test, weaken an assertion, or replace a real dependency with an in-memory substitute.
-7. Re-run the exact failure, then its owning integration project. Broader CI remains the remote checkpoint.
-
-Use `engineering:failing-tests` for general failure policy, `engineering:failure-provenance` when the failure
-may predate the change, and `dotnet:testing-integration` for fixture and authoring rules.
+Read and follow the [canonical definition](../../.agents/dotnet/operation/debug/integration/SKILL.md) in full.
+This discovery entry is generated; edit the referenced `.agents/` definition.

@@ -1,6 +1,10 @@
 {
   "plugin": "dotnet",
-  "dependencies": [],
+  "dependencies": [
+    "tj-agents/base",
+    "tj-agents/engineering",
+    "tj-agents/machine"
+  ],
   "profiles": {
     "aspnet": [
       "http-api"

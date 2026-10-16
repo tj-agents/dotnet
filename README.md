@@ -46,4 +46,4 @@ pwsh .agents/sync-generated.ps1 -Check
 python -B -m unittest discover -s .agents/tests -p "test_*.py"
 ```
 
-The layout, the vendored generator and CI come from [kit](https://github.com/tj-agents/kit).
+The layout, the vendored generator and CI come from [Template](https://github.com/tj-agents/template).
