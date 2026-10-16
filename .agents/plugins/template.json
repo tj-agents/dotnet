@@ -2,5 +2,5 @@
   "schema_version": 1,
   "repository": "tj-agents/dotnet",
   "type": "stack",
-  "template": "2.0.0"
+  "template": "2.0.1"
 }
