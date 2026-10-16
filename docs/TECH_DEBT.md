@@ -25,19 +25,18 @@
 - Verification evidence: this goal's original human gate, dotnet:learning's convention procedure,
   .agents/delivery-authorization.json, and Tommy's 2026-10-12 instruction to record debt and continue.
 
-## D002: Exclude private delivery state from local kit conformance
+## D002: Exclude private delivery state from local Template conformance
 
 - Kind: debt.
 - Observed/reported: 2026-10-12. The pinned kit1.2.1 checker rejects the gitignored
   `.agents/persistent-workflow-binding.json` in an active delivery checkout as outside its plugin layout.
   The same checker passes the exact immutable tracked candidate, which excludes this private runtime file.
 - Impact and priority: P3; local validation reports a layout error while source/package conformance passes.
-- Source owner: kit/Template layout checking; the binding itself is owned by engineering delivery.
+- Source owner: Template layout checking; the binding itself is owned by engineering delivery.
 - State: open.
-- Repair link: the existing kit-to-Template migration. This scaffold explicitly excludes kit/Template edits;
-  its pinned and vendored files remain unchanged.
+- Repair link: Template layout checking; the current repository now consumes Template 2.0.0.
 - Next action: have the layout owner distinguish ignored private runtime state from shipped plugin assets,
-  then adopt the resulting kit version through its normal updater.
+  then adopt the resulting Template version through its normal updater.
 - Resolution condition: both an active checkout with delivery state and its tracked candidate pass the
   pinned checker, while unexpected authored/package files still fail.
 - Verification evidence: checks of active Docs/ScaffoldLayout and Feature/ScriptedScaffold reported that
