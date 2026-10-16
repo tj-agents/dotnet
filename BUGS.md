@@ -167,7 +167,7 @@ B007 corrective evidence: the released four-file manifest3aa364769bc8c17a0381bb9
 - **State:** open
 - **Repair link:** none; the Template migration PR corrects the published guidance but does not change the scaffold adopter contract.
 - **Next action:** migrate the scaffold's adopter invocation and lock validation to Core's `machine:plugin-lock` contract, then update focused scaffold tests.
-- **Resolution condition:** a real new project scaffold with current Core writes a valid `.agents/plugins.lock.json` and host settings; focused tests and Template CI pass.
+- **Resolution condition:** a real new project scaffold with current Core writes a valid unversioned `.agents/plugins.json` and host settings; focused tests and Template CI pass.
 - **Verification evidence:** .NET Template migration PR #54 failed its first Ubuntu and Windows reference checks on the retired skill; Core origin/main publishes `plugin-lock` and no `bootstrap-capabilities`.
 
 ## B013
@@ -179,5 +179,5 @@ B007 corrective evidence: the released four-file manifest3aa364769bc8c17a0381bb9
 - **State:** open
 - **Repair link:** none; the Template migration PR corrects the published guidance but does not change the scaffold adopter contract.
 - **Next action:** migrate the scaffold's adopter invocation and lock validation to Core's `machine:plugin-lock` contract, then update focused scaffold tests.
-- **Resolution condition:** a real new project scaffold with current Core writes a valid `.agents/plugins.lock.json` and host settings; focused tests and Template CI pass.
+- **Resolution condition:** a real new project scaffold with current Core writes a valid unversioned `.agents/plugins.json` and host settings; focused tests and Template CI pass.
 - **Verification evidence:** .NET Template migration PR #54 failed its first Ubuntu and Windows reference checks on the retired skill; Core origin/main publishes `plugin-lock` and no `bootstrap-capabilities`.
