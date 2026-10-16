@@ -42,15 +42,14 @@ def run(command: Sequence[str], cwd: Path) -> None:
 
 
 def standards_arguments() -> list[str]:
-    adopter = os.environ.get("STANDARDS_ADOPTER")
-    standards_input = os.environ.get("STANDARDS_INPUT")
-    if not adopter or not standards_input:
-        raise RuntimeError("STANDARDS_ADOPTER and STANDARDS_INPUT are required")
+    adopter = os.environ.get("PLUGIN_LOCK_ADOPTER")
+    revision = os.environ.get("MARKETPLACE_REVISION")
+    if not adopter or not revision:
+        raise RuntimeError("PLUGIN_LOCK_ADOPTER and MARKETPLACE_REVISION are required")
     adopter_path = Path(adopter)
-    input_path = Path(standards_input)
-    if not adopter_path.is_file() or not input_path.is_file():
-        raise RuntimeError("STANDARDS_ADOPTER and STANDARDS_INPUT must be files")
-    return ["--standards-adopter", str(adopter_path), "--standards-input", str(input_path)]
+    if not adopter_path.is_file():
+        raise RuntimeError("PLUGIN_LOCK_ADOPTER must be a file")
+    return ["--plugin-lock-adopter", str(adopter_path), "--marketplace-revision", revision]
 
 
 def scaffold_command(destination: Path, name: str, preset: str, overrides: Sequence[str] = ()) -> list[str]:
