@@ -29,11 +29,10 @@ root segment is not `Program`.
 Use `--preset sandbox` for Web, Functions with Durable support, worker, EF Core/PostgreSQL, OpenTelemetry and
 unit plus integration project wiring.
 
-Create the composition input with `machine:bootstrap-capabilities`. It must select `base-agents/base`,
-`base-agents/engineering`, `base-agents/machine`, and `dotagents/dotnet`; include `azure-agents/azure` when
-`cloud=azure` is selected. `new` runs its `adopt_repository.py` before creating the destination, validates the
-prepared lock and host settings, then writes the catalog, lock, Claude settings, Codex settings, and any generated
-rules with the scaffolded solution. A failed adoption or preflight leaves the destination absent.
+`new` currently requires a legacy adopter implementing `adopt_repository.py` and the capabilities-lock
+schema. Current Core publishes `machine:plugin-lock`, whose lock schema differs; its adopter cannot be
+passed to `--standards-adopter` until this scaffold is migrated. A failed adoption or preflight leaves
+the destination absent.
 
 ```text
 python -B <skill-directory>/scripts/scaffold.py options --preset web
