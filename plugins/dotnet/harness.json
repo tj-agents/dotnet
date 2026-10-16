@@ -47,7 +47,7 @@
               "options"
             ]
           ],
-          "justification": "Runs only the packaged .NET scaffold entry point to resolve approved options or create a new selected single-service solution.",
+          "justification": "Runs only the packaged .NET scaffold entry point to resolve approved options or create a new selected single-service solution using the current-main plugin adopter.",
           "match": [
             [
               "python",
@@ -57,7 +57,9 @@
               "--name",
               "MyService",
               "--destination",
-              "C:/source/repos"
+              "C:/source/repos",
+              "--plugin-adopter",
+              "adopt_plugins.py"
             ],
             [
               "python3",
