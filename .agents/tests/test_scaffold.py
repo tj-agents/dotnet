@@ -122,8 +122,8 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
     def main():
         parser = argparse.ArgumentParser()
         parser.add_argument("--root", required=True)
-        parser.add_argument("--marketplace-revision", required=True)
         parser.add_argument("--stack", required=True)
+        parser.add_argument("--plugin", action="append", default=[])
         parser.add_argument("--mode", required=True)
         args = parser.parse_args()
         log_path = os.environ.get("FAKE_STANDARDS_LOG")
@@ -146,7 +146,7 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
         if omitted:
             plugins = [plugin for plugin in plugins if plugin != omitted]
         files = {
-            ".agents/plugins.lock.json": json.dumps({"schema_version": int(os.environ.get("FAKE_STANDARDS_SCHEMA_VERSION", "3")), "marketplaces": {"tj-agents": {"repository": "tj-agents/marketplace", "revision": args.marketplace_revision}}, "plugins": plugins}) + "\\n",
+            ".agents/plugins.json": json.dumps({"schema_version": int(os.environ.get("FAKE_STANDARDS_SCHEMA_VERSION", "1")), "marketplaces": {"tj-agents": {"repository": "tj-agents/marketplace"}}, "plugins": plugins}) + "\\n",
             ".claude/settings.json": "{}\\n",
             ".codex/config.toml": "[plugins]\\n",
             ".codex/rules/agent-harness.rules": "allow\\n",
@@ -167,7 +167,7 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
 )
 
 FAKE_STANDARD_FILES = [
-    ".agents/plugins.lock.json",
+    ".agents/plugins.json",
     ".claude/settings.json",
     ".codex/config.toml",
     ".codex/rules/agent-harness.rules",
@@ -184,29 +184,29 @@ def write_fake_azure(root: Path) -> Path:
     return script
 
 
-def write_fake_standards_adopter(root: Path) -> tuple[Path, Path]:
+def write_fake_standards_adopter(root: Path) -> Path:
     root.mkdir(parents=True, exist_ok=True)
     adopter = root / "adopt_repository.py"
     adopter.write_text(FAKE_STANDARDS_ADOPTER, encoding="utf-8")
-    return adopter, "07c8b399e4c2e70a30340c7b0b11a8a7b1074e80"
+    return adopter
 
 
 class ScaffoldTests(unittest.TestCase):
     def setUp(self) -> None:
         self.standards_temporary = tempfile.TemporaryDirectory()
-        self.standards_adopter, self.marketplace_revision = write_fake_standards_adopter(Path(self.standards_temporary.name))
+        self.standards_adopter = write_fake_standards_adopter(Path(self.standards_temporary.name))
 
     def tearDown(self) -> None:
         self.standards_temporary.cleanup()
 
     def standards_arguments(self) -> list[str]:
-        return ["--plugin-lock-adopter", str(self.standards_adopter), "--marketplace-revision", self.marketplace_revision]
+        return ["--plugin-selection-adopter", str(self.standards_adopter)]
 
     def run_cli(self, *args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
         arguments = list(args)
         if arguments[:1] == ["new"] and "--no-input" not in arguments:
             arguments.append("--no-input")
-        if arguments[:1] == ["new"] and "--plugin-lock-adopter" not in arguments:
+        if arguments[:1] == ["new"] and "--plugin-selection-adopter" not in arguments:
             arguments.extend(self.standards_arguments())
         return subprocess.run(
             [sys.executable, "-B", str(SCRIPT), *arguments],
@@ -366,7 +366,7 @@ class ScaffoldTests(unittest.TestCase):
             self.assertFalse((root / "Example").exists())
             self.assertIn("src/Example.Web/Program.cs", json.loads(result.stdout)["files"])
 
-    def test_new_requires_standards_adopter_and_input_before_creating_project(self) -> None:
+    def test_new_requires_standards_adopter_before_creating_project(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             missing_flags = subprocess.run(
@@ -375,19 +375,13 @@ class ScaffoldTests(unittest.TestCase):
             )
             missing_adopter = self.run_cli(
                 "new", "--name", "MissingAdopter", "--destination", str(root), "--no-input",
-                "--plugin-lock-adopter", str(root / "missing.py"), "--marketplace-revision", self.marketplace_revision,
-            )
-            missing_input = self.run_cli(
-                "new", "--name", "MissingInput", "--destination", str(root), "--no-input",
-                "--plugin-lock-adopter", str(self.standards_adopter), "--marketplace-revision", "invalid-revision",
+                "--plugin-selection-adopter", str(root / "missing.py"),
             )
 
             self.assertEqual(2, missing_flags.returncode)
             self.assertEqual(1, missing_adopter.returncode)
-            self.assertEqual(2, missing_input.returncode)
             self.assertFalse((root / "Missing").exists())
             self.assertFalse((root / "MissingAdopter").exists())
-            self.assertFalse((root / "MissingInput").exists())
 
     def test_verify_callers_pass_required_standards_arguments_before_builds(self) -> None:
         class StopVerification(Exception):
@@ -396,9 +390,8 @@ class ScaffoldTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             adopter = root / "adopt_repository.py"
-            marketplace_revision = self.marketplace_revision
             adopter.write_text("", encoding="utf-8")
-            environment = {"PLUGIN_LOCK_ADOPTER": str(adopter), "MARKETPLACE_REVISION": marketplace_revision}
+            environment = {"PLUGIN_SELECTION_ADOPTER": str(adopter)}
             for caller in (
                 lambda: VERIFY.verify("VerifyCaller", "minimal"),
                 lambda: VERIFY.negative_path_gates("NegativeCaller", "web", ('tests=["integration"]',)),
@@ -409,8 +402,7 @@ class ScaffoldTests(unittest.TestCase):
                         with self.assertRaises(StopVerification):
                             caller()
                 command = run.call_args.args[0]
-                self.assertEqual(str(adopter), command[command.index("--plugin-lock-adopter") + 1])
-                self.assertEqual(marketplace_revision, command[command.index("--marketplace-revision") + 1])
+                self.assertEqual(str(adopter), command[command.index("--plugin-selection-adopter") + 1])
 
     def test_verify_callers_reject_missing_standards_before_commands(self) -> None:
         for caller in (
@@ -418,7 +410,7 @@ class ScaffoldTests(unittest.TestCase):
             lambda: VERIFY.negative_path_gates("NegativeMissing", "web"),
             lambda: VERIFY.snippet_compile_gate("SnippetMissing"),
         ):
-            with mock.patch.dict(os.environ, {"PLUGIN_LOCK_ADOPTER": "", "MARKETPLACE_REVISION": ""}, clear=False):
+            with mock.patch.dict(os.environ, {"PLUGIN_SELECTION_ADOPTER": ""}, clear=False):
                 with mock.patch.object(VERIFY, "run") as run:
                     with self.assertRaises(RuntimeError):
                         caller()
@@ -436,8 +428,7 @@ class ScaffoldTests(unittest.TestCase):
 
     def test_documented_new_examples_execute_with_fixture_substitutions(self) -> None:
         standard_flags = (
-            " --plugin-lock-adopter <machine-plugin-lock-skill-directory>/scripts/adopt_plugins.py"
-            " --marketplace-revision <marketplace-commit>"
+            " --plugin-selection-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py"
         )
         updated = SCAFFOLD_SKILL.read_text(encoding="utf-8")
         previous = updated.replace(standard_flags, "")
@@ -451,8 +442,7 @@ class ScaffoldTests(unittest.TestCase):
             updated_skill.write_text(updated, encoding="utf-8")
             replacements = (
                 ("<skill-directory>/scripts/scaffold.py", SCRIPT.as_posix()),
-                ("<machine-plugin-lock-skill-directory>/scripts/adopt_plugins.py", self.standards_adopter.as_posix()),
-                ("<marketplace-commit>", self.marketplace_revision),
+                ("<machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py", self.standards_adopter.as_posix()),
                 ("~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py", azure_script.as_posix()),
                 ("~/source/repos", destination.as_posix()),
             )
@@ -482,8 +472,8 @@ class ScaffoldTests(unittest.TestCase):
             updated_results = run_documented_commands(updated_skill)
             for result in updated_results:
                 self.assertEqual(0, result.returncode, result.stderr)
-            self.assertTrue((destination / "MyService" / ".agents" / "plugins.lock.json").is_file())
-            self.assertTrue((destination / "Sandbox" / ".agents" / "plugins.lock.json").is_file())
+            self.assertTrue((destination / "MyService" / ".agents" / "plugins.json").is_file())
+            self.assertTrue((destination / "Sandbox" / ".agents" / "plugins.json").is_file())
             self.assertTrue((destination / "Sandbox" / "infra" / "FAKE_AZURE_RAN.txt").is_file())
 
     def test_standards_adopter_receives_dotnet_and_azure_when_selected(self) -> None:
@@ -503,7 +493,9 @@ class ScaffoldTests(unittest.TestCase):
             calls = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
             self.assertEqual(["write", "check", "write", "check"], [call[call.index("--mode") + 1] for call in calls])
             self.assertEqual(["dotnet", "dotnet", "azure", "azure"], [call[call.index("--stack") + 1] for call in calls])
-            self.assertTrue(all(call[call.index("--marketplace-revision") + 1] == self.marketplace_revision for call in calls))
+            self.assertTrue(all("--marketplace-revision" not in call for call in calls))
+            for call in calls:
+                self.assertEqual(list(SCAFFOLD.CORE_PLUGIN_IDS), [call[index + 1] for index, value in enumerate(call) if value == "--plugin"])
 
     def test_standards_files_are_copied_and_listed_by_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

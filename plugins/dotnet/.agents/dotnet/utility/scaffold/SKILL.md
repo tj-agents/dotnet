@@ -16,7 +16,7 @@ Creates a .NET 10 `single-service` solution in the File structure `dotnet:struct
 ## Create a project
 
 ```text
-python -B <skill-directory>/scripts/scaffold.py new --name MyService --destination ~/source/repos --preset web --plugin-lock-adopter <machine-plugin-lock-skill-directory>/scripts/adopt_plugins.py --marketplace-revision <marketplace-commit>
+python -B <skill-directory>/scripts/scaffold.py new --name MyService --destination ~/source/repos --preset web --plugin-selection-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py
 ```
 
 ## Build and adapt
@@ -29,8 +29,8 @@ root segment is not `Program`.
 Use `--preset sandbox` for Web, Functions with Durable support, worker, EF Core/PostgreSQL, OpenTelemetry and
 unit plus integration project wiring.
 
-`new` uses Core `machine:plugin-lock` to select the .NET stack, adding Azure when `cloud=azure`.
-Pass an immutable marketplace release tag or full commit. A failed adoption or preflight leaves the
+`new` uses Core `machine:plugin-selection` to select the .NET stack, adding Azure when `cloud=azure`.
+Selected plugins follow their marketplace main branches. A failed adoption or preflight leaves the
 destination absent.
 
 ```text
@@ -57,7 +57,7 @@ command prints the exact azure invocation instead of running it. On a TTY, with 
 azure's own unset options).
 
 ```text
-python -B <skill-directory>/scripts/scaffold.py new --name Sandbox --destination ~/source/repos --preset sandbox --set cloud=azure --azure-scaffold ~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py --plugin-lock-adopter <machine-plugin-lock-skill-directory>/scripts/adopt_plugins.py --marketplace-revision <marketplace-commit>
+python -B <skill-directory>/scripts/scaffold.py new --name Sandbox --destination ~/source/repos --preset sandbox --set cloud=azure --azure-scaffold ~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py --plugin-selection-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py
 ```
 
 ## Validation and publication

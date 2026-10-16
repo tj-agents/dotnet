@@ -49,14 +49,14 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", required=True)
-    parser.add_argument("--marketplace-revision", required=True)
     parser.add_argument("--stack", required=True)
+    parser.add_argument("--plugin", action="append", default=[])
     parser.add_argument("--mode", required=True)
     args = parser.parse_args()
     root = Path(args.root)
     plugins = ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents", "dotnet@tj-agents"]
     files = {
-        ".agents/plugins.lock.json": json.dumps({"schema_version": 3, "marketplaces": {"tj-agents": {"repository": "tj-agents/marketplace", "revision": args.marketplace_revision}}, "plugins": plugins}) + "\\n",
+        ".agents/plugins.json": json.dumps({"schema_version": 1, "marketplaces": {"tj-agents": {"repository": "tj-agents/marketplace"}}, "plugins": plugins}) + "\\n",
         ".claude/settings.json": "{}\\n",
         ".codex/config.toml": "[plugins]\\n",
     }
@@ -159,7 +159,7 @@ class SnippetFixtureTests(unittest.TestCase):
             standards_root = Path(temporary)
             adopter = standards_root / "adopt_plugins.py"
             adopter.write_text(FAKE_STANDARDS_ADOPTER, encoding="utf-8")
-            environment = {"PLUGIN_LOCK_ADOPTER": str(adopter), "MARKETPLACE_REVISION": "07c8b399e4c2e70a30340c7b0b11a8a7b1074e80"}
+            environment = {"PLUGIN_SELECTION_ADOPTER": str(adopter)}
             for path in (VERIFY_PATH, *GENERATED_VERIFY_PATHS):
                 with self.subTest(verifier=path):
                     verifier = load_verify(path)
