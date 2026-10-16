@@ -159,7 +159,7 @@ class SnippetFixtureTests(unittest.TestCase):
             standards_root = Path(temporary)
             adopter = standards_root / "adopt_plugins.py"
             adopter.write_text(FAKE_STANDARDS_ADOPTER, encoding="utf-8")
-            environment = {"PLUGIN_LOCK_ADOPTER": str(adopter), "MARKETPLACE_REVISION": "a807aa3d3b5e791e318c3c8b44d3eb56eaa308dd"}
+            environment = {"PLUGIN_LOCK_ADOPTER": str(adopter), "MARKETPLACE_REVISION": "07c8b399e4c2e70a30340c7b0b11a8a7b1074e80"}
             for path in (VERIFY_PATH, *GENERATED_VERIFY_PATHS):
                 with self.subTest(verifier=path):
                     verifier = load_verify(path)

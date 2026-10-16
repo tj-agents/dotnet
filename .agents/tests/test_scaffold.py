@@ -188,7 +188,7 @@ def write_fake_standards_adopter(root: Path) -> tuple[Path, Path]:
     root.mkdir(parents=True, exist_ok=True)
     adopter = root / "adopt_repository.py"
     adopter.write_text(FAKE_STANDARDS_ADOPTER, encoding="utf-8")
-    return adopter, "a807aa3d3b5e791e318c3c8b44d3eb56eaa308dd"
+    return adopter, "07c8b399e4c2e70a30340c7b0b11a8a7b1074e80"
 
 
 class ScaffoldTests(unittest.TestCase):

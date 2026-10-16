@@ -49,4 +49,4 @@ jobs:
         env:
           AZURE_SCAFFOLD: ${{ github.workspace }}/.azure/.agents/azure/utility/scaffold/scripts/scaffold.py
           PLUGIN_LOCK_ADOPTER: ${{ github.workspace }}/.core/.agents/machine/utility/plugin-lock/scripts/adopt_plugins.py
-          MARKETPLACE_REVISION: a807aa3d3b5e791e318c3c8b44d3eb56eaa308dd
+          MARKETPLACE_REVISION: 07c8b399e4c2e70a30340c7b0b11a8a7b1074e80
