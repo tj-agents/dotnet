@@ -51,10 +51,9 @@ CSHARP_INTRINSICS = {"__arglist", "__makeref", "__reftype", "__refvalue"}
 AZURE_SET_PREFIX = "azure."
 CLOUD_NAME = re.compile(r"^[a-z][a-z0-9]{0,11}$")
 SHELL_SPECIAL = re.compile(r"""[\s"'\\$`|&;<>()\[\]{}*?!~#%^]""")
-CORE_PLUGIN_IDS = ("base-agents/base", "base-agents/engineering", "base-agents/machine")
+CORE_PLUGIN_IDS = ("base@tj-agents", "engineering@tj-agents", "machine@tj-agents")
 REQUIRED_STANDARDS_OUTPUTS = (
-    ".agents/capabilities.lock.json",
-    ".agents/catalog/catalog.json",
+    ".agents/plugins.lock.json",
     ".claude/settings.json",
     ".codex/config.toml",
 )
@@ -650,23 +649,23 @@ def run_azure(azure_script: Path, command_args: Sequence[str]) -> subprocess.Com
 
 
 def standards_plugin_ids(options: Mapping[str, Any]) -> List[str]:
-    plugins = [PACKAGE]
+    plugins = ["dotnet@tj-agents"]
     if options["cloud"] == "azure":
-        plugins.append("azure-agents/azure")
+        plugins.append("azure@tj-agents")
     return plugins
 
 
 def lock_plugin_ids(lock: Any) -> set[str]:
-    if not isinstance(lock, dict) or lock.get("schema_version") != 1:
-        raise ScaffoldError("standards adopter lock must have schema_version 1")
+    if not isinstance(lock, dict) or lock.get("schema_version") != 3:
+        raise ScaffoldError("plugin lock must have schema_version 3")
     plugins = lock.get("plugins")
     if not isinstance(plugins, list):
         raise ScaffoldError("standards adopter lock must have plugin selections")
     identifiers: set[str] = set()
     for plugin in plugins:
-        if not isinstance(plugin, dict) or not isinstance(plugin.get("id"), str):
+        if not isinstance(plugin, str):
             raise ScaffoldError("standards adopter lock has invalid plugin selection")
-        identifiers.add(plugin["id"])
+        identifiers.add(plugin)
     return identifiers
 
 
@@ -688,28 +687,28 @@ def prepared_standard_files(stage: Path, required_plugins: Sequence[str]) -> Dic
     if missing:
         raise ScaffoldError(f"standards adopter did not prepare required output: {missing[0]}")
     try:
-        lock = json.loads(files[".agents/capabilities.lock.json"])
+        lock = json.loads(files[".agents/plugins.lock.json"])
     except (TypeError, json.JSONDecodeError) as error:
-        raise ScaffoldError("standards adopter produced invalid capabilities lock") from error
+        raise ScaffoldError("plugin-lock adopter produced invalid plugin lock") from error
     missing_plugins = sorted(set((*CORE_PLUGIN_IDS, *required_plugins)) - lock_plugin_ids(lock))
     if missing_plugins:
         raise ScaffoldError(f"standards adopter lock does not select required plugin: {missing_plugins[0]}")
     return files
 
 
-def prepare_standards(adopter: Path, standards_input: Path, options: Mapping[str, Any]) -> Dict[str, str]:
+def prepare_standards(adopter: Path, marketplace_revision: str, options: Mapping[str, Any]) -> Dict[str, str]:
     if not adopter.is_file():
         raise ScaffoldError(f"standards adopter must be a file: {adopter}")
-    if not standards_input.is_file():
-        raise ScaffoldError(f"standards input must be a file: {standards_input}")
+    if not re.fullmatch(r"(?:v[0-9]+\.[0-9]+\.[0-9]+|[0-9a-f]{40})", marketplace_revision):
+        raise ValidationError("marketplace revision must be a release tag or full commit")
     required_plugins = standards_plugin_ids(options)
     with tempfile.TemporaryDirectory(prefix="dotnet-scaffold-standards-") as temporary:
         stage = Path(temporary)
         command = [
-            sys.executable, "-B", str(adopter), "--root", str(stage), "--input", str(standards_input),
+            sys.executable, "-B", str(adopter), "--root", str(stage),
+            "--marketplace-revision", marketplace_revision,
+            "--stack", "azure" if options["cloud"] == "azure" else "dotnet",
         ]
-        for plugin in required_plugins:
-            command.extend(["--plugin", plugin])
         for mode in ("write", "check"):
             try:
                 result = subprocess.run([*command, "--mode", mode], capture_output=True, text=True, check=False, timeout=60)
@@ -778,7 +777,7 @@ def create(args: argparse.Namespace) -> None:
         raise ScaffoldError(f"project already exists: {project}")
 
     files = plan(args.name, options, preset)
-    standards = prepare_standards(args.standards_adopter.expanduser(), args.standards_input.expanduser(), options)
+    standards = prepare_standards(args.plugin_lock_adopter.expanduser(), args.marketplace_revision, options)
     collisions = sorted(set(files).intersection(standards))
     if collisions:
         raise ScaffoldError(f"standards output collides with scaffold file: {collisions[0]}")
@@ -841,8 +840,8 @@ def parser() -> argparse.ArgumentParser:
     new.add_argument("--dry-run", action="store_true")
     new.add_argument("--no-input", action="store_true")
     new.add_argument("--azure-scaffold", type=Path)
-    new.add_argument("--standards-adopter", type=Path, required=True)
-    new.add_argument("--standards-input", type=Path, required=True)
+    new.add_argument("--plugin-lock-adopter", type=Path, required=True)
+    new.add_argument("--marketplace-revision", required=True)
     options = commands.add_parser("options")
     options.add_argument("--preset")
     options.add_argument("--config", type=Path)
