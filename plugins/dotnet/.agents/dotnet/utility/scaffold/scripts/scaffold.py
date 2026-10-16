@@ -655,11 +655,9 @@ def standards_plugin_ids(options: Mapping[str, Any]) -> List[str]:
     return plugins
 
 
-def selection_plugin_ids(selection: Any) -> set[str]:
+def selected_plugin_ids(selection: Any) -> set[str]:
     if not isinstance(selection, dict) or selection.get("schema_version") != 1:
         raise ScaffoldError("plugin selection must have schema_version 1")
-    if selection.get("marketplaces") != {"tj-agents": {"repository": "tj-agents/marketplace"}}:
-        raise ScaffoldError("standards selection must follow tj-agents/marketplace without revision pins")
     plugins = selection.get("plugins")
     if not isinstance(plugins, list):
         raise ScaffoldError("standards adopter selection must have plugin selections")
@@ -691,8 +689,8 @@ def prepared_standard_files(stage: Path, required_plugins: Sequence[str]) -> Dic
     try:
         selection = json.loads(files[".agents/plugins.json"])
     except (TypeError, json.JSONDecodeError) as error:
-        raise ScaffoldError("plugin adopter produced invalid plugin selection") from error
-    missing_plugins = sorted(set((*CORE_PLUGIN_IDS, *required_plugins)) - selection_plugin_ids(selection))
+        raise ScaffoldError("plugin-selection adopter produced invalid plugin selection") from error
+    missing_plugins = sorted(set((*CORE_PLUGIN_IDS, *required_plugins)) - selected_plugin_ids(selection))
     if missing_plugins:
         raise ScaffoldError(f"standards adopter selection does not select required plugin: {missing_plugins[0]}")
     return files
@@ -708,8 +706,8 @@ def prepare_standards(adopter: Path, options: Mapping[str, Any]) -> Dict[str, st
             sys.executable, "-B", str(adopter), "--root", str(stage),
             "--stack", "azure" if options["cloud"] == "azure" else "dotnet",
         ]
-        for plugin in CORE_PLUGIN_IDS:
-            command.extend(("--plugin", plugin))
+        for identity in CORE_PLUGIN_IDS:
+            command.extend(["--plugin", identity])
         for mode in ("write", "check"):
             try:
                 result = subprocess.run([*command, "--mode", mode], capture_output=True, text=True, check=False, timeout=60)
@@ -778,7 +776,7 @@ def create(args: argparse.Namespace) -> None:
         raise ScaffoldError(f"project already exists: {project}")
 
     files = plan(args.name, options, preset)
-    standards = prepare_standards(args.plugin_adopter.expanduser(), options)
+    standards = prepare_standards(args.plugin_selection_adopter.expanduser(), options)
     collisions = sorted(set(files).intersection(standards))
     if collisions:
         raise ScaffoldError(f"standards output collides with scaffold file: {collisions[0]}")
@@ -841,7 +839,7 @@ def parser() -> argparse.ArgumentParser:
     new.add_argument("--dry-run", action="store_true")
     new.add_argument("--no-input", action="store_true")
     new.add_argument("--azure-scaffold", type=Path)
-    new.add_argument("--plugin-adopter", type=Path, required=True)
+    new.add_argument("--plugin-selection-adopter", type=Path, required=True)
     options = commands.add_parser("options")
     options.add_argument("--preset")
     options.add_argument("--config", type=Path)

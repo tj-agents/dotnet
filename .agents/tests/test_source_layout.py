@@ -17,9 +17,6 @@ def load(name: str, path: Path):
 
 generator = load("dotnet_sync_generated", ROOT / ".agents/sync_generated.py")
 
-# The exact stack-free hubs: the naming family, style, and the six generic required hubs kit's
-# stack standard needs. Nothing with a real library or architecture prerequisite belongs here —
-# that content lives one level down, in a family member that keeps its own profile.
 CORE_MEMBERS = {
     "naming",
     "naming-collaborators",

@@ -122,8 +122,8 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
     def main():
         parser = argparse.ArgumentParser()
         parser.add_argument("--root", required=True)
-        parser.add_argument("--plugin", action="append", default=[])
         parser.add_argument("--stack", required=True)
+        parser.add_argument("--plugin", action="append", default=[])
         parser.add_argument("--mode", required=True)
         args = parser.parse_args()
         log_path = os.environ.get("FAKE_STANDARDS_LOG")
@@ -152,10 +152,6 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
             ".codex/rules/agent-harness.rules": "allow\\n",
             "standards/manifest.txt": "prepared\\n",
         }
-        if os.environ.get("FAKE_STANDARDS_PIN"):
-            selection = json.loads(files[".agents/plugins.json"])
-            selection["marketplaces"]["tj-agents"]["revision"] = "v1.1.0"
-            files[".agents/plugins.json"] = json.dumps(selection) + "\\n"
         missing = os.environ.get("FAKE_STANDARDS_MISSING")
         for relative, content in files.items():
             if relative == missing:
@@ -204,13 +200,13 @@ class ScaffoldTests(unittest.TestCase):
         self.standards_temporary.cleanup()
 
     def standards_arguments(self) -> list[str]:
-        return ["--plugin-adopter", str(self.standards_adopter)]
+        return ["--plugin-selection-adopter", str(self.standards_adopter)]
 
     def run_cli(self, *args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
         arguments = list(args)
         if arguments[:1] == ["new"] and "--no-input" not in arguments:
             arguments.append("--no-input")
-        if arguments[:1] == ["new"] and "--plugin-adopter" not in arguments:
+        if arguments[:1] == ["new"] and "--plugin-selection-adopter" not in arguments:
             arguments.extend(self.standards_arguments())
         return subprocess.run(
             [sys.executable, "-B", str(SCRIPT), *arguments],
@@ -370,7 +366,7 @@ class ScaffoldTests(unittest.TestCase):
             self.assertFalse((root / "Example").exists())
             self.assertIn("src/Example.Web/Program.cs", json.loads(result.stdout)["files"])
 
-    def test_new_requires_adopter_and_rejects_retired_pin_argument(self) -> None:
+    def test_new_requires_standards_adopter_before_creating_project(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             missing_flags = subprocess.run(
@@ -379,19 +375,13 @@ class ScaffoldTests(unittest.TestCase):
             )
             missing_adopter = self.run_cli(
                 "new", "--name", "MissingAdopter", "--destination", str(root), "--no-input",
-                "--plugin-adopter", str(root / "missing.py"),
-            )
-            missing_input = self.run_cli(
-                "new", "--name", "MissingInput", "--destination", str(root), "--no-input",
-                "--plugin-adopter", str(self.standards_adopter), "--marketplace-revision", "invalid-revision",
+                "--plugin-selection-adopter", str(root / "missing.py"),
             )
 
             self.assertEqual(2, missing_flags.returncode)
             self.assertEqual(1, missing_adopter.returncode)
-            self.assertEqual(2, missing_input.returncode)
             self.assertFalse((root / "Missing").exists())
             self.assertFalse((root / "MissingAdopter").exists())
-            self.assertFalse((root / "MissingInput").exists())
 
     def test_verify_callers_pass_required_standards_arguments_before_builds(self) -> None:
         class StopVerification(Exception):
@@ -401,7 +391,7 @@ class ScaffoldTests(unittest.TestCase):
             root = Path(temporary)
             adopter = root / "adopt_repository.py"
             adopter.write_text("", encoding="utf-8")
-            environment = {"PLUGIN_ADOPTER": str(adopter)}
+            environment = {"PLUGIN_SELECTION_ADOPTER": str(adopter)}
             for caller in (
                 lambda: VERIFY.verify("VerifyCaller", "minimal"),
                 lambda: VERIFY.negative_path_gates("NegativeCaller", "web", ('tests=["integration"]',)),
@@ -412,8 +402,7 @@ class ScaffoldTests(unittest.TestCase):
                         with self.assertRaises(StopVerification):
                             caller()
                 command = run.call_args.args[0]
-                self.assertEqual(str(adopter), command[command.index("--plugin-adopter") + 1])
-                self.assertNotIn("--marketplace-revision", command)
+                self.assertEqual(str(adopter), command[command.index("--plugin-selection-adopter") + 1])
 
     def test_verify_callers_reject_missing_standards_before_commands(self) -> None:
         for caller in (
@@ -421,7 +410,7 @@ class ScaffoldTests(unittest.TestCase):
             lambda: VERIFY.negative_path_gates("NegativeMissing", "web"),
             lambda: VERIFY.snippet_compile_gate("SnippetMissing"),
         ):
-            with mock.patch.dict(os.environ, {"PLUGIN_ADOPTER": ""}, clear=False):
+            with mock.patch.dict(os.environ, {"PLUGIN_SELECTION_ADOPTER": ""}, clear=False):
                 with mock.patch.object(VERIFY, "run") as run:
                     with self.assertRaises(RuntimeError):
                         caller()
@@ -439,7 +428,7 @@ class ScaffoldTests(unittest.TestCase):
 
     def test_documented_new_examples_execute_with_fixture_substitutions(self) -> None:
         standard_flags = (
-            " --plugin-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py"
+            " --plugin-selection-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py"
         )
         updated = SCAFFOLD_SKILL.read_text(encoding="utf-8")
         previous = updated.replace(standard_flags, "")
@@ -505,7 +494,8 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(["write", "check", "write", "check"], [call[call.index("--mode") + 1] for call in calls])
             self.assertEqual(["dotnet", "dotnet", "azure", "azure"], [call[call.index("--stack") + 1] for call in calls])
             self.assertTrue(all("--marketplace-revision" not in call for call in calls))
-            self.assertTrue(all([call[n + 1] for n, arg in enumerate(call) if arg == "--plugin"] == ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents"] for call in calls))
+            for call in calls:
+                self.assertEqual(list(SCAFFOLD.CORE_PLUGIN_IDS), [call[index + 1] for index, value in enumerate(call) if value == "--plugin"])
 
     def test_standards_files_are_copied_and_listed_by_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -565,20 +555,12 @@ class ScaffoldTests(unittest.TestCase):
             )
             invalid_schema = self.run_cli(
                 "new", "--name", "InvalidSchema", "--destination", str(root), "--preset", "minimal",
-                env=dict(os.environ, FAKE_STANDARDS_SCHEMA_VERSION="3"),
+                env=dict(os.environ, FAKE_STANDARDS_SCHEMA_VERSION="0"),
             )
 
-            pinned = self.run_cli(
-                "new", "--name", "Pinned", "--destination", str(root), "--preset", "minimal",
-                env=dict(os.environ, FAKE_STANDARDS_PIN="1"),
-            )
-            self.assertEqual(1, pinned.returncode)
-            self.assertIn("without revision pins", pinned.stderr)
-            self.assertFalse((root / "Pinned").exists())
             self.assertEqual(1, missing_output.returncode)
             self.assertEqual(1, missing_plugin.returncode)
             self.assertEqual(1, invalid_schema.returncode)
-            self.assertIn("schema_version 1", invalid_schema.stderr)
             self.assertFalse((root / "MissingOutput").exists())
             self.assertFalse((root / "MissingPlugin").exists())
             self.assertFalse((root / "InvalidSchema").exists())

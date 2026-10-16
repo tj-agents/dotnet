@@ -49,8 +49,8 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", required=True)
-    parser.add_argument("--plugin", action="append", default=[])
     parser.add_argument("--stack", required=True)
+    parser.add_argument("--plugin", action="append", default=[])
     parser.add_argument("--mode", required=True)
     args = parser.parse_args()
     root = Path(args.root)
@@ -159,7 +159,7 @@ class SnippetFixtureTests(unittest.TestCase):
             standards_root = Path(temporary)
             adopter = standards_root / "adopt_plugins.py"
             adopter.write_text(FAKE_STANDARDS_ADOPTER, encoding="utf-8")
-            environment = {"PLUGIN_ADOPTER": str(adopter)}
+            environment = {"PLUGIN_SELECTION_ADOPTER": str(adopter)}
             for path in (VERIFY_PATH, *GENERATED_VERIFY_PATHS):
                 with self.subTest(verifier=path):
                     verifier = load_verify(path)
