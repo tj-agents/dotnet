@@ -1,0 +1,13 @@
+{
+  "when": {"tests": {"contains": "integration"}},
+  "requires": {"hosts": {"contains": "web"}, "database": {"oneOf": ["postgres", "sqlserver"]}},
+  "conflicts": {},
+  "projects": [
+    "tests/$NAME$.IntegrationTests/$NAME$.IntegrationTests.csproj",
+    "tests/$NAME$.IntegrationTests.Fixtures/$NAME$.IntegrationTests.Fixtures.csproj"
+  ],
+  "append": {
+    "WEB_PROGRAM_DECLARATIONS": "\npublic partial class Program;",
+    "PACKAGE_VERSIONS": "    <PackageVersion Include=\"Microsoft.AspNetCore.Mvc.Testing\" Version=\"10.0.12\" />\n    <PackageVersion Include=\"Respawn\" Version=\"7.0.0\" />\n    <PackageVersion Include=\"Shouldly\" Version=\"4.3.0\" />"
+  }
+}

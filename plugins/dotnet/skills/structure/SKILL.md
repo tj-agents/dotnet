@@ -11,17 +11,5 @@ provenance: house
 
 # Module structure
 
-Owns the repository and module layout, visibility, and where dependencies are wired.
-
-Layered module and shared-library structure is `dotnet:structure-modules` when a
-project selects that architecture.
-
-## Agreed
-
-Repository and service layout follows the selected architecture.
-
-## File structure
-
-`dotnet:structure-single-service` owns the single-service repository layout. `dotnet:structure-modules` owns
-modular-service and layered shared-library layout. Each architecture-specific contract applies only when its
-architecture is selected.
+Read and follow the [canonical definition](../../.agents/dotnet/contract/structure/SKILL.md) in full.
+This discovery entry is generated; edit the referenced `.agents/` definition.

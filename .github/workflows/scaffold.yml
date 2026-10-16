@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: tj-agents/core
-          ref: 9341db876dee3c57d3e7e83e518e3dd64cb27813
+          ref: f29a8bc66559272c6b25fc1413f649b64eda160f
           path: .core
       - uses: actions/checkout@v4
         with:
@@ -45,11 +45,8 @@ jobs:
           terraform_wrapper: false
       - run: python -B .agents/tests/test_scaffold.py
       - run: pwsh .agents/sync-generated.ps1 -Check
-      - name: Compose scaffold standards input
-        run: >
-          python -B -c 'import json, os, pathlib, subprocess; root = pathlib.Path.cwd(); entries = (("tj-agents/core", root / ".core", ["base", "engineering", "machine"], "base"), ("tj-agents/dotnet", root, ["dotnet"], "dotnet"), ("tj-agents/azure", root / ".azure", ["azure"], "azure")); sources = [{"repository": repository, "checkout": str(checkout.resolve()), "commit": subprocess.check_output(["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True).strip(), "plugins": plugins, "version_plugin": version_plugin} for repository, checkout, plugins, version_plugin in entries]; output = pathlib.Path(os.environ["RUNNER_TEMP"]) / "scaffold-sources.json"; output.write_text(json.dumps({"schema_version": 1, "sources": sources}) + "\n", encoding="utf-8"); pathlib.Path(os.environ["GITHUB_ENV"]).open("a", encoding="utf-8").write(f"STANDARDS_INPUT={output}\n")'
       - run: python -B .agents/dotnet/utility/scaffold/scripts/verify.py
         env:
           AZURE_SCAFFOLD: ${{ github.workspace }}/.azure/.agents/azure/utility/scaffold/scripts/scaffold.py
-          STANDARDS_ADOPTER: ${{ github.workspace }}/.core/.agents/machine/utility/bootstrap-capabilities/scripts/adopt_repository.py
-          STANDARDS_INPUT: ${{ env.STANDARDS_INPUT }}
+          PLUGIN_LOCK_ADOPTER: ${{ github.workspace }}/.core/.agents/machine/utility/plugin-lock/scripts/adopt_plugins.py
+          MARKETPLACE_REVISION: a807aa3d3b5e791e318c3c8b44d3eb56eaa308dd

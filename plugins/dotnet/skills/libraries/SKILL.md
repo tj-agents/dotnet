@@ -11,14 +11,5 @@ provenance: house
 
 # Dependency and library policy
 
-Owns when to take a dependency and which ones are chosen.
-
-**One library per job.** A second library for a job an existing one already does is the violation, even
-when the newcomer is better in isolation. Replace, or don't add.
-
-The concrete chosen libraries for Tommy's full selected .NET application stack are
-`dotnet:libraries-selected`.
-
-## Agreed
-
-_Nothing yet further._ Propose a rule through `dotnet:learning`'s convention procedure.
+Read and follow the [canonical definition](../../.agents/dotnet/contract/libraries/SKILL.md) in full.
+This discovery entry is generated; edit the referenced `.agents/` definition.

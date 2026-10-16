@@ -18,5 +18,8 @@
         "testing"
       ]
     }
+  ],
+  "allowCrossMarketplaceDependenciesOn": [
+    "tj-agents"
   ]
 }

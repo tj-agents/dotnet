@@ -1,0 +1,8 @@
+{
+  "when": {"cloud": "azure", "hosts": {"contains": "worker"}},
+  "requires": {},
+  "conflicts": {},
+  "variables": {
+    "WORKER_CLOUD_PROPERTIES": "\n    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>"
+  }
+}
