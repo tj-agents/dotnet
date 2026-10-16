@@ -16,7 +16,7 @@ Creates a .NET 10 `single-service` solution in the File structure `dotnet:struct
 ## Create a project
 
 ```text
-python -B <skill-directory>/scripts/scaffold.py new --name MyService --destination ~/source/repos --preset web --plugin-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py
+python -B <skill-directory>/scripts/scaffold.py new --name MyService --destination ~/source/repos --preset web --plugin-selection-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py
 ```
 
 ## Build and adapt
@@ -30,9 +30,8 @@ Use `--preset sandbox` for Web, Functions with Durable support, worker, EF Core/
 unit plus integration project wiring.
 
 `new` uses Core `machine:plugin-selection` to select the .NET stack, adding Azure when `cloud=azure`.
-The generated `.agents/plugins.json` follows publisher main without release pins. The scaffold explicitly
-selects base, engineering and machine alongside the requested stack. A failed adoption or preflight leaves
-the destination absent.
+Selected plugins follow their marketplace main branches. A failed adoption or preflight leaves the
+destination absent.
 
 ```text
 python -B <skill-directory>/scripts/scaffold.py options --preset web
@@ -58,7 +57,7 @@ command prints the exact azure invocation instead of running it. On a TTY, with 
 azure's own unset options).
 
 ```text
-python -B <skill-directory>/scripts/scaffold.py new --name Sandbox --destination ~/source/repos --preset sandbox --set cloud=azure --azure-scaffold ~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py --plugin-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py
+python -B <skill-directory>/scripts/scaffold.py new --name Sandbox --destination ~/source/repos --preset sandbox --set cloud=azure --azure-scaffold ~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py --plugin-selection-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py
 ```
 
 ## Validation and publication

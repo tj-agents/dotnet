@@ -161,23 +161,11 @@ B007 corrective evidence: the released four-file manifest3aa364769bc8c17a0381bb9
 ## B013
 
 - **Kind:** bug
-- **Observed/reported:** 2026-10-16. Template 1.6.2's skill-reference CI check found that `dotnet:scaffold` names `machine:bootstrap-capabilities`, which current Core no longer publishes. The scaffold CLI still requires that retired adopter's `adopt_repository.py` interface and capabilities-lock schema. Cause confirmed by the scaffold implementation and Core's current plugin-lock contract.
-- **Impact and priority:** P2; new project scaffolding cannot use Core's current `machine:plugin-lock` adopter, and the stale skill reference fails Template CI.
+- **Observed/reported:** 2026-10-16. The .NET scaffold required Core's retired capabilities adopter, so it could not use the current `machine:plugin-lock` interface.
+- **Impact and priority:** P2; current Core could not prepare standards for a new scaffolded project.
 - **Source owner:** `tj-agents/dotnet` `.agents/dotnet/utility/scaffold`.
-- **State:** open
-- **Repair link:** none; the Template migration PR corrects the published guidance but does not change the scaffold adopter contract.
-- **Next action:** migrate the scaffold's adopter invocation and lock validation to Core's `machine:plugin-lock` contract, then update focused scaffold tests.
-- **Resolution condition:** a real new project scaffold with current Core writes a valid unversioned `.agents/plugins.json` and host settings; focused tests and Template CI pass.
-- **Verification evidence:** .NET Template migration PR #54 failed its first Ubuntu and Windows reference checks on the retired skill; Core origin/main publishes `plugin-lock` and no `bootstrap-capabilities`.
-
-## B013
-
-- **Kind:** bug
-- **Observed/reported:** 2026-10-16. Template 1.6.2's skill-reference CI check found that `dotnet:scaffold` names `machine:bootstrap-capabilities`, which current Core no longer publishes. The scaffold CLI still requires that retired adopter's `adopt_repository.py` interface and capabilities-lock schema. Cause confirmed by the scaffold implementation and Core's current plugin-lock contract.
-- **Impact and priority:** P2; new project scaffolding cannot use Core's current `machine:plugin-lock` adopter, and the stale skill reference fails Template CI.
-- **Source owner:** `tj-agents/dotnet` `.agents/dotnet/utility/scaffold`.
-- **State:** open
-- **Repair link:** none; the Template migration PR corrects the published guidance but does not change the scaffold adopter contract.
-- **Next action:** migrate the scaffold's adopter invocation and lock validation to Core's `machine:plugin-lock` contract, then update focused scaffold tests.
-- **Resolution condition:** a real new project scaffold with current Core writes a valid unversioned `.agents/plugins.json` and host settings; focused tests and Template CI pass.
-- **Verification evidence:** .NET Template migration PR #54 failed its first Ubuntu and Windows reference checks on the retired skill; Core origin/main publishes `plugin-lock` and no `bootstrap-capabilities`.
+- **State:** resolved
+- **Repair link:** PR #54, merged at `728b3049ef5b69fc7e3af5a3ab2ddc3cf2edde55`.
+- **Next action:** none.
+- **Resolution condition:** current Core writes a valid `.agents/plugins.lock.json` and host settings for scaffolded .NET and Azure projects, and scaffold CI passes.
+- **Verification evidence:** real adoption dry run passed locally; Linux and Windows scaffold verification, Template conformance, generated freshness and host checks passed on PR #54 before merge.
