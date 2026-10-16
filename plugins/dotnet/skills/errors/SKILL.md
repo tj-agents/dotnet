@@ -11,13 +11,5 @@ provenance: house
 
 # .NET errors
 
-Owns error types, how errors propagate, and what may fail fast.
-
-Typed operation-owned error unions, when Reunion and Dunet are selected, are
-`dotnet:errors-results`; converting Result/Option carriers is
-`dotnet:errors-carriers`; turning a Result into a boundary response is
-`dotnet:errors-terminals`.
-
-## Agreed
-
-_Nothing yet further._ Propose a rule through `dotnet:learning`'s convention procedure.
+Read and follow the [canonical definition](../../.agents/dotnet/contract/errors/SKILL.md) in full.
+This discovery entry is generated; edit the referenced `.agents/` definition.

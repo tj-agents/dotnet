@@ -49,15 +49,14 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", required=True)
-    parser.add_argument("--input", required=True)
-    parser.add_argument("--plugin", action="append", default=[])
+    parser.add_argument("--marketplace-revision", required=True)
+    parser.add_argument("--stack", required=True)
     parser.add_argument("--mode", required=True)
     args = parser.parse_args()
     root = Path(args.root)
-    plugins = ["base-agents/base", "base-agents/engineering", "base-agents/machine", *args.plugin]
+    plugins = ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents", "dotnet@tj-agents"]
     files = {
-        ".agents/capabilities.lock.json": json.dumps({"schema_version": 1, "plugins": [{"id": plugin} for plugin in plugins]}) + "\\n",
-        ".agents/catalog/catalog.json": "{}\\n",
+        ".agents/plugins.lock.json": json.dumps({"schema_version": 3, "marketplaces": {"tj-agents": {"repository": "tj-agents/marketplace", "revision": args.marketplace_revision}}, "plugins": plugins}) + "\\n",
         ".claude/settings.json": "{}\\n",
         ".codex/config.toml": "[plugins]\\n",
     }
@@ -158,11 +157,9 @@ class SnippetFixtureTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as temporary:
             standards_root = Path(temporary)
-            adopter = standards_root / "adopt_repository.py"
-            standards_input = standards_root / "sources.json"
+            adopter = standards_root / "adopt_plugins.py"
             adopter.write_text(FAKE_STANDARDS_ADOPTER, encoding="utf-8")
-            standards_input.write_text("{}\\n", encoding="utf-8")
-            environment = {"STANDARDS_ADOPTER": str(adopter), "STANDARDS_INPUT": str(standards_input)}
+            environment = {"PLUGIN_LOCK_ADOPTER": str(adopter), "MARKETPLACE_REVISION": "a807aa3d3b5e791e318c3c8b44d3eb56eaa308dd"}
             for path in (VERIFY_PATH, *GENERATED_VERIFY_PATHS):
                 with self.subTest(verifier=path):
                     verifier = load_verify(path)
