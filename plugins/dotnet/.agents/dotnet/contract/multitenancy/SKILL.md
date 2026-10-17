@@ -35,11 +35,11 @@ honours.
 
 ## Declare filters per entity, and only where reads are tenant-private
 
-Never auto-derive filters from the marker interface. The marker means "carries the owner id", not "is
+Never auto-derive filters from a tenant marker interface. The marker means "carries the owner id", not "is
 filtered" — marked ≠ filtered is a per-entity product decision.
 
 **Filter an entity only when its *reads* are tenant-private.** If the entity's core flow reads it *across*
-tenants, leave it unfiltered and let the write-side interceptor guard the writes; filtering it fails those
-cross-tenant reads closed, silently. A public listing read by anonymous visitors, or a counterparty's terms
-read by the party responding to them, are unfiltered by design. Owner-private reads are filtered, with any
-public browse split off to the read stance.
+tenants, leave it unfiltered and let a write-side interceptor that stamps the tenant guard the writes;
+filtering it fails those cross-tenant reads closed, silently. A public listing read by anonymous visitors,
+or a counterparty's terms read by the party responding to them, are unfiltered by design. Owner-private
+reads are filtered, with any public browse split off to a tenant-independent read context.

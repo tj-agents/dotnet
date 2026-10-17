@@ -49,15 +49,17 @@ selector is the real defect — that is a per-row round trip.
 
 ## Commit by the number of flushes and contexts
 
-- One context and one flush: stage every entity change, then save once; EF commits that save atomically.
+- One context and one flush, the default: stage every entity change, then save once; EF commits that save
+  atomically.
 - One context where the operation genuinely needs several `SaveChanges` calls, or needs its reads and writes
   to share one explicit transaction: run it inside one explicit transaction.
-- Writes to several contexts inside one service: an ambient `TransactionScope`, because a single-context
-  transaction cannot span them.
+- Writes to several contexts inside one service, and only then: an ambient `TransactionScope`, because a
+  single-context transaction cannot span them.
 
-Only the owner of an ambient scope can roll it back. A block that classifies an expected write failure and
-returns normally inside that scope still commits whatever the failed save's pre-commit handlers wrote to the
-other enlisted contexts, so roll the scope back before classifying the failure.
+An expected write failure inside an ambient scope is classified only by the scope's owner, after rolling the
+scope back, so the recovery runs against no transaction. A block that classifies the failure and returns
+normally inside the scope still commits whatever the failed save's pre-commit handlers wrote to the other
+enlisted contexts. Nested inside another scope, classify nothing and let the failure reach the root.
 
 **Never share a transaction across services.** A separate service owns its own database — coordinate those
 with messages through an outbox, never a unit of work.
