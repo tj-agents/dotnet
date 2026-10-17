@@ -8,9 +8,8 @@ The canonical repository is [`tj-agents/dotnet`](https://github.com/tj-agents/do
 Families are folders, family first; a skill's name is its folder path joined by hyphens.
 
 - Knowledge: `dotnet:learning`, `dotnet:knowledge`, `dotnet:direction`.
-- Naming: `dotnet:naming`, `dotnet:naming-collaborators`, `dotnet:naming-repositories`,
-  `dotnet:naming-dtos`, `dotnet:naming-mapping`.
-- Style: `dotnet:style`, `dotnet:style-comments`.
+- Naming: `dotnet:naming`, `dotnet:naming-collaborators`, `dotnet:naming-dtos`.
+- Style: `dotnet:style`, `dotnet:fields`, `dotnet:comments`.
 - Structure: `dotnet:structure`, `dotnet:structure-modules`.
 - Domain: `dotnet:domain-design`, `dotnet:domain-ddd`, `dotnet:domain-values`, `dotnet:domain-events`.
 - Errors: `dotnet:errors`, `dotnet:errors-results`, `dotnet:errors-carriers`, `dotnet:errors-terminals`.
@@ -18,12 +17,12 @@ Families are folders, family first; a skill's name is its folder path joined by 
 - Libraries: `dotnet:libraries`, `dotnet:libraries-selected`.
 - Keyed: `dotnet:keyed-strategies`, `dotnet:keyed-unions`.
 - Other contracts: `dotnet:build`, `dotnet:dependency-injection`, `dotnet:http-api`, `dotnet:logging`,
-  `dotnet:microservice-boundaries`, `dotnet:multitenancy`, `dotnet:persistence`, `dotnet:proto`,
-  `dotnet:seeding`, `dotnet:validation`.
+  `dotnet:mapping`, `dotnet:messaging`, `dotnet:microservice-boundaries`, `dotnet:multitenancy`,
+  `dotnet:persistence`, `dotnet:proto`, `dotnet:repositories`, `dotnet:seeding`, `dotnet:validation`.
 - Operations: `dotnet:debug-integration`, `dotnet:debug-e2e`, `dotnet:debug-e2e-api`, `dotnet:debug-e2e-ui`.
 - Utilities: `dotnet:scaffold`.
 
-Renamed skills keep their old names as forwarding aliases; see [MIGRATION.md](MIGRATION.md).
+Renamed skills are listed in [MIGRATION.md](MIGRATION.md).
 
 ## Applicability
 

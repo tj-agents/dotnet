@@ -51,7 +51,7 @@ constructor-built `private readonly` field, Arrange/Act/Assert separated by blan
 `Assert.*`, a `[Theory]` with the expected value last, and a `#region` per method under test. Tommy,
 2026-10-13: a generic opening example, not a product-named one, demonstrates every convention without
 prose and without a second vocabulary. Its parameterless constructor assigns `inventory` unqualified —
-per `dotnet:style`'s Option A, `this.` appears only where a constructor parameter shadows the field it
+per `dotnet:fields`, `this.` appears only where a constructor parameter shadows the field it
 fills, and nothing here does.
 
 A unit test is a pure in-memory test of substantial, deterministic core logic with **no** database, HTTP,
@@ -79,7 +79,7 @@ Code being private, internal, or inconvenient to reach is not by itself a reason
 through the public behaviour unless direct coverage materially improves the clarity or completeness of the
 core logic's cases.
 
-General C# style — field naming, `this.` qualification, no primary-constructor captures — applies here
+`dotnet:fields` — field naming, `this.` qualification, no primary-constructor captures — applies here
 exactly as in production code.
 
 ## Framework and shape

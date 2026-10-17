@@ -5,13 +5,15 @@ The repository now uses [Template](https://github.com/tj-agents/template)'s layo
 path joined by hyphens. Each required standard contract is a stack-free `core` skill; the opinionated guidance
 it replaces is a family member that keeps its original profile and prerequisite.
 
-These old names remain forwarding aliases until 2027-03-31. Update references to the new names.
+Old names no longer resolve. Update references to the new names.
 
 | Old | New |
 |---|---|
 | `dotnet:csharp-naming` | `dotnet:naming` |
 | `dotnet:csharp-style` | `dotnet:style` |
-| `dotnet:comments` | `dotnet:style-comments` |
+| `dotnet:style-comments` | `dotnet:comments` |
+| `dotnet:naming-mapping` | `dotnet:mapping` |
+| `dotnet:naming-repositories` | `dotnet:repositories` |
 | `dotnet:module-structure` | `dotnet:structure-modules` |
 | `dotnet:ddd` | `dotnet:domain-ddd` |
 | `dotnet:value-semantics` | `dotnet:domain-values` |
@@ -28,5 +30,6 @@ These old names remain forwarding aliases until 2027-03-31. Update references to
 | `dotnet:e2e-ui-debug` | `dotnet:debug-e2e-ui` |
 
 `dotnet:domain-events`, `dotnet:keyed-strategies` and `dotnet:keyed-unions` keep their names inside their families.
-`dotnet:naming-collaborators`, `dotnet:naming-repositories`, `dotnet:naming-data-contracts` and
-`dotnet:naming-mapping` are new; they replace the single broad naming skill's sections.
+`dotnet:fields` and `dotnet:messaging` are new: `fields` takes field naming, `this.`, `base.` and
+primary-constructor rules from `dotnet:style`; `messaging` takes the publisher and processor roles from
+`dotnet:naming-collaborators` and `dotnet:microservice-boundaries`.
