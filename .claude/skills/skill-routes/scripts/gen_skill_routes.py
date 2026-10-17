@@ -46,18 +46,19 @@ EXTENSIONS_PATH = r"(?i:extensions?\.cs$)"
 DEPENDENCY_INJECTION_CS_PATH = r"(?i:(\.c)s$)"
 DEPENDENCY_INJECTION_CONTENT = r"(?i:\biservicecollection\b|\.add(scoped|singleton|transient)\b)"
 COLLABORATOR_PATH = r"(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|committer)s?\.cs$)"
-DDD_CONTENT = r"(?i:\b(iaggregateroot|aggregateroot)\b|:\s*entity<)"
-VALUES_CONTENT = r"(?i:\brecord\s+struct\b|\bbool\s+try[a-z]\w*\s*\([^)]*\bout\b)"
-CARRIERS_CONTENT = r"(?i:\b(result|unitresult|option)<)"
+DDD_CONTENT = r"(?im:\b(iaggregateroot|aggregateroot|valueobject)\b|\b(i|base|auditable)?entity<\w+>\s*(,|\{|$))"
+VALUES_CONTENT = r"(?i:\brecord\s+struct\b|\bbool\s+try[a-z]\w*\s*\(.*\bout\s)"
+CARRIERS_CONTENT = r"(?i:\b(result|unitresult|option)<|\.(trygeterror|maperror|valueor|tooption|orfailure|bindasync)\()"
 RESULTS_CONTENT = r"(?i:\bierror\b|errordefinition\.)"
-TERMINALS_CONTENT = r"(?i:\.(tookorproblem|tonocontentorproblem|tocreatedorproblem|tocreatedatactionorproblem|toactionresult|toresults|tookornotfound|tookornocontent|tookor)\()"
-KEYED_STRATEGIES_CONTENT = r"(?i:\[fromkeyedservices|\.addkeyed(scoped|singleton|transient)\b|getrequiredkeyedservice|\bikeyedserviceprovider\b)"
-KEYED_UNIONS_CONTENT = r"(?is:(?=.*\[union\])(?=.*keyed))"
-MICROSERVICE_CONTENT = r"(?i:\.add(grpcclient|servicediscovery|refitclient|servicedefaults)\b)"
-MULTITENANCY_CONTENT = r"(?i:\b(itenantcontext|itenantscoped)\b|\.hasqueryfilter\(|\.ignorequeryfilters\()"
+TERMINALS_CONTENT = r"(?i:\.(tookorproblem|tonocontentorproblem|tocreatedorproblem|tocreatedatactionorproblem|tocreatedatrouteorproblem|toactionresult|toresults|tookornotfound|tookornocontent|tookor)\()"
+KEYED_STRATEGIES_CONTENT = r"(?i:\[fromkeyedservices|\.(try)?addkeyed(scoped|singleton|transient)\b|\bget(required)?keyedservice\b|\bikeyedserviceprovider\b|\.require(all|exactly)<)"
+KEYED_UNIONS_CONTENT = r"(?i:\.case<\w+>\(|\bkeyedunion\w*|\bunionfactory\b)"
+MICROSERVICE_CONTENT = r"(?i:\.add(grpcclient|servicediscovery|refitclient|grpc)\b|\.mapgrpcservice<|\bgrpcchannel\.foraddress\b)"
+MULTITENANCY_CONTENT = r"(?i:\b(itenantcontext|imultitenantcontextaccessor|icurrenttenant)\b|\.hasqueryfilter\([^)\n]*tenant|\.ignorequeryfilters\()"
 PACKAGES_PATH = r"(?i:(^|/)directory\.packages\.props$)"
 SELECTED_STACK_CONTENT = r"(?i:meziantou\.analyzer|\breunion\b)"
-SINGLE_SERVICE_PATH = r"(?i:^(?!.*/modules/).*\.web/[^/]+\.web\.csproj$)"
+SCAFFOLD_PATH = r"(?i:(^|/)\.scaffold\.json$)"
+SINGLE_SERVICE_CONTENT = r'"architecture"\s*:\s*"single-service"'
 
 
 def cs_content_path(skill: str) -> str:
@@ -118,7 +119,7 @@ def routes(kind: str) -> dict:
         {"path": cs_content_path("microservice-boundaries"), "content_requires": MICROSERVICE_CONTENT, "skills": ["dotnet:microservice-boundaries"]},
         {"path": cs_content_path("multitenancy"), "content_requires": MULTITENANCY_CONTENT, "skills": ["dotnet:multitenancy"]},
         {"path": PACKAGES_PATH, "content_requires": SELECTED_STACK_CONTENT, "skills": ["dotnet:libraries-selected"]},
-        {"path": SINGLE_SERVICE_PATH, "skills": ["dotnet:structure-single-service"]},
+        {"path": SCAFFOLD_PATH, "content_requires": SINGLE_SERVICE_CONTENT, "skills": ["dotnet:structure-single-service"]},
     ]
     return {
         "_comment": [
