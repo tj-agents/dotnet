@@ -34,10 +34,10 @@
 - Impact and priority: P3; local validation reports a layout error while source/package conformance passes.
 - Source owner: Template layout checking; the binding itself is owned by engineering delivery.
 - State: open.
-- Repair link: Template layout checking; the current repository now consumes Template 2.0.0.
+- Repair link: current Template layout checking.
 - Next action: have the layout owner distinguish ignored private runtime state from shipped plugin assets,
-  then adopt the resulting Template version through its normal updater.
+  then refresh this repository from the current Template with `template:update`.
 - Resolution condition: both an active checkout with delivery state and its tracked candidate pass the
-  pinned checker, while unexpected authored/package files still fail.
+  current Template checker, while unexpected authored/package files still fail.
 - Verification evidence: checks of active Docs/ScaffoldLayout and Feature/ScriptedScaffold reported that
   single path; their frozen tracked trees passed kit1.2.1 without changing or weakening the checker.
