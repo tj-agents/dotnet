@@ -41,11 +41,32 @@ MESSAGING_PATH = r"(?i:(publisher|processor)s?\.cs$)"
 MESSAGING_CS_PATH = r"(?i:\.c[s]$)"
 MESSAGING_CONTENT = r"(?i:\biintegrationeventpublisher\b|\bservicebusprocessor\b)"
 COMMENTS_CS_PATH = r"(?i:\.[c]s$)"
-COMMENTS_CONTENT = r"(?m:^\s*//)"
+COMMENTS_CONTENT = r"(?m:^[ \t]*//)"
 EXTENSIONS_PATH = r"(?i:extensions?\.cs$)"
 DEPENDENCY_INJECTION_CS_PATH = r"(?i:(\.c)s$)"
 DEPENDENCY_INJECTION_CONTENT = r"(?i:\biservicecollection\b|\.add(scoped|singleton|transient)\b)"
 COLLABORATOR_PATH = r"(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|committer)s?\.cs$)"
+DDD_CONTENT = r"(?i:\b(iaggregateroot|aggregateroot|valueobject)\b|\bclass\s+\w+(?:<[^<>]{0,100}>)?(?:\([^()]{0,300}\))?\s*:\s*(?:[\w.]+(?:<[^<>]{0,100}>)?\s*,\s*){0,5}(?:i|base|auditable)?entity<)"
+VALUES_CONTENT = r"(?i:\brecord\s+struct\b|\bbool\s+try[a-z]\w*\s*\((?:[^()]|\([^()]{0,200}\)){0,400}?\bout\s)"
+CARRIERS_CONTENT = r"(?i:\b(result|unitresult|option)<|\.(trygeterror|maperror|valueor|tooption|orfailure|bindasync)\()"
+RESULTS_CONTENT = r"(?i:\bierror\b|errordefinition\.)"
+TERMINALS_CONTENT = r"(?i:\.(tookorproblem|tonocontentorproblem|tocreatedorproblem|tocreatedatactionorproblem|tocreatedatrouteorproblem|toactionresult|toresults|tookornotfound|tookornocontent|tookor)\()"
+KEYED_STRATEGIES_CONTENT = r"(?i:\[fromkeyedservices|\.(try)?addkeyed(scoped|singleton|transient)\b|\bget(required)?keyedservice\b|\bikeyedserviceprovider\b|\.require(all|exactly)<)"
+KEYED_UNIONS_CONTENT = r"(?i:\.case<[\w.]+>\(|\bkeyedunion\w*|unionfactory\b)"
+MICROSERVICE_CONTENT = r"(?i:\.add(grpcclient|servicediscovery|refitclient|grpc)\b|\.mapgrpcservice<|\bgrpcchannel\.foraddress\b)"
+MULTITENANCY_CONTENT = r"(?i:\b(itenantcontext|imultitenantcontextaccessor|icurrenttenant)\b|\.hasqueryfilter\([^)]{0,300}?tenant|\.ignorequeryfilters\()"
+PACKAGES_PATH = r"(?i:(^|/)directory\.packages\.props$)"
+SELECTED_STACK_CONTENT = r"(?i:meziantou\.analyzer|\breunion\b)"
+SCAFFOLD_PATH = r"(?i:(^|/)\.scaffold\.json$)"
+SINGLE_SERVICE_CONTENT = r'"architecture"\s*:\s*"single-service"'
+SOLUTION_PATH = r"(?i:\.slnx?$)"
+SINGLE_SERVICE_SOLUTION_CONTENT = r"(?is:\A(?!.*[\\/]modules[\\/])(?!(?:.*?\.application[\\/]){2}).*\.application[\\/])"
+
+
+def cs_content_path(skill: str) -> str:
+    return rf"(?i:\.cs$)(?#{skill})"
+
+
 KINDS = ("dotnet-service",)
 REGISTRY = {
     "infonetica/cris-authz": "dotnet-service",
@@ -90,6 +111,18 @@ def routes(kind: str) -> dict:
         {"path": MESSAGING_CS_PATH, "content_requires": MESSAGING_CONTENT, "skills": ["dotnet:messaging"]},
         {"path": DEPENDENCY_INJECTION_CS_PATH, "content_requires": DEPENDENCY_INJECTION_CONTENT, "skills": ["dotnet:dependency-injection"]},
         {"path": COLLABORATOR_PATH, "skills": ["dotnet:naming-collaborators"]},
+        {"path": cs_content_path("domain-ddd"), "content_requires": DDD_CONTENT, "skills": ["dotnet:domain-ddd"]},
+        {"path": cs_content_path("domain-values"), "content_requires": VALUES_CONTENT, "skills": ["dotnet:domain-values"]},
+        {"path": cs_content_path("errors-carriers"), "content_requires": CARRIERS_CONTENT, "skills": ["dotnet:errors-carriers"]},
+        {"path": cs_content_path("errors-results"), "content_requires": RESULTS_CONTENT, "skills": ["dotnet:errors-results"]},
+        {"path": cs_content_path("errors-terminals"), "content_requires": TERMINALS_CONTENT, "skills": ["dotnet:errors-terminals"]},
+        {"path": cs_content_path("keyed-strategies"), "content_requires": KEYED_STRATEGIES_CONTENT, "skills": ["dotnet:keyed-strategies"]},
+        {"path": cs_content_path("keyed-unions"), "content_requires": KEYED_UNIONS_CONTENT, "skills": ["dotnet:keyed-unions"]},
+        {"path": cs_content_path("microservice-boundaries"), "content_requires": MICROSERVICE_CONTENT, "skills": ["dotnet:microservice-boundaries"]},
+        {"path": cs_content_path("multitenancy"), "content_requires": MULTITENANCY_CONTENT, "skills": ["dotnet:multitenancy"]},
+        {"path": PACKAGES_PATH, "content_requires": SELECTED_STACK_CONTENT, "skills": ["dotnet:libraries-selected"]},
+        {"path": SCAFFOLD_PATH, "content_requires": SINGLE_SERVICE_CONTENT, "skills": ["dotnet:structure-single-service"]},
+        {"path": SOLUTION_PATH, "content_requires": SINGLE_SERVICE_SOLUTION_CONTENT, "skills": ["dotnet:structure-single-service"]},
     ]
     return {
         "_comment": [
