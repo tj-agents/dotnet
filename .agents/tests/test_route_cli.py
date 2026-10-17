@@ -66,6 +66,7 @@ CARVED_TREE = {
     ("src/Acme.Billing.Infrastructure/Messaging/OrderCancelledEventConsumer.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events", "dotnet:naming-collaborators"},
     ("src/Acme.Billing.Infrastructure/Messaging/OrderEventsProcessor.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:messaging"},
     ("src/Acme.Billing.Application/Orders/OrderService.cs", "private readonly IIntegrationEventPublisher integrationEventPublisher;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:messaging"},
+    ("src/Acme.Billing.Application/Orders/OrderPlacedReaction.cs", "internal sealed class OrderPlacedReaction : IIntegrationEventHandler<OrderPlacedEvent>"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events"},
     ("src/Acme.Billing.Domain/Invoice.cs", "    /// <summary>The issued invoice.</summary>"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:comments"},
     ("src/Acme.Billing.Infrastructure/Startup/ModuleRegistration.cs", "services.AddScoped<IOrderRepository, OrderRepository>();"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:dependency-injection"},
     ("src/Acme.Billing.Application/Pricing/DiscountResolver.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators"},
