@@ -24,8 +24,8 @@ can use this naming contract without choosing EF Core, tenancy, a result library
 
 Name a repository for the established entity or read-model subject and its role: `IOrderRepository` /
 `OrderRepository`. A narrower interface can be implemented by its existing repository when that repository
-owns the capability. The interface's operations determine its capability, including when a query enlists a
-writable context in an existing transaction. Transaction participation and use by an authorization
+owns the capability. The interface's operations determine its capability — read, write or both — including when a
+query enlists a writable context in an existing transaction. Transaction participation and use by an authorization
 operation preserve that persistence role. Framework-owned repository interfaces keep their framework
 contracts.
 
