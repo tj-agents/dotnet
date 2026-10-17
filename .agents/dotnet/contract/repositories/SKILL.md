@@ -1,6 +1,6 @@
 ---
 name: repositories
-description: Canonical C# repository contracts independent of an ORM — read, write and combined capabilities; entity and visibility qualifiers; query and write verbs; nullable single-row results, collections and predicates; and the boundary to application resolvers and result carriers. Use when naming or reviewing a repository, persistence method, or extracted application collaborator.
+description: Canonical C# repository contracts independent of an ORM — the entity a repository persists, query and write verbs, nullable single-row results, collections and predicates, locking suffixes, and the boundary to application resolvers and result carriers. Use when naming or reviewing a repository, persistence method, or extracted application collaborator.
 kind: contract
 domain: dotnet
 profile: core
@@ -11,32 +11,23 @@ provenance: house
 
 # Repository naming and contracts
 
-Owns repository capability names, query/write verbs, storage return shapes and the application boundary.
+Owns repository names, query/write verbs, storage return shapes and the application boundary.
 
 ## Applicability and ownership
 
 These house conventions apply wherever a project exposes repositories. Shared identifiers follow
-`dotnet:naming`. EF Core mechanics and the selected repository base
-hierarchy belong to `dotnet:persistence` when that profile applies. A project
+`dotnet:naming`. EF Core practice belongs to `dotnet:persistence` when that profile applies; a
+product's own repository base hierarchy belongs to that product's standards. A project
 can use this naming contract without choosing EF Core, tenancy, a result library or a dispatch architecture.
 
-## Name the entity and exposed capability
+## Name the entity it persists
 
-| Exposed capability | Interface and implementation |
-|---|---|
-| Read-only persistence operations | `IOrderReadRepository` / `OrderReadRepository` |
-| Write-only persistence operations | `IOrderWriteRepository` / `OrderWriteRepository` |
-| Combined read and write operations | `IOrderRepository` / `OrderRepository` |
-
-Use the established entity or read-model subject. A narrower interface can be implemented by its
-existing repository when that repository owns the capability. The interface's operations determine
-its capability, including when a query enlists a writable context in an existing transaction.
-Transaction participation and use by an authorization operation preserve that persistence role.
-
-Visibility is a separate qualifier. When the project selects multitenancy, compose its
-visibility convention in `dotnet:multitenancy` with the exposed capability, such as
-`OrderPrivilegedReadRepository` or `OrderPrivateReadRepository`. Framework-owned repository interfaces
-keep their framework contracts.
+Name a repository for the established entity or read-model subject and its role: `IOrderRepository` /
+`OrderRepository`. A narrower interface can be implemented by its existing repository when that repository
+owns the capability. The interface's operations determine its capability, including when a query enlists a
+writable context in an existing transaction. Transaction participation and use by an authorization
+operation preserve that persistence role. Framework-owned repository interfaces keep their framework
+contracts.
 
 ## Query and write contracts
 
