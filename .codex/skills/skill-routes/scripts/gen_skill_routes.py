@@ -46,6 +46,24 @@ EXTENSIONS_PATH = r"(?i:extensions?\.cs$)"
 DEPENDENCY_INJECTION_CS_PATH = r"(?i:(\.c)s$)"
 DEPENDENCY_INJECTION_CONTENT = r"(?i:\biservicecollection\b|\.add(scoped|singleton|transient)\b)"
 COLLABORATOR_PATH = r"(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|committer)s?\.cs$)"
+DDD_CONTENT = r"(?i:\b(iaggregateroot|aggregateroot)\b|:\s*entity<)"
+VALUES_CONTENT = r"(?i:\brecord\s+struct\b|\bbool\s+try[a-z]\w*\s*\([^)]*\bout\b)"
+CARRIERS_CONTENT = r"(?i:\b(result|unitresult|option)<)"
+RESULTS_CONTENT = r"(?i:\bierror\b|errordefinition\.)"
+TERMINALS_CONTENT = r"(?i:\.(tookorproblem|tonocontentorproblem|tocreatedorproblem|tocreatedatactionorproblem|toactionresult|toresults|tookornotfound|tookornocontent|tookor)\()"
+KEYED_STRATEGIES_CONTENT = r"(?i:\[fromkeyedservices|\.addkeyed(scoped|singleton|transient)\b|getrequiredkeyedservice|\bikeyedserviceprovider\b)"
+KEYED_UNIONS_CONTENT = r"(?is:(?=.*\[union\])(?=.*keyed))"
+MICROSERVICE_CONTENT = r"(?i:\.add(grpcclient|servicediscovery|refitclient|servicedefaults)\b)"
+MULTITENANCY_CONTENT = r"(?i:\b(itenantcontext|itenantscoped)\b|\.hasqueryfilter\(|\.ignorequeryfilters\()"
+PACKAGES_PATH = r"(?i:(^|/)directory\.packages\.props$)"
+SELECTED_STACK_CONTENT = r"(?i:meziantou\.analyzer|\breunion\b)"
+SINGLE_SERVICE_PATH = r"(?i:^(?!.*/modules/).*\.web/[^/]+\.web\.csproj$)"
+
+
+def cs_content_path(skill: str) -> str:
+    return rf"(?i:\.cs$)(?#{skill})"
+
+
 KINDS = ("dotnet-service",)
 REGISTRY = {
     "infonetica/cris-authz": "dotnet-service",
@@ -90,6 +108,17 @@ def routes(kind: str) -> dict:
         {"path": MESSAGING_CS_PATH, "content_requires": MESSAGING_CONTENT, "skills": ["dotnet:messaging"]},
         {"path": DEPENDENCY_INJECTION_CS_PATH, "content_requires": DEPENDENCY_INJECTION_CONTENT, "skills": ["dotnet:dependency-injection"]},
         {"path": COLLABORATOR_PATH, "skills": ["dotnet:naming-collaborators"]},
+        {"path": cs_content_path("domain-ddd"), "content_requires": DDD_CONTENT, "skills": ["dotnet:domain-ddd"]},
+        {"path": cs_content_path("domain-values"), "content_requires": VALUES_CONTENT, "skills": ["dotnet:domain-values"]},
+        {"path": cs_content_path("errors-carriers"), "content_requires": CARRIERS_CONTENT, "skills": ["dotnet:errors-carriers"]},
+        {"path": cs_content_path("errors-results"), "content_requires": RESULTS_CONTENT, "skills": ["dotnet:errors-results"]},
+        {"path": cs_content_path("errors-terminals"), "content_requires": TERMINALS_CONTENT, "skills": ["dotnet:errors-terminals"]},
+        {"path": cs_content_path("keyed-strategies"), "content_requires": KEYED_STRATEGIES_CONTENT, "skills": ["dotnet:keyed-strategies"]},
+        {"path": cs_content_path("keyed-unions"), "content_requires": KEYED_UNIONS_CONTENT, "skills": ["dotnet:keyed-unions"]},
+        {"path": cs_content_path("microservice-boundaries"), "content_requires": MICROSERVICE_CONTENT, "skills": ["dotnet:microservice-boundaries"]},
+        {"path": cs_content_path("multitenancy"), "content_requires": MULTITENANCY_CONTENT, "skills": ["dotnet:multitenancy"]},
+        {"path": PACKAGES_PATH, "content_requires": SELECTED_STACK_CONTENT, "skills": ["dotnet:libraries-selected"]},
+        {"path": SINGLE_SERVICE_PATH, "skills": ["dotnet:structure-single-service"]},
     ]
     return {
         "_comment": [
