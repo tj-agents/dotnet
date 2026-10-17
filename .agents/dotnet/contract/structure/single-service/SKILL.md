@@ -71,7 +71,8 @@ option is selected:
 
 `src` contains production projects and `tests` contains test projects. `Domain` holds entities, value objects
 and domain events; it references nothing. `Application` holds services, repository interfaces, DTOs and
-requests, and mappers; it references Domain. Infrastructure references Application and Domain and supplies
+requests, and mappers; it references Domain. Its services follow `dotnet:structure-modules`' application
+service role. Infrastructure references Application and Domain and supplies
 selected persistence. Selected Web, Functions and Worker projects are process entry points and composition
 roots; each references Application and Infrastructure when it is selected. Durable is an extension in
 Functions, not a separate process or project. Integration fixture infrastructure belongs in its own project.

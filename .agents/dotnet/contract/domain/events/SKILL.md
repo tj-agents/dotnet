@@ -95,7 +95,7 @@ Tommy, 2026-10-13: the process boundary defines an integration event, because a 
 needs the same broker contract and atomic outbox guarantee as another service.
 
 `IIntegrationEventPublisher` is the one broker-abstraction role per solution; see
-`dotnet:naming-collaborators`. Tommy, 2026-10-13: one named publisher role, so no repository invents a
+`dotnet:messaging`. Tommy, 2026-10-13: one named publisher role, so no repository invents a
 per-subject publisher.
 
 Because the publisher is a transactional outbox, that publish stages a row on the caller's context — so

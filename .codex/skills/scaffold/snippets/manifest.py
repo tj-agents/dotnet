@@ -25,10 +25,10 @@ def entry(
 
 
 SNIPPETS: list[Snippet] = [
-    entry("style-01-private-fields", "style/SKILL.md", 1, "infrastructure", "SnippetFixtures.Style01",
+    entry("fields-01-private-fields", "fields/SKILL.md", 1, "infrastructure", "SnippetFixtures.Fields01",
           header="internal sealed class OrderDbContext;\n\n#pragma warning disable CS0169, CS8618\n\ninternal sealed class OrderService\n{\n",
           footer="\n}\n\n#pragma warning restore CS0169, CS8618\n"),
-    entry("style-02-no-shadow", "style/SKILL.md", 2, "infrastructure", "SnippetFixtures.Style02",
+    entry("fields-02-no-shadow", "fields/SKILL.md", 2, "infrastructure", "SnippetFixtures.Fields02",
           header=(
               "internal sealed class StockCatalog;\n"
               "internal sealed class Inventory(StockCatalog catalog)\n{\n"
@@ -36,15 +36,15 @@ SNIPPETS: list[Snippet] = [
               "internal sealed class InventoryTests\n{\n"
           ),
           footer="\n}\n"),
-    entry("style-03-null-check", "style/SKILL.md", 3, "infrastructure", "SnippetFixtures.Style03",
+    entry("style-01-null-check", "style/SKILL.md", 1, "infrastructure", "SnippetFixtures.Style01",
           skip="three independent inline examples (CORRECT, CORRECT, WRONG) each assuming their own scope for a `tenantId` identifier — the second introduces a fresh pattern-bound `tenantId` and the third reuses the first's, so flattened into one method body the declarations collide (CS0136/CS0841); splitting them would require inserting braces inside the verbatim region."),
-    entry("style-04-null-bang", "style/SKILL.md", 4, "infrastructure", "SnippetFixtures.Style04",
+    entry("style-02-null-bang", "style/SKILL.md", 2, "infrastructure", "SnippetFixtures.Style02",
           skip="two side-by-side fragments at different syntactic levels (a class member default and a local variable statement) that cannot share one compilable unit without altering the verbatim text, plus a duplicate `DisplayName` member (CS0102) between the correct and wrong halves."),
-    entry("style-05-braces", "style/SKILL.md", 5, "infrastructure", "SnippetFixtures.Style05",
+    entry("style-03-braces", "style/SKILL.md", 3, "infrastructure", "SnippetFixtures.Style03",
           skip="a bare `catch` clause with no preceding `try` is a hard syntax error (not a warning), so it cannot share a compilable method body with the preceding guard-clause example without altering the verbatim text."),
-    entry("style-06-optional-param", "style/SKILL.md", 6, "infrastructure", "SnippetFixtures.Style06",
+    entry("style-04-optional-param", "style/SKILL.md", 4, "infrastructure", "SnippetFixtures.Style04",
           skip="`private Task<int> PlaceAsync(...);` is a body-less signature (illustrating a name only), which is not a legal member on a concrete class; it is pseudocode, not compilable C#."),
-    entry("style-07-base-call", "style/SKILL.md", 7, "infrastructure", "SnippetFixtures.Style07",
+    entry("fields-03-base-call", "fields/SKILL.md", 3, "infrastructure", "SnippetFixtures.Fields03",
           header=(
               "using Microsoft.EntityFrameworkCore;\n\n"
               "#pragma warning disable CS0162\n\n"
@@ -55,7 +55,7 @@ SNIPPETS: list[Snippet] = [
               "    public async Task<List<Entity>> GetActiveAsync(CancellationToken ct)\n    {\n"
           ),
           footer="\n    }\n}\n\n#pragma warning restore CS0162\n"),
-    entry("style-comments-01", "style/comments/SKILL.md", 1, "infrastructure", "SnippetFixtures.StyleComments01",
+    entry("comments-01", "comments/SKILL.md", 1, "infrastructure", "SnippetFixtures.Comments01",
           skip="the CORRECT and WRONG halves declare the same `TenantId` member twice (CS0102), so they cannot share one compilable unit without altering the verbatim text."),
 
     entry("di-01-dependency-holder", "dependency-injection/SKILL.md", 1, "infrastructure", "SnippetFixtures.DependencyInjection01",
@@ -73,14 +73,14 @@ SNIPPETS: list[Snippet] = [
           header="using Microsoft.Extensions.Logging;\n\ninternal static partial class Log01\n{\n",
           footer="\n}\n"),
 
-    entry("mapping-01-xmappers", "naming/mapping/SKILL.md", 1, "infrastructure", "SnippetFixtures.NamingMapping01",
+    entry("mapping-01-xmappers", "mapping/SKILL.md", 1, "infrastructure", "SnippetFixtures.Mapping01",
           header=(
               "internal sealed class ShipmentEntity\n{\n"
               "    public Guid Id { get; init; }\n    public string TrackingReference { get; init; } = null!;\n}\n\n"
               "internal sealed record Shipment(Guid Id, string TrackingReference);\n\n"
           )),
 
-    entry("collaborators-01-publisher", "naming/collaborators/SKILL.md", 1, "infrastructure", "SnippetFixtures.NamingCollaborators01",
+    entry("messaging-01-publisher", "messaging/SKILL.md", 1, "infrastructure", "SnippetFixtures.Messaging01",
           header=""),
 
     entry("domain-events-01-raiser", "domain/events/SKILL.md", 1, "infrastructure", "SnippetFixtures.DomainEvents01",
@@ -104,7 +104,7 @@ SNIPPETS: list[Snippet] = [
           ),
           footer="\n    }\n}\n"),
 
-    entry("microservice-boundaries-01-processor", "microservice/boundaries/SKILL.md", 1, "infrastructure", "SnippetFixtures.MicroserviceBoundaries01",
+    entry("messaging-02-processor", "messaging/SKILL.md", 2, "infrastructure", "SnippetFixtures.Messaging02",
           header=(
               "using Azure.Messaging.ServiceBus;\n"
               "using Microsoft.Extensions.DependencyInjection;\n"

@@ -1,12 +1,12 @@
 ---
 name: style
-description: Generic C# style standard — private fields without an underscore prefix, `this.` only where a constructor parameter shadows the member it fills, `null!` rather than `string.Empty` for populated-later members, explicit fields instead of primary-constructor captures, brace and empty-block shape, when an optional parameter has stopped paying for itself, `base.`-qualified inherited calls, `#region` only in an aggregating file, and C# 14 `extension()` blocks. Use when writing or reviewing any C# type, choosing between a primary constructor and explicit fields, adding a parameter to an existing signature, adding an extension method, or deciding whether a style rule belongs in prose or in `.editorconfig`.
+description: General C# style any codebase follows — enforceable rules live in `.editorconfig`, an enum is a genuine closed choice, a plain null check on a variable, `null!` rather than `string.Empty` for populated-later members, brace and empty-block shape, and when an optional parameter has stopped paying for itself. Use when writing or reviewing any C# type, adding a parameter to an existing signature, or deciding whether a style rule belongs in prose or in `.editorconfig`.
 kind: contract
 domain: dotnet
 profile: core
 applicability: all C# and .NET code
 requires: none
-provenance: language, house
+provenance: language
 ---
 
 # C# style

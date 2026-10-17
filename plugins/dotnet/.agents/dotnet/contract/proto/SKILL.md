@@ -39,7 +39,7 @@ Task<Result<ShipmentResponse, DispatchError>> DispatchAsync(...);
 
 ## Each side owns its own mappers
 
-Proto ⇄ domain conversion follows `dotnet:naming-mapping`, with
+Proto ⇄ domain conversion follows `dotnet:mapping`, with
 the client and server sides each owning their own mappers rather than sharing one.
 
 ```csharp
