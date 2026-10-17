@@ -26,12 +26,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: tj-agents/core
-          ref: 2ed865e13f071a573d505dacd59c1a482eb5f2bb
+          ref: main
           path: .core
       - uses: actions/checkout@v4
         with:
           repository: tj-agents/azure
-          ref: 320779cf68822f13a062f87f01686d3b7276b9db
+          ref: main
           path: .azure
       - uses: actions/setup-python@v5
         with:
