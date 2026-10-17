@@ -7,6 +7,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -72,16 +73,20 @@ CARVED_TREE = {
     ("src/Acme.Billing.Application/Pricing/DiscountResolver.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators"},
     ("src/Acme.Billing.Domain/Order.cs", "public sealed class Order : IAggregateRoot"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-ddd"},
     ("src/Acme.Billing.Domain/Money.cs", "public readonly record struct Money(decimal Amount);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-values"},
+    ("src/Acme.Billing.Domain/Sku.cs", "public static bool TryParse(string? text, [MaybeNullWhen(false)] out Sku sku)"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-values"},
+    ("src/Acme.Billing.Domain/Invoices/InvoiceEntity.cs", "public sealed class InvoiceEntity : BaseEntity<Guid>"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-ddd"},
+    ("src/Acme.Billing.Application/Orders/OrderLookup.cs", "var error = await lookup.FindAsync(id).MapError(OrderErrors.From);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors-carriers"},
+    ("src/Acme.Billing.Infrastructure/Configurations/InvoiceConfiguration.cs", "builder.HasQueryFilter(invoice => !invoice.IsDeleted);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules"},
     ("src/Acme.Billing.Application/Orders/OrderService.cs", "public async Task<Result<Order, PlaceOrderError>> PlaceAsync()"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-carriers"},
     ("src/Acme.Billing.Application/Orders/PlaceOrderError.cs", "public partial record PlaceOrderError : IError"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-results"},
     ("src/Acme.Billing.Web/Orders/OrdersController.cs", "return result.ToOkOrProblem();"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:http-api", "dotnet:errors-terminals"},
     ("src/Acme.Billing.Infrastructure/Fulfilment/FulfilmentRegistration.cs", "services.AddKeyedScoped<IFulfilmentStep, CourierStep>(FulfilmentMode.Courier);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:keyed-strategies"},
-    ("src/Acme.Billing.Infrastructure/Fulfilment/FulfilmentArms.cs", "[Union] public partial record FulfilmentArm; services.AddKeyedScoped<IFulfilmentArm, CourierArm>(key);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:keyed-strategies", "dotnet:keyed-unions"},
+    ("src/Acme.Billing.Infrastructure/Fulfilment/FulfilmentRegistration.Unions.cs", "    .Case<IFulfilToAddress>(arm => arm.Use<CourierFulfil>(FulfilmentMode.Courier))"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:keyed-unions"},
     ("src/Acme.Billing.Web/Program.cs", "builder.Services.AddGrpcClient<Orders.OrdersClient>();"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:dependency-injection", "dotnet:microservice-boundaries"},
     ("src/Acme.Billing.Infrastructure/Configurations/OrderConfiguration.cs", "builder.HasQueryFilter(order => order.TenantId == tenantContext.TenantId);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:multitenancy"},
     ("Directory.Packages.props", '<PackageVersion Include="Meziantou.Analyzer" Version="3.0.299" />'): {"dotnet:build", "dotnet:libraries", "dotnet:structure", "dotnet:libraries-selected"},
-    ("src/Acme.Billing.Web/Acme.Billing.Web.csproj", '<Project Sdk="Microsoft.NET.Sdk.Web"></Project>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure", "dotnet:structure-single-service"},
-    ("src/Modules/Billing/Acme.Shop.Billing.Web/Acme.Shop.Billing.Web.csproj", '<Project Sdk="Microsoft.NET.Sdk.Web"></Project>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure"},
+    (".scaffold.json", '{"options": {"architecture": "single-service"}}'): {"dotnet:structure-single-service"},
+    ("src/Acme.Billing.Web/Acme.Billing.Web.csproj", '<Project Sdk="Microsoft.NET.Sdk.Web"></Project>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure"},
     ("plans/skill-routes/PLAN.md", ""): {"engineering:plans"},
     ("reviews/Feature-SkillRoutes/REVIEW.md", ""): {"engineering:review-lifecycle"},
     ("AGENTS.md", ""): {"engineering:docs"},
@@ -153,7 +158,14 @@ class RouteDerivationTests(unittest.TestCase):
             re.search(r"^name: (.+)$", path.read_text(encoding="utf-8"), re.M).group(1)
             for path in (ROOT / ".agents/dotnet/contract").rglob("SKILL.md")
         }
+        self.assertGreater(len(contracts), 30)
         self.assertEqual(set(), contracts - routed)
+
+    def test_rows_stay_linear_on_a_large_file(self) -> None:
+        content = ("    [Union] public sealed record Arm(int Value); keyed\n" * 4000) + ("x" * 100000)
+        started = time.perf_counter()
+        generator.skills_for("dotnet-service", "src/Acme.Billing.Infrastructure/Large.cs", content)
+        self.assertLess(time.perf_counter() - started, 2.0)
 
     def test_route_path_strings_are_pairwise_distinct(self) -> None:
         paths = [route["path"] for route in generator.routes("dotnet-service")["routes"]]
