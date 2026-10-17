@@ -121,7 +121,7 @@ unit and integration test projects. A shared library takes the same per-layer fo
 
 - **Zero cross-module runtime queries.** Every module reads only from its own `DbContext`.
 - **That applies per *stance* too.** Where a module has both a tenant-bound context and a tenant-independent
-  read context, the read context still composes only *that module's* configuration provider. A service-wide
+  read context, the read context still composes only *that module's* own model configuration. A service-wide
   context over every module's model is exactly the monolith query surface this rule exists to prevent — do not
   add one, not even for integration fixtures; each fixture reads back through the owning module's own context.
 - **Cross-module communication is a facade or an event** — an `IXModule` facade in Contracts for commands and
