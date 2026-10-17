@@ -50,7 +50,7 @@ CARVED_TREE = {
     ("features/AccessReview.feature", ""): {"dotnet:testing", "dotnet:testing-e2e"},
     ("api/src/Acme.Authz.Api/Telemetry/Log.cs", "[LoggerMessage(Level = LogLevel.Information)]"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:logging"},
     ("api/src/Acme.Authz.Api/Grants/GrantStore.cs", "private readonly ILoggerFactory loggerFactory;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:logging"},
-    ("api/src/Acme.Authz.Application/Access/RequestAccess.cs", "public Result<AccessGrant, RequestAccessError> Handle()"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors"},
+    ("api/src/Acme.Authz.Application/Access/RequestAccess.cs", "public Result<AccessGrant, RequestAccessError> Handle()"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-carriers"},
     ("api/src/Acme.Authz.Api/CLAUDE.md", ""): {"engineering:docs"},
     ("src/Acme.Billing.Infrastructure/Repositories/InvoiceRepository.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:persistence", "dotnet:repositories"},
     ("src/Acme.Billing.Application/Invoices/RegisterInvoiceHandler.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators", "dotnet:domain-events"},
@@ -70,6 +70,18 @@ CARVED_TREE = {
     ("src/Acme.Billing.Domain/Invoice.cs", "    /// <summary>The issued invoice.</summary>"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:comments"},
     ("src/Acme.Billing.Infrastructure/Startup/ModuleRegistration.cs", "services.AddScoped<IOrderRepository, OrderRepository>();"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:dependency-injection"},
     ("src/Acme.Billing.Application/Pricing/DiscountResolver.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators"},
+    ("src/Acme.Billing.Domain/Order.cs", "public sealed class Order : IAggregateRoot"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-ddd"},
+    ("src/Acme.Billing.Domain/Money.cs", "public readonly record struct Money(decimal Amount);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-values"},
+    ("src/Acme.Billing.Application/Orders/OrderService.cs", "public async Task<Result<Order, PlaceOrderError>> PlaceAsync()"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-carriers"},
+    ("src/Acme.Billing.Application/Orders/PlaceOrderError.cs", "public partial record PlaceOrderError : IError"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-results"},
+    ("src/Acme.Billing.Web/Orders/OrdersController.cs", "return result.ToOkOrProblem();"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:http-api", "dotnet:errors-terminals"},
+    ("src/Acme.Billing.Infrastructure/Fulfilment/FulfilmentRegistration.cs", "services.AddKeyedScoped<IFulfilmentStep, CourierStep>(FulfilmentMode.Courier);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:keyed-strategies"},
+    ("src/Acme.Billing.Infrastructure/Fulfilment/FulfilmentArms.cs", "[Union] public partial record FulfilmentArm; services.AddKeyedScoped<IFulfilmentArm, CourierArm>(key);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:keyed-strategies", "dotnet:keyed-unions"},
+    ("src/Acme.Billing.Web/Program.cs", "builder.Services.AddGrpcClient<Orders.OrdersClient>();"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:dependency-injection", "dotnet:microservice-boundaries"},
+    ("src/Acme.Billing.Infrastructure/Configurations/OrderConfiguration.cs", "builder.HasQueryFilter(order => order.TenantId == tenantContext.TenantId);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:multitenancy"},
+    ("Directory.Packages.props", '<PackageVersion Include="Meziantou.Analyzer" Version="3.0.299" />'): {"dotnet:build", "dotnet:libraries", "dotnet:structure", "dotnet:libraries-selected"},
+    ("src/Acme.Billing.Web/Acme.Billing.Web.csproj", '<Project Sdk="Microsoft.NET.Sdk.Web"></Project>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure", "dotnet:structure-single-service"},
+    ("src/Modules/Billing/Acme.Shop.Billing.Web/Acme.Shop.Billing.Web.csproj", '<Project Sdk="Microsoft.NET.Sdk.Web"></Project>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure"},
     ("plans/skill-routes/PLAN.md", ""): {"engineering:plans"},
     ("reviews/Feature-SkillRoutes/REVIEW.md", ""): {"engineering:review-lifecycle"},
     ("AGENTS.md", ""): {"engineering:docs"},
@@ -129,6 +141,19 @@ class RouteDerivationTests(unittest.TestCase):
                 for (path, content) in CARVED_TREE
             )
             self.assertTrue(fired, f"route {index} ({route['path']}) matches nothing in the simulated tree")
+
+    def test_every_contract_skill_has_an_evidence_row(self) -> None:
+        routed = {
+            identifier.split(":")[1]
+            for route in generator.routes("dotnet-service")["routes"]
+            for identifier in route["skills"]
+            if identifier.startswith("dotnet:")
+        }
+        contracts = {
+            re.search(r"^name: (.+)$", path.read_text(encoding="utf-8"), re.M).group(1)
+            for path in (ROOT / ".agents/dotnet/contract").rglob("SKILL.md")
+        }
+        self.assertEqual(set(), contracts - routed)
 
     def test_route_path_strings_are_pairwise_distinct(self) -> None:
         paths = [route["path"] for route in generator.routes("dotnet-service")["routes"]]
