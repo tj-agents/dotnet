@@ -1,4 +1,4 @@
-namespace SnippetFixtures.Persistence07;
+namespace SnippetFixtures.Persistence01;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

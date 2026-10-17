@@ -539,8 +539,7 @@
       ],
       "provenance": [
         "library",
-        "architecture",
-        "house"
+        "architecture"
       ]
     },
     {
@@ -593,16 +592,13 @@
       "kind": "contract",
       "profile": "ef-core",
       "applicability": [
-        "projects using EF Core and the selected repository/unit-of-work abstractions"
+        "projects using EF Core"
       ],
       "requires": [
-        "ef-core",
-        "selected-data-access-abstractions"
+        "ef-core"
       ],
       "provenance": [
-        "library",
-        "selected-stack",
-        "house"
+        "library"
       ]
     },
     {

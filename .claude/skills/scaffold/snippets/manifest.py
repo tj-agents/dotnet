@@ -329,55 +329,7 @@ SNIPPETS: list[Snippet] = [
     entry("testing-e2e-01-clock", "testing/e2e/SKILL.md", 1, "e2e-tests", "SnippetFixtures.TestingE2E01",
           header=""),
 
-    entry("persistence-01-alias", "persistence/SKILL.md", 1, "infrastructure", "SnippetFixtures.Persistence01",
-          header=(
-              ""
-              "internal interface IGuidEntity { Guid Id { get; } }\n"
-              "internal sealed class OrderDbContext : Shared.IDbContext;\n\n"
-          )),
-    entry("persistence-02-repository", "persistence/SKILL.md", 2, "infrastructure", "SnippetFixtures.Persistence02",
-          header=(
-              ""
-              "internal interface IGuidEntity { Guid Id { get; } }\n"
-              "internal sealed class OrderEntity : IGuidEntity { public Guid Id { get; init; } }\n"
-              "internal sealed class OrderDbContext : Shared.IDbContext;\n"
-              "internal abstract class Repository<TEntity> : Repository<TEntity, Guid> where TEntity : class, IGuidEntity\n{\n"
-              "    protected Repository(OrderDbContext context) : base(context) { }\n}\n\n"
-          )),
-    entry("persistence-03-page-map", "persistence/SKILL.md", 3, "infrastructure", "SnippetFixtures.Persistence03",
-          header=(
-              ""
-              "internal sealed record QueueItem;\ninternal sealed record QueueItemDto;\n"
-              "internal static class QueueItemMappers\n{\n    extension(QueueItem item)\n    {\n        public QueueItemDto ToDto() => new();\n    }\n}\n"
-              "internal sealed record PageParams;\n"
-              "internal interface IReportRepository { Task<IPagination<QueueItem>> GetQueueAsync(PageParams pageParams); }\n\n"
-              "internal static class Example\n{\n    public static async Task<IPagination<QueueItemDto>> Run(IReportRepository reportRepository, PageParams pageParams)\n    {\n        "
-          ),
-          footer="\n    }\n}\n"),
-    entry("persistence-04-async-mapper", "persistence/SKILL.md", 4, "infrastructure", "SnippetFixtures.Persistence04",
-          header=(
-              ""
-              "internal sealed record Deal;\ninternal sealed record DealHeader;\ninternal sealed record SellerHeader;\n"
-              "internal static class Example\n{\n"
-              "    private static Task<Dictionary<Guid, Deal>> DealsByIdAsync(IReadOnlyList<SellerHeader> data) => Task.FromResult(new Dictionary<Guid, Deal>());\n"
-              "    private static DealHeader ToDto(SellerHeader item, Dictionary<Guid, Deal> deals) => new();\n\n"
-              "    public static async Task<IPagination<DealHeader>> Run(IPagination<SellerHeader> page)\n    {\n"
-          ),
-          footer="\n    }\n}\n"),
-    entry("persistence-05-unit-of-work", "persistence/SKILL.md", 5, "infrastructure", "SnippetFixtures.Persistence05",
-          header="internal sealed class OrderDbContext : Shared.IDbContext;\n\n"),
-    entry("persistence-06-registration", "persistence/SKILL.md", 6, "infrastructure", "SnippetFixtures.Persistence06",
-          header=(
-              "using Microsoft.Extensions.DependencyInjection;\n\n"
-              "internal sealed class OrderDbContext : Shared.IDbContext;\n"
-              "internal interface IUnitOfWork : DataAccess.Application.IUnitOfWork<OrderDbContext>;\n"
-              "internal sealed class UnitOfWork(OrderDbContext context) : DataAccess.Infrastructure.UnitOfWork<OrderDbContext>(context), IUnitOfWork;\n"
-              "internal interface IUnitOfWorkBehavior;\n"
-              "internal sealed class UnitOfWorkBehavior : IUnitOfWorkBehavior;\n\n"
-              "internal static class Example\n{\n    public static void Register(IServiceCollection services)\n    {\n"
-          ),
-          footer="\n    }\n}\n"),
-    entry("persistence-07-exclude-from-migrations", "persistence/SKILL.md", 7, "infrastructure", "SnippetFixtures.Persistence07",
+    entry("persistence-01-exclude-from-migrations", "persistence/SKILL.md", 1, "infrastructure", "SnippetFixtures.Persistence01",
           header=(
               "using Microsoft.EntityFrameworkCore;\nusing Microsoft.EntityFrameworkCore.Metadata.Builders;\n\n"
               "internal sealed class SellerRatingProjection;\n\n"
@@ -385,53 +337,6 @@ SNIPPETS: list[Snippet] = [
               "    public void Configure(EntityTypeBuilder<SellerRatingProjection> builder)\n    {\n"
           ),
           footer="\n    }\n}\n"),
-
-    entry("multitenancy-01-tenant-scoped", "multitenancy/SKILL.md", 1, "infrastructure", "SnippetFixtures.Multitenancy01",
-          header=(
-              "using Microsoft.EntityFrameworkCore;\n\n"
-              "internal static class Schema { public const string Name = \"orders\"; }\n"
-              "internal sealed class OrderConfigurationProvider;\n"
-              "internal sealed class OrderEntity;\ninternal sealed class OrderLineEntity;\n"
-              "internal static class TenantFilterExtensions\n{\n    extension(ModelBuilder builder)\n    {\n        public void ApplySingleOwner<TEntity>(object context) { }\n    }\n}\n\n"
-          )),
-    entry("multitenancy-02-read-context", "multitenancy/SKILL.md", 2, "infrastructure", "SnippetFixtures.Multitenancy02",
-          header=(
-              "using Microsoft.EntityFrameworkCore;\n\n"
-              "internal static class Schema { public const string Name = \"orders\"; }\n"
-              "internal sealed class OrderConfigurationProvider;\n"
-              "internal sealed class OrderEntity;\n\n"
-          )),
-    entry("multitenancy-03-privileged", "multitenancy/SKILL.md", 3, "infrastructure", "SnippetFixtures.Multitenancy03",
-          header=(
-              "using Microsoft.EntityFrameworkCore;\n\n"
-              "internal static class Schema { public const string Name = \"orders\"; }\n"
-              "internal sealed class OrderConfigurationProvider;\n"
-              "internal sealed class OrderEntity;\n\n"
-          )),
-    entry("multitenancy-04-registration", "multitenancy/SKILL.md", 4, "infrastructure", "SnippetFixtures.Multitenancy04",
-          header=(
-              "using Microsoft.EntityFrameworkCore;\nusing Microsoft.Extensions.DependencyInjection;\n\n"
-              "internal static class Configuration\n{\n    extension(DbContextOptionsBuilder builder)\n    {\n        public DbContextOptionsBuilder UseOrdersDb(object configuration) => builder;\n    }\n}\n"
-              "internal sealed class OrderDbContext(DbContextOptions<OrderDbContext> options) : DbContext(options);\n"
-              "internal interface IOrderReadDbContext;\n"
-              "internal sealed class OrderReadDbContext(DbContextOptions<OrderReadDbContext> options) : DbContext(options), IOrderReadDbContext;\n"
-              "internal sealed class AuditInterceptor : Microsoft.EntityFrameworkCore.Diagnostics.SaveChangesInterceptor;\n"
-              "internal sealed class TenantInterceptor : Microsoft.EntityFrameworkCore.Diagnostics.SaveChangesInterceptor;\n"
-              "internal interface IDomainEventDispatchInterceptor : Microsoft.EntityFrameworkCore.Diagnostics.IInterceptor;\n"
-              "internal sealed class DomainEventDispatchInterceptor : Microsoft.EntityFrameworkCore.Diagnostics.SaveChangesInterceptor, IDomainEventDispatchInterceptor;\n"
-              "internal static class SeedingExtensions\n{\n    extension(DbContextOptionsBuilder builder)\n    {\n        public DbContextOptionsBuilder UseSeedingSupport(IServiceProvider sp) => builder;\n    }\n}\n\n"
-              "internal static class Example\n{\n    public static void Register(IServiceCollection services, object configuration)\n    {\n"
-          ),
-          footer="\n    }\n}\n"),
-    entry("multitenancy-05-stance-test", "multitenancy/SKILL.md", 5, "unit-tests", "SnippetFixtures.Multitenancy05",
-          header=(
-              "using Microsoft.EntityFrameworkCore;\nusing Xunit;\n\n"
-              "#pragma warning disable MA0004\n\n"
-              "internal static class Example\n{\n"
-              "    private static readonly Type[] TenantFilteredTypes = [];\n\n"
-              "    public static async Task Run(ReadDbContext readContext, TenantScopedDbContext tenantContext)\n    {\n"
-          ),
-          footer="\n    }\n}\n\n#pragma warning restore MA0004\n"),
 
     entry("seeding-01-seed-async", "seeding/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding01",
           header=(
