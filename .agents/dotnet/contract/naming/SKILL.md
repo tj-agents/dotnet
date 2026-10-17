@@ -25,8 +25,8 @@ owner for the task at hand; load the relevant owner when its concern and prerequ
 | Define a collaborator role, operation and semantic outcome | `dotnet:naming-collaborators` |
 | Select application presence/failure carriers when Reunion is selected | `dotnet:errors-carriers` |
 | Name a DTO or query result | `dotnet:naming-dtos` |
-| Name a mapper or receiver extension | `dotnet:naming-mapping` |
-| Name a repository, persistence operation and storage return contract | `dotnet:naming-repositories` |
+| Name a mapper or receiver extension | `dotnet:mapping` |
+| Name a repository, persistence operation and storage return contract | `dotnet:repositories` |
 | Implement EF Core repository/context conventions when selected | `dotnet:persistence` |
 | Distinguish tenant visibility in repository contracts | `dotnet:multitenancy` |
 | Name HTTP contracts or routes | `dotnet:http-api` |
@@ -70,8 +70,8 @@ name their own subject and responsibility, such as `HostPauser`. Qualify an impl
 need to distinguish a real alternative.
 
 Use PascalCase for type and public member names, camelCase for parameters and locals, and the `Async`
-suffix for asynchronous operations. Field formatting and constructor qualification belong to
-`dotnet:style`. File names follow their top-level type; each top-level
+suffix for asynchronous operations. Field naming and constructor qualification belong to
+`dotnet:fields`. File names follow their top-level type; each top-level
 request, result, status and execution shape has its own correspondingly named file.
 
 ## Use the containing namespace when naming a type

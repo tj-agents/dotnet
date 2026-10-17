@@ -86,7 +86,7 @@ contracts.
 
 ## Repository contracts
 
-`dotnet:naming-repositories` owns entity/capability names, query and write
+`dotnet:repositories` owns entity/capability names, query and write
 verbs, storage return shapes, visibility composition and the boundary to application collaborators.
 Apply it together with this selected EF Core implementation contract. Module-local aliases bind the
 exposed capability to the corresponding context triple described above; the context's wider capability

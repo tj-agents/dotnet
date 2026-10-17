@@ -46,7 +46,7 @@ Each row has a skill covering *how* to use it well; this file only decides *what
 | Local orchestration | **.NET Aspire** | `microservice-boundaries` |
 | API description | **Swashbuckle** | `http-api` |
 | Package versioning | **MinVer**, from the tag | — |
-| Analyzers | **Meziantou.Analyzer** + **BannedApiAnalyzers** | `style` |
+| Analyzers | **Meziantou.Analyzer** + **BannedApiAnalyzers** | `scaffold` |
 
 2026-10-13: the stack selected xUnit, Reqnroll and Playwright without ever recording which library proves
 an assertion, so this table is the one place that decision lives — `dotnet:testing` owns the per-tier

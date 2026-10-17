@@ -1,6 +1,6 @@
 ---
 name: naming-collaborators
-description: Canonical C# collaborator roles and operation contracts — select the subject, responsibility, verb, returned value and caller-visible outcomes together. Distinguishes resolvers, validators, services, repositories, mappers, factories, calculators, providers, accessors, registries, policies, evaluators, specifications, sessions, runners, committers, integration-event publishers and the processor that pumps a broker subscription, with separate owners for persistence, result carriers, validation and DI. Use when designing, naming or reviewing a collaborator and its interface.
+description: Canonical C# collaborator roles and operation contracts — select the subject, responsibility, verb, returned value and caller-visible outcomes together. Distinguishes resolvers, validators, repositories, mappers, factories, calculators, providers, accessors, handlers, registries, policies, evaluators, specifications, sessions, runners and committers, with separate owners for persistence, result carriers, validation, messaging and DI. Use when designing, naming or reviewing a collaborator and its interface.
 kind: contract
 domain: dotnet
 profile: core
@@ -52,7 +52,6 @@ Creating an object can be one step in a calculation. Name the complete responsib
 
 | Responsibility | Type and operation | Contract observed by the caller |
 |---|---|---|
-| Orchestrate an application use case | `OrderService.PlaceAsync` | Operation value or completion, with the use case's expected failures |
 | Select or derive a usable value from inputs, candidates or current state | `OrderResolver.ResolveSnapshotAsync` | The resolved `OrderSnapshot`, with absence or rejection when the contract permits them |
 | Assess a supplied candidate against rules | `OrderValidator.ValidateCheckoutAsync` | Validation decision and diagnostics; the supplied candidate remains the candidate |
 | Compute a value | `TaxCalculator.Calculate` | The computed amount; any expected failure belongs to the calculation contract |
@@ -64,8 +63,6 @@ Creating an object can be one step in a calculation. Name the complete responsib
 | Supply a value or pluggable strategy | `TimeProvider.GetUtcNow` | The supplied value under the provider's stated guarantee |
 | Expose a current or ambient value | `RequestContextAccessor.Current` | The value already associated with that context |
 | React to an event or message | `OrderPlacedHandler.HandleAsync` | Handling completion under the messaging contract |
-| Publish an integration event | `IIntegrationEventPublisher.PublishAsync<TEvent>` | The event staged in the outbox, committing with the caller's unit of work |
-| Pump a broker subscription and dispatch to its handler | `OrderEventsProcessor : BackgroundService` | Each received message settled — complete, abandon or dead-letter — once its handler has run |
 | Render, serialize or export | `InvoiceRenderer.Render`, `OrderSerializer.Serialize`, `ReportExporter.Export` | The rendered or encoded representation |
 | Decide an outcome by applying declared rules | `TransitionEvaluator.Evaluate`, `ShipmentReleaseEvaluator.EvaluateAsync` | The decision as a verdict type, over the inputs and any state the rules require |
 | Declare a named rule with no side effects | `ShipmentGrantPolicy` | The rule as data or expression; an evaluator or filter composition enforces it |
@@ -76,8 +73,10 @@ Creating an object can be one step in a calculation. Name the complete responsib
 | Commit work staged elsewhere | `CheckoutCommitter.CommitAsync` | The terminal commit of the staged unit |
 
 Persistence roles and their method/return contracts are owned by
-`dotnet:naming-repositories`. Pure conversions are owned by
-`dotnet:naming-mapping`. An operation count or DI registration does not alter these roles.
+`dotnet:repositories`. Pure conversions are owned by
+`dotnet:mapping`. Integration-event publishing and broker-subscription roles are `dotnet:messaging`. The
+use-case orchestrator is named by the selected architecture; the layered application service is
+`dotnet:structure-modules`. An operation count or DI registration does not alter these roles.
 
 ## Resolver contracts
 
@@ -156,31 +155,6 @@ The service still owns the use case; a handler still reacts to a message.
 `Command` names a real command object — a GoF Command, a CQRS/mediator dispatch message or a CLI
 command — never a synonym for "a write". An ordinary write operation belongs to its service, repository
 or handler under the roles above.
-
-## Messaging roles
-
-```csharp
-public interface IIntegrationEventPublisher
-{
-    Task PublishAsync<TEvent>(TEvent integrationEvent, CancellationToken ct = default)
-        where TEvent : IIntegrationEvent;
-}
-```
-
-2026-10-13: `IIntegrationEventPublisher` is the one broker-abstraction role per solution — generic over
-the event type, never per subject (`INoteEventPublisher` names the subject, not the role). A field or
-parameter holding it is `integrationEventPublisher`, per the subject+role naming rule above.
-
-`dotnet:domain-events` owns the domain-event/integration-event boundary and the pre-commit translation,
-including broker events consumed by the same service's own worker.
-
-The role that pumps a broker subscription is `<Subscription>Processor` — `OrderEventsProcessor`, a
-`BackgroundService` in Infrastructure that owns one subscription, dispatches each received message to
-its `<Event>Handler` (the Handler role above), then settles the message. Rejected names: `HostedService`
-(names the host mechanism, not the role), `Consumer` (already the Handler's role in some broker SDKs),
-`Worker` (no contract), `Listener` and `Subscriber` (both read as the handler). This contract is
-stack-free; the concrete `BackgroundService`/broker-SDK snippet lives in
-`dotnet:microservice-boundaries`, which carries the `distributed-services` prerequisite this role needs.
 
 ## Construction and qualifiers
 

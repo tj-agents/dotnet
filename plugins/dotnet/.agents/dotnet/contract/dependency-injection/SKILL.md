@@ -66,13 +66,13 @@ internal sealed class StandardFulfilmentFlow : IFulfilmentFlow
 
 The parameters stay **concrete** so DI resolves the registered concrete step, while the properties are
 **interface-typed** — the contract consumers see. The implicit conversion happens at assignment. Per
-`dotnet:style`, the assignment stays unqualified here: the property name (`Reserve`) differs from the
+`dotnet:fields`, the assignment stays unqualified here: the property name (`Reserve`) differs from the
 parameter it's assigned from (`reserveStockStep`), so there is no shadowing for `this.` to disambiguate.
 
 **This is not a licence to drop `private readonly` fields elsewhere.** It applies only where the member is
 a genuine public part of the type's contract that passes the dependency straight through. A dependency the
 type consumes *internally* — a repository a service queries, a client a step invokes — stays a
-`private readonly` field, which is captured state and still governed by the `style` rule against
+`private readonly` field, which is captured state and still governed by the `fields` rule against
 primary-constructor captures.
 
 ## Lifetimes

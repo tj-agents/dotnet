@@ -1,4 +1,4 @@
-namespace SnippetFixtures.NamingMapping01;
+namespace SnippetFixtures.Mapping01;
 
 internal sealed class ShipmentEntity
 {

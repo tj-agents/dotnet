@@ -16,6 +16,6 @@ skill gains a rule only through `learning`'s convention procedure, after Tommy d
 
 Core C# guidance must remain usable without ASP.NET Core, EF Core, tenancy, gRPC, Aspire, microservices, or
 Tommy's selected library stack: the required hubs (`style`, `structure`, `domain-design`, `errors`, `testing`,
-`build`, `libraries`, plus the `naming` family) stay stack-free in `core`, and every prerequisite-bearing
+`build`, `libraries`, the `naming` family, `fields`, `comments`, `mapping`, `repositories`) stay stack-free in `core`, and every prerequisite-bearing
 family member keeps its own profile one level down. Concrete product harness commands and rosters stay with
 their product owner.
