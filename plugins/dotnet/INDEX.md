@@ -1,6 +1,7 @@
 # dotnet package capabilities
 
 - `build` — contract — core
+- `comments` — contract — core
 - `dependency-injection` — contract — extensions
 - `domain-ddd` — contract — domain-model
 - `domain-design` — contract — core
@@ -10,27 +11,28 @@
 - `errors-carriers` — contract — results
 - `errors-results` — contract — results
 - `errors-terminals` — contract — results
+- `fields` — contract — core
 - `http-api` — contract — aspnet
 - `keyed-strategies` — contract — keyed-design
 - `keyed-unions` — contract — keyed-design
 - `libraries` — contract — core
 - `libraries-selected` — contract — selected-stack
 - `logging` — contract — extensions
+- `mapping` — contract — core
+- `messaging` — contract — distributed-services
 - `microservice-boundaries` — contract — distributed-services
 - `multitenancy` — contract — multitenancy
 - `naming` — contract — core
 - `naming-collaborators` — contract — core
 - `naming-dtos` — contract — core
-- `naming-mapping` — contract — core
-- `naming-repositories` — contract — core
 - `persistence` — contract — ef-core
 - `proto` — contract — distributed-services
+- `repositories` — contract — core
 - `seeding` — contract — ef-core
 - `structure` — contract — core
 - `structure-modules` — contract — modular-services
 - `structure-single-service` — contract — single-service
 - `style` — contract — core
-- `style-comments` — contract — core
 - `testing` — contract — core
 - `testing-e2e` — contract — e2e
 - `testing-integration` — contract — integration-testing

@@ -64,67 +64,9 @@ your control dictates the wire format.
   service the rest of the platform uses.
 - **Do not use gRPC-Web to reach a service from a browser.** Frontends go through that service's HTTP edge.
 
-## Message-bus subscription: the Processor pumps it, the Handler reacts to it
+## Message-bus subscription
 
-```csharp
-internal sealed class OrderEventsProcessor : BackgroundService
-{
-    private readonly ServiceBusProcessor processor;
-    private readonly IServiceScopeFactory scopeFactory;
-    private readonly ILogger<OrderEventsProcessor> logger;
-
-    public OrderEventsProcessor(
-        ServiceBusProcessor processor,
-        IServiceScopeFactory scopeFactory,
-        ILogger<OrderEventsProcessor> logger)
-    {
-        this.processor = processor;
-        this.scopeFactory = scopeFactory;
-        this.logger = logger;
-        processor.ProcessMessageAsync += HandleMessageAsync;
-        processor.ProcessErrorAsync += HandleErrorAsync;
-    }
-
-    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
-        processor.StartProcessingAsync(stoppingToken);
-
-    public override async Task StopAsync(CancellationToken cancellationToken)
-    {
-        await processor.StopProcessingAsync(cancellationToken).ConfigureAwait(false);
-        await base.StopAsync(cancellationToken).ConfigureAwait(false);
-    }
-
-    private async Task HandleMessageAsync(ProcessMessageEventArgs args)
-    {
-        var integrationEvent = args.Message.Body.ToObjectFromJson<OrderPlacedEvent>();
-
-        var scope = scopeFactory.CreateAsyncScope();
-        await using (scope.ConfigureAwait(false))
-        {
-            var handler = scope.ServiceProvider.GetRequiredService<IIntegrationEventHandler<OrderPlacedEvent>>();
-            await handler.HandleAsync(integrationEvent, args.CancellationToken).ConfigureAwait(false);
-        }
-
-        await args.CompleteMessageAsync(args.Message, args.CancellationToken).ConfigureAwait(false);
-    }
-
-    private Task HandleErrorAsync(ProcessErrorEventArgs args)
-    {
-        logger.SubscriptionProcessingFailed(args.EntityPath, args.Exception);
-        return Task.CompletedTask;
-    }
-}
-```
-
-2026-10-13: `<Subscription>Processor` is the one role for the hosted loop that pumps a broker
-subscription — see `dotnet:naming-collaborators` for the role decision and its rejected names. It takes
-explicit `private readonly` fields assigned with `this.` in the constructor, never a primary-constructor
-capture, and uses the broker SDK's own type (`ServiceBusProcessor` above) as the receive source rather
-than inventing a receiver role. It dispatches each message to its `<Event>Handler` in a fresh DI scope, because the processor is a
-singleton and handlers are scoped, then settles the message itself: the Handler owns only the business
-reaction, never the settlement. A handler that throws leaves the message unsettled, so the broker
-redelivers it and dead-letters it after its maximum delivery count. Register the `ServiceBusProcessor`
-with `AutoCompleteMessages = false`.
+Pumping a broker subscription and handing each message to its handler is `dotnet:messaging`.
 
 ## HTTP surfaces
 

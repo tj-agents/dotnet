@@ -37,7 +37,12 @@ PROTO_PATH = r"(?i:\.proto$)"
 DOMAIN_EVENTS_CS_PATH = r"(?i:\.c(s)$)"
 DOMAIN_EVENTS_CONTENT = r"(?i:\bidomainevent\b|\bieventraiser\b|domaineventhandler|integrationeventhandler)"
 PUBLISHER_CONSUMER_PATH = r"(?i:(publisher|consumer|handler)s?\.cs$)"
-PROCESSOR_PATH = r"(?i:processors?\.cs$)"
+MESSAGING_PATH = r"(?i:(publisher|processor)s?\.cs$)"
+MESSAGING_CS_PATH = r"(?i:\.c[s]$)"
+MESSAGING_CONTENT = r"(?i:\biintegrationeventpublisher\b|\biintegrationeventhandler\b|\bservicebusprocessor\b)"
+COMMENTS_CS_PATH = r"(?i:\.[c]s$)"
+COMMENTS_CONTENT = r"(?m:^\s*//)"
+EXTENSIONS_PATH = r"(?i:extensions?\.cs$)"
 DEPENDENCY_INJECTION_CS_PATH = r"(?i:(\.c)s$)"
 DEPENDENCY_INJECTION_CONTENT = r"(?i:\biservicecollection\b|\.add(scoped|singleton|transient)\b)"
 COLLABORATOR_PATH = r"(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|committer)s?\.cs$)"
@@ -56,7 +61,8 @@ def routes(kind: str) -> dict:
         {"path": r"^reviews/", "skills": ["engineering:review-lifecycle"]},
         {"path": r"(^|/)(AGENTS|CLAUDE)\.md$", "skills": ["engineering:docs"]},
         {"path": r"(^|/)TECH_DEBT\.md$", "skills": ["engineering:write-debt"]},
-        {"path": CS_PATH, "skills": ["dotnet:style", "dotnet:naming"]},
+        {"path": CS_PATH, "skills": ["dotnet:style", "dotnet:naming", "dotnet:fields"]},
+        {"path": COMMENTS_CS_PATH, "content_requires": COMMENTS_CONTENT, "skills": ["dotnet:comments"]},
         {"path": BUILD_PATH, "skills": ["dotnet:build", "dotnet:libraries", "dotnet:structure"]},
         {"path": TEST_PATH, "skills": ["dotnet:testing"]},
         {"path": r"(?i:\.csproj$)", "content_requires": TEST_PROJECT_CONTENT, "skills": ["dotnet:testing"]},
@@ -67,19 +73,21 @@ def routes(kind: str) -> dict:
         {"path": MODULE_LAYER_PATH, "skills": ["dotnet:structure-modules"]},
         {"path": HTTP_EDGE_PATH, "skills": ["dotnet:http-api"]},
         {"path": DTO_PATH, "skills": ["dotnet:naming-dtos"]},
-        {"path": REPOSITORY_PATH, "skills": ["dotnet:persistence", "dotnet:naming-repositories"]},
+        {"path": REPOSITORY_PATH, "skills": ["dotnet:persistence", "dotnet:repositories"]},
         {"path": PERSISTENCE_PATH, "skills": ["dotnet:persistence"]},
         {"path": COMPOSITION_PATH, "skills": ["dotnet:dependency-injection"]},
         {"path": LOG_FILE_PATH, "skills": ["dotnet:logging"]},
         {"path": LOGGING_CS_PATH, "content_requires": LOGGING_CONTENT, "skills": ["dotnet:logging"]},
         {"path": ERRORS_CS_PATH, "content_requires": ERRORS_CONTENT, "skills": ["dotnet:errors"]},
         {"path": VALIDATOR_PATH, "skills": ["dotnet:validation"]},
-        {"path": MAPPER_PATH, "skills": ["dotnet:naming-mapping"]},
+        {"path": MAPPER_PATH, "skills": ["dotnet:mapping"]},
+        {"path": EXTENSIONS_PATH, "skills": ["dotnet:mapping"]},
         {"path": SEEDING_PATH, "skills": ["dotnet:seeding"]},
         {"path": PROTO_PATH, "skills": ["dotnet:proto"]},
         {"path": DOMAIN_EVENTS_CS_PATH, "content_requires": DOMAIN_EVENTS_CONTENT, "skills": ["dotnet:domain-events"]},
         {"path": PUBLISHER_CONSUMER_PATH, "skills": ["dotnet:naming-collaborators", "dotnet:domain-events"]},
-        {"path": PROCESSOR_PATH, "skills": ["dotnet:naming-collaborators", "dotnet:microservice-boundaries"]},
+        {"path": MESSAGING_PATH, "skills": ["dotnet:messaging"]},
+        {"path": MESSAGING_CS_PATH, "content_requires": MESSAGING_CONTENT, "skills": ["dotnet:messaging"]},
         {"path": DEPENDENCY_INJECTION_CS_PATH, "content_requires": DEPENDENCY_INJECTION_CONTENT, "skills": ["dotnet:dependency-injection"]},
         {"path": COLLABORATOR_PATH, "skills": ["dotnet:naming-collaborators"]},
     ]

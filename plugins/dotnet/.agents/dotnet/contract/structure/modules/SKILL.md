@@ -53,6 +53,10 @@ When each layer is warranted:
 - **Infrastructure** — there are concrete implementations behind those abstractions, or it owns EF mappings.
 - **Api** — it exposes HTTP endpoints.
 
+An application service in `Application` orchestrates one use case: `OrderService.PlaceAsync` returns the
+operation value or completion, with the use case's expected failures. The collaborators it composes take
+their roles from `dotnet:naming-collaborators`.
+
 ## Time
 
 `TimeProvider` is resolved in `Application` or `Infrastructure`, once per operation, and the instant passed

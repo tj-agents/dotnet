@@ -5,6 +5,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 ## dotnet
 
 - `build` — contract — core — `.agents/dotnet/contract/build/SKILL.md`
+- `comments` — contract — core — `.agents/dotnet/contract/comments/SKILL.md`
 - `dependency-injection` — contract — extensions — `.agents/dotnet/contract/dependency-injection/SKILL.md`
 - `domain-ddd` — contract — domain-model — `.agents/dotnet/contract/domain/ddd/SKILL.md`
 - `domain-design` — contract — core — `.agents/dotnet/contract/domain/design/SKILL.md`
@@ -14,27 +15,28 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `errors-carriers` — contract — results — `.agents/dotnet/contract/errors/carriers/SKILL.md`
 - `errors-results` — contract — results — `.agents/dotnet/contract/errors/results/SKILL.md`
 - `errors-terminals` — contract — results — `.agents/dotnet/contract/errors/terminals/SKILL.md`
+- `fields` — contract — core — `.agents/dotnet/contract/fields/SKILL.md`
 - `http-api` — contract — aspnet — `.agents/dotnet/contract/http-api/SKILL.md`
 - `keyed-strategies` — contract — keyed-design — `.agents/dotnet/contract/keyed/strategies/SKILL.md`
 - `keyed-unions` — contract — keyed-design — `.agents/dotnet/contract/keyed/unions/SKILL.md`
 - `libraries` — contract — core — `.agents/dotnet/contract/libraries/SKILL.md`
 - `libraries-selected` — contract — selected-stack — `.agents/dotnet/contract/libraries/selected/SKILL.md`
 - `logging` — contract — extensions — `.agents/dotnet/contract/logging/SKILL.md`
+- `mapping` — contract — core — `.agents/dotnet/contract/mapping/SKILL.md`
+- `messaging` — contract — distributed-services — `.agents/dotnet/contract/messaging/SKILL.md`
 - `microservice-boundaries` — contract — distributed-services — `.agents/dotnet/contract/microservice/boundaries/SKILL.md`
 - `multitenancy` — contract — multitenancy — `.agents/dotnet/contract/multitenancy/SKILL.md`
 - `naming` — contract — core — `.agents/dotnet/contract/naming/SKILL.md`
 - `naming-collaborators` — contract — core — `.agents/dotnet/contract/naming/collaborators/SKILL.md`
 - `naming-dtos` — contract — core — `.agents/dotnet/contract/naming/dtos/SKILL.md`
-- `naming-mapping` — contract — core — `.agents/dotnet/contract/naming/mapping/SKILL.md`
-- `naming-repositories` — contract — core — `.agents/dotnet/contract/naming/repositories/SKILL.md`
 - `persistence` — contract — ef-core — `.agents/dotnet/contract/persistence/SKILL.md`
 - `proto` — contract — distributed-services — `.agents/dotnet/contract/proto/SKILL.md`
+- `repositories` — contract — core — `.agents/dotnet/contract/repositories/SKILL.md`
 - `seeding` — contract — ef-core — `.agents/dotnet/contract/seeding/SKILL.md`
 - `structure` — contract — core — `.agents/dotnet/contract/structure/SKILL.md`
 - `structure-modules` — contract — modular-services — `.agents/dotnet/contract/structure/modules/SKILL.md`
 - `structure-single-service` — contract — single-service — `.agents/dotnet/contract/structure/single-service/SKILL.md`
 - `style` — contract — core — `.agents/dotnet/contract/style/SKILL.md`
-- `style-comments` — contract — core — `.agents/dotnet/contract/style/comments/SKILL.md`
 - `testing` — contract — core — `.agents/dotnet/contract/testing/SKILL.md`
 - `testing-e2e` — contract — e2e — `.agents/dotnet/contract/testing/e2e/SKILL.md`
 - `testing-integration` — contract — integration-testing — `.agents/dotnet/contract/testing/integration/SKILL.md`

@@ -32,8 +32,11 @@ internal static partial void PublishedOrderEvents(this ILogger logger, int count
 Set `CA1848` to `error` in `.editorconfig`. That makes the inline form a build failure rather than a
 convention someone has to remember, and it is the reason the debugging rule below has no exception.
 
-`Log.cs` is the one file where `#region` is right — one region per emitting class, named for that class.
-See the `style` skill.
+`Log.cs` is the one file where `#region` is right: it aggregates one member shape, so grouping by owner is
+the only practical way to navigate. Give it one region per emitting class, named for that class.
+
+The `[LoggerMessage]` declaration keeps its `this ILogger` receiver in the method signature, because the
+generator requires it; it is the one exception to `dotnet:mapping`'s `extension()` blocks.
 
 ## Observability is production code, including a probe
 

@@ -11,20 +11,22 @@
     ],
     "core": [
       "build",
+      "comments",
       "domain-design",
       "errors",
+      "fields",
       "libraries",
+      "mapping",
       "naming",
       "naming-collaborators",
       "naming-dtos",
-      "naming-mapping",
-      "naming-repositories",
+      "repositories",
       "structure",
       "style",
-      "style-comments",
       "testing"
     ],
     "distributed-services": [
+      "messaging",
       "microservice-boundaries",
       "proto"
     ],
@@ -105,6 +107,21 @@
         "dotnet"
       ],
       "provenance": [
+        "house"
+      ]
+    },
+    {
+      "name": "comments",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
         "house"
       ]
     },
@@ -333,6 +350,20 @@
       ]
     },
     {
+      "name": "fields",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "house"
+      ]
+    },
+    {
       "name": "http-api",
       "kind": "contract",
       "profile": "aspnet",
@@ -451,6 +482,36 @@
       ]
     },
     {
+      "name": "mapping",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "language",
+        "house"
+      ]
+    },
+    {
+      "name": "messaging",
+      "kind": "contract",
+      "profile": "distributed-services",
+      "applicability": [
+        "services publishing or consuming integration events through a message broker"
+      ],
+      "requires": [
+        "message-broker"
+      ],
+      "provenance": [
+        "architecture",
+        "house"
+      ]
+    },
+    {
       "name": "microservice-boundaries",
       "kind": "contract",
       "profile": "distributed-services",
@@ -528,36 +589,6 @@
       ]
     },
     {
-      "name": "naming-mapping",
-      "kind": "contract",
-      "profile": "core",
-      "applicability": [
-        "all C# and .NET code"
-      ],
-      "requires": [
-        "none"
-      ],
-      "provenance": [
-        "language",
-        "house"
-      ]
-    },
-    {
-      "name": "naming-repositories",
-      "kind": "contract",
-      "profile": "core",
-      "applicability": [
-        "C# projects exposing repository contracts",
-        "regardless of persistence library"
-      ],
-      "requires": [
-        "none"
-      ],
-      "provenance": [
-        "house"
-      ]
-    },
-    {
       "name": "persistence",
       "kind": "contract",
       "profile": "ef-core",
@@ -588,6 +619,21 @@
       "provenance": [
         "protocol",
         "library",
+        "house"
+      ]
+    },
+    {
+      "name": "repositories",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "C# projects exposing repository contracts",
+        "regardless of persistence library"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
         "house"
       ]
     },
@@ -689,23 +735,7 @@
         "none"
       ],
       "provenance": [
-        "language",
-        "house"
-      ]
-    },
-    {
-      "name": "style-comments",
-      "kind": "contract",
-      "profile": "core",
-      "applicability": [
-        "all C# and .NET code"
-      ],
-      "requires": [
-        "none"
-      ],
-      "provenance": [
-        "language",
-        "house"
+        "language"
       ]
     },
     {
