@@ -137,3 +137,17 @@ Focused snippet suite: 9 passed in 16.134s; source-layout suite: 5 passed in 1.4
 803 current files. Namespace selection, shared-source ownership and snippet bytes are preserved.
 The two-file canonical adoption is committed separately after the ownership repair; final committed-range
 normal qualification follows that commit. Publication remains held by the parent.
+
+## Scaffold CI recovery
+
+After user-approved delivery opened `https://github.com/tj-agents/dotnet/pull/60` at `12f476e`, main CI
+passed but Scaffold run `39167868433` failed before verification: its Python 3.11 pin cannot parse the
+canonical Template generator's PEP 695 `type JSONObject = ...` syntax. This is a workflow runtime mismatch,
+not a reason to alter the Template-owned generator. The Scaffold workflow now selects Python 3.12,
+matching the current shared Template CI bootstrap and the generator's required syntax on both OS legs.
+
+Focused verification uses the official `python:3.12-slim` container with source mounted read-only and
+container networking disabled. The exact underlying generator entry point `python -B .agents/sync_generated.py
+--root /work --check` passes with 803 current outputs. Source-layout tests under that same runtime pass:
+5 tests in 28.228s. Local source-layout tests also pass (5 in 1.460s); diff hygiene is clean. No check was
+removed or bypassed. The parent owns native review, publication and monitoring the replacement remote runs.
