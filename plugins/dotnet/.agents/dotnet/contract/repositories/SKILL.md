@@ -11,6 +11,8 @@ provenance: house
 
 # Repository naming and contracts
 
+Owns repository names, query/write verbs, storage return shapes and the application boundary.
+
 ```csharp
 public interface IOrderRepository
 {
@@ -21,8 +23,6 @@ public interface IOrderRepository
 
 A missing single row is `null`; a collection query returns an empty collection when nothing matches.
 These storage contracts require no ORM. An EF implementation additionally loads `efcore:persistence`.
-
-Owns repository names, query/write verbs, storage return shapes and the application boundary.
 
 ## Applicability and ownership
 

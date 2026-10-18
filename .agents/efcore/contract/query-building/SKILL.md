@@ -11,6 +11,8 @@ provenance: library, house
 
 # EF Core query building
 
+Owns injected EF Core query composition, deferred execution boundaries and builder dependency lifetimes.
+
 ```csharp
 public sealed record ReadyOrdersParameters(IReadOnlyCollection<Guid> Ids);
 

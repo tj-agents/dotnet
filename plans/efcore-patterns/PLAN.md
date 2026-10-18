@@ -118,3 +118,15 @@ compiled against real EF Core.Relational 10.0.12 on net10.0 with 0 warnings/erro
 `C:/Users/tommy/AppData/Local/Temp/efcore-conformity-examples-build.log`.
 Generated-output check reports 803 current files; packaged snippet generation exits 0; diff hygiene clean.
 The committed full-range checker is run immediately after this local checkpoint commit.
+
+## Contract opening repair
+
+Restored the existing normal Template `Owns ...` opening rule in the nine changed contracts whose example
+had been placed first. Existing ownership lines moved before the example; three EF contracts gained one
+short ownership line. All fenced examples and the snippet manifest remain byte-identical. Focused snippet
+suite: 9 passed in 13.657s; generation: 803 current outputs; normal Template opening helper: 9/9 passed.
+
+The actual normal Template checker reports only two vendor-drift failures: `.agents/sync_generated.py`
+and `.gitignore` differ from current Template. Both are unchanged against original base `1d97dbe`;
+this branch introduced neither difference. They remain untouched. Parent owns canonical Template adoption
+for that existing gate; this bounded repair does not bypass it or claim the full normal check passed.

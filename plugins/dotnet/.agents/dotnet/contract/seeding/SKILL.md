@@ -11,6 +11,8 @@ provenance: library, house
 
 # Seeding
 
+Owns what a seeder may write directly, the dev/test split, seeding simulators and idempotency.
+
 ```csharp
 public sealed class OrderSeedSimulator
 {
@@ -31,8 +33,6 @@ public sealed class OrderSeedSimulator
 `OrderSeedState` is the producer's canonical seed catalog; `OrderCreated` is its integration event.
 The producer-owned simulator drives the consumer's normal handler path instead of inserting its
 projection rows. This rule and this example require no EF Core storage API.
-
-Owns what a seeder may write directly, the dev/test split, seeding simulators and idempotency.
 
 ## Applicability
 
