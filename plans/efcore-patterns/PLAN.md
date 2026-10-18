@@ -126,7 +126,14 @@ had been placed first. Existing ownership lines moved before the example; three 
 short ownership line. All fenced examples and the snippet manifest remain byte-identical. Focused snippet
 suite: 9 passed in 13.657s; generation: 803 current outputs; normal Template opening helper: 9/9 passed.
 
-The actual normal Template checker reports only two vendor-drift failures: `.agents/sync_generated.py`
-and `.gitignore` differ from current Template. Both are unchanged against original base `1d97dbe`;
-this branch introduced neither difference. They remain untouched. Parent owns canonical Template adoption
-for that existing gate; this bounded repair does not bypass it or claim the full normal check passed.
+The initial actual normal Template check found two baseline vendor-drift failures: `.agents/sync_generated.py`
+and `.gitignore` differed from current Template. Both were unchanged against original base `1d97dbe`.
+Read-only comparison proved the existing and canonical generators produce the same 803 paths and bytes;
+Template update's dry run selected exactly those two files. Parent then approved bounded adoption through
+Template's owning update utility. No manual vendor patch or generated-source copy was used.
+
+After adoption, the actual normal Template check reports `efcore-standards conforms to Template`.
+Focused snippet suite: 9 passed in 16.134s; source-layout suite: 5 passed in 1.473s; generator check:
+803 current files. Namespace selection, shared-source ownership and snippet bytes are preserved.
+The two-file canonical adoption is committed separately after the ownership repair; final committed-range
+normal qualification follows that commit. Publication remains held by the parent.
