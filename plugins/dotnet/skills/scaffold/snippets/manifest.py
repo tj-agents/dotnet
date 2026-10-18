@@ -330,6 +330,15 @@ SNIPPETS: list[Snippet] = [
     entry("testing-e2e-01-clock", "testing/e2e/SKILL.md", 1, "e2e-tests", "SnippetFixtures.TestingE2E01",
           header=""),
 
+    entry("efcore-specification-01-ready-orders", "specification/SKILL.md", 1, "infrastructure", "SnippetFixtures.EfQueryPatterns",
+          owner="efcore", header="using System.Linq.Expressions;\n\n"),
+    entry("efcore-query-building-01-builder", "query-building/SKILL.md", 1, "infrastructure", "SnippetFixtures.EfQueryPatterns",
+          owner="efcore"),
+    entry("efcore-query-building-02-repository", "query-building/SKILL.md", 2, "infrastructure", "SnippetFixtures.EfQueryPatterns",
+          owner="efcore", header="using Microsoft.EntityFrameworkCore;\n\n"),
+    entry("efcore-query-building-03-registration", "query-building/SKILL.md", 3, "infrastructure", "SnippetFixtures.EfQueryPatterns",
+          owner="efcore", header="using Microsoft.EntityFrameworkCore;\nusing Microsoft.Extensions.DependencyInjection;\n\n"),
+
     entry("persistence-01-exclude-from-migrations", "persistence/SKILL.md", 1, "infrastructure", "SnippetFixtures.Persistence01", owner="efcore",
           header=(
               "using Microsoft.EntityFrameworkCore;\nusing Microsoft.EntityFrameworkCore.Metadata.Builders;\n\n"

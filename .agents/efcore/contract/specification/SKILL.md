@@ -11,63 +11,50 @@ provenance: library, house
 
 # EF Core specifications
 
-A specification describes a selection rule. Construct it as an ordinary per-operation object and pass it
-as a parameter to the query/evaluator API. An injected service that resolves inputs and assembles a query
-is a `QueryBuilder`, governed by `efcore:query-building`.
+```csharp
+public sealed class ReadyOrdersSpecification : PredicateSpecification<Order>
+{
+    private readonly Guid[] ids;
+    private readonly DateTimeOffset asOf;
 
-## Criteria are values, not services
+    public ReadyOrdersSpecification(IEnumerable<Guid> ids, DateTimeOffset asOf)
+    {
+        this.ids = ids.ToArray();
+        this.asOf = asOf;
+    }
 
-A specification constructor captures the concrete values defining its rule: a normalized search term,
-an id set, a UTC timestamp, or an already-created geographic point and radius. Its resulting predicate
-or declared query shape stays stable for that operation. Copy caller-owned mutable collections; either
-own immutable geometry or copy mutable inputs so later caller changes cannot alter deferred execution.
+    protected override Expression<Func<Order, bool>> Predicate =>
+        order => ids.Contains(order.Id) && order.ReadyAt <= asOf;
+}
+```
 
-Do not register a specification in DI or give it dependencies such as `DbContext`, `TimeProvider`, a
-geometry provider, tenant accessor, HTTP client or service provider. Resolve those inputs before
-construction, normally in the injected query builder. Capture the current instant once per build;
-a predicate must not read a moving clock during evaluation.
+This example uses the selected shared `PredicateSpecification<TEntity>` / `IPredicateSpecification<TEntity>`
+contract: `ToExpression()` exposes the predicate for query application. `Order` has `Guid Id` and
+`DateTimeOffset ReadyAt`. Empty ids match no orders. The constructor copies caller-owned ids and captures
+a concrete instant, so changes to the input collection or clock cannot change this operation's criteria.
+Use the existing shared contract; do not add this base/interface or another specification library to a service.
 
-A specification is not a reusable service whose predicate accepts an entire request each time. Put the
-specific rule's criteria in its constructor, keep them get-only/private, and pass the specification itself
-to its consumer. Do not add an interface per leaf merely to inject it.
+Construct a specification per operation and pass it to the selected query/evaluator API. It is an ordinary
+criteria object, never a DI registration. Do not inject `DbContext`, `TimeProvider`, geometry providers,
+tenant accessors or other services into it. The builder resolves their values before construction;
+`efcore:query-building` continues this same Order example. Mutable geometry needs the same ownership or
+copying discipline as collections. Keep captured criteria private/get-only.
 
-## Reuse the selected specification model
+Compose predicates with the selected shared `And`, `Or` and `Not` API, which rebinds expression parameters.
+Do not compile predicates to delegates or introduce invocation nodes the selected EF provider cannot
+translate. The evaluator applies the description; it does not resolve request inputs. A library's
+`SpecificationEvaluator` names this query adapter, distinct from an application verdict evaluator under
+`dotnet:naming-collaborators`.
 
-Use the repository's existing shared specification and evaluator API when it fits. Do not introduce a
-second generic specification base, evaluator, or a new library per service. A product may choose a
-predicate-only model or an established richer query specification model; the latter may describe includes,
-ordering or projection as supported by its library. This contract does not require Ardalis.
+A predicate-only model leaves includes, projection and ordering with the query builder. A selected richer
+library may describe them in its specification. Preserve declared null/empty semantics: an omitted optional
+filter is either absent or an identity predicate, while this example's empty id set intentionally matches
+nothing. Count/existence operations reuse criteria without accidentally applying page limits.
 
-In a predicate-only model, `ToExpression()` produces an `Expression<Func<TEntity, bool>>`; `And`, `Or`
-and `Not` combine specifications. Rebind expression parameters through the selected shared composition
-implementation. Avoid compiling a predicate to a delegate or using expression invocation that the selected
-provider cannot translate. The evaluator applies the expression with `Where`; it does not resolve services
-or decide request-specific criteria. `dotnet:naming-collaborators` owns the generic predicate role; an EF
-`SpecificationEvaluator` is the library's query-application role rather than an application verdict service.
+Check provider translation and database behavior in the selected integration tier (`dotnet:testing`).
+LINQ-to-Objects checks alone cannot establish EF translation, null semantics or paging behavior.
 
-Keep projection, includes and ordering in the builder/evaluator layer when the selected model supports
-predicates only. Filtering a count or existence query uses the same criteria while respecting its own
-cardinality contract; do not accidentally apply page limits before counting.
-
-An inactive optional criterion contributes the selected model's identity predicate (true for an `And`
-chain), or the builder omits it. Empty input and null semantics must preserve the operation's declared
-behavior. A set of specifications is request data, never a process-wide mutable cache.
-
-## Verify the persistence behavior
-
-Use provider-backed integration coverage for SQL translation, null/empty criteria, combined filters,
-ordering and pagination where they affect this operation. Pure expression checks may supplement this,
-but a LINQ-to-Objects test alone cannot establish EF translation or database semantics. Follow
-`dotnet:testing` for the selected test tier; do not introduce a new test layer for this convention.
-
-## Source and decision
-
-Tommy, 2026-10-18: specifications are parameter objects rather than DI services; EF query conventions
-live under `efcore` so their scope is visible. This retains the selected product abstraction instead of
-adding another one.
-
-[Ardalis constructs specifications from constructor criteria](https://specification.ardalis.com/usage/create-specifications.html)
-and [applies them through a stateless evaluator](https://specification.ardalis.com/usage/use-specification-repository-pattern.html).
-Those examples support the separation of description from application. Dependency-free per-operation
-criteria and the naming above are the house convention; a specification pattern can also be used outside
-EF Core.
+Tommy, 2026-10-18: specifications are constructor-bound parameter objects rather than DI services; the EF
+query convention has an `efcore` owner. [Ardalis constructor criteria](https://specification.ardalis.com/usage/create-specifications.html)
+and [stateless evaluation](https://specification.ardalis.com/usage/use-specification-repository-pattern.html)
+support that separation without requiring Ardalis. Specifications can also be used outside EF Core.

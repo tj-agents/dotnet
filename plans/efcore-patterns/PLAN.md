@@ -62,3 +62,32 @@ Final baseline before this repair: full suite 82 tests in 119.671s, OK (2 option
 Repair validation: focused snippet suite passed 9 tests in 17.502s; both the exact packaged canonical
 reproduction and source generator `--check` exit 0; generated outputs current (759 files); diff hygiene
 clean. Immutable repair commit follows this checkpoint; publication remains parent-held.
+
+## User callout repair: concrete EF pattern examples
+
+Tommy reported that the new specification/query-building skills were prose-only and left their boundaries
+ambiguous. This source repair adds one coherent Order example: copied ids and concrete UTC instant in
+ReadyOrdersSpecification; injected OrderQueryBuilder reads TimeProvider once and creates/applies criteria;
+repository materializes with cancellation; registration keeps builder singleton and context/repository scoped.
+Prose is consolidated around the examples and distinguishes reusable building logic from per-operation,
+context-bound IQueryable values. `QueryBuilder` remains a house recommendation, not a universal industry name.
+
+Every new C# block is owner-aware manifest content with a byte-identical generated compile fixture. Fixture-only
+support stands in for the selected shared IPredicateSpecification contract; no new production framework.
+Existing dotnet M003/M004 govern example correctness/compilation; no existing record matches the missing-example
+callout. Parent owns the primary mistake record and global Core/Template authoring-policy repair; this branch
+owns only the concrete EF skill examples and their qualification. No publication is authorized here.
+
+Example repair verification:
+- `python -B -m unittest discover -s .agents/tests -p test_snippets.py`: 9 tests passed in 11.231s,
+  including every new EF C# block's manifest coverage and byte identity plus isolated packaged generation.
+- Copied the four generated `efcore-*.Snippet.cs` files and fixture-only support into a temporary net10.0
+  project referencing real `Microsoft.EntityFrameworkCore` 10.0.12 (including real DI abstractions), with
+  nullable/implicit usings/code-style enforcement and warnings as errors. `dotnet build --configuration Release`
+  succeeded with 0 warnings, 0 errors on SDK 10.0.302; evidence at
+  `C:/Users/tommy/AppData/Local/Temp/efcore-pattern-examples-build.log`.
+- `pwsh .agents/sync-generated.ps1 -Check`: 779 current files.
+- Packaged canonical snippet generator `--check`: exit 0; `git diff --check` clean.
+
+Parent owns incremental independent review and the publication hold. No global policy source or Search code
+was changed by this repair.
