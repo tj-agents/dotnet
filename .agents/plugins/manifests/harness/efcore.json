@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "plugin": "dotagents/efcore",
+  "source_roots": [
+    ".agents/efcore"
+  ],
+  "requires": {
+    "marketplaces": [
+      {
+        "id": "dotagents",
+        "repository": "tj-agents/dotnet"
+      }
+    ],
+    "plugins": [
+      "dotagents/efcore",
+      "dotagents/dotnet"
+    ],
+    "hooks": [],
+    "permissions": {
+      "claude_allow": [],
+      "codex_prefix_rules": []
+    }
+  }
+}

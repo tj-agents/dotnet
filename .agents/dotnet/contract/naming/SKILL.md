@@ -27,7 +27,7 @@ owner for the task at hand; load the relevant owner when its concern and prerequ
 | Name a DTO or query result | `dotnet:naming-dtos` |
 | Name a mapper or receiver extension | `dotnet:mapping` |
 | Name a repository, persistence operation and storage return contract | `dotnet:repositories` |
-| Implement EF Core data access when selected | `dotnet:persistence` |
+| Implement EF Core data access when selected | `efcore:persistence` |
 | Name HTTP contracts or routes | `dotnet:http-api` |
 | Name protobuf messages and RPC contracts | `dotnet:proto` |
 | Name projects and module folders | `dotnet:structure-modules` |

@@ -1,0 +1,17 @@
+{
+  "name": "efcore",
+  "displayName": "EF Core Standards",
+  "description": "EF Core persistence, specification and query-building standards.",
+  "author": {
+    "name": "Tommy Seery"
+  },
+  "repository": "https://github.com/tj-agents/dotnet",
+  "skills": "./skills/",
+  "keywords": [
+    "standards",
+    "dotnet",
+    "ef-core",
+    "specification",
+    "query-builder"
+  ]
+}

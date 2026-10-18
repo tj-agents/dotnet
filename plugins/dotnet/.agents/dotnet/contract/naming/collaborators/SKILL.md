@@ -127,6 +127,8 @@ stays a pure decision over a prepared context. Both forms are evaluators.
 A specification is a combinable predicate value object — `IsSatisfiedBy(candidate)` with and/or/not
 composition and no dependencies — for a rule used in more than one mode, such as testing a candidate
 and selecting matching rows ([Evans & Fowler, Specifications](https://martinfowler.com/apsupp/spec.pdf)).
+For EF Core query specifications and injected query composition, use `efcore:specification` and
+`efcore:query-building`; a `QueryBuilder` builds a deferred query, while a specification carries criteria.
 
 Keep the boundaries: a validator assesses a supplied candidate and reports diagnostics; an evaluator
 decides an outcome; a resolver produces a usable value; a calculator computes an amount. An evaluator

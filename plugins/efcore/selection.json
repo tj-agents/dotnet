@@ -1,0 +1,102 @@
+{
+  "plugin": "efcore",
+  "dependencies": [
+    "tj-agents/base",
+    "tj-agents/engineering",
+    "tj-agents/machine",
+    "dotnet"
+  ],
+  "profiles": {
+    "domain-model": [
+      "event-dispatch"
+    ],
+    "ef-core": [
+      "persistence",
+      "query-building",
+      "specification"
+    ],
+    "multitenancy": [
+      "multitenancy"
+    ]
+  },
+  "compatibilitySkillAliases": {},
+  "skills": [
+    {
+      "name": "event-dispatch",
+      "kind": "contract",
+      "profile": "domain-model",
+      "applicability": [
+        "EF Core projects dispatching domain events at the persistence boundary"
+      ],
+      "requires": [
+        "ef-core",
+        "domain-events"
+      ],
+      "provenance": [
+        "library",
+        "architecture",
+        "house"
+      ]
+    },
+    {
+      "name": "multitenancy",
+      "kind": "contract",
+      "profile": "multitenancy",
+      "applicability": [
+        "multi-tenant projects using EF Core"
+      ],
+      "requires": [
+        "ef-core",
+        "multitenancy"
+      ],
+      "provenance": [
+        "library",
+        "architecture"
+      ]
+    },
+    {
+      "name": "persistence",
+      "kind": "contract",
+      "profile": "ef-core",
+      "applicability": [
+        "projects using EF Core"
+      ],
+      "requires": [
+        "ef-core"
+      ],
+      "provenance": [
+        "library"
+      ]
+    },
+    {
+      "name": "query-building",
+      "kind": "contract",
+      "profile": "ef-core",
+      "applicability": [
+        "EF Core projects extracting query composition into injected collaborators"
+      ],
+      "requires": [
+        "ef-core"
+      ],
+      "provenance": [
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "specification",
+      "kind": "contract",
+      "profile": "ef-core",
+      "applicability": [
+        "EF Core projects using reusable query specifications"
+      ],
+      "requires": [
+        "ef-core"
+      ],
+      "provenance": [
+        "library",
+        "house"
+      ]
+    }
+  ]
+}

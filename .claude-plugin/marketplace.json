@@ -14,8 +14,20 @@
         "standards",
         "dotnet",
         "csharp",
-        "ef-core",
         "testing"
+      ]
+    },
+    {
+      "name": "efcore",
+      "source": "./plugins/efcore",
+      "description": "EF Core persistence, specification and query-building standards.",
+      "category": "Productivity",
+      "keywords": [
+        "standards",
+        "dotnet",
+        "ef-core",
+        "specification",
+        "query-builder"
       ]
     }
   ],

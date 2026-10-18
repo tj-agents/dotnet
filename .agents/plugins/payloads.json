@@ -2,7 +2,15 @@
   "payloads": {
     "dotnet": [
       "dotnet"
+    ],
+    "efcore": [
+      "efcore"
     ]
   },
-  "compatibilitySkillAliases": {}
+  "compatibilitySkillAliases": {},
+  "dependencies": {
+    "efcore": [
+      "dotnet"
+    ]
+  }
 }

@@ -24,8 +24,8 @@ import gen_snippets  # noqa: E402
 
 VERIFY_PATH = ROOT / ".agents" / "dotnet" / "utility" / "scaffold" / "scripts" / "verify.py"
 GENERATED_VERIFY_PATHS = (
-    ROOT / ".claude" / "skills" / "scaffold" / "scripts" / "verify.py",
-    ROOT / ".codex" / "skills" / "scaffold" / "scripts" / "verify.py",
+    ROOT / ".claude" / "skills" / "dotnet-scaffold" / "scripts" / "verify.py",
+    ROOT / ".codex" / "skills" / "dotnet-scaffold" / "scripts" / "verify.py",
     ROOT / "plugins" / "dotnet" / "skills" / "scaffold" / "scripts" / "verify.py",
 )
 
@@ -55,6 +55,7 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
     args = parser.parse_args()
     root = Path(args.root)
     plugins = ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents", "dotnet@tj-agents"]
+    plugins.extend(plugin for plugin in args.plugin if plugin not in plugins)
     files = {
         ".agents/plugins.json": json.dumps({"schema_version": 1, "marketplaces": {"tj-agents": {"repository": "tj-agents/marketplace"}}, "plugins": plugins}) + "\\n",
         ".claude/settings.json": "{}\\n",
@@ -74,8 +75,8 @@ class SnippetFixtureTests(unittest.TestCase):
         covered: dict[str, set[int]] = {}
         for snippet in SNIPPETS:
             covered.setdefault(snippet["skill"], set()).add(snippet["block"])
-        for skill_path in sorted(CONTRACTS_ROOT.rglob("SKILL.md")):
-            relative = skill_path.relative_to(CONTRACTS_ROOT).as_posix()
+        for skill_path in sorted([*CONTRACTS_ROOT.rglob("SKILL.md"), *(ROOT / ".agents/efcore/contract").rglob("SKILL.md")]):
+            relative = Path(os.path.relpath(skill_path, CONTRACTS_ROOT)).as_posix()
             count = len(FENCE.findall(skill_path.read_text(encoding="utf-8")))
             if count == 0:
                 continue

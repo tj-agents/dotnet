@@ -25,14 +25,12 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `mapping` — contract — core — `.agents/dotnet/contract/mapping/SKILL.md`
 - `messaging` — contract — distributed-services — `.agents/dotnet/contract/messaging/SKILL.md`
 - `microservice-boundaries` — contract — distributed-services — `.agents/dotnet/contract/microservice/boundaries/SKILL.md`
-- `multitenancy` — contract — multitenancy — `.agents/dotnet/contract/multitenancy/SKILL.md`
 - `naming` — contract — core — `.agents/dotnet/contract/naming/SKILL.md`
 - `naming-collaborators` — contract — core — `.agents/dotnet/contract/naming/collaborators/SKILL.md`
 - `naming-dtos` — contract — core — `.agents/dotnet/contract/naming/dtos/SKILL.md`
-- `persistence` — contract — ef-core — `.agents/dotnet/contract/persistence/SKILL.md`
 - `proto` — contract — distributed-services — `.agents/dotnet/contract/proto/SKILL.md`
 - `repositories` — contract — core — `.agents/dotnet/contract/repositories/SKILL.md`
-- `seeding` — contract — ef-core — `.agents/dotnet/contract/seeding/SKILL.md`
+- `seeding` — contract — seeding — `.agents/dotnet/contract/seeding/SKILL.md`
 - `structure` — contract — core — `.agents/dotnet/contract/structure/SKILL.md`
 - `structure-modules` — contract — modular-services — `.agents/dotnet/contract/structure/modules/SKILL.md`
 - `structure-single-service` — contract — single-service — `.agents/dotnet/contract/structure/single-service/SKILL.md`
@@ -51,3 +49,11 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `debug-integration` — operation — integration-testing — `.agents/dotnet/operation/debug/integration/SKILL.md`
 - `scaffold` — utility — scaffold — `.agents/dotnet/utility/scaffold/SKILL.md`
 - `skill-routes` — utility — skill-routes — `.agents/dotnet/utility/skill-routes/SKILL.md`
+
+## efcore
+
+- `event-dispatch` — contract — domain-model — `.agents/efcore/contract/event-dispatch/SKILL.md`
+- `multitenancy` — contract — multitenancy — `.agents/efcore/contract/multitenancy/SKILL.md`
+- `persistence` — contract — ef-core — `.agents/efcore/contract/persistence/SKILL.md`
+- `query-building` — contract — ef-core — `.agents/efcore/contract/query-building/SKILL.md`
+- `specification` — contract — ef-core — `.agents/efcore/contract/specification/SKILL.md`

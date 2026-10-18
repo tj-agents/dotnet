@@ -36,8 +36,6 @@ CORE_MEMBERS = {
 ALLOWED_CORE_REQUIRES = {"none", "dotnet"}
 PREREQUISITE_BEARING = (
     "http-api",
-    "persistence",
-    "multitenancy",
     "microservice-boundaries",
     "messaging",
     "seeding",
@@ -81,6 +79,27 @@ class CoreProfilePinTests(unittest.TestCase):
             self.assertNotEqual("core", skill["metadata"]["profile"], name)
             requires = {item.strip() for item in skill["metadata"]["requires"].split(",")}
             self.assertFalse(requires.issubset(ALLOWED_CORE_REQUIRES), f"{name}: {requires}")
+
+
+class EfCoreOwnershipTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        config = generator.load_config(ROOT)
+        cls.plugins = generator.discover(ROOT, config["namespace"])
+
+    def test_efcore_contracts_have_one_explicit_owner_and_prerequisite(self) -> None:
+        skills = self.plugins["efcore"]
+        self.assertEqual({"persistence", "multitenancy", "specification", "query-building", "event-dispatch"}, set(skills))
+        for name, skill in skills.items():
+            with self.subTest(name=name):
+                self.assertIn("ef-core", {item.strip() for item in skill["metadata"]["requires"].split(",")})
+        self.assertNotIn("persistence", self.plugins["dotnet"])
+        self.assertNotIn("multitenancy", self.plugins["dotnet"])
+
+    def test_generic_dotnet_contracts_do_not_require_efcore(self) -> None:
+        for name, skill in self.plugins["dotnet"].items():
+            with self.subTest(name=name):
+                self.assertNotIn("ef-core", {item.strip() for item in skill["metadata"]["requires"].split(",")})
 
 
 if __name__ == "__main__":
