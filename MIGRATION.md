@@ -33,3 +33,24 @@ Old names no longer resolve. Update references to the new names.
 `dotnet:fields` and `dotnet:messaging` are new: `fields` takes field naming, `this.`, `base.` and
 primary-constructor rules from `dotnet:style`; `messaging` takes the publisher and processor roles from
 `dotnet:naming-collaborators` and `dotnet:microservice-boundaries`.
+
+## EF Core namespace
+
+EF Core-specific contracts now publish from `efcore@dotagents` in this repository. Its dependency on
+`dotnet@dotagents` retains generic C# conventions. Consumers using the central `tj-agents` marketplace
+select `efcore@tj-agents`; refresh their composed catalog/harness and generated route tables together.
+No old-name forwarding skills remain.
+
+| Old | New |
+|---|---|
+| `dotnet:persistence` | `efcore:persistence` |
+| `dotnet:multitenancy` | `efcore:multitenancy` |
+| EF SaveChanges portion of `dotnet:domain-events` | `efcore:event-dispatch` |
+
+`dotnet:domain-events` keeps generic event raising, handler registration and integration-event translation.
+`dotnet:seeding` keeps production-write ownership, canonical seed state and idempotency independently of an
+ORM; its EF persistence example moved to `efcore:persistence`. Query patterns are newly canonical under
+`efcore:specification` and `efcore:query-building`. Repository contracts remain `dotnet:repositories`.
+
+With two source plugins, repository-local host discovery adapters are qualified (`dotnet-scaffold`,
+`efcore-specification`); installed per-plugin public names remain `dotnet:scaffold`, `efcore:specification`.

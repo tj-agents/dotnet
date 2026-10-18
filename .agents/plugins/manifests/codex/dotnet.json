@@ -10,7 +10,6 @@
     "standards",
     "dotnet",
     "csharp",
-    "ef-core",
     "testing"
   ],
   "interface": {

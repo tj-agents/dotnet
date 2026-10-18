@@ -13,9 +13,20 @@ provenance: house
 
 Owns domain-model design — entities, values, aggregates and domain services.
 
+```text
+Task: Raise OrderCancelledDomainEvent from Order.Cancel.
+Load: dotnet:domain-events.
+
+Task: Dispatch those events through an EF Core SaveChanges interceptor.
+Load: dotnet:domain-events and efcore:event-dispatch.
+```
+
+The first task concerns the domain's announcement; the second selects the EF persistence adapter.
+This routing example adds no entity/aggregate design convention.
+
 DDD's building-block vocabulary is `dotnet:domain-ddd` when a project selects that
-architecture; value construction is `dotnet:domain-values`; domain events raised
-through an EF Core save boundary are `dotnet:domain-events`.
+architecture; value construction is `dotnet:domain-values`; domain events
+are `dotnet:domain-events`; EF Core save-boundary dispatch is `efcore:event-dispatch`.
 
 ## Agreed
 

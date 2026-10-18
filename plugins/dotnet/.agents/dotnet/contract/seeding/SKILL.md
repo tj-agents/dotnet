@@ -3,9 +3,9 @@ name: seeding
 description: The seeding standard for a .NET service — a seeder may only write data production code writes directly, so anything whose only production write path is a handler reacting to an event (read-model projections, event-synced replicas, user rows provisioned on registration, external-provider records, inbox/outbox messages) is never inserted by a seeder; drive the trigger instead. Covers the dev-versus-test seeder split, the producing service's seeding simulator and the dependency direction that makes it work, the two sanctioned exceptions (an integration-test projection seeder driven from the same canonical catalog, and inherently unreproducible historical state), constructor-built seed state with factory `Seed` statics, one canonical seed-state model shared by producer and consumer rather than a `Snapshot` or mirror hierarchy, sentinel guards, and idempotency. Use before writing or changing any seeder, when a table is empty at seed time, when a standalone host lacks another service's data, when a seed-state type would collide on a name with a domain type, or when reviewing a `context.X.AddRange(...)` call.
 kind: contract
 domain: dotnet
-profile: ef-core
-applicability: projects using EF Core seeders
-requires: ef-core
+profile: seeding
+applicability: .NET projects with development or test seeders
+requires: seeding
 provenance: library, house
 ---
 
@@ -13,13 +13,34 @@ provenance: library, house
 
 Owns what a seeder may write directly, the dev/test split, seeding simulators and idempotency.
 
+```csharp
+public sealed class OrderSeedSimulator
+{
+    private readonly IIntegrationEventPublisher publisher;
+    private readonly OrderSeedState seedState;
+
+    public OrderSeedSimulator(IIntegrationEventPublisher publisher, OrderSeedState seedState)
+    {
+        this.publisher = publisher;
+        this.seedState = seedState;
+    }
+
+    public Task SeedAsync(CancellationToken ct = default) =>
+        publisher.PublishAsync(seedState.OrderCreated, ct);
+}
+```
+
+`OrderSeedState` is the producer's canonical seed catalog; `OrderCreated` is its integration event.
+The producer-owned simulator drives the consumer's normal handler path instead of inserting its
+projection rows. This rule and this example require no EF Core storage API.
+
 ## Applicability
 
-This contract applies only to projects using EF Core seeders. It requires `ef-core`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies to .NET development and test seeders independently of their persistence library. It requires `seeding`. EF Core persistence details belong to `efcore:persistence`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 > ## ⚠ Read this before writing a seeder body
 >
-> **Never write `context.X.Add(...)` or `context.X.AddRange(...)` against a DbSet whose entity is only written
+> **Never write `context.X.Add(...)` or `context.X.AddRange(...)` against storage whose entity is only written
 > by a handler in production.**
 >
 > **The rule: a seeder may only write data that production code writes directly.** If production creates the
@@ -46,7 +67,7 @@ Each of these has a production write path that is only ever a reaction:
 and expected.
 
 **The check, before writing the body:** open the entity's repository, service, or handler. If the only production
-code calling `.Add`/`.AddRange` on that DbSet is inside a handler reacting to an event, the seeder may not write
+code calling `.Add`/`.AddRange` on that storage collection is inside a handler reacting to an event, the seeder may not write
 it either — make the trigger fire.
 
 ## Dev seeder versus test seeder
@@ -111,14 +132,8 @@ infrastructure concerns into the domain; it goes on the factory.
 
 Seeders read from seed state and persist. They never assign to it:
 
-```csharp
-public async Task SeedAsync(CancellationToken ct)
-{
-    if (await context.Warehouses.AnyAsync(ct).ConfigureAwait(false)) return;
-    context.Warehouses.AddRange(seedData.Warehouses);
-    await context.SaveChangesAsync(ct).ConfigureAwait(false);
-}
-```
+The EF Core persistence example is owned by `efcore:persistence`; the same ownership rule applies to
+other persistence implementations.
 
 ## One canonical seed-state model
 
@@ -137,5 +152,5 @@ Every dev seeder must be safe to run repeatedly against a database that already 
 seed-if-empty helper for bulk inserts, or guard individual rows with an existence check.
 
 **Where a cross-service event handler can write to the same table before the seeder runs, do not guard on
-`AnyAsync()`** — one race-created row would skip the entire seed. Guard on a specific entity only the seeder ever
+whole-table existence** — one race-created row would skip the entire seed. Guard on a specific entity only the seeder ever
 creates, so partial event-driven rows cannot suppress a full seed.

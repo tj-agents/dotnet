@@ -13,10 +13,21 @@ provenance: house
 
 Owns repository names, query/write verbs, storage return shapes and the application boundary.
 
+```csharp
+public interface IOrderRepository
+{
+    Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<IReadOnlyList<Order>> GetByCustomerIdAsync(Guid customerId, CancellationToken ct = default);
+}
+```
+
+A missing single row is `null`; a collection query returns an empty collection when nothing matches.
+These storage contracts require no ORM. An EF implementation additionally loads `efcore:persistence`.
+
 ## Applicability and ownership
 
 These house conventions apply wherever a project exposes repositories. Shared identifiers follow
-`dotnet:naming`. EF Core practice belongs to `dotnet:persistence` when that profile applies; a
+`dotnet:naming`. EF Core practice belongs to `efcore:persistence` when that profile applies; a
 product's own repository base hierarchy belongs to that product's standards. A project
 can use this naming contract without choosing EF Core, tenancy, a result library or a dispatch architecture.
 

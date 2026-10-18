@@ -5,6 +5,7 @@ from typing import Optional, TypedDict
 
 class Snippet(TypedDict):
     id: str
+    owner: str
     skill: str
     block: int
     project: str
@@ -16,10 +17,10 @@ class Snippet(TypedDict):
 
 def entry(
     id: str, skill: str, block: int, project: str, namespace: str,
-    header: str = "", footer: str = "", skip: Optional[str] = None,
+    header: str = "", footer: str = "", skip: Optional[str] = None, owner: str = "dotnet",
 ) -> Snippet:
     return {
-        "id": id, "skill": skill, "block": block, "project": project,
+        "id": id, "owner": owner, "skill": skill, "block": block, "project": project,
         "namespace": namespace, "header": header, "footer": footer, "skip": skip,
     }
 
@@ -329,7 +330,36 @@ SNIPPETS: list[Snippet] = [
     entry("testing-e2e-01-clock", "testing/e2e/SKILL.md", 1, "e2e-tests", "SnippetFixtures.TestingE2E01",
           header=""),
 
-    entry("persistence-01-exclude-from-migrations", "persistence/SKILL.md", 1, "infrastructure", "SnippetFixtures.Persistence01",
+    entry("repositories-01-contract", "repositories/SKILL.md", 1, "infrastructure", "SnippetFixtures.Repositories01",
+          header="public sealed record Order(Guid Id);\n\n"),
+    entry("naming-collaborators-01-query-builder", "naming/collaborators/SKILL.md", 1, "infrastructure", "SnippetFixtures.NamingCollaborators01",
+          header="using SnippetFixtures.EfQueryPatterns;\n\n"),
+    entry("seeding-02-event-path", "seeding/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding02",
+          header=(
+              "public sealed record OrderCreatedEvent(Guid Id) : IIntegrationEvent;\n\n"
+              "public sealed class OrderSeedState\n{\n"
+              "    public OrderCreatedEvent OrderCreated { get; } = new(Guid.Parse(\"61a662e9-123e-4b0c-925d-af7c2bedad8c\"));\n"
+              "}\n\n"
+          )),
+    entry("efcore-multitenancy-01-entity-filter", "multitenancy/SKILL.md", 1, "infrastructure", "SnippetFixtures.EfMultitenancy01",
+          owner="efcore", header="using Microsoft.EntityFrameworkCore;\nusing Microsoft.EntityFrameworkCore.Metadata.Builders;\n\n"),
+    entry("efcore-event-dispatch-01-transaction", "event-dispatch/SKILL.md", 1, "infrastructure", "SnippetFixtures.EfEventDispatch01",
+          owner="efcore", header=(
+              "using Microsoft.EntityFrameworkCore;\n\n"
+              "internal static class Example\n{\n"
+              "    public static async Task SaveAndCommitAsync(DbContext context, CancellationToken ct = default)\n    {\n"
+          ), footer="\n    }\n}\n"),
+
+    entry("efcore-specification-01-ready-orders", "specification/SKILL.md", 1, "infrastructure", "SnippetFixtures.EfQueryPatterns",
+          owner="efcore", header="using System.Linq.Expressions;\n\n"),
+    entry("efcore-query-building-01-builder", "query-building/SKILL.md", 1, "infrastructure", "SnippetFixtures.EfQueryPatterns",
+          owner="efcore"),
+    entry("efcore-query-building-02-repository", "query-building/SKILL.md", 2, "infrastructure", "SnippetFixtures.EfQueryPatterns",
+          owner="efcore", header="using Microsoft.EntityFrameworkCore;\n\n"),
+    entry("efcore-query-building-03-registration", "query-building/SKILL.md", 3, "infrastructure", "SnippetFixtures.EfQueryPatterns",
+          owner="efcore", header="using Microsoft.EntityFrameworkCore;\nusing Microsoft.Extensions.DependencyInjection;\n\n"),
+
+    entry("persistence-01-exclude-from-migrations", "persistence/SKILL.md", 1, "infrastructure", "SnippetFixtures.Persistence01", owner="efcore",
           header=(
               "using Microsoft.EntityFrameworkCore;\nusing Microsoft.EntityFrameworkCore.Metadata.Builders;\n\n"
               "internal sealed class SellerRatingProjection;\n\n"
@@ -338,7 +368,7 @@ SNIPPETS: list[Snippet] = [
           ),
           footer="\n    }\n}\n"),
 
-    entry("seeding-01-seed-async", "seeding/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding01",
+    entry("seeding-01-seed-async", "persistence/SKILL.md", 2, "infrastructure", "SnippetFixtures.Seeding01", owner="efcore",
           header=(
               "using Microsoft.EntityFrameworkCore;\n\n"
               "internal sealed class Warehouse;\n"
