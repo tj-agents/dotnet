@@ -11,6 +11,16 @@ provenance: selected-stack
 
 # Stack defaults
 
+```xml
+<ItemGroup>
+  <PackageReference Include="Microsoft.EntityFrameworkCore" />
+</ItemGroup>
+```
+
+In a centrally versioned project that selects EF Core, this reference chooses relational data access;
+load `efcore:persistence` for its usage rules. Versions remain in the owning `Directory.Packages.props`.
+Installing these standards alone does not select this package.
+
 Owns the chosen library or platform facility for each job in Tommy's selected .NET application stack.
 
 ## Applicability
@@ -26,7 +36,7 @@ Each row has a skill covering *how* to use it well; this file only decides *what
 | Job | Reach for | Depth |
 |---|---|---|
 | Relational data access | **EF Core** | `efcore:persistence` |
-| A query EF expresses badly | **Dapper**, inside the repository | `persistence` |
+| A query EF expresses badly | **Dapper**, inside the repository | `dotnet:repositories` |
 | Results and errors | **Reunion** | `errors-carriers` |
 | Closed unions in domain and error code | **Dunet** source generator | `errors` |
 | Single-value primitives worth a type | **Vogen** | — |

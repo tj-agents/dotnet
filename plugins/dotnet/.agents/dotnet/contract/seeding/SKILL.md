@@ -11,6 +11,27 @@ provenance: library, house
 
 # Seeding
 
+```csharp
+public sealed class OrderSeedSimulator
+{
+    private readonly IIntegrationEventPublisher publisher;
+    private readonly OrderSeedState seedState;
+
+    public OrderSeedSimulator(IIntegrationEventPublisher publisher, OrderSeedState seedState)
+    {
+        this.publisher = publisher;
+        this.seedState = seedState;
+    }
+
+    public Task SeedAsync(CancellationToken ct = default) =>
+        publisher.PublishAsync(seedState.OrderCreated, ct);
+}
+```
+
+`OrderSeedState` is the producer's canonical seed catalog; `OrderCreated` is its integration event.
+The producer-owned simulator drives the consumer's normal handler path instead of inserting its
+projection rows. This rule and this example require no EF Core storage API.
+
 Owns what a seeder may write directly, the dev/test split, seeding simulators and idempotency.
 
 ## Applicability

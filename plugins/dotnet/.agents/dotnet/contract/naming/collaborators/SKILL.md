@@ -130,6 +130,17 @@ and selecting matching rows ([Evans & Fowler, Specifications](https://martinfowl
 For EF Core query specifications and injected query composition, use `efcore:specification` and
 `efcore:query-building`; a `QueryBuilder` builds a deferred query, while a specification carries criteria.
 
+```csharp
+public interface IOrderQueryBuilder
+{
+    IQueryable<Order> Build(IQueryable<Order> source, ReadyOrdersParameters parameters);
+}
+```
+
+When an EF project needs a subject-specific interface, this contract names injected composition and its
+query result. `ReadyOrdersSpecification(ids, asOf)` instead names constructor-bound criteria, constructed
+per operation. A selected shared query-builder interface takes precedence over adding another one.
+
 Keep the boundaries: a validator assesses a supplied candidate and reports diagnostics; an evaluator
 decides an outcome; a resolver produces a usable value; a calculator computes an amount. An evaluator
 returns a `Decision`; the `Evidence` and `Proof` shapes around it follow

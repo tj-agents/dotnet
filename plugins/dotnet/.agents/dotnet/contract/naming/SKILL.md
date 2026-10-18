@@ -11,6 +11,16 @@ provenance: language, house
 
 # Shared C# naming
 
+```text
+Task: Name a storage operation returning one order or no match, independent of its ORM.
+Load: dotnet:repositories -> GetByIdAsync returns Order?.
+
+Task: Implement that operation using EF Core.
+Load: dotnet:repositories and efcore:persistence.
+```
+
+The additional persistence owner applies when EF Core is selected; repository naming remains generic.
+
 Owns shared C# identifier conventions and routes a naming decision to its concern owner.
 
 ## Applicability and ownership
