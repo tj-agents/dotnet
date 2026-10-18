@@ -13,6 +13,16 @@ provenance: language, house
 
 Owns shared C# identifier conventions and routes a naming decision to its concern owner.
 
+```text
+Task: Name a storage operation returning one order or no match, independent of its ORM.
+Load: dotnet:repositories -> GetByIdAsync returns Order?.
+
+Task: Implement that operation using EF Core.
+Load: dotnet:repositories and efcore:persistence.
+```
+
+The additional persistence owner applies when EF Core is selected; repository naming remains generic.
+
 ## Applicability and ownership
 
 These conventions apply to C# independently of an application stack. The table selects the additional
@@ -27,7 +37,7 @@ owner for the task at hand; load the relevant owner when its concern and prerequ
 | Name a DTO or query result | `dotnet:naming-dtos` |
 | Name a mapper or receiver extension | `dotnet:mapping` |
 | Name a repository, persistence operation and storage return contract | `dotnet:repositories` |
-| Implement EF Core data access when selected | `dotnet:persistence` |
+| Implement EF Core data access when selected | `efcore:persistence` |
 | Name HTTP contracts or routes | `dotnet:http-api` |
 | Name protobuf messages and RPC contracts | `dotnet:proto` |
 | Name projects and module folders | `dotnet:structure-modules` |

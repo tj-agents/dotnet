@@ -23,16 +23,16 @@ OPTIONS_PATH = ROOT / "options.json"
 PRESETS = ROOT / "presets"
 COMPONENTS = ROOT / "components"
 TEMPLATES = ROOT / "templates"
-SKILL_ROUTES_GENERATOR = ROOT.parent / "skill-routes" / "scripts" / "gen_skill_routes.py"
+SKILL_ROUTES_GENERATOR = ROOT.parent / f"{ROOT.name.removesuffix('scaffold')}skill-routes" / "scripts" / "gen_skill_routes.py"
 
 
-def skill_routes_document() -> Dict[str, Any]:
+def skill_routes_document(options: Mapping[str, Any]) -> Dict[str, Any]:
     specification = importlib.util.spec_from_file_location("dotnet_gen_skill_routes", SKILL_ROUTES_GENERATOR)
     if specification is None or specification.loader is None:
         raise ScaffoldError(f"cannot load skill-routes generator: {SKILL_ROUTES_GENERATOR}")
     module = importlib.util.module_from_spec(specification)
     specification.loader.exec_module(module)
-    return module.routes("dotnet-service")
+    return module.routes("efcore-service" if options["data"] in ("efcore", "efcore+dapper") else "dotnet-service")
 IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 WINDOWS_INVALID = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
 TOKEN = re.compile(r"\$([A-Z][A-Z0-9_]*)\$")
@@ -508,7 +508,7 @@ def plan(name: str, options: Mapping[str, Any], preset: Optional[str]) -> Dict[s
         files["infra/app.json"] = json.dumps(profile, indent=2) + "\n"
     if ".agents/skill-routes.json" in files:
         raise ScaffoldError("template collision: .agents/skill-routes.json")
-    files[".agents/skill-routes.json"] = json.dumps(skill_routes_document(), indent=2) + "\n"
+    files[".agents/skill-routes.json"] = json.dumps(skill_routes_document(options), indent=2) + "\n"
     metadata = {
         "package": PACKAGE,
         "skill": SKILL,
@@ -650,6 +650,8 @@ def run_azure(azure_script: Path, command_args: Sequence[str]) -> subprocess.Com
 
 def standards_plugin_ids(options: Mapping[str, Any]) -> List[str]:
     plugins = ["dotnet@tj-agents"]
+    if options["data"] in ("efcore", "efcore+dapper"):
+        plugins.append("efcore@tj-agents")
     if options["cloud"] == "azure":
         plugins.append("azure@tj-agents")
     return plugins
@@ -706,7 +708,7 @@ def prepare_standards(adopter: Path, options: Mapping[str, Any]) -> Dict[str, st
             sys.executable, "-B", str(adopter), "--root", str(stage),
             "--stack", "azure" if options["cloud"] == "azure" else "dotnet",
         ]
-        for identity in CORE_PLUGIN_IDS:
+        for identity in (*CORE_PLUGIN_IDS, *required_plugins):
             command.extend(["--plugin", identity])
         for mode in ("write", "check"):
             try:

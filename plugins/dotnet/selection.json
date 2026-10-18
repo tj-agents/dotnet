@@ -40,10 +40,6 @@
       "debug-e2e-ui",
       "testing-e2e"
     ],
-    "ef-core": [
-      "persistence",
-      "seeding"
-    ],
     "extensions": [
       "dependency-injection",
       "logging"
@@ -64,9 +60,6 @@
     "modular-services": [
       "structure-modules"
     ],
-    "multitenancy": [
-      "multitenancy"
-    ],
     "patterns": [
       "domain-values"
     ],
@@ -77,6 +70,9 @@
     ],
     "scaffold": [
       "scaffold"
+    ],
+    "seeding": [
+      "seeding"
     ],
     "selected-stack": [
       "libraries-selected"
@@ -257,11 +253,10 @@
       "kind": "contract",
       "profile": "domain-model",
       "applicability": [
-        "domain models dispatching events through an EF Core save boundary"
+        "domain models raising and dispatching in-process events"
       ],
       "requires": [
-        "domain-events",
-        "ef-core"
+        "domain-events"
       ],
       "provenance": [
         "library",
@@ -527,22 +522,6 @@
       ]
     },
     {
-      "name": "multitenancy",
-      "kind": "contract",
-      "profile": "multitenancy",
-      "applicability": [
-        "multi-tenant projects using EF Core"
-      ],
-      "requires": [
-        "ef-core",
-        "multitenancy"
-      ],
-      "provenance": [
-        "library",
-        "architecture"
-      ]
-    },
-    {
       "name": "naming",
       "kind": "contract",
       "profile": "core",
@@ -585,20 +564,6 @@
       "provenance": [
         "language",
         "house"
-      ]
-    },
-    {
-      "name": "persistence",
-      "kind": "contract",
-      "profile": "ef-core",
-      "applicability": [
-        "projects using EF Core"
-      ],
-      "requires": [
-        "ef-core"
-      ],
-      "provenance": [
-        "library"
       ]
     },
     {
@@ -650,12 +615,12 @@
     {
       "name": "seeding",
       "kind": "contract",
-      "profile": "ef-core",
+      "profile": "seeding",
       "applicability": [
-        "projects using EF Core seeders"
+        ".NET projects with development or test seeders"
       ],
       "requires": [
-        "ef-core"
+        "seeding"
       ],
       "provenance": [
         "library",

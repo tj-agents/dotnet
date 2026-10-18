@@ -4,6 +4,7 @@ import importlib.util
 import io
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -24,8 +25,8 @@ import gen_snippets  # noqa: E402
 
 VERIFY_PATH = ROOT / ".agents" / "dotnet" / "utility" / "scaffold" / "scripts" / "verify.py"
 GENERATED_VERIFY_PATHS = (
-    ROOT / ".claude" / "skills" / "scaffold" / "scripts" / "verify.py",
-    ROOT / ".codex" / "skills" / "scaffold" / "scripts" / "verify.py",
+    ROOT / ".claude" / "skills" / "dotnet-scaffold" / "scripts" / "verify.py",
+    ROOT / ".codex" / "skills" / "dotnet-scaffold" / "scripts" / "verify.py",
     ROOT / "plugins" / "dotnet" / "skills" / "scaffold" / "scripts" / "verify.py",
 )
 
@@ -55,6 +56,7 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
     args = parser.parse_args()
     root = Path(args.root)
     plugins = ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents", "dotnet@tj-agents"]
+    plugins.extend(plugin for plugin in args.plugin if plugin not in plugins)
     files = {
         ".agents/plugins.json": json.dumps({"schema_version": 1, "marketplaces": {"tj-agents": {"repository": "tj-agents/marketplace"}}, "plugins": plugins}) + "\\n",
         ".claude/settings.json": "{}\\n",
@@ -71,24 +73,25 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
 
 class SnippetFixtureTests(unittest.TestCase):
     def test_every_csharp_block_is_covered_by_the_manifest(self) -> None:
-        covered: dict[str, set[int]] = {}
+        covered: dict[tuple[str, str], set[int]] = {}
         for snippet in SNIPPETS:
-            covered.setdefault(snippet["skill"], set()).add(snippet["block"])
-        for skill_path in sorted(CONTRACTS_ROOT.rglob("SKILL.md")):
-            relative = skill_path.relative_to(CONTRACTS_ROOT).as_posix()
-            count = len(FENCE.findall(skill_path.read_text(encoding="utf-8")))
-            if count == 0:
-                continue
-            expected = set(range(1, count + 1))
-            actual = covered.get(relative, set())
-            self.assertEqual(expected, actual, f"{relative} has {count} csharp blocks; manifest covers {sorted(actual)}")
+            covered.setdefault((snippet["owner"], snippet["skill"]), set()).add(snippet["block"])
+        for owner, contracts in gen_snippets.contract_roots().items():
+            for skill_path in sorted(contracts.rglob("SKILL.md")):
+                relative = skill_path.relative_to(contracts).as_posix()
+                count = len(FENCE.findall(skill_path.read_text(encoding="utf-8")))
+                if count == 0:
+                    continue
+                expected = set(range(1, count + 1))
+                actual = covered.get((owner, relative), set())
+                self.assertEqual(expected, actual, f"{owner}:{relative} has {count} csharp blocks; manifest covers {sorted(actual)}")
 
     def test_fixture_snippet_region_is_byte_identical_to_its_skill_md_block(self) -> None:
         for snippet in SNIPPETS:
             if snippet["skip"]:
                 continue
             with self.subTest(id=snippet["id"]):
-                skill_path = CONTRACTS_ROOT / snippet["skill"]
+                skill_path = gen_snippets.contract_path(snippet, gen_snippets.contract_roots())
                 expected = gen_snippets.extract_block(skill_path, snippet["block"])
                 fixture_path = SNIPPETS_DIR / snippet["project"] / f"{snippet['id']}.Snippet.cs"
                 self.assertTrue(fixture_path.is_file(), f"missing fixture: {fixture_path}")
@@ -97,6 +100,35 @@ class SnippetFixtureTests(unittest.TestCase):
 
     def test_fixtures_are_not_stale(self) -> None:
         self.assertEqual(0, gen_snippets.write_or_check(check=True))
+
+    def test_packaged_snippet_generation_uses_the_separate_efcore_owner(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            payloads = Path(temporary)
+            for owner in ("dotnet", "efcore"):
+                shutil.copytree(ROOT / "plugins" / owner, payloads / owner)
+            dotnet = payloads / "dotnet"
+            self.assertFalse((dotnet / ".agents/efcore").exists())
+            scripts = (
+                dotnet / ".agents/dotnet/utility/scaffold/snippets/gen_snippets.py",
+                dotnet / "skills/scaffold/snippets/gen_snippets.py",
+            )
+            for script in scripts:
+                with self.subTest(script=script):
+                    result = subprocess.run([sys.executable, "-B", str(script), "--check"], cwd=payloads, capture_output=True, text=True)
+                    self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+            separate = payloads / "separate-cache" / "efcore-version"
+            separate.parent.mkdir()
+            (payloads / "efcore").rename(separate)
+            missing = subprocess.run([sys.executable, "-B", str(scripts[0]), "--check"], cwd=payloads, capture_output=True, text=True)
+            self.assertNotEqual(0, missing.returncode)
+            self.assertIn("--contract-root efcore=", missing.stderr)
+            bound = subprocess.run(
+                [sys.executable, "-B", str(scripts[0]), "--check", "--contract-root", f"efcore={separate / '.agents/efcore/contract'}"],
+                cwd=payloads, capture_output=True, text=True,
+            )
+            self.assertEqual(0, bound.returncode, bound.stdout + bound.stderr)
+            self.assertFalse((dotnet / ".agents/efcore").exists())
 
     def test_generated_verifiers_resolve_the_complete_shipped_snippet_assets(self) -> None:
         expected_files = {
