@@ -11,6 +11,8 @@ provenance: library, house
 
 # EF Core specifications
 
+Owns constructor-bound specification criteria, expression composition and evaluator boundaries in EF Core queries.
+
 ```csharp
 public sealed class ReadyOrdersSpecification : PredicateSpecification<Order>
 {

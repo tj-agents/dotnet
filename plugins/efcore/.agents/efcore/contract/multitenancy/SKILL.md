@@ -11,6 +11,8 @@ provenance: library, architecture
 
 # Multitenancy
 
+Owns multi-tenant EF Core visibility — composed stances, stance separation and filter declarations.
+
 ```csharp
 public sealed class PrivateOrderConfiguration : IEntityTypeConfiguration<PrivateOrder>
 {
@@ -31,8 +33,6 @@ applies this per-entity configuration. Keep `OnModelCreating` with the owning ba
 context uses its deliberate tenant-independent map, rather than subtracting this private filter per query.
 The predicate references the current context's tenant, not a tenant id frozen into a shared model.
 
-
-Owns multi-tenant EF Core visibility — composed stances, stance separation and filter declarations.
 
 ## Applicability
 

@@ -11,6 +11,8 @@ provenance: library, architecture, house
 
 # EF Core event dispatch
 
+Owns EF Core domain-event dispatch at save and transaction boundaries.
+
 ```csharp
 var transaction = await context.Database.BeginTransactionAsync(ct).ConfigureAwait(false);
 await using (transaction.ConfigureAwait(false))

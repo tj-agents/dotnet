@@ -11,6 +11,8 @@ provenance: selected-stack
 
 # Stack defaults
 
+Owns the chosen library or platform facility for each job in Tommy's selected .NET application stack.
+
 ```xml
 <ItemGroup>
   <PackageReference Include="Microsoft.EntityFrameworkCore" />
@@ -20,8 +22,6 @@ provenance: selected-stack
 In a centrally versioned project that selects EF Core, this reference chooses relational data access;
 load `efcore:persistence` for its usage rules. Versions remain in the owning `Directory.Packages.props`.
 Installing these standards alone does not select this package.
-
-Owns the chosen library or platform facility for each job in Tommy's selected .NET application stack.
 
 ## Applicability
 
