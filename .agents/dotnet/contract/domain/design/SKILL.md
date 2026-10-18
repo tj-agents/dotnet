@@ -14,8 +14,8 @@ provenance: house
 Owns domain-model design — entities, values, aggregates and domain services.
 
 DDD's building-block vocabulary is `dotnet:domain-ddd` when a project selects that
-architecture; value construction is `dotnet:domain-values`; domain events raised
-through an EF Core save boundary are `dotnet:domain-events`.
+architecture; value construction is `dotnet:domain-values`; domain events
+are `dotnet:domain-events`; EF Core save-boundary dispatch is `efcore:event-dispatch`.
 
 ## Agreed
 

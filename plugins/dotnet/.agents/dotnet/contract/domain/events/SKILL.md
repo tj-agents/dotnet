@@ -1,11 +1,11 @@
 ---
 name: domain-events
-description: Domain events in a .NET service — a domain method raises an event on the entity instead of calling a bus, the entity composes an event-raiser collection rather than inheriting an aggregate base, a SaveChanges interceptor clears then dispatches in a pre-commit phase that joins the caller's transaction and a post-commit phase that does not, one pre-commit handler per event translating the domain event into the published integration event so the outbox row commits atomically with the state change, handlers registered against the closed IDomainEventHandler<TEvent> interface because a concrete-only registration dispatches to nothing silently, and the anti-patterns (publishing alongside the write, injecting a bus into the domain project, business logic in a handler, raising from a setter). Use when a state change must announce itself, adding or reviewing a domain event or its handler, deciding pre-commit versus post-commit, wiring an integration-event publish, or when a domain project is about to take an infrastructure dependency.
+description: Domain events in a .NET service — a domain method raises an event on the entity instead of calling a bus, the entity composes an event-raiser collection rather than inheriting an aggregate base, persistence dispatches through its selected save boundary, one pre-commit handler per event translating the domain event into the published integration event so the outbox row commits atomically with the state change, handlers registered against the closed IDomainEventHandler<TEvent> interface because a concrete-only registration dispatches to nothing silently, and the anti-patterns (publishing alongside the write, injecting a bus into the domain project, business logic in a handler, raising from a setter). Use when a state change must announce itself, adding or reviewing a domain event or its handler, deciding pre-commit versus post-commit, wiring an integration-event publish, or when a domain project is about to take an infrastructure dependency.
 kind: contract
 domain: dotnet
 profile: domain-model
-applicability: domain models dispatching events through an EF Core save boundary
-requires: domain-events, ef-core
+applicability: domain models raising and dispatching in-process events
+requires: domain-events
 provenance: library, architecture, house
 ---
 
@@ -15,7 +15,7 @@ Owns how a domain event is raised, dispatched at save, and translated into a pub
 
 ## Applicability
 
-This contract applies only to domain models dispatching events through an EF Core save boundary. It requires `domain-events, ef-core`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies to domain models raising and dispatching in-process events. It requires `domain-events`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 A domain method that changes state never calls a bus, a notifier, or another module. It **raises** a
 domain event on the entity; the persistence layer dispatches it when the change is saved. Two things
@@ -49,21 +49,12 @@ public sealed class OrderEntity : IEventRaiser
 A domain event is a `sealed record` implementing the marker interface, named past-tense with a
 `DomainEvent` suffix, and lives in the **domain** project beside the entity that raises it.
 
-## The save is what dispatches, in two phases
+## Persistence dispatch
 
-A `SaveChangesInterceptor` collects the events off every tracked raiser, clears them, and dispatches:
-
-- **Pre-commit**, inside `SavingChangesAsync` — the handler's own writes join the caller's transaction
-  and commit atomically with it.
-- **Post-commit**, inside `SavedChangesAsync` — for work that must not run unless the change actually
-  committed, and whose own failure must not roll the change back.
-
-Clearing before dispatch is load-bearing: a handler that saves again re-enters the interceptor, and an
-uncleared collection dispatches the same event a second time.
-
-**Pre-commit is the default.** Reach for post-commit only when the side effect is genuinely
-non-transactional, and never for a bus publish that goes through an outbox — the outbox row is the
-thing that must be atomic.
+Persistence dispatches the accumulated events at its selected save boundary. The persistence adapter
+owns transaction enlistment and the timing of each phase. When EF Core is selected, `efcore:event-dispatch`
+owns the interceptor, clearing, pre-commit and post-commit implementation. A post-save callback alone
+does not prove an enclosing transaction has committed.
 
 ## A pre-commit handler is where a domain event becomes an integration event
 

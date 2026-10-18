@@ -21,14 +21,12 @@
 - `mapping` — contract — core
 - `messaging` — contract — distributed-services
 - `microservice-boundaries` — contract — distributed-services
-- `multitenancy` — contract — multitenancy
 - `naming` — contract — core
 - `naming-collaborators` — contract — core
 - `naming-dtos` — contract — core
-- `persistence` — contract — ef-core
 - `proto` — contract — distributed-services
 - `repositories` — contract — core
-- `seeding` — contract — ef-core
+- `seeding` — contract — seeding
 - `structure` — contract — core
 - `structure-modules` — contract — modular-services
 - `structure-single-service` — contract — single-service

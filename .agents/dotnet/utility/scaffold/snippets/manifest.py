@@ -329,7 +329,7 @@ SNIPPETS: list[Snippet] = [
     entry("testing-e2e-01-clock", "testing/e2e/SKILL.md", 1, "e2e-tests", "SnippetFixtures.TestingE2E01",
           header=""),
 
-    entry("persistence-01-exclude-from-migrations", "persistence/SKILL.md", 1, "infrastructure", "SnippetFixtures.Persistence01",
+    entry("persistence-01-exclude-from-migrations", "../../efcore/contract/persistence/SKILL.md", 1, "infrastructure", "SnippetFixtures.Persistence01",
           header=(
               "using Microsoft.EntityFrameworkCore;\nusing Microsoft.EntityFrameworkCore.Metadata.Builders;\n\n"
               "internal sealed class SellerRatingProjection;\n\n"
@@ -338,7 +338,7 @@ SNIPPETS: list[Snippet] = [
           ),
           footer="\n    }\n}\n"),
 
-    entry("seeding-01-seed-async", "seeding/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding01",
+    entry("seeding-01-seed-async", "../../efcore/contract/persistence/SKILL.md", 2, "infrastructure", "SnippetFixtures.Seeding01",
           header=(
               "using Microsoft.EntityFrameworkCore;\n\n"
               "internal sealed class Warehouse;\n"

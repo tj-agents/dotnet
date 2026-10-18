@@ -25,7 +25,7 @@ Each row has a skill covering *how* to use it well; this file only decides *what
 
 | Job | Reach for | Depth |
 |---|---|---|
-| Relational data access | **EF Core** | `persistence` |
+| Relational data access | **EF Core** | `efcore:persistence` |
 | A query EF expresses badly | **Dapper**, inside the repository | `persistence` |
 | Results and errors | **Reunion** | `errors-carriers` |
 | Closed unions in domain and error code | **Dunet** source generator | `errors` |

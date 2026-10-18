@@ -1,6 +1,6 @@
 ---
 name: skill-routes
-description: Generate a .NET consumer repository's `.agents/skill-routes.json` and the registry of which repo gets which route-table kind, so `skill_router.py` gates its writes and reviews behind the owning dotnet and engineering standards. Use when wiring a .NET repo into skill routing, registering a new consumer repo, or changing what a path routes to.
+description: Generate a .NET consumer repository's `.agents/skill-routes.json` and the registry of which repo gets which route-table kind, so `skill_router.py` gates its writes and reviews behind the owning dotnet and engineering standards. Use when wiring a .NET repo into skill routing, registering a new consumer repo, or changing what a path routes to, or selecting ORM-independent versus EF Core routes.
 kind: utility
 domain: dotnet
 profile: skill-routes
@@ -20,6 +20,7 @@ Its generator sits beside this file.
 ```
 python scripts/gen_skill_routes.py --kind dotnet-service --into <repo>      # the consumer's table
 python scripts/gen_skill_routes.py --kind dotnet-service --into <repo> --check
+python scripts/gen_skill_routes.py --kind efcore-service --into <ef-core-repo>
 python scripts/gen_skill_routes.py --emit-registry <dir>                    # registry.json + one table per kind
 python scripts/gen_skill_routes.py --emit-registry <dir> --check
 ```
@@ -30,6 +31,9 @@ row in the generator.
 
 ## Kinds
 
-- `dotnet-service` — a carved or standalone .NET service, no frontend: the meta rows, the dotnet rows,
-  the `.cs` floor anchored at the repo root.
+- `dotnet-service` — a carved or standalone .NET service, no frontend: meta and generic .NET rows,
+  with the `.cs` floor anchored at the repo root. It never requires an EF Core plugin.
+- `efcore-service` — the same service with EF Core selected: adds the `efcore` layer and its persistence,
+  specification, query-building, event-dispatch and tenancy rows. EF scaffolds choose this kind from
+  their selected data option; Dapper-only and no-database scaffolds keep `dotnet-service`.
 - `dotnet-service-with-app` — **not yet.** The frontend seam is gated on `POLYREPO_ROADMAP §6/§4c`.

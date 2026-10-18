@@ -40,7 +40,7 @@ CARVED_TREE = {
     ("api/src/Acme.Authz.Api/Program.cs", "var builder = WebApplication.CreateBuilder(args);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:dependency-injection"},
     ("api/src/Acme.Authz.Domain/SystemClock.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design"},
     ("api/src/Acme.Authz.Contracts/PermissionCheck.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:naming-dtos"},
-    ("api/src/Acme.Authz.Api/Persistence/MigrationRunner.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:persistence"},
+    ("api/src/Acme.Authz.Api/Persistence/MigrationRunner.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "efcore:persistence"},
     ("api/test/Acme.Authz.Api.Tests.Integration/ApiFixture.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:testing", "dotnet:testing-integration"},
     ("api/test/Acme.Authz.Api.Tests.Unit/TelemetryTestEnvironment.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:testing", "dotnet:testing-unit"},
     ("api/test/Acme.Authz.Tests.Builders/AccessGrantBuilder.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:testing"},
@@ -52,10 +52,10 @@ CARVED_TREE = {
     ("api/src/Acme.Authz.Api/Grants/GrantStore.cs", "private readonly ILoggerFactory loggerFactory;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:logging"},
     ("api/src/Acme.Authz.Application/Access/RequestAccess.cs", "public Result<AccessGrant, RequestAccessError> Handle()"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-carriers"},
     ("api/src/Acme.Authz.Api/CLAUDE.md", ""): {"engineering:docs"},
-    ("src/Acme.Billing.Infrastructure/Repositories/InvoiceRepository.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:persistence", "dotnet:repositories"},
+    ("src/Acme.Billing.Infrastructure/Repositories/InvoiceRepository.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:repositories"},
     ("src/Acme.Billing.Application/Invoices/RegisterInvoiceHandler.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators", "dotnet:domain-events"},
-    ("src/Acme.Billing.Infrastructure/BillingDbContext.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:persistence"},
-    ("src/Acme.Billing.Infrastructure/Migrations/20260101000000_Init.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:persistence"},
+    ("src/Acme.Billing.Infrastructure/BillingDbContext.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:persistence"},
+    ("src/Acme.Billing.Infrastructure/Migrations/20260101000000_Init.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:persistence"},
     ("src/Acme.Billing.Api/Invoices/InvoiceMappers.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:mapping"},
     ("src/Acme.Billing.Application/Invoices/RegisterInvoiceValidator.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:validation"},
     ("src/Acme.Billing.Infrastructure/Seeding/InvoiceSeeder.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:seeding"},
@@ -82,7 +82,7 @@ CARVED_TREE = {
     ("src/Acme.Billing.Infrastructure/Fulfilment/FulfilmentRegistration.cs", "services.AddKeyedScoped<IFulfilmentStep, CourierStep>(FulfilmentMode.Courier);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:keyed-strategies"},
     ("src/Acme.Billing.Infrastructure/Fulfilment/FulfilmentRegistration.Unions.cs", "    .Case<IFulfilToAddress>(arm => arm.Use<CourierFulfil>(FulfilmentMode.Courier))"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:keyed-unions"},
     ("src/Acme.Billing.Web/Program.cs", "builder.Services.AddGrpcClient<Orders.OrdersClient>();"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:dependency-injection", "dotnet:microservice-boundaries"},
-    ("src/Acme.Billing.Infrastructure/Configurations/OrderConfiguration.cs", "builder.HasQueryFilter(order => order.TenantId == tenantContext.TenantId);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:multitenancy"},
+    ("src/Acme.Billing.Infrastructure/Configurations/OrderConfiguration.cs", "builder.HasQueryFilter(order => order.TenantId == tenantContext.TenantId);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:multitenancy"},
     ("Directory.Packages.props", '<PackageVersion Include="Meziantou.Analyzer" Version="3.0.299" />'): {"dotnet:build", "dotnet:libraries", "dotnet:structure", "dotnet:libraries-selected"},
     (".scaffold.json", '{"options": {"architecture": "single-service"}}'): {"dotnet:structure-single-service"},
     ("src/Acme.Billing.Web/Acme.Billing.Web.csproj", '<Project Sdk="Microsoft.NET.Sdk.Web"></Project>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure"},
@@ -91,9 +91,13 @@ CARVED_TREE = {
     ("Acme.Platform.slnx", '<Solution>\n  <Project Path="src/Acme.Ledger.Application/Acme.Ledger.Application.csproj" />\n  <Project Path="src/Acme.Audit.Application/Acme.Audit.Application.csproj" />\n</Solution>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure"},
     ("src/Acme.Billing.Domain/Orders/Order.cs", "public sealed class Order(Guid id) : Entity<Guid>(id)"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-ddd"},
     ("src/Acme.Billing.Application/Payments/PaymentSession.cs", "public static bool TryCreate(\n    string reference,\n    out PaymentSession session)"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-values"},
-    ("src/Acme.Billing.Infrastructure/Data/TenantFilters.cs", "builder.HasQueryFilter(Key, entity =>\n    entity.TenantId == context.TenantId);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:multitenancy"},
-    ("src/Acme.Billing.Infrastructure/Repositories/ScopedRepository.cs", "internal interface IScopedRepository<TEntity> where TEntity : class, IEntity<Guid>;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:persistence", "dotnet:repositories"},
+    ("src/Acme.Billing.Infrastructure/Data/TenantFilters.cs", "builder.HasQueryFilter(Key, entity =>\n    entity.TenantId == context.TenantId);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:multitenancy"},
+    ("src/Acme.Billing.Infrastructure/Repositories/ScopedRepository.cs", "internal interface IScopedRepository<TEntity> where TEntity : class, IEntity<Guid>;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:repositories"},
     ("src/Acme.Billing.Application/Fulfilment/IFulfilmentUnionFactory.cs", "internal interface IFulfilmentUnionFactory;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators", "dotnet:keyed-unions"},
+    ("src/Acme.Billing.Infrastructure/Specifications/OrdersByStatusSpecification.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators", "efcore:specification"},
+    ("src/Acme.Billing.Infrastructure/Queries/OrderQueryBuilder.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators", "efcore:query-building"},
+    ("src/Acme.Billing.Infrastructure/Interceptors/DispatchInterceptor.cs", "internal sealed class DispatchInterceptor : SaveChangesInterceptor;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:persistence", "efcore:event-dispatch"},
+    ("src/Acme.Billing.Infrastructure/Repositories/EfInvoiceRepository.cs", "return await query.ToListAsync(ct);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:repositories", "efcore:persistence"},
     ("plans/skill-routes/PLAN.md", ""): {"engineering:plans"},
     ("reviews/Feature-SkillRoutes/REVIEW.md", ""): {"engineering:review-lifecycle"},
     ("AGENTS.md", ""): {"engineering:docs"},
@@ -108,7 +112,7 @@ class RouteDerivationTests(unittest.TestCase):
     def test_carved_tree_resolves_expected_skills(self) -> None:
         for (path, content), expected in CARVED_TREE.items():
             with self.subTest(path=path):
-                self.assertEqual(expected, generator.skills_for("dotnet-service", path, content))
+                self.assertEqual(expected, generator.skills_for("efcore-service", path, content))
 
     def test_matching_agrees_with_the_shipped_router(self) -> None:
         root = core_root()
@@ -120,7 +124,7 @@ class RouteDerivationTests(unittest.TestCase):
             router = load("core_skill_router", hooks / "skill_router.py")
         finally:
             sys.path.remove(str(hooks))
-        routes = generator.routes("dotnet-service")["routes"]
+        routes = generator.routes("efcore-service")["routes"]
         for (path, content), expected in CARVED_TREE.items():
             with self.subTest(path=path):
                 matched = {
@@ -135,7 +139,7 @@ class RouteDerivationTests(unittest.TestCase):
             if not path.endswith(".cs"):
                 continue
             with self.subTest(path=path):
-                matched = generator.skills_for("dotnet-service", path, content)
+                matched = generator.skills_for("efcore-service", path, content)
                 self.assertLessEqual({"dotnet:style", "dotnet:naming", "dotnet:fields"}, matched)
 
     def test_rows_port_between_monorepo_and_carved_layouts(self) -> None:
@@ -143,10 +147,10 @@ class RouteDerivationTests(unittest.TestCase):
             if not path.startswith("api/"):
                 continue
             with self.subTest(path=path):
-                self.assertEqual(expected, generator.skills_for("dotnet-service", path[len("api/"):], content))
+                self.assertEqual(expected, generator.skills_for("efcore-service", path[len("api/"):], content))
 
     def test_no_row_is_dead_on_the_simulated_tree(self) -> None:
-        for index, route in enumerate(generator.routes("dotnet-service")["routes"]):
+        for index, route in enumerate(generator.routes("efcore-service")["routes"]):
             needle = route.get("content_requires")
             fired = any(
                 re.search(route["path"], path) and (not needle or re.search(needle, content))
@@ -156,30 +160,40 @@ class RouteDerivationTests(unittest.TestCase):
 
     def test_every_contract_skill_has_an_evidence_row(self) -> None:
         routed = {
-            identifier.split(":")[1]
-            for route in generator.routes("dotnet-service")["routes"]
+            identifier
+            for route in generator.routes("efcore-service")["routes"]
             for identifier in route["skills"]
-            if identifier.startswith("dotnet:")
+            if identifier.startswith(("dotnet:", "efcore:"))
         }
         contracts = {
-            re.search(r"^name: (.+)$", path.read_text(encoding="utf-8"), re.M).group(1)
-            for path in (ROOT / ".agents/dotnet/contract").rglob("SKILL.md")
+            f"{plugin}:" + re.search(r"^name: (.+)$", path.read_text(encoding="utf-8"), re.M).group(1)
+            for plugin in ("dotnet", "efcore")
+            for path in (ROOT / f".agents/{plugin}/contract").rglob("SKILL.md")
         }
         self.assertTrue(contracts)
         self.assertEqual(set(), contracts - routed)
 
+    def test_generic_dotnet_routes_do_not_require_efcore(self) -> None:
+        declaration = generator.routes("dotnet-service")
+        self.assertNotIn("efcore", declaration["layers"])
+        self.assertTrue(all(not skill.startswith("efcore:") for row in declaration["routes"] for skill in row["skills"]))
+        for path, content in CARVED_TREE:
+            with self.subTest(path=path):
+                expected = {skill for skill in generator.skills_for("efcore-service", path, content) if not skill.startswith("efcore:")}
+                self.assertEqual(expected, generator.skills_for("dotnet-service", path, content))
+
     def test_route_path_strings_are_pairwise_distinct(self) -> None:
-        paths = [route["path"] for route in generator.routes("dotnet-service")["routes"]]
+        paths = [route["path"] for route in generator.routes("efcore-service")["routes"]]
         self.assertEqual(len(paths), len(set(paths)), "skill_router keys seen-state on the path string")
 
     def test_routed_skills_resolve_and_stay_inside_the_layers(self) -> None:
-        declaration = generator.routes("dotnet-service")
+        declaration = generator.routes("efcore-service")
         root = core_root()
         for route in declaration["routes"]:
             for identifier in route["skills"]:
                 package, capability = identifier.split(":")
                 self.assertIn(package, declaration["layers"])
-                if package == "dotnet":
+                if package in ("dotnet", "efcore"):
                     self.assertTrue((ROOT / "plugins" / package / "skills" / capability / "SKILL.md").is_file(), identifier)
                 else:
                     if root is None:
@@ -206,14 +220,14 @@ class RouteCliTests(unittest.TestCase):
     def test_kind_into_writes_a_current_consumer_table(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            written = self.run_generator("--kind", "dotnet-service", "--into", str(root))
+            written = self.run_generator("--kind", "efcore-service", "--into", str(root))
             self.assertEqual(0, written.returncode, written.stdout + written.stderr)
             table = json.loads((root / ".agents/skill-routes.json").read_text(encoding="utf-8"))
-            self.assertEqual(generator.routes("dotnet-service"), table)
-            current = self.run_generator("--kind", "dotnet-service", "--into", str(root), "--check")
+            self.assertEqual(generator.routes("efcore-service"), table)
+            current = self.run_generator("--kind", "efcore-service", "--into", str(root), "--check")
             self.assertEqual(0, current.returncode, current.stdout + current.stderr)
             (root / ".agents/skill-routes.json").write_text("{}", encoding="utf-8")
-            stale = self.run_generator("--kind", "dotnet-service", "--into", str(root), "--check")
+            stale = self.run_generator("--kind", "efcore-service", "--into", str(root), "--check")
             self.assertEqual(1, stale.returncode)
             self.assertIn("STALE", stale.stdout)
 
@@ -235,12 +249,12 @@ class RouteCliTests(unittest.TestCase):
             self.assertIn("STALE", stale.stdout)
 
     def test_emit_registry_cannot_be_combined_with_kind(self) -> None:
-        result = self.run_generator("--emit-registry", "routes", "--kind", "dotnet-service", "--into", ".")
+        result = self.run_generator("--emit-registry", "routes", "--kind", "efcore-service", "--into", ".")
         self.assertNotEqual(0, result.returncode)
         self.assertIn("cannot be combined", result.stderr)
 
     def test_kind_requires_into(self) -> None:
-        result = self.run_generator("--kind", "dotnet-service")
+        result = self.run_generator("--kind", "efcore-service")
         self.assertNotEqual(0, result.returncode)
         self.assertIn("--kind and --into are required", result.stderr)
 

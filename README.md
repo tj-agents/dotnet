@@ -1,6 +1,6 @@
 # dotnet
 
-Generic .NET guidance for Claude Code and Codex, published as `dotnet@dotagents`.
+Generic .NET guidance for Claude Code and Codex, published as `dotnet@dotagents` and the optional `efcore@dotagents`.
 The canonical repository is [`tj-agents/dotnet`](https://github.com/tj-agents/dotnet); the marketplace ID remains `dotagents`.
 
 ## Skills
@@ -17,8 +17,9 @@ Families are folders, family first; a skill's name is its folder path joined by 
 - Libraries: `dotnet:libraries`, `dotnet:libraries-selected`.
 - Keyed: `dotnet:keyed-strategies`, `dotnet:keyed-unions`.
 - Other contracts: `dotnet:build`, `dotnet:dependency-injection`, `dotnet:http-api`, `dotnet:logging`,
-  `dotnet:mapping`, `dotnet:messaging`, `dotnet:microservice-boundaries`, `dotnet:multitenancy`,
-  `dotnet:persistence`, `dotnet:proto`, `dotnet:repositories`, `dotnet:seeding`, `dotnet:validation`.
+  `dotnet:mapping`, `dotnet:messaging`, `dotnet:microservice-boundaries`, `dotnet:proto`, `dotnet:repositories`, `dotnet:seeding`, `dotnet:validation`.
+- EF Core: `efcore:persistence`, `efcore:multitenancy`, `efcore:specification`, `efcore:query-building`,
+  `efcore:event-dispatch`. Install this plugin only for EF Core projects; it depends on `dotnet`.
 - Operations: `dotnet:debug-integration`, `dotnet:debug-e2e`, `dotnet:debug-e2e-api`, `dotnet:debug-e2e-ui`.
 - Utilities: `dotnet:scaffold`.
 
@@ -30,8 +31,9 @@ The `core` profile holds only the family hubs and the naming/style family: no ap
 prerequisite. Each required hub's family members — DDD, value semantics, domain events, EF Core
 persistence, Reunion results and errors, ASP.NET Core, multitenancy, distributed services, every testing
 tier, and Tommy's selected full application stack — are independent profiles with their own prerequisite.
-Installing the plugin makes them all discoverable; a repository selects only the capabilities matching
-its actual stack.
+The `dotnet` plugin supplies generic guidance; `efcore` owns the EF Core-specific profiles. A repository
+selects the plugins and capabilities matching its actual stack. Generic seeding and domain-event raising
+remain in `dotnet`; their EF persistence and dispatch adapters live in `efcore`.
 
 Concertable-specific rules and concrete harness commands remain in `Concertable/agents`. Machine and engineering
 workflow capabilities remain in `tj-agents/core`. React and TypeScript guidance remains in

@@ -140,6 +140,7 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
             return 0
         root = Path(args.root)
         plugins = ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents", "dotnet@tj-agents"]
+        plugins.extend(plugin for plugin in args.plugin if plugin not in plugins)
         if args.stack == "azure":
             plugins.append("azure@tj-agents")
         omitted = os.environ.get("FAKE_STANDARDS_OMIT_PLUGIN")
@@ -494,8 +495,21 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(["write", "check", "write", "check"], [call[call.index("--mode") + 1] for call in calls])
             self.assertEqual(["dotnet", "dotnet", "azure", "azure"], [call[call.index("--stack") + 1] for call in calls])
             self.assertTrue(all("--marketplace-revision" not in call for call in calls))
-            for call in calls:
-                self.assertEqual(list(SCAFFOLD.CORE_PLUGIN_IDS), [call[index + 1] for index, value in enumerate(call) if value == "--plugin"])
+            for index, call in enumerate(calls):
+                expected = [*SCAFFOLD.CORE_PLUGIN_IDS, "dotnet@tj-agents"]
+                if index >= 2:
+                    expected.extend(["efcore@tj-agents", "azure@tj-agents"])
+                self.assertEqual(expected, [call[position + 1] for position, value in enumerate(call) if value == "--plugin"])
+
+    def test_efcore_standards_are_selected_only_for_efcore_data_access(self) -> None:
+        for data in ("none", "dapper", "efcore", "efcore+dapper"):
+            with self.subTest(data=data):
+                options = {"cloud": "none", "data": data}
+                selected = SCAFFOLD.standards_plugin_ids(options)
+                self.assertEqual(data in ("efcore", "efcore+dapper"), "efcore@tj-agents" in selected)
+                self.assertIn("dotnet@tj-agents", selected)
+                routes = SCAFFOLD.skill_routes_document(options)
+                self.assertEqual(data in ("efcore", "efcore+dapper"), "efcore" in routes["layers"])
 
     def test_standards_files_are_copied_and_listed_by_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -1228,7 +1242,8 @@ class ScaffoldTests(unittest.TestCase):
             routes_path = root / "Routed" / ".agents" / "skill-routes.json"
             self.assertTrue(routes_path.is_file())
             table = json.loads(routes_path.read_text(encoding="utf-8"))
-            self.assertEqual(SCAFFOLD.skill_routes_document(), table)
+            self.assertEqual("efcore-service", table["kind"])
+            self.assertIn("efcore", table["layers"])
             routes_module_spec = importlib.util.spec_from_file_location(
                 "dotnet_gen_skill_routes", SCRIPT.parent.parent.parent / "skill-routes" / "scripts" / "gen_skill_routes.py"
             )
