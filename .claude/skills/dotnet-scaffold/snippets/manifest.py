@@ -330,6 +330,26 @@ SNIPPETS: list[Snippet] = [
     entry("testing-e2e-01-clock", "testing/e2e/SKILL.md", 1, "e2e-tests", "SnippetFixtures.TestingE2E01",
           header=""),
 
+    entry("repositories-01-contract", "repositories/SKILL.md", 1, "infrastructure", "SnippetFixtures.Repositories01",
+          header="public sealed record Order(Guid Id);\n\n"),
+    entry("naming-collaborators-01-query-builder", "naming/collaborators/SKILL.md", 1, "infrastructure", "SnippetFixtures.NamingCollaborators01",
+          header="using SnippetFixtures.EfQueryPatterns;\n\n"),
+    entry("seeding-02-event-path", "seeding/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding02",
+          header=(
+              "public sealed record OrderCreatedEvent(Guid Id) : IIntegrationEvent;\n\n"
+              "public sealed class OrderSeedState\n{\n"
+              "    public OrderCreatedEvent OrderCreated { get; } = new(Guid.Parse(\"61a662e9-123e-4b0c-925d-af7c2bedad8c\"));\n"
+              "}\n\n"
+          )),
+    entry("efcore-multitenancy-01-entity-filter", "multitenancy/SKILL.md", 1, "infrastructure", "SnippetFixtures.EfMultitenancy01",
+          owner="efcore", header="using Microsoft.EntityFrameworkCore;\nusing Microsoft.EntityFrameworkCore.Metadata.Builders;\n\n"),
+    entry("efcore-event-dispatch-01-transaction", "event-dispatch/SKILL.md", 1, "infrastructure", "SnippetFixtures.EfEventDispatch01",
+          owner="efcore", header=(
+              "using Microsoft.EntityFrameworkCore;\n\n"
+              "internal static class Example\n{\n"
+              "    public static async Task SaveAndCommitAsync(DbContext context, CancellationToken ct = default)\n    {\n"
+          ), footer="\n    }\n}\n"),
+
     entry("efcore-specification-01-ready-orders", "specification/SKILL.md", 1, "infrastructure", "SnippetFixtures.EfQueryPatterns",
           owner="efcore", header="using System.Linq.Expressions;\n\n"),
     entry("efcore-query-building-01-builder", "query-building/SKILL.md", 1, "infrastructure", "SnippetFixtures.EfQueryPatterns",

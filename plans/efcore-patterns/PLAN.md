@@ -91,3 +91,30 @@ Example repair verification:
 
 Parent owns incremental independent review and the publication hold. No global policy source or Search code
 was changed by this repair.
+
+## Changed-skill example conformity
+
+The user requires a concrete example in every added/updated authored skill. The full candidate touched
+eight additional code-free definitions, so this bounded repair adds demonstrations only to domain-design,
+libraries-selected, naming, naming-collaborators, repositories, seeding and EF event-dispatch. Generic hubs
+show concrete task-to-owner selection; selected libraries show a centrally versioned EF package reference;
+C# examples show an ORM-independent repository, query-builder role, producer event seeding and explicit
+SaveChanges-versus-Commit transaction ownership. The Dapper depth link now points to the generic repository
+owner instead of the removed bare persistence name. No unrelated skill sweep or new design rule.
+
+New C# fences enter the owner-aware snippet manifest and compilation fixtures. Shared-policy checker
+qualification will cover every changed authored definition from `1d97dbe` through the final branch head.
+Parent owns the Core/Template checker and publication hold; no external changes are made here.
+
+Parent expanded the bounded conformity repair to the clean-moved `efcore:multitenancy` definition, which
+also lacked an example. Its per-entity configuration references the current private-read context's tenant;
+existing context-capability/base model composition retains OnModelCreating ownership, and public reads keep
+a separate deliberate stance. The fixture supplies only the sample entity/context, not a new production base.
+
+Conformity verification: the new shared Core checker was invoked with explicit working-tree paths for
+all 13 changed authored definitions and exited 0. Focused snippet suite passed 9 tests in 13.052s.
+All affected C# fixtures (including private-tenant configuration and explicit transaction ownership)
+compiled against real EF Core.Relational 10.0.12 on net10.0 with 0 warnings/errors; retained log:
+`C:/Users/tommy/AppData/Local/Temp/efcore-conformity-examples-build.log`.
+Generated-output check reports 803 current files; packaged snippet generation exits 0; diff hygiene clean.
+The committed full-range checker is run immediately after this local checkpoint commit.

@@ -11,6 +11,20 @@ provenance: library, architecture, house
 
 # EF Core event dispatch
 
+```csharp
+var transaction = await context.Database.BeginTransactionAsync(ct).ConfigureAwait(false);
+await using (transaction.ConfigureAwait(false))
+{
+    await context.SaveChangesAsync(ct).ConfigureAwait(false);
+    await transaction.CommitAsync(ct).ConfigureAwait(false);
+}
+```
+
+The transaction owner starts with already-staged changes. `SavedChangesAsync` runs during the save,
+while this explicit transaction is still uncommitted. The later `CommitAsync` is the commit boundary;
+outbox rows staged by pre-commit handlers must enlist in that same transaction. No direct bus publish
+is added after either call.
+
 `dotnet:domain-events` owns event raising, handler contracts and translation to integration events.
 This skill owns their EF Core persistence adapter. It selects no product-specific dispatcher or outbox.
 

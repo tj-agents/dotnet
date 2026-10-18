@@ -11,6 +11,27 @@ provenance: library, architecture
 
 # Multitenancy
 
+```csharp
+public sealed class PrivateOrderConfiguration : IEntityTypeConfiguration<PrivateOrder>
+{
+    private readonly PrivateReadDbContext context;
+
+    public PrivateOrderConfiguration(PrivateReadDbContext context)
+    {
+        this.context = context;
+    }
+
+    public void Configure(EntityTypeBuilder<PrivateOrder> builder) =>
+        builder.HasQueryFilter(order => order.TenantId == context.TenantId);
+}
+```
+
+The private-read context exposes its tenant value; its established context-capability model composition
+applies this per-entity configuration. Keep `OnModelCreating` with the owning base. A separate public-read
+context uses its deliberate tenant-independent map, rather than subtracting this private filter per query.
+The predicate references the current context's tenant, not a tenant id frozen into a shared model.
+
+
 Owns multi-tenant EF Core visibility — composed stances, stance separation and filter declarations.
 
 ## Applicability

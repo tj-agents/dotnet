@@ -11,6 +11,17 @@ provenance: house
 
 # Repository naming and contracts
 
+```csharp
+public interface IOrderRepository
+{
+    Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<IReadOnlyList<Order>> GetByCustomerIdAsync(Guid customerId, CancellationToken ct = default);
+}
+```
+
+A missing single row is `null`; a collection query returns an empty collection when nothing matches.
+These storage contracts require no ORM. An EF implementation additionally loads `efcore:persistence`.
+
 Owns repository names, query/write verbs, storage return shapes and the application boundary.
 
 ## Applicability and ownership
