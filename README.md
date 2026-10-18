@@ -48,3 +48,9 @@ python -B -m unittest discover -s .agents/tests -p "test_*.py"
 ```
 
 The layout, the vendored generator and CI come from [Template](https://github.com/tj-agents/template).
+
+Snippet source owners are explicit in the scaffold's manifest. In a checkout, the generator reads each
+owner's authored contracts; in generated packages it reads the separate sibling payloads. Check that
+layout with `python -B plugins/dotnet/.agents/dotnet/utility/scaffold/snippets/gen_snippets.py --check`.
+If installed plugin payloads occupy unrelated cache directories, bind the owning source explicitly:
+`--contract-root efcore=<efcore-plugin-root>/.agents/efcore/contract`. No EF source is copied into dotnet.

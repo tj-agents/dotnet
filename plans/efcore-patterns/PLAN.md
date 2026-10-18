@@ -47,3 +47,18 @@ After both producers publish, consumer adoption is `python -B <machine-plugin-se
 - Full-suite run exposed two stale test assumptions (moved persistence skill and no-argument route helper); both repaired and focused verification passed. No check was weakened or disabled.
 
 Review and remote delivery remain. Parent owns independent review and dependent marketplace/core roster publication; producer should land first.
+
+## Review repair: packaged snippet source ownership
+
+Parent's independent review of `088e21f` found that relative EF contract paths only worked in the source
+checkout. The dotnet canonical payload intentionally omits EF source; its snippet generator therefore
+failed with FileNotFoundError. Repair keeps each contract in its owner: manifest entries declare `owner`,
+source roots resolve to authored families or separate plugin payloads, and `--contract-root OWNER=DIRECTORY`
+binds separately installed caches. A regression copies the real generated dotnet and efcore payloads to
+an isolated temporary layout, checks both canonical/public generators, verifies missing-owner diagnostics,
+and checks an explicit binding to a relocated EF cache. No fake authored-source path or duplicate EF tree.
+
+Final baseline before this repair: full suite 82 tests in 119.671s, OK (2 optional core-checkout checks skipped).
+Repair validation: focused snippet suite passed 9 tests in 17.502s; both the exact packaged canonical
+reproduction and source generator `--check` exit 0; generated outputs current (759 files); diff hygiene
+clean. Immutable repair commit follows this checkpoint; publication remains parent-held.

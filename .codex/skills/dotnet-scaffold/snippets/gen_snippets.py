@@ -9,13 +9,38 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from manifest import SNIPPETS
+from manifest import SNIPPETS, Snippet
 
 ROOT = Path(__file__).resolve().parent
-CONTRACTS_ROOT = ROOT.parents[2] / "contract"
 FENCE = re.compile(r"```csharp\n(.*?)\n```", re.DOTALL)
 BEGIN = "// snippet:begin\n"
 END = "// snippet:end\n"
+
+
+
+def contract_roots() -> dict[str, Path]:
+    owners = {snippet["owner"] for snippet in SNIPPETS}
+    for ancestor in ROOT.parents:
+        if not (ancestor / ".agents/dotnet/contract").is_dir():
+            continue
+        if (ancestor / "harness.json").is_file():
+            return {
+                owner: (ancestor if owner == "dotnet" else ancestor.parent / owner) / ".agents" / owner / "contract"
+                for owner in owners
+            }
+        return {owner: ancestor / ".agents" / owner / "contract" for owner in owners}
+    raise ValueError("Cannot locate the dotnet authored contracts for this snippet generator")
+
+
+def contract_path(snippet: Snippet, roots: dict[str, Path]) -> Path:
+    owner = snippet["owner"]
+    path = roots[owner] / snippet["skill"]
+    if not path.is_file():
+        raise ValueError(
+            f"Cannot locate {owner} contract: {path}. "
+            f"Supply --contract-root {owner}=<owning-plugin-contract-directory>."
+        )
+    return path
 
 
 def extract_block(skill_path: Path, block: int) -> str:
@@ -36,12 +61,13 @@ def region(text: str) -> str:
     return text[start:end].removesuffix("\n")
 
 
-def write_or_check(check: bool) -> int:
+def write_or_check(check: bool, roots: dict[str, Path] | None = None) -> int:
+    roots = contract_roots() if roots is None else roots
     stale = False
     for snippet in SNIPPETS:
         if snippet["skip"]:
             continue
-        skill_path = CONTRACTS_ROOT / snippet["skill"]
+        skill_path = contract_path(snippet, roots)
         verbatim = extract_block(skill_path, snippet["block"])
         expected = fixture_text(snippet["namespace"], verbatim, snippet.get("header", ""), snippet.get("footer", ""))
         target = ROOT / snippet["project"] / f"{snippet['id']}.Snippet.cs"
@@ -65,8 +91,24 @@ def write_or_check(check: bool) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--contract-root", action="append", default=[], metavar="OWNER=DIRECTORY",
+        help="Bind an owner's contracts when plugin payloads are installed separately; repeat per owner.",
+    )
     args = parser.parse_args()
-    return write_or_check(args.check)
+    roots = contract_roots()
+    for binding in args.contract_root:
+        owner, separator, directory = binding.partition("=")
+        if not separator or owner not in roots or not directory:
+            parser.error("--contract-root requires a known OWNER=DIRECTORY")
+        path = Path(directory).expanduser().resolve()
+        if not path.is_dir():
+            parser.error(f"--contract-root directory does not exist: {path}")
+        roots[owner] = path
+    try:
+        return write_or_check(args.check, roots)
+    except ValueError as error:
+        parser.exit(1, f"{error}\n")
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ from typing import Optional, TypedDict
 
 class Snippet(TypedDict):
     id: str
+    owner: str
     skill: str
     block: int
     project: str
@@ -16,10 +17,10 @@ class Snippet(TypedDict):
 
 def entry(
     id: str, skill: str, block: int, project: str, namespace: str,
-    header: str = "", footer: str = "", skip: Optional[str] = None,
+    header: str = "", footer: str = "", skip: Optional[str] = None, owner: str = "dotnet",
 ) -> Snippet:
     return {
-        "id": id, "skill": skill, "block": block, "project": project,
+        "id": id, "owner": owner, "skill": skill, "block": block, "project": project,
         "namespace": namespace, "header": header, "footer": footer, "skip": skip,
     }
 
@@ -329,7 +330,7 @@ SNIPPETS: list[Snippet] = [
     entry("testing-e2e-01-clock", "testing/e2e/SKILL.md", 1, "e2e-tests", "SnippetFixtures.TestingE2E01",
           header=""),
 
-    entry("persistence-01-exclude-from-migrations", "../../efcore/contract/persistence/SKILL.md", 1, "infrastructure", "SnippetFixtures.Persistence01",
+    entry("persistence-01-exclude-from-migrations", "persistence/SKILL.md", 1, "infrastructure", "SnippetFixtures.Persistence01", owner="efcore",
           header=(
               "using Microsoft.EntityFrameworkCore;\nusing Microsoft.EntityFrameworkCore.Metadata.Builders;\n\n"
               "internal sealed class SellerRatingProjection;\n\n"
@@ -338,7 +339,7 @@ SNIPPETS: list[Snippet] = [
           ),
           footer="\n    }\n}\n"),
 
-    entry("seeding-01-seed-async", "../../efcore/contract/persistence/SKILL.md", 2, "infrastructure", "SnippetFixtures.Seeding01",
+    entry("seeding-01-seed-async", "persistence/SKILL.md", 2, "infrastructure", "SnippetFixtures.Seeding01", owner="efcore",
           header=(
               "using Microsoft.EntityFrameworkCore;\n\n"
               "internal sealed class Warehouse;\n"
