@@ -11,68 +11,95 @@ provenance: library, house
 
 # EF Core query building
 
-Use `<Subject>QueryBuilder`, with `Build(source, parameters)`, for an injected collaborator whose job is
-to compose an EF query. An interface, when the application needs one, is `I<Subject>QueryBuilder`.
-Reuse the product's shared query-builder contract; do not invent a generic base or interface per service.
-`DI` describes construction, not the class's name or responsibility.
+```csharp
+public sealed record ReadyOrdersParameters(IReadOnlyCollection<Guid> Ids);
 
-## Roles and operation flow
+public sealed class OrderQueryBuilder
+{
+    private readonly TimeProvider timeProvider;
 
-| Role | Input and output | Lifetime and owner |
-|---|---|---|
-| Specification | Concrete criteria to stable predicate/query description | Constructed per operation; `efcore:specification` |
-| Query builder | Source `IQueryable<TEntity>` and operation parameters to composed `IQueryable<TEntity>` | Injected service; owns input resolution and query composition |
-| Specification evaluator | Source and specification to filtered/shaped query | Selected shared/library adapter; no request-specific input resolution |
-| Repository | Operation input to materialized storage result | Owns context, execution, cancellation and storage boundary; `efcore:persistence` |
+    public OrderQueryBuilder(TimeProvider timeProvider)
+    {
+        this.timeProvider = timeProvider;
+    }
 
-The builder resolves concrete values from its injected dependencies, creates fresh specifications, composes
-them using the selected shared API, and applies them through the selected evaluator. It adds joins,
-projection and ordering as required by the operation. For example, a builder reads the clock once and
-creates a temporal specification from that instant; it resolves geometry through the selected provider
-and gives the geographic specification the resulting point and radius. The specification never receives
-the clock or provider.
+    public IQueryable<Order> Build(IQueryable<Order> source, ReadyOrdersParameters parameters)
+    {
+        var asOf = timeProvider.GetUtcNow();
+        IPredicateSpecification<Order> specification = new ReadyOrdersSpecification(parameters.Ids, asOf);
 
-Keep `Build` synchronous when it only composes an expression and uses synchronous dependencies. Inputs
-requiring I/O must be resolved through the owning asynchronous operation with cancellation before this
-composition; never block on a task inside `Build`. A service that executes a query and returns rows has an
-execution responsibility, and follows repository/application naming rather than claiming to only build.
+        return source.Where(specification.ToExpression())
+            .OrderBy(order => order.ReadyAt)
+            .ThenBy(order => order.Id);
+    }
+}
+```
 
-## Deferred execution stays inside data access
+This continues `efcore:specification`'s Order example. The injected builder reads the clock once, constructs
+fresh criteria, applies their expression and adds deterministic ordering with an id tie-breaker. `Where`
+is the query-application step here; use the selected shared evaluator when that API owns application.
+Reuse an existing shared builder interface when the product has one; no new generic framework is implied.
 
-Accept the source explicitly and preserve its EF provider. Do not call `ToList`, `AsEnumerable`, `Compile`
-or a terminal async method inside a composition-only builder. Do not turn fetched rows back into
-`IQueryable` to resemble the EF contract. Materialization belongs to the repository, while its context
-is alive, and the repository propagates cancellation to EF's terminal operation.
+Use `<Subject>QueryBuilder` / `Build(source, parameters)` for this composition-only collaborator. It is a
+house recommendation: the research found no universally accepted name for this exact DI role. Reserve
+[`IQueryProvider`](https://learn.microsoft.com/en-us/dotnet/api/system.linq.iqueryprovider) for LINQ provider
+infrastructure. `DI` describes how the service is constructed, not its responsibility or class name.
 
-The internal `IQueryable` return is intentional: it stays between data-access collaborators. An application
-service or HTTP caller receives the declared materialized result, not the query. Match the existing
-operation's tracking stance, projection, count semantics and page boundaries. Paging needs a deterministic
-ordering with a unique tie-breaker when the selected primary order can tie.
+The builder's query-building logic is reusable across calls. Each returned `IQueryable` is a new deferred,
+context-bound expression for that operation; never retain it, its source, request, specifications or resolved
+values in the service's fields. Preserve the EF provider: no `ToList`, `AsEnumerable`, compiled delegates,
+blocking I/O or terminal async operation inside `Build`. Resolve inputs requiring I/O in the owning async
+operation with cancellation before calling synchronous composition.
 
-## DI lifetime follows dependencies
+```csharp
+public sealed class OrderRepository
+{
+    private readonly OrderDbContext context;
+    private readonly OrderQueryBuilder queryBuilder;
 
-A builder stores dependencies only. It never stores the source query, request, specifications, current time,
-geometry or other operation state in fields between builds. Resolve keyed dependencies explicitly when
-the product selects them. Register only the builder and supporting services; remove leaf specification
-interfaces and registrations that existed only to inject parameterized rules.
+    public OrderRepository(OrderDbContext context, OrderQueryBuilder queryBuilder)
+    {
+        this.context = context;
+        this.queryBuilder = queryBuilder;
+    }
 
-A singleton builder is valid only when it is thread-safe and all dependencies are singleton-safe.
-It must not capture a scoped `DbContext`, tenant/request accessor or another scoped dependency. A builder
-that genuinely requires a scoped dependency is scoped. Passing a context-backed source to a stateless
-singleton method does not let the builder retain it, use it concurrently or outlive the owning operation.
-Use `dotnet:dependency-injection` for registration conventions.
+    public async Task<IReadOnlyList<Order>> GetReadyAsync(
+        ReadyOrdersParameters parameters, CancellationToken ct = default) =>
+        await queryBuilder.Build(context.Orders.AsNoTracking(), parameters)
+            .ToListAsync(ct).ConfigureAwait(false);
+}
+```
 
-## Naming evidence
+The repository supplies its live context's source and materializes the query with cancellation. The
+application receives rows; the deferred `IQueryable` stays inside data access (`efcore:persistence`).
+Preserve the operation's tracking, projection and count/page semantics when extending the builder.
 
-`QueryBuilder` / `Build` is a descriptive house convention, not a Microsoft-defined extension point.
-Microsoft calls the LINQ infrastructure [`IQueryProvider`](https://learn.microsoft.com/en-us/dotnet/api/system.linq.iqueryprovider);
-reserve that name for actual provider implementations. `Query` alone may mean a request, an expression
-or an executable operation, so it does not communicate this collaborator's composition-only role.
+```csharp
+public static class OrderServices
+{
+    public static IServiceCollection AddOrderQueries(
+        this IServiceCollection services, Action<DbContextOptionsBuilder> configureDatabase)
+    {
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<OrderQueryBuilder>();
+        services.AddDbContext<OrderDbContext>(configureDatabase);
+        services.AddScoped<OrderRepository>();
+        return services;
+    }
+}
+```
 
-[Microsoft explains deferred EF query execution](https://learn.microsoft.com/en-us/ef/core/querying/how-query-works)
-and [the short-lived, non-thread-safe DbContext](https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/).
-Those facts motivate the execution/lifetime boundary. [Ardalis's evaluator example](https://specification.ardalis.com/usage/use-specification-repository-pattern.html)
-demonstrates applying a description to a source without putting request resolution in the specification.
+`configureDatabase` supplies the application's selected EF provider. `AddDbContext` registers the context
+as scoped; the repository shares that scope. This builder can be singleton because it stores only the
+thread-safe singleton clock. A builder needing a scoped dependency is scoped instead. Never capture a
+scoped context, request/tenant accessor or a context-backed query in a singleton. Passing the source into
+`Build` does not permit retaining it or concurrently using the context. Register builders and dependencies,
+not leaf specifications; use `dotnet:dependency-injection` for registration conventions.
 
-Tommy, 2026-10-18: canonical query-building guidance accompanies the specification parameter-object
-convention under the EF Core namespace. The role name is chosen for what the service returns.
+[Microsoft documents deferred execution](https://learn.microsoft.com/en-us/ef/core/querying/how-query-works)
+and [short-lived, non-thread-safe contexts](https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/).
+Those facts establish the composition/execution boundary; [Ardalis's evaluator example](https://specification.ardalis.com/usage/use-specification-repository-pattern.html)
+illustrates applying criteria without placing service resolution inside them.
+
+Tommy, 2026-10-18: canonical EF query-building guidance accompanies constructor-bound specifications.
+The examples make the house role name, input ownership and DI lifetime concrete.
