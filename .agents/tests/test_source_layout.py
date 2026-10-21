@@ -29,6 +29,7 @@ CORE_MEMBERS = {
     "structure",
     "domain-design",
     "errors",
+    "explanation",
     "testing",
     "build",
     "libraries",

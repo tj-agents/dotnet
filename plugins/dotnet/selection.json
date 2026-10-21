@@ -14,6 +14,7 @@
       "comments",
       "domain-design",
       "errors",
+      "explanation",
       "fields",
       "libraries",
       "mapping",
@@ -341,6 +342,20 @@
       "provenance": [
         "library",
         "framework",
+        "house"
+      ]
+    },
+    {
+      "name": "explanation",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
         "house"
       ]
     },

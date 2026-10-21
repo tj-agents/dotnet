@@ -386,6 +386,8 @@ SNIPPETS: list[Snippet] = [
           ),
           footer="\n}\n"),
 
+    entry("explanation-01-quoting", "explanation/SKILL.md", 1, "infrastructure", "SnippetFixtures.Explanation01",
+          skip="`...` stands in for elided usings/body lines in an explanation quote; it is not valid C# syntax."),
     entry("proto-01-naming", "proto/SKILL.md", 1, "infrastructure", "SnippetFixtures.Proto01",
           skip="`(...)` is a literal ellipsis standing in for an elided parameter list and body; it is not valid C# syntax, so the contrast (proto-named vs domain-named payload) is illustrative only."),
     entry("proto-02-mappers", "proto/SKILL.md", 2, "infrastructure", "SnippetFixtures.Proto02",
