@@ -15,6 +15,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `errors-carriers` — contract — results — `.agents/dotnet/contract/errors/carriers/SKILL.md`
 - `errors-results` — contract — results — `.agents/dotnet/contract/errors/results/SKILL.md`
 - `errors-terminals` — contract — results — `.agents/dotnet/contract/errors/terminals/SKILL.md`
+- `explanation` — contract — core — `.agents/dotnet/contract/explanation/SKILL.md`
 - `fields` — contract — core — `.agents/dotnet/contract/fields/SKILL.md`
 - `http-api` — contract — aspnet — `.agents/dotnet/contract/http-api/SKILL.md`
 - `keyed-strategies` — contract — keyed-design — `.agents/dotnet/contract/keyed/strategies/SKILL.md`

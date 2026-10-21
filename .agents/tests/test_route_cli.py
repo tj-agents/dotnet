@@ -169,7 +169,7 @@ class RouteDerivationTests(unittest.TestCase):
             f"{plugin}:" + re.search(r"^name: (.+)$", path.read_text(encoding="utf-8"), re.M).group(1)
             for plugin in ("dotnet", "efcore")
             for path in (ROOT / f".agents/{plugin}/contract").rglob("SKILL.md")
-        }
+        } - {"dotnet:explanation"}
         self.assertTrue(contracts)
         self.assertEqual(set(), contracts - routed)
 

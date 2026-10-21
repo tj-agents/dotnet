@@ -11,6 +11,7 @@
 - `errors-carriers` — contract — results
 - `errors-results` — contract — results
 - `errors-terminals` — contract — results
+- `explanation` — contract — core
 - `fields` — contract — core
 - `http-api` — contract — aspnet
 - `keyed-strategies` — contract — keyed-design
