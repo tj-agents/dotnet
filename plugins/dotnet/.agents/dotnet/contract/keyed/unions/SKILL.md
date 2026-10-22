@@ -15,7 +15,7 @@ Owns the shape for behaviour that varies by a closed key when the variants have 
 
 ## Applicability
 
-This contract applies only to closed-key variants with different signatures. It requires `dunet`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to closed-key variants with different signatures. It requires `dunet`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 **When behaviour varies by a closed key and the variants do not share one signature**, resolve a *union* by
 key rather than a strategy. `dotnet:keyed-strategies` owns the other half; the two are different patterns sharing

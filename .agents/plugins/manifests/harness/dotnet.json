@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
-  "plugin": "dotagents/dotnet",
+  "plugin": "tj-agents/dotnet",
   "source_roots": [
     ".agents/dotnet"
   ],
   "requires": {
     "marketplaces": [
       {
-        "id": "dotagents",
-        "repository": "tj-agents/dotnet"
+        "id": "tj-agents",
+        "repository": "tj-agents/marketplace"
       }
     ],
     "plugins": [
-      "dotagents/dotnet"
+      "tj-agents/dotnet"
     ],
     "hooks": [],
     "permissions": {
@@ -29,35 +29,84 @@
       "codex_prefix_rules": [
         {
           "pattern": [
-            ["python", "python3"],
+            [
+              "python",
+              "python3"
+            ],
             "-B",
             "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py",
-            ["new", "options"]
+            [
+              "new",
+              "options"
+            ]
           ],
           "justification": "Runs only the packaged .NET scaffold entry point to resolve approved options or create a new selected single-service solution.",
           "match": [
-            ["python", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "new", "--name", "MyService", "--destination", "C:/source/repos"],
-            ["python3", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "options", "--preset", "web"]
+            [
+              "python",
+              "-B",
+              "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py",
+              "new",
+              "--name",
+              "MyService",
+              "--destination",
+              "C:/source/repos"
+            ],
+            [
+              "python3",
+              "-B",
+              "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py",
+              "options",
+              "--preset",
+              "web"
+            ]
           ],
           "not_match": [
-            ["python", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "new"],
-            ["python3", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"]
+            [
+              "python",
+              "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py",
+              "new"
+            ],
+            [
+              "python3",
+              "-B",
+              "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"
+            ]
           ]
         },
         {
           "pattern": [
-            ["python", "python3"],
+            [
+              "python",
+              "python3"
+            ],
             "-B",
             "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"
           ],
           "justification": "Runs only the packaged scaffold verification gate, including contract snippet compilation under the scaffold analyzers.",
           "match": [
-            ["python", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"],
-            ["python3", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"]
+            [
+              "python",
+              "-B",
+              "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"
+            ],
+            [
+              "python3",
+              "-B",
+              "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"
+            ]
           ],
           "not_match": [
-            ["python", "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"],
-            ["python", "-B", "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py", "new"]
+            [
+              "python",
+              "${PLUGIN_ROOT}/skills/scaffold/scripts/verify.py"
+            ],
+            [
+              "python",
+              "-B",
+              "${PLUGIN_ROOT}/skills/scaffold/scripts/scaffold.py",
+              "new"
+            ]
           ]
         }
       ]

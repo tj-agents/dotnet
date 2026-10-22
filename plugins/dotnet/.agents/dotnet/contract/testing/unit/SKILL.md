@@ -16,7 +16,7 @@ assertion library are owned by `dotnet:testing`.
 
 ## Applicability
 
-This contract applies only to projects using xUnit for deterministic core logic. It requires `xunit`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to projects using xUnit for deterministic core logic. It requires `xunit`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 ```csharp
 public sealed class InventoryTests

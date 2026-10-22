@@ -1,5 +1,4 @@
 {
-  "name": "dotagents",
   "interface": {
     "displayName": ".NET Agent Standards"
   }

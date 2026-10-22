@@ -15,7 +15,7 @@ Owns the HTTP contract shape — DTO vs Response, write-input `Request` records,
 
 ## Applicability
 
-This contract applies only to ASP.NET Core HTTP APIs. It requires `aspnet-core`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to ASP.NET Core HTTP APIs. It requires `aspnet-core`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 ## Services return DTOs; only the Api layer speaks HTTP
 

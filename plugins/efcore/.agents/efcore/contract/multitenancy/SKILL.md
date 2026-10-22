@@ -36,7 +36,7 @@ The predicate references the current context's tenant, not a tenant id frozen in
 
 ## Applicability
 
-This contract applies only to multi-tenant projects using EF Core. It requires `ef-core, multitenancy`. Installing `efcore@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to multi-tenant projects using EF Core. It requires `ef-core, multitenancy`. Installing `efcore@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 A product's concrete stance classes, their registration and its repository qualifier vocabulary belong to
 that product's standards.
