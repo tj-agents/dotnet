@@ -15,7 +15,7 @@ Owns proto/C# naming, mapper ownership, what may cross the wire, and client erro
 
 ## Applicability
 
-This contract applies only to services using gRPC and Protobuf. It requires `grpc, protobuf`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to services using gRPC and Protobuf. It requires `grpc, protobuf`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 Applies only to a service that actually owns or consumes a `.proto`. Protocol *selection* — whether a
 hop is gRPC at all — is a separate decision and is not this skill's concern.

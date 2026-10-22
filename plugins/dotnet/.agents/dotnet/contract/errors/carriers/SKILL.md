@@ -15,7 +15,7 @@ Owns choosing and composing the Reunion Result/Option carriers across a .NET ser
 
 ## Applicability
 
-This contract applies only to projects that select Reunion result and option carriers. It requires `reunion`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to projects that select Reunion result and option carriers. It requires `reunion`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 Reunion is the single carrier family: `Reunion` owns `Result`, `Result<TValue>`,
 `Result<TValue, TError>`, `UnitResult<TError>`, `Option<T>`, their named cases, and the composition,

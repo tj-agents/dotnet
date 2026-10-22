@@ -16,7 +16,7 @@ Owns the DDD building-block vocabulary — entity/value split, aggregate boundar
 ## Applicability
 
 This contract applies only to domain models designed with DDD building blocks. It requires
-`domain-model-architecture`. Installing `dotnet@dotagents` makes this guidance available; it does not
+`domain-model-architecture`. Installing `dotnet@tj-agents` makes this guidance available; it does not
 select that architecture for a consuming repository.
 
 ## An entity has identity; a value object has none

@@ -36,7 +36,7 @@ projection rows. This rule and this example require no EF Core storage API.
 
 ## Applicability
 
-This contract applies to .NET development and test seeders independently of their persistence library. It requires `seeding`. EF Core persistence details belong to `efcore:persistence`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies to .NET development and test seeders independently of their persistence library. It requires `seeding`. EF Core persistence details belong to `efcore:persistence`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 > ## ⚠ Read this before writing a seeder body
 >

@@ -15,7 +15,7 @@ Owns EF Core data-access practice: query surfaces, cancellation, table naming, c
 
 ## Applicability
 
-This contract applies only to projects using EF Core. It requires `ef-core`. Installing `efcore@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to projects using EF Core. It requires `ef-core`. Installing `efcore@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 `efcore:specification` owns parameterized criteria; `efcore:query-building` owns injected query composition.
 `dotnet:repositories` owns repository names, query and write verbs, storage return shapes and the boundary

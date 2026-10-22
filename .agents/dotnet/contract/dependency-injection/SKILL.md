@@ -15,7 +15,7 @@ Owns DI registration shape — interface-typed dependencies, composition roots a
 
 ## Applicability
 
-This contract applies only to projects using Microsoft.Extensions.DependencyInjection. It requires `microsoft-extensions-dependency-injection`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to projects using Microsoft.Extensions.DependencyInjection. It requires `microsoft-extensions-dependency-injection`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 Collaborator names follow `dotnet:naming-collaborators`.
 Registration composes those responsibilities; their names describe what they do.

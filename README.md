@@ -1,7 +1,7 @@
 # dotnet
 
-Generic .NET guidance for Claude Code and Codex, published as `dotnet@dotagents` and the optional `efcore@dotagents`.
-The canonical repository is [`tj-agents/dotnet`](https://github.com/tj-agents/dotnet); the marketplace ID remains `dotagents`.
+Generic .NET guidance for Claude Code and Codex, published as `dotnet@tj-agents` and the optional `efcore@tj-agents`.
+The canonical repository is [`tj-agents/dotnet`](https://github.com/tj-agents/dotnet); the marketplace ID remains `tj-agents`.
 
 ## Skills
 
