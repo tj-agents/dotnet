@@ -1,6 +1,6 @@
 ---
 name: domain-values
-description: The pattern for a small immutable value and its construction — defaulting to a reference record and choosing a `readonly record struct` for a single-field wrapper or only when its default is valid, it is not optional/nullable, and allocation volume matters, putting construction and the value's own behaviour on the type as a static `From`/`Create`/`TryGet…` rather than in helpers beside it, and the shape a `Try` method follows. Use when introducing a type to carry a value, when a method returns several related values, when deciding between a struct and a class for one, or when reviewing a `Try` signature.
+description: The pattern for a small immutable value and its construction — defaulting to a reference record and choosing a `readonly record struct` for a single-field wrapper or tuple-replacing private key, or only when its default is valid, it is not optional/nullable, and allocation volume matters, putting construction and the value's own behaviour on the type as a static `From`/`Create`/`TryGet…` rather than in helpers beside it, and the shape a `Try` method follows. Use when introducing a type to carry a value, when a method returns several related values, when deciding between a struct and a class for one, or when reviewing a `Try` signature.
 kind: contract
 domain: dotnet
 profile: patterns
@@ -20,8 +20,8 @@ This contract applies to every C#/.NET repository and has no application-stack p
 ## Struct or reference
 
 Default to a reference record, preferably a `sealed record`, for a small immutable value object or
-multi-value result. Use a `readonly record struct` for a single-field wrapper such as a strongly typed id,
-or when `default(T)` is genuinely valid, the value is under 16 bytes, not held as optional/nullable, and
+multi-value result. Use a `readonly record struct` for a single-field wrapper such as a strongly typed id
+or a private composite key standing in for a tuple, or when `default(T)` is genuinely valid, the value is under 16 bytes, not held as optional/nullable, and
 allocation volume matters (per item of a materialised collection or on a hot path). A reference-typed
 field makes `default` invalid: nullable analysis does not warn on `default`, `new()` or a struct array.
 Keep construction private when ordinary creation canonicalizes the value.
