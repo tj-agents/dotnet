@@ -410,7 +410,7 @@ SNIPPETS: list[Snippet] = [
           ),
           footer="\n    }\n}\n"),
     entry("domain-ddd-01-aggregate-root", "domain/ddd/SKILL.md", 1, "infrastructure", "SnippetFixtures.DomainDdd01",
-          header="internal enum OrderStatus { Placed, Shipped, Cancelled }\n\n"),
+          header="public enum OrderStatus { Placed, Shipped, Cancelled }\n\n"),
     entry("http-api-01-request-record", "http-api/SKILL.md", 1, "web", "SnippetFixtures.HttpApi01",
           header=(
               "using Microsoft.AspNetCore.Mvc;\n\n"

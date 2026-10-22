@@ -1,6 +1,6 @@
 namespace SnippetFixtures.DomainDdd01;
 
-internal enum OrderStatus { Placed, Shipped, Cancelled }
+public enum OrderStatus { Placed, Shipped, Cancelled }
 
 // snippet:begin
 public sealed class Order

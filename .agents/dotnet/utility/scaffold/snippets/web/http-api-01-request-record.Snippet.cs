@@ -20,8 +20,8 @@ public sealed record VenueRequest
 }
 
 [HttpPut("api/venue/{venueId:guid}")]
-public async Task<VenueDto> Update(Guid venueId, VenueRequest request, CancellationToken ct) =>
-    await venueService.UpdateAsync(venueId, request, ct);
+public Task<VenueDto> Update(Guid venueId, VenueRequest request, CancellationToken ct) =>
+    venueService.UpdateAsync(venueId, request, ct);
 // snippet:end
 
 }

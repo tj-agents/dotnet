@@ -58,8 +58,8 @@ public sealed record VenueRequest
 }
 
 [HttpPut("api/venue/{venueId:guid}")]
-public async Task<VenueDto> Update(Guid venueId, VenueRequest request, CancellationToken ct) =>
-    await venueService.UpdateAsync(venueId, request, ct);
+public Task<VenueDto> Update(Guid venueId, VenueRequest request, CancellationToken ct) =>
+    venueService.UpdateAsync(venueId, request, ct);
 ```
 
 Which validator shape a request gets, and whether it is auto-validated or injected, is the `validation`
