@@ -101,7 +101,7 @@ CARVED_TREE = {
     ("plans/skill-routes/PLAN.md", ""): {"engineering:plans"},
     ("reviews/Feature-SkillRoutes/REVIEW.md", ""): {"engineering:review-lifecycle"},
     ("AGENTS.md", ""): {"engineering:docs"},
-    ("TECH_DEBT.md", ""): {"engineering:write-debt"},
+    ("TECH_DEBT.md", ""): {"engineering:address-debt"},
     ("db/migrations/0001_init.sql", ""): set(),
     ("model/authorization-model.fga", ""): set(),
     (".github/workflows/ci.yml", ""): set(),
