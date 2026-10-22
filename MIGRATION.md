@@ -36,8 +36,8 @@ primary-constructor rules from `dotnet:style`; `messaging` takes the publisher a
 
 ## EF Core namespace
 
-EF Core-specific contracts now publish from `efcore@dotagents` in this repository. Its dependency on
-`dotnet@dotagents` retains generic C# conventions. Consumers using the central `tj-agents` marketplace
+EF Core-specific contracts now publish from `efcore@tj-agents` in this repository. Its dependency on
+`dotnet@tj-agents` retains generic C# conventions. Consumers using the central `tj-agents` marketplace
 select `efcore@tj-agents`; refresh their composed catalog/harness and generated route tables together.
 No old-name forwarding skills remain.
 

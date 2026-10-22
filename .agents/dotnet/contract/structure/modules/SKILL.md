@@ -15,7 +15,7 @@ Owns module/library layering, visibility, folder naming and cross-module rules.
 
 ## Applicability
 
-This contract applies only to modular service or layered shared-library architecture. It requires `modular-service-architecture`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to modular service or layered shared-library architecture. It requires `modular-service-architecture`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 Applies to **modules** (a unit of audience-facing functionality) and to **shared libraries** that are not tied
 to one module's data. Same layering rules; the only difference is that a shared library is consumed by several

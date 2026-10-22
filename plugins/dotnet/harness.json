@@ -1,22 +1,18 @@
 {
   "schema_version": 1,
-  "plugin": "dotagents/dotnet",
+  "plugin": "tj-agents/dotnet",
   "source_roots": [
     ".agents/dotnet"
   ],
   "requires": {
     "marketplaces": [
       {
-        "id": "dotagents",
-        "repository": "tj-agents/dotnet"
-      },
-      {
         "id": "tj-agents",
         "repository": "tj-agents/marketplace"
       }
     ],
     "plugins": [
-      "dotagents/dotnet",
+      "tj-agents/dotnet",
       "tj-agents/base",
       "tj-agents/engineering",
       "tj-agents/machine"

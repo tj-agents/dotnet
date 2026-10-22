@@ -15,7 +15,7 @@ Owns how a domain event is raised, dispatched at save, and translated into a pub
 
 ## Applicability
 
-This contract applies to domain models raising and dispatching in-process events. It requires `domain-events`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies to domain models raising and dispatching in-process events. It requires `domain-events`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 A domain method that changes state never calls a bus, a notifier, or another module. It **raises** a
 domain event on the entity; the persistence layer dispatches it when the change is saved. Two things

@@ -15,7 +15,7 @@ Owns what a .NET service may depend on, how services talk, and the protocol deci
 
 ## Applicability
 
-This contract applies only to distributed services. It requires `distributed-service-architecture`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to distributed services. It requires `distributed-service-architecture`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 ## Two kinds of service, two rules
 
@@ -63,6 +63,10 @@ your control dictates the wire format.
 - Service-to-service auth is a `client_credentials` bearer token on the call metadata, from the same token
   service the rest of the platform uses.
 - **Do not use gRPC-Web to reach a service from a browser.** Frontends go through that service's HTTP edge.
+
+```csharp
+services.AddGrpcClient<Proto.Escrow.EscrowClient>(options => options.Address = new Uri("https://escrow"));
+```
 
 ## Message-bus subscription
 

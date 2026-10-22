@@ -15,7 +15,7 @@ Owns the project's `Log.cs` — source-generated `[LoggerMessage]` methods and t
 
 ## Applicability
 
-This contract applies only to projects using Microsoft.Extensions.Logging. It requires `microsoft-extensions-logging`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to projects using Microsoft.Extensions.Logging. It requires `microsoft-extensions-logging`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 ## Every message is a source-generated `[LoggerMessage]` method
 

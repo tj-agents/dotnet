@@ -15,7 +15,7 @@ from string import Template
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
 
-PACKAGE = "dotagents/dotnet"
+PACKAGE = "tj-agents/dotnet"
 SKILL = "dotnet:scaffold"
 VERSION = "0.1.0"
 ROOT = Path(__file__).resolve().parent.parent

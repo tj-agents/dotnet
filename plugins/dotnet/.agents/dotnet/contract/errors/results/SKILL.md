@@ -15,7 +15,7 @@ Owns the shape of a typed, operation-owned application error union and its publi
 
 ## Applicability
 
-This contract applies only to projects that select Reunion errors and Dunet unions. It requires `reunion, dunet`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to projects that select Reunion errors and Dunet unions. It requires `reunion, dunet`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 Every `TError` is a **closed, operation-owned `XError` union implementing `IError`**. Give every expected
 outcome a natural named case, including cases with no payload. Callers match those cases; they never

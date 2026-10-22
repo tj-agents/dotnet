@@ -15,7 +15,7 @@ Owns input-shape vs domain-eligibility validation, invocation and composing vali
 
 ## Applicability
 
-This contract applies only to projects using FluentValidation and Reunion validation results. It requires `fluentvalidation, reunion`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to projects using FluentValidation and Reunion validation results. It requires `fluentvalidation, reunion`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 Two different jobs, two different tools. Picking the wrong one produces either a hand-rolled worse
 `MaximumLength`, or validation that silently runs twice.

@@ -1,26 +1,22 @@
 {
   "schema_version": 1,
-  "plugin": "dotagents/efcore",
+  "plugin": "tj-agents/efcore",
   "source_roots": [
     ".agents/efcore"
   ],
   "requires": {
     "marketplaces": [
       {
-        "id": "dotagents",
-        "repository": "tj-agents/dotnet"
-      },
-      {
         "id": "tj-agents",
         "repository": "tj-agents/marketplace"
       }
     ],
     "plugins": [
-      "dotagents/efcore",
+      "tj-agents/efcore",
       "tj-agents/base",
       "tj-agents/engineering",
       "tj-agents/machine",
-      "dotagents/dotnet"
+      "tj-agents/dotnet"
     ],
     "hooks": [],
     "permissions": {

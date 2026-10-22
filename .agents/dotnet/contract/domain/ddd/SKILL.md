@@ -16,7 +16,7 @@ Owns the DDD building-block vocabulary — entity/value split, aggregate boundar
 ## Applicability
 
 This contract applies only to domain models designed with DDD building blocks. It requires
-`domain-model-architecture`. Installing `dotnet@dotagents` makes this guidance available; it does not
+`domain-model-architecture`. Installing `dotnet@tj-agents` makes this guidance available; it does not
 select that architecture for a consuming repository.
 
 ## An entity has identity; a value object has none
@@ -43,6 +43,22 @@ or a domain event that should carry the second half of the work instead.
 
 Put an invariant on the aggregate that owns every field it constrains. A rule that reads two aggregates'
 state to validate one of them has no single owner and drifts the moment either changes independently.
+
+```csharp
+public sealed class Order
+{
+    public Guid Id { get; }
+    public Guid CustomerId { get; }
+    public OrderStatus Status { get; private set; }
+
+    public void Cancel()
+    {
+        if (Status == OrderStatus.Shipped)
+            throw new InvalidOperationException("A shipped order cannot be cancelled.");
+        Status = OrderStatus.Cancelled;
+    }
+}
+```
 
 ## Domain services own business operations without a natural entity or value owner
 

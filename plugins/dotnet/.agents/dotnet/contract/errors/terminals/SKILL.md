@@ -15,7 +15,7 @@ Owns turning a Result or Option into a response at the one boundary that termina
 
 ## Applicability
 
-This contract applies only to ASP.NET Core or worker/RPC edges using Reunion carriers. It requires `reunion, aspnet-core-or-worker-rpc`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to ASP.NET Core or worker/RPC edges using Reunion carriers. It requires `reunion, aspnet-core-or-worker-rpc`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 A Result is in-process vocabulary; a terminal is the one place it becomes a response. Map **only** at the
 controller, endpoint, worker, or RPC-server boundary — never halfway down the call stack.
