@@ -85,7 +85,6 @@ def routes(kind: str) -> dict:
         {"path": r"^plans/", "skills": ["engineering:plans"]},
         {"path": r"^reviews/", "skills": ["engineering:review-lifecycle"]},
         {"path": r"(^|/)(AGENTS|CLAUDE)\.md$", "skills": ["engineering:docs"]},
-        {"path": r"(^|/)TECH_DEBT\.md$", "skills": ["engineering:address-debt"]},
         {"path": CS_PATH, "skills": ["dotnet:style", "dotnet:naming", "dotnet:fields"]},
         {"path": COMMENTS_CS_PATH, "content_requires": COMMENTS_CONTENT, "skills": ["dotnet:comments"]},
         {"path": BUILD_PATH, "skills": ["dotnet:build", "dotnet:libraries", "dotnet:structure"]},

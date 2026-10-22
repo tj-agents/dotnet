@@ -64,6 +64,10 @@ your control dictates the wire format.
   service the rest of the platform uses.
 - **Do not use gRPC-Web to reach a service from a browser.** Frontends go through that service's HTTP edge.
 
+```csharp
+services.AddGrpcClient<Proto.Escrow.EscrowClient>(options => options.Address = new Uri("https://escrow"));
+```
+
 ## Message-bus subscription
 
 Pumping a broker subscription and handing each message to its handler is `dotnet:messaging`.
