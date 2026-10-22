@@ -15,7 +15,7 @@ Owns the HTTP contract shape — DTO vs Response, write-input `Request` records,
 
 ## Applicability
 
-This contract applies only to ASP.NET Core HTTP APIs. It requires `aspnet-core`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to ASP.NET Core HTTP APIs. It requires `aspnet-core`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 ## Services return DTOs; only the Api layer speaks HTTP
 
@@ -49,6 +49,18 @@ parameter, not from the body. Request records use `{ get; init; }`.
 
 Where create and update accept the identical writable shape, share **one** `XRequest` rather than duplicating
 `CreateXRequest`/`UpdateXRequest`; split them the moment the contracts diverge.
+
+```csharp
+public sealed record VenueRequest
+{
+    public required string Name { get; init; }
+    public required int Capacity { get; init; }
+}
+
+[HttpPut("api/venue/{venueId:guid}")]
+public Task<VenueDto> Update(Guid venueId, VenueRequest request, CancellationToken ct) =>
+    venueService.UpdateAsync(venueId, request, ct);
+```
 
 Which validator shape a request gets, and whether it is auto-validated or injected, is the `validation`
 skill's subject.

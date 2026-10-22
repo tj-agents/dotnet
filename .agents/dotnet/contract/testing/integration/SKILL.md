@@ -16,7 +16,7 @@ the assertion library are owned by `dotnet:testing`.
 
 ## Applicability
 
-This contract applies only to ASP.NET Core integration suites with a real database reset between tests. It requires `aspnet-core, xunit, testcontainers, respawn`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to ASP.NET Core integration suites with a real database reset between tests. It requires `aspnet-core, xunit, testcontainers, respawn`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 ```csharp
 [Collection(IntegrationCollection.Name)]

@@ -25,7 +25,7 @@ Installing these standards alone does not select this package.
 
 ## Applicability
 
-This contract applies only to repositories that explicitly select Tommy's full application stack. It requires `selected-stack-profile`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to repositories that explicitly select Tommy's full application stack. It requires `selected-stack-profile`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 **One library per job.** A second library for a job an existing one already does is the violation, even
 when the newcomer is better in isolation — two answers to one question is what makes a solution

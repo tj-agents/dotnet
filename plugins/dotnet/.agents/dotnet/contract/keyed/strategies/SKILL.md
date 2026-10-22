@@ -15,7 +15,7 @@ Owns the shape for behaviour that varies by a closed key through keyed dependenc
 
 ## Applicability
 
-This contract applies only to closed-key behaviour selected through keyed dependency injection. It requires `microsoft-extensions-dependency-injection`. Installing `dotnet@dotagents` makes this guidance available; it does not select those technologies for a consuming repository.
+This contract applies only to closed-key behaviour selected through keyed dependency injection. It requires `microsoft-extensions-dependency-injection`. Installing `dotnet@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
 **When behaviour varies by a closed key**, declare every strategy family vertically at the owning module's
 composition root. A module-local generic factory owns keyed resolution; operation-specific facades delegate

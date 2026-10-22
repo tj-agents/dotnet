@@ -1,5 +1,5 @@
 {
-  "name": "dotagents",
+  "name": "tj-agents",
   "description": "Generic .NET guidance, distributed as load-on-demand skills with explicit stack and test-tier applicability. React and TypeScript guidance is published separately by tj-agents/react.",
   "owner": {
     "name": "Tommy Seery"
@@ -30,8 +30,5 @@
         "query-builder"
       ]
     }
-  ],
-  "allowCrossMarketplaceDependenciesOn": [
-    "tj-agents"
   ]
 }
