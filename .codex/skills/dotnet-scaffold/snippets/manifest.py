@@ -409,4 +409,22 @@ SNIPPETS: list[Snippet] = [
               "internal static class Example\n{\n    public static void Register(IServiceCollection services, string address)\n    {\n"
           ),
           footer="\n    }\n}\n"),
+    entry("domain-ddd-01-aggregate-root", "domain/ddd/SKILL.md", 1, "infrastructure", "SnippetFixtures.DomainDdd01",
+          header="internal enum OrderStatus { Placed, Shipped, Cancelled }\n\n"),
+    entry("http-api-01-request-record", "http-api/SKILL.md", 1, "web", "SnippetFixtures.HttpApi01",
+          header=(
+              "using Microsoft.AspNetCore.Mvc;\n\n"
+              "internal sealed record VenueDto(Guid Id, string Name, int Capacity);\n\n"
+              "internal interface IVenueService\n{\n"
+              "    Task<VenueDto> UpdateAsync(Guid venueId, VenueController.VenueRequest request, CancellationToken ct);\n}\n\n"
+              "[ApiController]\n"
+              "internal sealed class VenueController(IVenueService venueService) : ControllerBase\n{\n"
+          ),
+          footer="\n}\n"),
+    entry("microservice-boundaries-01-grpc-client", "microservice/boundaries/SKILL.md", 1, "infrastructure", "SnippetFixtures.MicroserviceBoundaries01",
+          header=(
+              "using Grpc.Net.ClientFactory;\nusing Microsoft.Extensions.DependencyInjection;\n\n"
+              "internal static class Example\n{\n    public static void Register(IServiceCollection services)\n    {\n"
+          ),
+          footer="\n    }\n}\n"),
 ]
