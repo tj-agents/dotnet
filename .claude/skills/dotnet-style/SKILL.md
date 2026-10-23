@@ -1,6 +1,6 @@
 ---
 name: style
-description: General C# style defaults — enforceable rules live in `.editorconfig`, an enum is a genuine closed choice, a plain null check on a variable, `null!` rather than `string.Empty` for populated-later members, brace and empty-block shape, and when an optional parameter has stopped paying for itself. Use when writing or reviewing any C# type, adding a parameter to an existing signature, or deciding whether a style rule belongs in prose or in `.editorconfig`.
+description: General C# style — enforceable rules live in `.editorconfig`, an enum is a genuine closed choice, a plain null check on a variable, `null!` rather than `string.Empty` for populated-later members, brace and empty-block shape, and when an optional parameter has stopped paying for itself. Use when writing or reviewing any C# type, adding a parameter to an existing signature, or deciding whether a style rule belongs in prose or in `.editorconfig`.
 kind: contract
 domain: dotnet
 profile: core

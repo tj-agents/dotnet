@@ -25,8 +25,7 @@ The additional persistence owner applies when EF Core is selected; repository na
 
 ## Applicability and ownership
 
-These conventions apply to C# independently of an application stack; the tier gate's
-codebase-conventions rule decides where a codebase's own way wins. The table selects the additional
+These conventions apply to C# independently of an application stack. The table selects the additional
 owner for the task at hand; load the relevant owner when its concern and prerequisites apply.
 
 | Task | Naming owner |
