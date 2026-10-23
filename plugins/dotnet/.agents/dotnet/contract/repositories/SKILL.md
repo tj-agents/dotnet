@@ -72,9 +72,8 @@ predicate; spell out component names when they distinguish different queries.
 Repositories own storage queries, filtering, projection, persistence and the locks/enlistment supporting
 those operations. Returned shape names follow `dotnet:dtos`.
 
-Application selection, resolution rules and the interpretation of several persisted inputs belong to
-the appropriate collaborator under `dotnet:naming-collaborators`.
-That collaborator consumes repository queries and exposes its own operation and returned outcomes.
+Application selection, resolution rules and the interpretation of several persisted inputs belong to an
+application collaborator, which consumes repository queries and exposes its own operation and outcomes.
 A project location named Infrastructure can contain implementations on both sides of this boundary.
 
 Repository single-row absence remains nullable. The consuming application boundary converts that

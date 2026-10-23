@@ -55,8 +55,7 @@ equivalent.
 
 Use `XValidator` for the assessed subject or request: `PlaceOrderRequestValidator`, `OrderValidator`.
 Each top-level type has its matching file, following
-`dotnet:naming`. The collaborator role is defined by
-`dotnet:naming-collaborators`.
+`dotnet:naming`.
 
 | Validation responsibility | Operation | Result owner |
 |---|---|---|

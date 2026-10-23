@@ -333,10 +333,9 @@ SNIPPETS: list[Snippet] = [
     entry("testing-e2e-01-clock", "testing/e2e/SKILL.md", 1, "e2e-tests", "SnippetFixtures.TestingE2E01",
           header=""),
 
+    entry("unit-of-work-01-contract", "unit-of-work/SKILL.md", 1, "infrastructure", "SnippetFixtures.UnitOfWork01"),
     entry("repositories-01-contract", "repositories/SKILL.md", 1, "infrastructure", "SnippetFixtures.Repositories01",
           header="public sealed record Order(Guid Id);\n\n"),
-    entry("naming-collaborators-01-query-builder", "naming/collaborators/SKILL.md", 1, "infrastructure", "SnippetFixtures.NamingCollaborators01",
-          header="using SnippetFixtures.EfQueryPatterns;\n\n"),
     entry("seeding-02-event-path", "seeding/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding02",
           header=(
               "public sealed record OrderCreatedEvent(Guid Id) : IIntegrationEvent;\n\n"

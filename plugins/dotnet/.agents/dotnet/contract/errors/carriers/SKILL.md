@@ -61,8 +61,7 @@ The exposed responsibility and caller decisions select the carrier. A project or
 Infrastructure can implement both persistence and application collaborators. Repository/provider lookups
 return `T?`; application resolver, service, domain, module-facade and published client contracts expose
 intentional present-or-absent outcomes as `Option<T>`. Moving an operation across that boundary includes
-its return contract and all observers. The role and method are selected by
-`dotnet:naming-collaborators`. Commands
+its return contract and all observers. Commands
 and queries with named rejections use a Result. A guaranteed value stays a plain value, and an optional
 property on a DTO stays nullable rather than wrapping each field in an Option — converted once at that
 boundary, and grouped so values sharing a lifetime become one nullable value object rather than several

@@ -8,7 +8,7 @@ The canonical repository is [`tj-agents/dotnet`](https://github.com/tj-agents/do
 Families are folders, family first; a skill's name is its folder path joined by hyphens.
 
 - Knowledge: `dotnet:learning`, `dotnet:knowledge`, `dotnet:direction`.
-- Naming: `dotnet:naming`, `dotnet:naming-collaborators`, `dotnet:dtos`.
+- Naming: `dotnet:naming`, `dotnet:dtos`.
 - Style: `dotnet:style`, `dotnet:fields`, `dotnet:comments`.
 - Structure: `dotnet:structure`, `dotnet:structure-modules`.
 - Domain: `dotnet:domain-design`, `dotnet:domain-ddd`, `dotnet:domain-values`, `dotnet:domain-events`.
@@ -17,17 +17,15 @@ Families are folders, family first; a skill's name is its folder path joined by 
 - Libraries: `dotnet:libraries`, `dotnet:libraries-selected`.
 - Keyed: `dotnet:keyed-strategies`, `dotnet:keyed-unions`.
 - Other contracts: `dotnet:build`, `dotnet:dependency-injection`, `dotnet:http-api`, `dotnet:logging`,
-  `dotnet:mapping`, `dotnet:messaging`, `dotnet:microservice-boundaries`, `dotnet:proto`, `dotnet:repositories`, `dotnet:seeding`, `dotnet:validation`.
+  `dotnet:mapping`, `dotnet:messaging`, `dotnet:microservice-boundaries`, `dotnet:proto`, `dotnet:repositories`, `dotnet:seeding`, `dotnet:unit-of-work`, `dotnet:validation`.
 - EF Core: `efcore:persistence`, `efcore:multitenancy`, `efcore:specification`, `efcore:query-building`,
   `efcore:event-dispatch`. Install this plugin only for EF Core projects; it depends on `dotnet`.
 - Operations: `dotnet:debug-integration`, `dotnet:debug-e2e`, `dotnet:debug-e2e-api`, `dotnet:debug-e2e-ui`.
 - Utilities: `dotnet:scaffold`.
 
-Renamed skills are listed in [MIGRATION.md](MIGRATION.md).
-
 ## Applicability
 
-The `core` profile holds only the family hubs and the naming/style family: no application-stack
+The `core` profile holds only the family hubs and the naming and style skills: no application-stack
 prerequisite. Each required hub's family members — DDD, value semantics, domain events, EF Core
 persistence, Reunion results and errors, ASP.NET Core, multitenancy, distributed services, every testing
 tier, and Tommy's selected full application stack — are independent profiles with their own prerequisite.

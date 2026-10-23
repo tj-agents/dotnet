@@ -17,8 +17,8 @@ Owns the integration-event publisher role and the processor that pumps a broker 
 
 This contract applies to services that publish or consume integration events through a message broker.
 `dotnet:domain-events` owns the domain-event/integration-event boundary and the pre-commit translation,
-including broker events consumed by the same service's own worker. Reacting to a message is the Handler
-role in `dotnet:naming-collaborators`.
+including broker events consumed by the same service's own worker. The class reacting to a message is its
+`<Event>Handler`.
 
 ## Publish through the one generic publisher
 

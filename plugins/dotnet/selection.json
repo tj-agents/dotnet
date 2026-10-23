@@ -20,11 +20,11 @@
       "libraries",
       "mapping",
       "naming",
-      "naming-collaborators",
       "repositories",
       "structure",
       "style",
-      "testing"
+      "testing",
+      "unit-of-work"
     ],
     "distributed-services": [
       "messaging",
@@ -566,21 +566,6 @@
       ]
     },
     {
-      "name": "naming-collaborators",
-      "kind": "contract",
-      "profile": "core",
-      "applicability": [
-        "all C# and .NET code"
-      ],
-      "requires": [
-        "none"
-      ],
-      "provenance": [
-        "language",
-        "house"
-      ]
-    },
-    {
       "name": "proto",
       "kind": "contract",
       "profile": "distributed-services",
@@ -774,6 +759,22 @@
       ],
       "provenance": [
         "library",
+        "house"
+      ]
+    },
+    {
+      "name": "unit-of-work",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "C# projects that persist state",
+        "regardless of persistence library"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "pattern",
         "house"
       ]
     },
