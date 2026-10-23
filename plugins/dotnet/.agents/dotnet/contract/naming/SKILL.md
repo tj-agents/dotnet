@@ -1,6 +1,6 @@
 ---
 name: naming
-description: Generic C# identifier naming — every field, parameter and local named for what it holds (`IUserService userService`), casing and affixes, nouns for types and verbs for methods, interface/implementation pairs, role nouns matching their verb, one subject word per concept, booleans and namespace-aware type names. Use when naming or reviewing any C# type, member, field, parameter or local.
+description: Generic C# identifier naming — every field, parameter and local named for what it holds (`IUserService userService`), casing and affixes, nouns for types and verbs for methods, interface/implementation pairs, the pattern words (`Factory`, `Builder`, `Provider`, `Accessor`, `Resolver`, `Registry`, `Policy`), one subject word per concept, booleans and namespace-aware type names. Use when naming or reviewing any C# type, member, field, parameter or local.
 kind: contract
 domain: dotnet
 profile: core
@@ -12,7 +12,7 @@ provenance: language, house
 # C# naming
 
 Owns every naming rule that holds for a C# identifier whatever its concern. A concern's own vocabulary —
-collaborator roles, data shapes, repository verbs, events, errors, tests, transports, projects — lives with
+data shapes, persistence, validation, messaging, events, errors, tests, transports, projects — lives with
 that concern's skill and loads through its route.
 
 ## Name every variable for what it holds
@@ -24,6 +24,7 @@ private readonly IUserService userService;
 A field, parameter or local holding a collaborator takes that collaborator's subject and role,
 without the `I`. A value takes its meaning rather than its type: `recipientEmail`. Source:
 [Microsoft, naming parameters](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/naming-parameters).
+
 ## Casing and affixes follow the ecosystem
 
 Per [Microsoft's identifier names](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/identifier-names):
@@ -46,10 +47,26 @@ Capability interfaces name the capability, such as `IDisposable` or `IPausable`;
 their own subject and responsibility, such as `HostPauser`. Qualify an implementation only when callers
 distinguish a real alternative.
 
+## Pattern words
+
+| Word | Use when the class |
+|---|---|
+| `Factory` | Returns a new, ready instance from one call |
+| `Builder` | Is configured across several calls, then produces its result once |
+| `Provider` | Is one pluggable implementation supplying a value or capability, with no selection of its own |
+| `Accessor` | Exposes a value another component stored |
+| `Resolver` | Turns a reference — a name, key or type — into the thing it denotes by rules; finding nothing is a valid answer |
+| `Registry` | Holds a keyed collection filled at startup and looked up by key |
+| `Policy` | Is a side-effect-free rule a mechanism consults |
+
+A class that fits none takes the agent noun of what it does. Sources: .NET's `IHttpClientFactory`,
+`WebApplicationBuilder`, `TimeProvider`, `IHttpContextAccessor`, `IJsonTypeInfoResolver`, `AuthorizationPolicy`;
+Polly's `ResiliencePipelineRegistry`.
+
 ## One word per concept
 
 Reuse the established word for the same concept within its bounded context, with its exact plurality, across
-every sibling: `OrderResolver` beside `IOrderRepository`, never `OrdersResolver`. A distinct word expresses a
+every sibling: `OrderResolver` beside `IOrderRepository`. A distinct word expresses a
 distinct meaning or contract. Read the declaration, implementation and callers together, and establish a new
 type's responsibility before naming it. A rename never changes the architecture: a repository capability,
 transaction or registration keeps its semantics.
@@ -57,9 +74,8 @@ transaction or registration keeps its semantics.
 ## Use the containing namespace when naming a type
 
 Read a proposed type name with its namespace and existing responsibility owner. Add a subject or qualifier
-when it names a domain concept, responsibility, contract or real distinction. Do not add a module, layer,
-product or default-scope prefix merely to repeat its containing namespace or make the simple name globally
-unique. For example, `Billing.IntegrationTests.ApiFixture` is clear without `BillingApiFixture`;
+only when it names a domain concept, responsibility, contract or real distinction; the namespace already
+supplies module, layer and product. For example, `Billing.IntegrationTests.ApiFixture` is clear without `BillingApiFixture`;
 `OrderRepository` still names the repository's subject and role.
 
 Apply the same rule to fixtures, test types and names proposed in code or plan snippets. Preserve

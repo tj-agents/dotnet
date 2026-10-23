@@ -185,7 +185,6 @@
     {
       "path": "(?i:(publisher|consumer|handler)s?\\.cs$)",
       "skills": [
-        "dotnet:naming-collaborators",
         "dotnet:domain-events"
       ]
     },
@@ -210,9 +209,16 @@
       ]
     },
     {
-      "path": "(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|querybuilder|committer)s?\\.cs$)",
+      "path": "(?i:unitofworks?\\.cs$)",
       "skills": [
-        "dotnet:naming-collaborators"
+        "dotnet:unit-of-work"
+      ]
+    },
+    {
+      "path": "(?i:\\.cs$)(?#unit-of-work)",
+      "content_requires": "(?i:\\biunitofwork\\b)",
+      "skills": [
+        "dotnet:unit-of-work"
       ]
     },
     {

@@ -1,6 +1,6 @@
 ---
 name: naming
-description: Generic C# identifier naming — every field, parameter and local named for what it holds (`IUserService userService`), casing and affixes, nouns for types and verbs for methods, interface/implementation pairs, role nouns matching their verb, one subject word per concept, booleans and namespace-aware type names. Use when naming or reviewing any C# type, member, field, parameter or local.
+description: Generic C# identifier naming — every field, parameter and local named for what it holds (`IUserService userService`), casing and affixes, nouns for types and verbs for methods, interface/implementation pairs, the pattern words (`Factory`, `Builder`, `Provider`, `Accessor`, `Resolver`, `Registry`, `Policy`), one subject word per concept, booleans and namespace-aware type names. Use when naming or reviewing any C# type, member, field, parameter or local.
 kind: contract
 domain: dotnet
 profile: core

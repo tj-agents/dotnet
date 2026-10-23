@@ -56,7 +56,8 @@ COMMENTS_CONTENT = r"(?m:^[ \t]*//)"
 EXTENSIONS_PATH = r"(?i:extensions?\.cs$)"
 DEPENDENCY_INJECTION_CS_PATH = r"(?i:(\.c)s$)"
 DEPENDENCY_INJECTION_CONTENT = r"(?i:\biservicecollection\b|\.add(scoped|singleton|transient)\b)"
-COLLABORATOR_PATH = r"(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|querybuilder|committer)s?\.cs$)"
+UNIT_OF_WORK_PATH = r"(?i:unitofworks?\.cs$)"
+UNIT_OF_WORK_CONTENT = r"(?i:\biunitofwork\b)"
 SPECIFICATION_PATH = r"(?i:specifications?\.cs$)"
 QUERY_BUILDER_PATH = r"(?i:querybuilders?\.cs$)"
 EF_PERSISTENCE_CONTENT = r"(?i:\b(dbcontext|dbset|savechangesasync|savechangesinterceptor)\b|microsoft\.entityframeworkcore|\.(tolistasync|singleordefaultasync|asnotracking)\()"
@@ -128,11 +129,12 @@ def routes(kind: str) -> dict:
         {"path": SEEDING_PATH, "skills": ["dotnet:seeding"]},
         {"path": PROTO_PATH, "skills": ["dotnet:proto"]},
         {"path": DOMAIN_EVENTS_CS_PATH, "content_requires": DOMAIN_EVENTS_CONTENT, "skills": ["dotnet:domain-events"]},
-        {"path": PUBLISHER_CONSUMER_PATH, "skills": ["dotnet:naming-collaborators", "dotnet:domain-events"]},
+        {"path": PUBLISHER_CONSUMER_PATH, "skills": ["dotnet:domain-events"]},
         {"path": MESSAGING_PATH, "skills": ["dotnet:messaging"]},
         {"path": MESSAGING_CS_PATH, "content_requires": MESSAGING_CONTENT, "skills": ["dotnet:messaging"]},
         {"path": DEPENDENCY_INJECTION_CS_PATH, "content_requires": DEPENDENCY_INJECTION_CONTENT, "skills": ["dotnet:dependency-injection"]},
-        {"path": COLLABORATOR_PATH, "skills": ["dotnet:naming-collaborators"]},
+        {"path": UNIT_OF_WORK_PATH, "skills": ["dotnet:unit-of-work"]},
+        {"path": cs_content_path("unit-of-work"), "content_requires": UNIT_OF_WORK_CONTENT, "skills": ["dotnet:unit-of-work"]},
         {"path": cs_content_path("domain-ddd"), "content_requires": DDD_CONTENT, "skills": ["dotnet:domain-ddd"]},
         {"path": cs_content_path("domain-values"), "content_requires": VALUES_CONTENT, "skills": ["dotnet:domain-values"]},
         {"path": cs_content_path("errors-carriers"), "content_requires": CARRIERS_CONTENT, "skills": ["dotnet:errors-carriers"]},

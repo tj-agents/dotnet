@@ -45,8 +45,7 @@ copying discipline as collections. Keep captured criteria private/get-only.
 Compose predicates with the selected shared `And`, `Or` and `Not` API, which rebinds expression parameters.
 Do not compile predicates to delegates or introduce invocation nodes the selected EF provider cannot
 translate. The evaluator applies the description; it does not resolve request inputs. A library's
-`SpecificationEvaluator` names this query adapter, distinct from an application verdict evaluator under
-`dotnet:naming-collaborators`.
+`SpecificationEvaluator` names this query adapter.
 
 A predicate-only model leaves includes, projection and ordering with the query builder. A selected richer
 library may describe them in its specification. Preserve declared null/empty semantics: an omitted optional
