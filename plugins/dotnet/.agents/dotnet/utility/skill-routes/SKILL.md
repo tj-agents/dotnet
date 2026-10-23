@@ -23,7 +23,13 @@ python scripts/gen_skill_routes.py --kind dotnet-service --into <repo> --check
 python scripts/gen_skill_routes.py --kind efcore-service --into <ef-core-repo>
 python scripts/gen_skill_routes.py --emit-registry <dir>                    # registry.json + one table per kind
 python scripts/gen_skill_routes.py --emit-registry <dir> --check
+python scripts/gen_skill_routes.py --emit-tiers <dotnet-repo>              # routes in .agents/tiers/*.json
+python scripts/gen_skill_routes.py --emit-tiers <dotnet-repo> --check
 ```
+
+The `routes` in the shipped `dotnet` and `efcore` tier declarations are what gate a repository with no
+table of its own, so every repository the tier detects is gated without a per-repository step. Rerun
+`--emit-tiers` after changing a row.
 
 The `--into` table is the mechanism the router resolves today; the emitted registry becomes live only
 once a routes directory ships beside the installed router. Adding a consumer repo is one `REGISTRY`

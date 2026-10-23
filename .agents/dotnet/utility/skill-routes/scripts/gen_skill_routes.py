@@ -145,6 +145,29 @@ def routes(kind: str) -> dict:
     }
 
 
+TIER_LAYERS = {"dotnet": ("dotnet-service", "dotnet:"), "efcore": ("efcore-service", "efcore:")}
+
+
+def tier_routes(tier: str) -> list[dict]:
+    kind, prefix = TIER_LAYERS[tier]
+    rows = []
+    for row in routes(kind)["routes"]:
+        skills = [skill for skill in row["skills"] if skill.startswith(prefix)]
+        if skills:
+            rows.append({**row, "skills": skills})
+    return rows
+
+
+def tier_files(root: Path) -> dict[Path, str]:
+    files = {}
+    for tier in TIER_LAYERS:
+        path = root / ".agents" / "tiers" / f"{tier}.json"
+        declaration = json.loads(path.read_text(encoding="utf-8"))
+        declaration["routes"] = tier_routes(tier)
+        files[path] = rendered(declaration)
+    return files
+
+
 def registry_document() -> dict:
     for identity, kind in REGISTRY.items():
         if not IDENTITY.match(identity):
@@ -208,12 +231,15 @@ def main() -> int:
     parser.add_argument("--kind", choices=KINDS)
     parser.add_argument("--into", type=Path)
     parser.add_argument("--emit-registry", type=Path)
+    parser.add_argument("--emit-tiers", type=Path)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     if args.emit_registry and (args.kind or args.into):
         parser.error("--emit-registry cannot be combined with --kind/--into")
     if args.emit_registry:
         return write_or_check(emitted_files(args.emit_registry.resolve()), args.check)
+    if args.emit_tiers:
+        return write_or_check(tier_files(args.emit_tiers.resolve()), args.check)
     if not args.kind or not args.into:
         parser.error("--kind and --into are required without --emit-registry")
     target = args.into.resolve() / ".agents" / "skill-routes.json"
