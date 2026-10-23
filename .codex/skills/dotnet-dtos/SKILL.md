@@ -1,6 +1,6 @@
 ---
 name: dtos
-description: The words for C# data shapes — the plain noun (or `XEntity`), `XSummary` for a list row, `XDto` where it would clash with a same-named entity, and `Page<T>` for one page. Use when naming or reviewing a record, DTO, query result or other shape carried between callers.
+description: The words for C# data shapes — the plain noun (or `XEntity`), `XSummary` for a list row, `XDto` where it would clash with a same-named entity, and `Pagination<T>` (or `IPagination<T>`) for one page. Use when naming or reviewing a record, DTO, query result or other shape carried between callers.
 kind: contract
 domain: dotnet
 profile: core

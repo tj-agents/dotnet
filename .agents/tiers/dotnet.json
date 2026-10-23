@@ -102,7 +102,7 @@
       ]
     },
     {
-      "path": "(?i:\\.(application|contracts)/.*\\.cs$)|(?-i:[a-z0-9](Dto|DTO|Summary|Summaries|Page)s?\\.cs$)",
+      "path": "(?i:\\.(application|contracts)/.*\\.cs$)|(?-i:[a-z0-9](Dto|DTO|Summary|Summaries)s?\\.cs$|(^|/)I?Pagination\\.cs$)",
       "skills": [
         "dotnet:dtos"
       ]
