@@ -14,6 +14,14 @@ provenance: house
 Owns the words for data shapes carried between callers. A shape that fits none of these takes the plain domain
 noun.
 
+```csharp
+public sealed record VenueSummary(Guid Id, string Name);
+
+public sealed record VenueDto(Guid Id, string Name, string City);
+
+public sealed record Page<T>(IReadOnlyList<T> Items, int TotalCount);
+```
+
 | Word | Use when |
 |---|---|
 | `Venue` (or `VenueEntity`) | The shape is the thing itself; `VenueEntity` where the codebase already suffixes its entities |

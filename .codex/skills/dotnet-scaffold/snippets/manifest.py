@@ -334,6 +334,7 @@ SNIPPETS: list[Snippet] = [
           header=""),
 
     entry("unit-of-work-01-contract", "unit-of-work/SKILL.md", 1, "infrastructure", "SnippetFixtures.UnitOfWork01"),
+    entry("dtos-01-shapes", "dtos/SKILL.md", 1, "infrastructure", "SnippetFixtures.Dtos01"),
     entry("repositories-01-contract", "repositories/SKILL.md", 1, "infrastructure", "SnippetFixtures.Repositories01",
           header="public sealed record Order(Guid Id);\n\n"),
     entry("seeding-02-event-path", "seeding/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding02",
