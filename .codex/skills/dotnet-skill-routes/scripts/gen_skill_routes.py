@@ -236,6 +236,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.emit_registry and (args.kind or args.into):
         parser.error("--emit-registry cannot be combined with --kind/--into")
+    if args.emit_tiers and (args.kind or args.into or args.emit_registry):
+        parser.error("--emit-tiers cannot be combined with --kind/--into/--emit-registry")
     if args.emit_registry:
         return write_or_check(emitted_files(args.emit_registry.resolve()), args.check)
     if args.emit_tiers:
