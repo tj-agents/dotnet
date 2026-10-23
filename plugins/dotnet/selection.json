@@ -13,6 +13,7 @@
       "build",
       "comments",
       "domain-design",
+      "dtos",
       "errors",
       "explanation",
       "fields",
@@ -20,7 +21,6 @@
       "mapping",
       "naming",
       "naming-collaborators",
-      "naming-dtos",
       "repositories",
       "structure",
       "style",
@@ -278,6 +278,20 @@
       "provenance": [
         "language",
         "pattern",
+        "house"
+      ]
+    },
+    {
+      "name": "dtos",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
         "house"
       ]
     },
@@ -553,21 +567,6 @@
     },
     {
       "name": "naming-collaborators",
-      "kind": "contract",
-      "profile": "core",
-      "applicability": [
-        "all C# and .NET code"
-      ],
-      "requires": [
-        "none"
-      ],
-      "provenance": [
-        "language",
-        "house"
-      ]
-    },
-    {
-      "name": "naming-dtos",
       "kind": "contract",
       "profile": "core",
       "applicability": [

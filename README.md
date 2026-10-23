@@ -8,7 +8,7 @@ The canonical repository is [`tj-agents/dotnet`](https://github.com/tj-agents/do
 Families are folders, family first; a skill's name is its folder path joined by hyphens.
 
 - Knowledge: `dotnet:learning`, `dotnet:knowledge`, `dotnet:direction`.
-- Naming: `dotnet:naming`, `dotnet:naming-collaborators`, `dotnet:naming-dtos`.
+- Naming: `dotnet:naming`, `dotnet:naming-collaborators`, `dotnet:dtos`.
 - Style: `dotnet:style`, `dotnet:fields`, `dotnet:comments`.
 - Structure: `dotnet:structure`, `dotnet:structure-modules`.
 - Domain: `dotnet:domain-design`, `dotnet:domain-ddd`, `dotnet:domain-values`, `dotnet:domain-events`.

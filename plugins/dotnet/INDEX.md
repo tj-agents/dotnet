@@ -7,6 +7,7 @@
 - `domain-design` — contract — core
 - `domain-events` — contract — domain-model
 - `domain-values` — contract — patterns
+- `dtos` — contract — core
 - `errors` — contract — core
 - `errors-carriers` — contract — results
 - `errors-results` — contract — results
@@ -24,7 +25,6 @@
 - `microservice-boundaries` — contract — distributed-services
 - `naming` — contract — core
 - `naming-collaborators` — contract — core
-- `naming-dtos` — contract — core
 - `proto` — contract — distributed-services
 - `repositories` — contract — core
 - `seeding` — contract — seeding

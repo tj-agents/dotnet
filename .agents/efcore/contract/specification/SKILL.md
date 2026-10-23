@@ -56,7 +56,6 @@ nothing. Count/existence operations reuse criteria without accidentally applying
 Check provider translation and database behavior in the selected integration tier (`dotnet:testing`).
 LINQ-to-Objects checks alone cannot establish EF translation, null semantics or paging behavior.
 
-Tommy, 2026-10-18: specifications are constructor-bound parameter objects rather than DI services; the EF
-query convention has an `efcore` owner. [Ardalis constructor criteria](https://specification.ardalis.com/usage/create-specifications.html)
+Specifications are constructor-bound parameter objects, not DI services. [Ardalis constructor criteria](https://specification.ardalis.com/usage/create-specifications.html)
 and [stateless evaluation](https://specification.ardalis.com/usage/use-specification-repository-pattern.html)
 support that separation without requiring Ardalis. Specifications can also be used outside EF Core.

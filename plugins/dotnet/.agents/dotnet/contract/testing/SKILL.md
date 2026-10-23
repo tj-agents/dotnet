@@ -26,9 +26,7 @@ public void Add_TwoOperands_ReturnsTheirSum(int left, int right, int expected)
 
 `Method_Scenario_ExpectedBehaviour` is the test-naming standard for unit, integration and e2e alike:
 `Method` names the member (or, for a Gherkin scenario, the behaviour under test), `Scenario` the input
-state, `ExpectedBehaviour` the observable outcome. 2026-10-13: one name shape, owned in one place, so
-`dotnet:naming`, `testing-unit`, `testing-integration` and `testing-e2e` route here rather than each
-keeping its own naming rule.
+state, `ExpectedBehaviour` the observable outcome.
 
 ### Each tier owns one assertion library
 
@@ -39,7 +37,7 @@ keeping its own naming rule.
 | E2E — page state | Playwright `Expect(locator)` (`Microsoft.Playwright.Assertions`) |
 | E2E — a value read outside the page | Shouldly |
 
-2026-10-13: a tier mixing two assertion libraries produces two failure-message formats and two idioms
+A tier mixing two assertion libraries produces two failure-message formats and two idioms
 for the same check, for no benefit. Gate the choice in the build rather than at review. E2E is the one
 exception, and it is a library split rather than a mix: `Expect` auto-retries until the page matches, so
 a scenario checking what the browser renders never races the UI the way a one-shot
