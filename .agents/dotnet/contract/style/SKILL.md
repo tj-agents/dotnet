@@ -1,6 +1,6 @@
 ---
 name: style
-description: General C# style any codebase follows — enforceable rules live in `.editorconfig`, an enum is a genuine closed choice, a plain null check on a variable, `null!` rather than `string.Empty` for populated-later members, brace and empty-block shape, and when an optional parameter has stopped paying for itself. Use when writing or reviewing any C# type, adding a parameter to an existing signature, or deciding whether a style rule belongs in prose or in `.editorconfig`.
+description: General C# style defaults — enforceable rules live in `.editorconfig`, an enum is a genuine closed choice, a plain null check on a variable, `null!` rather than `string.Empty` for populated-later members, brace and empty-block shape, and when an optional parameter has stopped paying for itself. Use when writing or reviewing any C# type, adding a parameter to an existing signature, or deciding whether a style rule belongs in prose or in `.editorconfig`.
 kind: contract
 domain: dotnet
 profile: core
@@ -15,7 +15,8 @@ Owns the general C# style rules every codebase shares; opinionated conventions h
 
 ## Applicability
 
-This contract applies to every C#/.NET repository and has no application-stack prerequisite.
+This contract has no application-stack prerequisite; its conventions are defaults under the tier gate's
+codebase-conventions rule.
 
 Style rules an analyzer can express belong in the repository's `.editorconfig` at `severity = error`,
 not in prose. `dotnet:scaffold` writes them for a new project; an existing repository's own
