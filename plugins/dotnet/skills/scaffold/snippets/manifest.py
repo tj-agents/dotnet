@@ -26,9 +26,12 @@ def entry(
 
 
 SNIPPETS: list[Snippet] = [
-    entry("fields-01-private-fields", "fields/SKILL.md", 1, "infrastructure", "SnippetFixtures.Fields01",
-          header="internal sealed class OrderDbContext;\n\n#pragma warning disable CS0169, CS8618\n\ninternal sealed class OrderService\n{\n",
+    entry("naming-01-collaborator-field", "naming/SKILL.md", 1, "infrastructure", "SnippetFixtures.Naming01",
+          header="internal interface IUserService { }\n\n#pragma warning disable CS0169, CS8618\n\ninternal sealed class InvoiceSender\n{\n",
           footer="\n}\n\n#pragma warning restore CS0169, CS8618\n"),
+    entry("fields-01-private-fields", "fields/SKILL.md", 1, "infrastructure", "SnippetFixtures.Fields01",
+          header="internal sealed class OrderDbContext;\n\n#pragma warning disable CS0169, CS8618, IDE1006\n\ninternal sealed class OrderService\n{\n",
+          footer="\n}\n\n#pragma warning restore CS0169, CS8618, IDE1006\n"),
     entry("fields-02-no-shadow", "fields/SKILL.md", 2, "infrastructure", "SnippetFixtures.Fields02",
           header=(
               "internal sealed class StockCatalog;\n"
@@ -330,10 +333,10 @@ SNIPPETS: list[Snippet] = [
     entry("testing-e2e-01-clock", "testing/e2e/SKILL.md", 1, "e2e-tests", "SnippetFixtures.TestingE2E01",
           header=""),
 
+    entry("unit-of-work-01-contract", "unit-of-work/SKILL.md", 1, "infrastructure", "SnippetFixtures.UnitOfWork01"),
+    entry("dtos-01-shapes", "dtos/SKILL.md", 1, "infrastructure", "SnippetFixtures.Dtos01"),
     entry("repositories-01-contract", "repositories/SKILL.md", 1, "infrastructure", "SnippetFixtures.Repositories01",
           header="public sealed record Order(Guid Id);\n\n"),
-    entry("naming-collaborators-01-query-builder", "naming/collaborators/SKILL.md", 1, "infrastructure", "SnippetFixtures.NamingCollaborators01",
-          header="using SnippetFixtures.EfQueryPatterns;\n\n"),
     entry("seeding-02-event-path", "seeding/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding02",
           header=(
               "public sealed record OrderCreatedEvent(Guid Id) : IIntegrationEvent;\n\n"

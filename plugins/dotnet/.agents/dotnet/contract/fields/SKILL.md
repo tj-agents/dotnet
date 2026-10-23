@@ -1,6 +1,6 @@
 ---
 name: fields
-description: How a C# type names, declares and reaches its own state — private fields without an underscore prefix, `this.` only where a constructor parameter shadows the member it fills, explicit `private readonly` fields instead of primary-constructor captures, and `base.`-qualified inherited calls. Use when declaring a field, writing a constructor, choosing between a primary constructor and explicit fields, or calling an inherited member.
+description: The house convention for how a C# type spells, declares and reaches its own state — private fields without an underscore prefix, `this.` only where a constructor parameter shadows the member it fills, explicit `private readonly` fields instead of primary-constructor captures, and `base.`-qualified inherited calls. Use when declaring a field, writing a constructor, choosing between a primary constructor and explicit fields, or calling an inherited member.
 kind: contract
 domain: dotnet
 profile: core
@@ -11,12 +11,15 @@ provenance: house
 
 # Fields and member qualification
 
-Owns how a type names, declares and qualifies its own state and inherited members.
+Owns how a type spells, declares and qualifies its own state and inherited members. What a field is
+called is `dotnet:naming`'s; this skill owns only its spelling.
 
 ## Applicability
 
-This contract applies to every C#/.NET repository and has no application-stack prerequisite. The
-repository's `.editorconfig` carries the enforceable half — the private-field naming rule and
+This contract has no application-stack prerequisite. It is house: Microsoft's default spells private
+fields `_camelCase`, `s_camelCase` and `t_camelCase`, so a codebase following that default replaces this
+skill and keeps `dotnet:naming`. The repository's `.editorconfig` carries the enforceable half — the
+private-field `camel_case` naming rule with `dotnet_diagnostic.IDE1006.severity = error`, and
 `dotnet_style_qualification_for_field = false:error` — and `dotnet:scaffold` writes both.
 
 ## Private fields carry no underscore prefix; `this.` disambiguates a shadowed constructor parameter
@@ -47,18 +50,11 @@ public InventoryTests()
 }
 ```
 
-2026-10-13: `this.` appears only where a constructor parameter is named after the member it fills and
-would otherwise shadow it — omitting it there, `context = context;`, is the self-assignment bug `this.`
-exists to prevent. A constructor that builds a field with no same-named parameter, or assigns a
-differently-named parameter to a public auto-property (`Reserve = reserveStockStep;`), has nothing to
-disambiguate, so the assignment stays unqualified. `dotnet_style_qualification_for_field = false:error`
-plus `EnforceCodeStyleInBuild` is kept at the scaffold level, but it is a partial gate, not a complete
-one: verified during implementation, IDE0003 ("remove this qualification") does not fire as a build
-diagnostic in the current SDK for field, property or method member access, under any configuration tried
-(including `dotnet_diagnostic.IDE0003.severity`, `dotnet format`, and with `Meziantou.Analyzer` added) —
-only the opposite direction, IDE0009 ("add this qualification"), does. A stray `this.` outside a
-constructor is therefore caught by review and by this contract's own examples, not by the build, until a
-reliable mechanism for that direction exists.
+`this.` appears only where a constructor parameter is named after the member it fills and would otherwise
+shadow it: there, `context = context;` is the self-assignment bug `this.` prevents. A constructor that builds
+a field with no same-named parameter, or assigns a differently-named parameter to a public auto-property
+(`Reserve = reserveStockStep;`), has nothing to disambiguate, so the assignment stays unqualified. The build
+does not report a stray `this.` (IDE0003 is not a build diagnostic), so review catches it.
 
 ## Captured state uses explicit `private readonly` fields, not primary-constructor captures
 

@@ -51,8 +51,9 @@ selector is the real defect — that is a per-row round trip.
 
 ## Commit by the number of flushes and contexts
 
-- One context and one flush, the default: stage every entity change, then save once; EF commits that save
-  atomically.
+The `DbContext` is the `dotnet:unit-of-work`; these cases choose its transaction.
+
+- One context and one flush, the default: EF commits the single save atomically.
 - One context where the operation genuinely needs several `SaveChanges` calls, or needs its reads and writes
   to share one explicit transaction: run it inside one explicit transaction.
 - Writes to several contexts inside one service, and only then: an ambient `TransactionScope`, because a
@@ -62,9 +63,6 @@ An expected write failure inside an ambient scope is classified only by the scop
 scope back, so the recovery runs against no transaction. A block that classifies the failure and returns
 normally inside the scope still commits whatever the failed save's pre-commit handlers wrote to the other
 enlisted contexts. Nested inside another scope, classify nothing and let the failure reach the root.
-
-**Never share a transaction across services.** A separate service owns its own database — coordinate those
-with messages through an outbox, never a unit of work.
 
 ## Exactly one context migrates a table — everyone else maps it with `ExcludeFromMigrations`
 

@@ -13,18 +13,18 @@
       "build",
       "comments",
       "domain-design",
+      "dtos",
       "errors",
       "explanation",
       "fields",
       "libraries",
       "mapping",
       "naming",
-      "naming-collaborators",
-      "naming-dtos",
       "repositories",
       "structure",
       "style",
-      "testing"
+      "testing",
+      "unit-of-work"
     ],
     "distributed-services": [
       "messaging",
@@ -278,6 +278,20 @@
       "provenance": [
         "language",
         "pattern",
+        "house"
+      ]
+    },
+    {
+      "name": "dtos",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
         "house"
       ]
     },
@@ -552,36 +566,6 @@
       ]
     },
     {
-      "name": "naming-collaborators",
-      "kind": "contract",
-      "profile": "core",
-      "applicability": [
-        "all C# and .NET code"
-      ],
-      "requires": [
-        "none"
-      ],
-      "provenance": [
-        "language",
-        "house"
-      ]
-    },
-    {
-      "name": "naming-dtos",
-      "kind": "contract",
-      "profile": "core",
-      "applicability": [
-        "all C# and .NET code"
-      ],
-      "requires": [
-        "none"
-      ],
-      "provenance": [
-        "language",
-        "house"
-      ]
-    },
-    {
       "name": "proto",
       "kind": "contract",
       "profile": "distributed-services",
@@ -775,6 +759,22 @@
       ],
       "provenance": [
         "library",
+        "house"
+      ]
+    },
+    {
+      "name": "unit-of-work",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "C# projects that persist state",
+        "regardless of persistence library"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "pattern",
         "house"
       ]
     },

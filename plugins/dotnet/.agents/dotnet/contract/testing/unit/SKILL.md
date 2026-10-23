@@ -48,9 +48,7 @@ public sealed class InventoryTests
 
 `InventoryTests` is the whole standard in one place: `Method_Scenario_ExpectedBehaviour` naming, a
 constructor-built `private readonly` field, Arrange/Act/Assert separated by blank lines, xUnit's
-`Assert.*`, a `[Theory]` with the expected value last, and a `#region` per method under test. Tommy,
-2026-10-13: a generic opening example, not a product-named one, demonstrates every convention without
-prose and without a second vocabulary. Its parameterless constructor assigns `inventory` unqualified —
+`Assert.*`, a `[Theory]` with the expected value last, and a `#region` per method under test. Its parameterless constructor assigns `inventory` unqualified —
 per `dotnet:fields`, `this.` appears only where a constructor parameter shadows the field it
 fills, and nothing here does.
 

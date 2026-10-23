@@ -17,8 +17,8 @@ Owns the integration-event publisher role and the processor that pumps a broker 
 
 This contract applies to services that publish or consume integration events through a message broker.
 `dotnet:domain-events` owns the domain-event/integration-event boundary and the pre-commit translation,
-including broker events consumed by the same service's own worker. Reacting to a message is the Handler
-role in `dotnet:naming-collaborators`.
+including broker events consumed by the same service's own worker. The class reacting to a message is its
+`<Event>Handler`.
 
 ## Publish through the one generic publisher
 
@@ -33,9 +33,7 @@ public interface IIntegrationEventPublisher
 }
 ```
 
-2026-10-13: `IIntegrationEventPublisher` is the one broker-abstraction role per solution — generic over
-the event type, never per subject (`INoteEventPublisher` names the subject, not the role). A field or
-parameter holding it is `integrationEventPublisher`, per `dotnet:naming-collaborators`' subject+role rule.
+`IIntegrationEventPublisher` is the one broker-abstraction role per solution, generic over the event type.
 
 ## The Processor pumps a subscription, the Handler reacts to it
 
@@ -50,16 +48,16 @@ role), `Consumer` (already the Handler's role in some broker SDKs), `Worker` (no
 internal sealed class OrderEventsProcessor : BackgroundService
 {
     private readonly ServiceBusProcessor processor;
-    private readonly IServiceScopeFactory scopeFactory;
+    private readonly IServiceScopeFactory serviceScopeFactory;
     private readonly ILogger<OrderEventsProcessor> logger;
 
     public OrderEventsProcessor(
         ServiceBusProcessor processor,
-        IServiceScopeFactory scopeFactory,
+        IServiceScopeFactory serviceScopeFactory,
         ILogger<OrderEventsProcessor> logger)
     {
         this.processor = processor;
-        this.scopeFactory = scopeFactory;
+        this.serviceScopeFactory = serviceScopeFactory;
         this.logger = logger;
         processor.ProcessMessageAsync += HandleMessageAsync;
         processor.ProcessErrorAsync += HandleErrorAsync;
@@ -78,7 +76,7 @@ internal sealed class OrderEventsProcessor : BackgroundService
     {
         var integrationEvent = args.Message.Body.ToObjectFromJson<OrderPlacedEvent>();
 
-        var scope = scopeFactory.CreateAsyncScope();
+        var scope = serviceScopeFactory.CreateAsyncScope();
         await using (scope.ConfigureAwait(false))
         {
             var handler = scope.ServiceProvider.GetRequiredService<IIntegrationEventHandler<OrderPlacedEvent>>();
@@ -96,7 +94,7 @@ internal sealed class OrderEventsProcessor : BackgroundService
 }
 ```
 
-2026-10-13: `<Subscription>Processor` is the one role for the hosted loop that pumps a broker
+`<Subscription>Processor` is the one role for the hosted loop that pumps a broker
 subscription. It takes explicit `private readonly` fields assigned with `this.` in the constructor, never a primary-constructor
 capture, and uses the broker SDK's own type (`ServiceBusProcessor` above) as the receive source rather
 than inventing a receiver role. It dispatches each message to its `<Event>Handler` in a fresh DI scope, because the processor is a

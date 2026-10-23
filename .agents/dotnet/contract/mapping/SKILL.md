@@ -16,8 +16,7 @@ Owns C# type-conversion and receiver-owned pure-operation naming — mapper fami
 ## Applicability
 
 These conventions apply to C# type conversions and receiver-owned pure operations. Shared identifiers
-follow `dotnet:naming`, and result shapes follow
-`dotnet:naming-dtos`.
+follow `dotnet:naming`, and result shapes follow `dotnet:dtos`.
 
 ## A subject owns its mapping family
 
@@ -60,8 +59,7 @@ or in its mapping family when it is a conversion. Examples are `value.ToDto()`,
 `reading.ToNormalized()` and `state.IsTerminal()`. Use the shortest unambiguous domain name at the call
 site. For intrinsic domain behavior and value construction, select the owner through
 `dotnet:domain-ddd` when DDD applies and
-`dotnet:domain-values`. A separate decision over independent peer inputs
-follows the collaborator convention in `dotnet:naming-collaborators`.
+`dotnet:domain-values`.
 
 ## Choose conversion mechanics for the data
 

@@ -79,9 +79,8 @@ tier — `Elapsed` the behaviour under test, `PastStart` the input state, `Retur
 and its `Examples` table keeps `expected` as the last column, exactly like a `[Theory]`'s last parameter.
 `ClockSteps` builds its `IPage` and fixture as constructor-assigned `private readonly` fields with
 `this.` (both parameters shadow their fields), uses no `this.` inside a step method, and groups its
-`Given`/`When`/`Then` steps under one `#region` per behaviour under test. Tommy, 2026-10-13: a generic
-opening example, not a product-named one, carries every convention a Gherkin/Reqnroll suite can show,
-without prose — and obeys this contract's own rules, not only the others': the `Given` fast-forwards by
+`Given`/`When`/`Then` steps under one `#region` per behaviour under test. It also obeys
+this contract's own rules: the `Given` fast-forwards by
 reading the already-seeded clock's id off the fixture onto scenario state, with no navigation or clicks;
 only the `When` drives the browser, for the behaviour the scenario titles as under test; and the `Then`
 asserts page state with Playwright's auto-retrying `Expect`, never a one-shot read.
