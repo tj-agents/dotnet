@@ -247,6 +247,35 @@ class RouteCliTests(unittest.TestCase):
             self.assertEqual(1, stale.returncode)
             self.assertIn("STALE", stale.stdout)
 
+    def test_shipped_tier_declarations_carry_current_routes(self) -> None:
+        current = self.run_generator("--emit-tiers", str(ROOT), "--check")
+        self.assertEqual(0, current.returncode, current.stdout + current.stderr)
+
+    def test_tier_routes_gate_every_csharp_file_with_only_their_own_skills(self) -> None:
+        dotnet = generator.tier_routes("dotnet")
+        efcore = generator.tier_routes("efcore")
+        self.assertTrue(all(skill.startswith("dotnet:") for row in dotnet for skill in row["skills"]))
+        self.assertTrue(all(skill.startswith("efcore:") for row in efcore for skill in row["skills"]))
+        floor = {skill for row in dotnet if re.search(row["path"], "src/Acme.Outbox/OutboxRelay.cs")
+                 and not row.get("content_requires") for skill in row["skills"]}
+        self.assertEqual({"dotnet:style", "dotnet:naming", "dotnet:fields"}, floor)
+
+    def test_emit_tiers_rewrites_a_stale_declaration(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / ".agents/tiers").mkdir(parents=True)
+            for tier in ("dotnet", "efcore"):
+                source = json.loads((ROOT / f".agents/tiers/{tier}.json").read_text(encoding="utf-8"))
+                source.pop("routes")
+                (root / f".agents/tiers/{tier}.json").write_text(json.dumps(source), encoding="utf-8")
+            stale = self.run_generator("--emit-tiers", str(root), "--check")
+            self.assertEqual(1, stale.returncode)
+            written = self.run_generator("--emit-tiers", str(root))
+            self.assertEqual(0, written.returncode, written.stdout + written.stderr)
+            tier = json.loads((root / ".agents/tiers/dotnet.json").read_text(encoding="utf-8"))
+            self.assertEqual(generator.tier_routes("dotnet"), tier["routes"])
+            self.assertEqual("tj-agents/dotnet", tier["owner_repository"][0])
+
     def test_emit_registry_cannot_be_combined_with_kind(self) -> None:
         result = self.run_generator("--emit-registry", "routes", "--kind", "efcore-service", "--into", ".")
         self.assertNotEqual(0, result.returncode)
