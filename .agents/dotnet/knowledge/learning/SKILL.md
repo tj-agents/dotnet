@@ -70,3 +70,9 @@ and grow only from decisions made in real projects.
 5. A rule's example leads with its code snippet; prose follows only to carry what the snippet
    can't show.
 6. An example obeys every contract that applies to it, including the one it sits in.
+
+```text
+Task: page a venue list; no paging shape is recorded.
+Stop: options are Page<T> or a PagedResult<T>; recommend Page<T>, since Result is reserved for the result pattern.
+Tommy picks Page<T>: record it in dotnet:dtos with its source, regenerate, commit and push.
+```
