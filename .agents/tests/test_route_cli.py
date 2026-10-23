@@ -276,6 +276,13 @@ class RouteCliTests(unittest.TestCase):
             self.assertEqual(generator.tier_routes("dotnet"), tier["routes"])
             self.assertEqual("tj-agents/dotnet", tier["owner_repository"][0])
 
+    def test_emit_tiers_cannot_be_combined_with_other_outputs(self) -> None:
+        for extra in (("--kind", "efcore-service", "--into", "."), ("--emit-registry", "routes")):
+            with self.subTest(extra=extra):
+                result = self.run_generator("--emit-tiers", ".", *extra)
+                self.assertNotEqual(0, result.returncode)
+                self.assertIn("--emit-tiers cannot be combined", result.stderr)
+
     def test_emit_registry_cannot_be_combined_with_kind(self) -> None:
         result = self.run_generator("--emit-registry", "routes", "--kind", "efcore-service", "--into", ".")
         self.assertNotEqual(0, result.returncode)
