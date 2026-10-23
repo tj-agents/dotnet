@@ -15,7 +15,7 @@ Owns the C# mechanics of a comment or XML doc once it has earned its place.
 
 ## Applicability
 
-This contract applies to every C#/.NET repository and has no application-stack prerequisite.
+This contract has no application-stack prerequisite.
 
 **The policy — default to zero comments, the *why* lives in the commit message — is always-applicable
 and lives in your global agent instructions, not here.** This skill is only the C# mechanics that apply

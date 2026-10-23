@@ -15,9 +15,9 @@ Owns how a type names, declares and qualifies its own state and inherited member
 
 ## Applicability
 
-This contract applies to every C#/.NET repository and has no application-stack prerequisite. The
-repository's `.editorconfig` carries the enforceable half — the private-field naming rule and
-`dotnet_style_qualification_for_field = false:error` — and `dotnet:scaffold` writes both.
+This contract has no application-stack prerequisite. The repository's `.editorconfig` carries the
+enforceable half — the private-field naming rule and `dotnet_style_qualification_for_field = false:error` —
+and `dotnet:scaffold` writes both.
 
 ## Private fields carry no underscore prefix; `this.` disambiguates a shadowed constructor parameter
 

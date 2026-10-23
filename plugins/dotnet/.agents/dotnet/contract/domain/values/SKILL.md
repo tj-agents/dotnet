@@ -1,6 +1,6 @@
 ---
 name: domain-values
-description: The pattern for a small immutable value and its construction — defaulting to a reference record and choosing a `readonly record struct` only when its default is valid, it is not optional/nullable, and allocation volume matters, putting construction and the value's own behaviour on the type as a static `From`/`Create`/`TryGet…` rather than in helpers beside it, and the shape a `Try` method follows. Use when introducing a type to carry a value, when a method returns several related values, when deciding between a struct and a class for one, or when reviewing a `Try` signature.
+description: The pattern for a small immutable value and its construction — defaulting to a reference record and choosing a `readonly record struct` only when its default is valid, it is not optional/nullable, and allocation volume matters, putting construction and the value's own behaviour on the type as a static `From`/`Create`/`TryGet…` rather than in helpers beside it, and the shape a `Try` method follows. Use when deciding whether a value earns its own type, introducing a type to carry a value, when a method returns several related values, when deciding between a struct and a class for one, or when reviewing a `Try` signature.
 kind: contract
 domain: dotnet
 profile: patterns
@@ -15,7 +15,16 @@ Owns small immutable value representation and construction — struct-or-class c
 
 ## Applicability
 
-This contract applies to every C#/.NET repository and has no application-stack prerequisite.
+This contract has no application-stack prerequisite. Wrap logic in a dedicated type only for a
+genuinely domain-rich concept; such types may enter a codebase that has few yet. A one-off condition, sort
+or deadline stays inline. 2026-10-23: a session wrapped one deadline check and one `OrderBy(...).ThenBy(...)` in types no domain
+concept stood behind.
+
+```text
+Task: stop claiming outbox messages after the claim timeout.
+Inline: if (clock.UtcNow - startedAt > claimTimeout) return;
+Not: a ClaimBudget record whose StartingAt factory wraps that one check.
+```
 
 ## Struct or reference
 
