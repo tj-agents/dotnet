@@ -16,7 +16,6 @@ Owns the single-service repository layout, optional host projects and project re
 ## Applicability
 
 This contract applies only to the single-service architecture and requires `single-service-architecture`.
-Tommy approved this layout on 2026-10-12.
 
 ## File structure
 
@@ -91,6 +90,3 @@ serves the whole web API.
 <Module>.Api/             a module's endpoint layer (structure-modules)
   <Module>.Api.csproj
 ```
-
-- The single-service tree keeps shared business logic infrastructure-free while allowing optional hosts and persistence; approved by Tommy on 2026-10-12 in the scripted-scaffold design.
-- `<Name>.Core` split into `<Name>.Domain` and `<Name>.Application`, and the host `<Name>.Api` renamed to `<Name>.Web`: one vocabulary with `dotnet:structure-modules`, where Domain already means entities only and Application holds services and DTOs; decided by Tommy on 2026-10-13.

@@ -16,8 +16,7 @@ Owns C# type-conversion and receiver-owned pure-operation naming — mapper fami
 ## Applicability
 
 These conventions apply to C# type conversions and receiver-owned pure operations. Shared identifiers
-follow `dotnet:naming`, and result shapes follow
-`dotnet:naming-dtos`.
+follow `dotnet:naming`, and result shapes follow `dotnet:dtos`.
 
 ## A subject owns its mapping family
 

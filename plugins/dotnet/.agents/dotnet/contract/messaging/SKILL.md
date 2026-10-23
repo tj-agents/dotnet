@@ -33,8 +33,7 @@ public interface IIntegrationEventPublisher
 }
 ```
 
-2026-10-13: `IIntegrationEventPublisher` is the one broker-abstraction role per solution — generic over
-the event type, never per subject (`INoteEventPublisher` names the subject, not the role).
+`IIntegrationEventPublisher` is the one broker-abstraction role per solution, generic over the event type.
 
 ## The Processor pumps a subscription, the Handler reacts to it
 
@@ -95,7 +94,7 @@ internal sealed class OrderEventsProcessor : BackgroundService
 }
 ```
 
-2026-10-13: `<Subscription>Processor` is the one role for the hosted loop that pumps a broker
+`<Subscription>Processor` is the one role for the hosted loop that pumps a broker
 subscription. It takes explicit `private readonly` fields assigned with `this.` in the constructor, never a primary-constructor
 capture, and uses the broker SDK's own type (`ServiceBusProcessor` above) as the receive source rather
 than inventing a receiver role. It dispatches each message to its `<Event>Handler` in a fresh DI scope, because the processor is a

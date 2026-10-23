@@ -31,15 +31,12 @@ Controllers return either:
 
 Do not pre-emptively shadow every DTO with a Response.
 
-**One bounded exception:** a **public, anonymous** surface may keep a dedicated `XDetailsResponse` even while
+**One bounded exception:** a **public, anonymous** surface may keep a dedicated `XResponse` even while
 it is a field-for-field clone of the DTO. There the Response *is* the frozen wire contract, and its whole
 value is that the internal read DTO can grow server-only fields or change projection shape without breaking
-public clients. That covers the public details reads, not every DTO.
+public clients. That covers those public reads, not every DTO.
 
-Drop the `Dto` suffix where the name already says what the shape is; keep it only to disambiguate from a
-same-named entity. DTO conventions belong to
-`dotnet:naming-dtos`. HTTP `Request` and `Response`
-names describe the boundary contracts defined here; the application keeps its domain-shaped payloads.
+DTO words belong to `dotnet:dtos`. HTTP `Request` and `Response` names describe the boundary contracts defined here; the application keeps its domain-shaped payloads.
 
 ## Write inputs are `Request` records
 

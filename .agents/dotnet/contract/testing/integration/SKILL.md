@@ -71,9 +71,7 @@ public sealed class CalculatorApiTests
 constructor-built `private readonly` fixture field assigned with `this.` rather than a primary-constructor
 capture, no `this.` inside a test method, `Method_Scenario_ExpectedBehaviour` naming, Arrange/Act/Assert
 separated by blank lines, Shouldly throughout, a `[Theory]` with the expected value last, and a `#region`
-per operation. Tommy, 2026-10-13: a generic opening example, not a product-named one, demonstrates every
-convention without prose, and the fixture is an explicit field — the prior `ShipmentApiTests(ShipmentApiFixture
-fixture)` primary-constructor capture and its mixed `Assert.*`/`ShouldBe` are gone.
+per operation.
 
 An integration test boots the service's **real `Program`** through `WebApplicationFactory<Program>`
 (`Microsoft.AspNetCore.Mvc.Testing`) and exercises it over HTTP against a real database. For pure in-memory

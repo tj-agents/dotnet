@@ -10,6 +10,16 @@ from pathlib import Path
 
 
 CS_PATH = r"(?i:\.cs$)"
+COLLABORATOR_FIELD_DENY = {
+    "pattern": (
+        r"\bprivate\s+(?:static\s+)?readonly\s+I"
+        r"(?!(?:ReadOnly|Async)?(?:Enumerable|Collection|List|Set|Dictionary)\b|(?:Equality)?Comparer\b)"
+        r"(?P<subject>[A-Z][A-Za-z0-9]*)(?:<[^;=()]*>)?\s+"
+        r"(?i:(?!\w*(?P=subject)\s*[;=])\w+)\s*[;=]"
+    ),
+    "reason": "A field holding a collaborator is named for that collaborator's subject and role without the `I`: "
+    "`private readonly IUserService userService;` (dotnet:naming).",
+}
 # Textually distinct from CS_PATH: skill_router keys its per-session seen-state on the path string,
 # so a row reusing the floor's exact pattern is never enforced after the floor first fires.
 LOGGING_CS_PATH = r"(?i:\.(cs)$)"
@@ -23,8 +33,9 @@ E2E_TEST_PATH = r"(?i:(tests\.e2e|e2etests)[./]|\.feature$)"
 DOMAIN_LAYER_PATH = r"(?i:\.domain/.*\.cs$)"
 MODULE_LAYER_PATH = r"(?i:\.(application|infrastructure)/.*\.cs$)"
 HTTP_EDGE_PATH = r"(?i:(controller|endpoint)s?\.cs$)"
-DTO_PATH = r"(?i:\.contracts/.*\.cs$|(dto|request|response|snapshot|summary|details|projection|decision|evidence|proof|descriptor|catalog|binding|(?<!db)context)s?\.cs$)"
-REPOSITORY_PATH = r"(?i:(repository|repositories)\.cs$)"
+DTO_PATH = r"(?i:\.(application|contracts)/.*\.cs$)|(?-i:[a-z0-9](Dto|DTO|Summary|Summaries|Page)s?\.cs$)"
+REQUEST_RESPONSE_PATH = r"(?i:(request|response)s?\.cs$)"
+REPOSITORY_PATH = r"(?i:(repository|repositories|stores?|projections?)\.cs$)"
 PERSISTENCE_PATH = r"(?i:dbcontext\.cs$|(^|/)(migrations|persistence)/.*\.cs$)"
 COMPOSITION_PATH = r"(?i:(^|/)program\.cs$|(servicecollection|dependencyinjection)[^/]*\.cs$)"
 LOG_FILE_PATH = r"(?i:(^|/)log\.cs$)"
@@ -45,8 +56,7 @@ COMMENTS_CONTENT = r"(?m:^[ \t]*//)"
 EXTENSIONS_PATH = r"(?i:extensions?\.cs$)"
 DEPENDENCY_INJECTION_CS_PATH = r"(?i:(\.c)s$)"
 DEPENDENCY_INJECTION_CONTENT = r"(?i:\biservicecollection\b|\.add(scoped|singleton|transient)\b)"
-COLLABORATOR_PATH = r"(?i:(resolver|validator|factory|builder|calculator|client|store|provider|accessor|evaluator|policy|specification|registry|session|runner|committer)s?\.cs$)"
-INTERFACE_CONTENT = r"(?m:^[ \t]*(?:(?:public|internal|private|protected|file|partial)[ \t]+)*interface[ \t]+I[A-Z])"
+COLLABORATOR_PATH = r"(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|querybuilder|committer)s?\.cs$)"
 SPECIFICATION_PATH = r"(?i:specifications?\.cs$)"
 QUERY_BUILDER_PATH = r"(?i:querybuilders?\.cs$)"
 EF_PERSISTENCE_CONTENT = r"(?i:\b(dbcontext|dbset|savechangesasync|savechangesinterceptor)\b|microsoft\.entityframeworkcore|\.(tolistasync|singleordefaultasync|asnotracking)\()"
@@ -89,7 +99,7 @@ def routes(kind: str) -> dict:
         {"path": r"^plans/", "skills": ["engineering:plans"]},
         {"path": r"^reviews/", "skills": ["engineering:review-lifecycle"]},
         {"path": r"(^|/)(AGENTS|CLAUDE)\.md$", "skills": ["engineering:docs"]},
-        {"path": CS_PATH, "skills": ["dotnet:style", "dotnet:naming", "dotnet:fields"]},
+        {"path": CS_PATH, "skills": ["dotnet:style", "dotnet:naming", "dotnet:fields"], "deny": [COLLABORATOR_FIELD_DENY]},
         {"path": COMMENTS_CS_PATH, "content_requires": COMMENTS_CONTENT, "skills": ["dotnet:comments"]},
         {"path": BUILD_PATH, "skills": ["dotnet:build", "dotnet:libraries", "dotnet:structure"]},
         {"path": TEST_PATH, "skills": ["dotnet:testing"]},
@@ -100,7 +110,8 @@ def routes(kind: str) -> dict:
         {"path": DOMAIN_LAYER_PATH, "skills": ["dotnet:domain-design"]},
         {"path": MODULE_LAYER_PATH, "skills": ["dotnet:structure-modules"]},
         {"path": HTTP_EDGE_PATH, "skills": ["dotnet:http-api"]},
-        {"path": DTO_PATH, "skills": ["dotnet:naming-dtos"]},
+        {"path": DTO_PATH, "skills": ["dotnet:dtos"]},
+        {"path": REQUEST_RESPONSE_PATH, "skills": ["dotnet:http-api"]},
         {"path": REPOSITORY_PATH, "skills": ["dotnet:repositories"]},
         {"path": PERSISTENCE_PATH, "skills": ["efcore:persistence"]},
         {"path": cs_content_path("efcore-persistence"), "content_requires": EF_PERSISTENCE_CONTENT, "skills": ["efcore:persistence"]},
@@ -122,7 +133,6 @@ def routes(kind: str) -> dict:
         {"path": MESSAGING_CS_PATH, "content_requires": MESSAGING_CONTENT, "skills": ["dotnet:messaging"]},
         {"path": DEPENDENCY_INJECTION_CS_PATH, "content_requires": DEPENDENCY_INJECTION_CONTENT, "skills": ["dotnet:dependency-injection"]},
         {"path": COLLABORATOR_PATH, "skills": ["dotnet:naming-collaborators"]},
-        {"path": cs_content_path("naming-collaborators"), "content_requires": INTERFACE_CONTENT, "skills": ["dotnet:naming-collaborators"]},
         {"path": cs_content_path("domain-ddd"), "content_requires": DDD_CONTENT, "skills": ["dotnet:domain-ddd"]},
         {"path": cs_content_path("domain-values"), "content_requires": VALUES_CONTENT, "skills": ["dotnet:domain-values"]},
         {"path": cs_content_path("errors-carriers"), "content_requires": CARRIERS_CONTENT, "skills": ["dotnet:errors-carriers"]},

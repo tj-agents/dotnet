@@ -22,20 +22,17 @@ private readonly IUserService userService;
 ```
 
 A field, parameter or local holding a collaborator takes that collaborator's subject and role,
-without the `I`; never a shortened or data-flavoured noun such as `users` or `service`. A value takes its
-meaning rather than its type: `recipientEmail`, not `text`. Source:
+without the `I`. A value takes its meaning rather than its type: `recipientEmail`. Source:
 [Microsoft, naming parameters](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/naming-parameters).
-2026-10-23: the collaborator half lived only in `naming-collaborators`, which no route loads for a type that
-merely holds a collaborator, so cris-erm #825 shipped `_users` for an `IUserSnapshotReader`.
-
 ## Casing and affixes follow the ecosystem
 
 Per [Microsoft's identifier names](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/identifier-names):
 PascalCase for types, namespaces, public members, methods, positional record parameters and every constant;
 camelCase for parameters and locals. Interfaces take `I`, type parameters a descriptive `T` name (`TEntity`),
-attributes `Attribute`, asynchronous methods `Async`. A non-flags enum is singular, a flags enum plural.
-Spell words out except universally known abbreviations. A file is named for its one top-level type. Private
-field spelling is the house `dotnet:fields` convention.
+attributes `Attribute`, asynchronous methods `Async`, and a class bound through the
+[options pattern](https://learn.microsoft.com/en-us/dotnet/core/extensions/options) `Options`. A non-flags enum
+is singular, a flags enum plural. Spell words out except universally known abbreviations. A file is named for
+its one top-level type. Private field spelling is the house `dotnet:fields` convention.
 
 ## Types are nouns, methods are verbs, and a role noun matches its verb
 
@@ -77,6 +74,6 @@ prefer readable, meaningful names. Read the identifier with its receiver, parame
 Include distinctions the caller needs, such as scope, locking, units or revision; use the surrounding context
 for information it already supplies.
 
-Qualify an operation by a meaningful returned shape, such as `ResolveSnapshotAsync`, or by a distinguishing
+Qualify an operation by a meaningful returned shape, such as `GetSummaryAsync`, or by a distinguishing
 input key, such as `GetByCustomerIdAsync`. Boolean members and questions use `Is`, `Has` or `Can`. A shared
 implementation step may use `Core` when a wrapper gives that step a different contract.

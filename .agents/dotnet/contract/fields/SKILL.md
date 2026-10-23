@@ -50,18 +50,11 @@ public InventoryTests()
 }
 ```
 
-2026-10-13: `this.` appears only where a constructor parameter is named after the member it fills and
-would otherwise shadow it — omitting it there, `context = context;`, is the self-assignment bug `this.`
-exists to prevent. A constructor that builds a field with no same-named parameter, or assigns a
-differently-named parameter to a public auto-property (`Reserve = reserveStockStep;`), has nothing to
-disambiguate, so the assignment stays unqualified. `dotnet_style_qualification_for_field = false:error`
-plus `EnforceCodeStyleInBuild` is kept at the scaffold level, but it is a partial gate, not a complete
-one: verified during implementation, IDE0003 ("remove this qualification") does not fire as a build
-diagnostic in the current SDK for field, property or method member access, under any configuration tried
-(including `dotnet_diagnostic.IDE0003.severity`, `dotnet format`, and with `Meziantou.Analyzer` added) —
-only the opposite direction, IDE0009 ("add this qualification"), does. A stray `this.` outside a
-constructor is therefore caught by review and by this contract's own examples, not by the build, until a
-reliable mechanism for that direction exists.
+`this.` appears only where a constructor parameter is named after the member it fills and would otherwise
+shadow it: there, `context = context;` is the self-assignment bug `this.` prevents. A constructor that builds
+a field with no same-named parameter, or assigns a differently-named parameter to a public auto-property
+(`Reserve = reserveStockStep;`), has nothing to disambiguate, so the assignment stays unqualified. The build
+does not report a stray `this.` (IDE0003 is not a build diagnostic), so review catches it.
 
 ## Captured state uses explicit `private readonly` fields, not primary-constructor captures
 
