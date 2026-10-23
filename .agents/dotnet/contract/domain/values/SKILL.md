@@ -15,9 +15,9 @@ Owns small immutable value representation and construction — struct-or-class c
 
 ## Applicability
 
-This contract has no application-stack prerequisite; its conventions are defaults under the tier gate's
-codebase-conventions rule. Wrap logic in a dedicated type only for a genuinely domain-rich concept, which
-may be introduced into a codebase that has few yet. A one-off condition, sort or deadline stays inline.
+This contract has no application-stack prerequisite; the tier gate's codebase-conventions rule
+decides where a codebase's own way wins. Wrap logic in a dedicated type only for a genuinely domain-rich
+concept; such types may enter a codebase that has few yet. A one-off condition, sort or deadline stays inline.
 2026-10-23: a session wrapped one deadline check and one `OrderBy(...).ThenBy(...)` in types no domain
 concept stood behind.
 

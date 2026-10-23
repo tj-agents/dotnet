@@ -15,8 +15,8 @@ Owns the C# mechanics of a comment or XML doc once it has earned its place.
 
 ## Applicability
 
-This contract has no application-stack prerequisite; its conventions are defaults under the tier gate's
-codebase-conventions rule.
+This contract has no application-stack prerequisite; the tier gate's codebase-conventions rule
+decides where a codebase's own way wins.
 
 **The policy — default to zero comments, the *why* lives in the commit message — is always-applicable
 and lives in your global agent instructions, not here.** This skill is only the C# mechanics that apply

@@ -39,8 +39,8 @@ keeping its own naming rule.
 | E2E — page state | Playwright `Expect(locator)` (`Microsoft.Playwright.Assertions`) |
 | E2E — a value read outside the page | Shouldly |
 
-The table is the default; a test project already using another library keeps it under the tier gate's
-codebase-conventions rule. 2026-10-23: a session added xUnit `Assert` to a FluentAssertions project.
+The tier gate's codebase-conventions rule decides when a test project's own library wins. 2026-10-23: a
+session added xUnit `Assert` to a FluentAssertions project.
 
 2026-10-13: a tier mixing two assertion libraries produces two failure-message formats and two idioms
 for the same check, for no benefit. Gate the choice in the build rather than at review. E2E is the one

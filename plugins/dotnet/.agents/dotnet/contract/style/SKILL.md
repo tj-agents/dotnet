@@ -15,8 +15,8 @@ Owns the general C# style rules every codebase shares; opinionated conventions h
 
 ## Applicability
 
-This contract has no application-stack prerequisite; its conventions are defaults under the tier gate's
-codebase-conventions rule.
+This contract has no application-stack prerequisite; the tier gate's codebase-conventions rule
+decides where a codebase's own way wins.
 
 Style rules an analyzer can express belong in the repository's `.editorconfig` at `severity = error`,
 not in prose. `dotnet:scaffold` writes them for a new project; an existing repository's own
