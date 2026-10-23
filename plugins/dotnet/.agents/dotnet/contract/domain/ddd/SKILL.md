@@ -72,9 +72,7 @@ inputs can belong to `PricingService.Quote`. A domain service can assess a cross
 the operation still needs an explicit consistency mechanism when concurrent changes could invalidate
 that decision. The service name alone supplies no transaction guarantee.
 
-Name the selected collaborator and operation through
-`dotnet:naming-collaborators`. Its role follows the business operation;
-the application-service row describes orchestration, not every service in a domain model.
+A domain service is named for the business operation it performs.
 
 ## A state change worth telling the rest of the system about is a domain event
 

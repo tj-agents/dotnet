@@ -35,11 +35,11 @@ TEST_CSPROJ = '<Project Sdk="Microsoft.NET.Sdk"><ItemGroup><PackageReference Inc
 
 CARVED_TREE = {
     ("api/src/Acme.Authz.Api/Placeholder/PlaceholderEndpoints.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:http-api"},
-    ("api/src/Acme.Authz.Api/Placeholder/PlaceholderResponse.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:naming-dtos"},
+    ("api/src/Acme.Authz.Api/Placeholder/PlaceholderResponse.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:http-api"},
     ("api/src/Acme.Authz.Api/Grants/ServiceCollectionExtensions.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:dependency-injection", "dotnet:mapping"},
     ("api/src/Acme.Authz.Api/Program.cs", "var builder = WebApplication.CreateBuilder(args);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:dependency-injection"},
     ("api/src/Acme.Authz.Domain/SystemClock.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design"},
-    ("api/src/Acme.Authz.Contracts/PermissionCheck.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:naming-dtos"},
+    ("api/src/Acme.Authz.Contracts/PermissionCheck.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:dtos"},
     ("api/src/Acme.Authz.Api/Persistence/MigrationRunner.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "efcore:persistence"},
     ("api/test/Acme.Authz.Api.Tests.Integration/ApiFixture.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:testing", "dotnet:testing-integration"},
     ("api/test/Acme.Authz.Api.Tests.Unit/TelemetryTestEnvironment.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:testing", "dotnet:testing-unit"},
@@ -49,35 +49,35 @@ CARVED_TREE = {
     ("api/test/Acme.Authz.Tests.E2E/Features/AccessReview.feature", ""): {"dotnet:testing", "dotnet:testing-e2e"},
     ("features/AccessReview.feature", ""): {"dotnet:testing", "dotnet:testing-e2e"},
     ("api/src/Acme.Authz.Api/Telemetry/Log.cs", "[LoggerMessage(Level = LogLevel.Information)]"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:logging"},
-    ("api/src/Acme.Authz.Api/Grants/GrantStore.cs", "private readonly ILoggerFactory loggerFactory;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:logging"},
-    ("api/src/Acme.Authz.Application/Access/RequestAccess.cs", "public Result<AccessGrant, RequestAccessError> Handle()"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-carriers"},
+    ("api/src/Acme.Authz.Api/Grants/GrantStore.cs", "private readonly ILoggerFactory loggerFactory;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:logging", "dotnet:repositories"},
+    ("api/src/Acme.Authz.Application/Access/RequestAccess.cs", "public Result<AccessGrant, RequestAccessError> Handle()"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-carriers", "dotnet:dtos"},
     ("api/src/Acme.Authz.Api/CLAUDE.md", ""): {"engineering:docs"},
     ("src/Acme.Billing.Infrastructure/Repositories/InvoiceRepository.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:repositories"},
-    ("src/Acme.Billing.Application/Invoices/RegisterInvoiceHandler.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators", "dotnet:domain-events"},
+    ("src/Acme.Billing.Application/Invoices/RegisterInvoiceHandler.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events", "dotnet:dtos"},
     ("src/Acme.Billing.Infrastructure/BillingDbContext.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:persistence"},
     ("src/Acme.Billing.Infrastructure/Migrations/20260101000000_Init.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:persistence"},
     ("src/Acme.Billing.Api/Invoices/InvoiceMappers.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:mapping"},
-    ("src/Acme.Billing.Application/Invoices/RegisterInvoiceValidator.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:validation"},
+    ("src/Acme.Billing.Application/Invoices/RegisterInvoiceValidator.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:validation", "dotnet:dtos"},
     ("src/Acme.Billing.Infrastructure/Seeding/InvoiceSeeder.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:seeding"},
     ("proto/authz/v1/authz.proto", ""): {"dotnet:proto"},
     ("api/src/Acme.Authz.Domain/Events/OrderCancelledDomainEvent.cs", "public sealed record OrderCancelledDomainEvent(Guid OrderId) : IDomainEvent;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-events"},
-    ("src/Acme.Billing.Application/Events/OrderCancelledDomainEventHandler.cs", "internal sealed class OrderCancelledDomainEventHandler : IPreCommitDomainEventHandler<OrderCancelledDomainEvent>"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events", "dotnet:naming-collaborators"},
-    ("src/Acme.Billing.Infrastructure/Messaging/OrderCancelledEventPublisher.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events", "dotnet:naming-collaborators", "dotnet:messaging"},
-    ("src/Acme.Billing.Infrastructure/Messaging/OrderCancelledEventConsumer.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events", "dotnet:naming-collaborators"},
+    ("src/Acme.Billing.Application/Events/OrderCancelledDomainEventHandler.cs", "internal sealed class OrderCancelledDomainEventHandler : IPreCommitDomainEventHandler<OrderCancelledDomainEvent>"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events", "dotnet:dtos"},
+    ("src/Acme.Billing.Infrastructure/Messaging/OrderCancelledEventPublisher.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events", "dotnet:messaging"},
+    ("src/Acme.Billing.Infrastructure/Messaging/OrderCancelledEventConsumer.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events"},
     ("src/Acme.Billing.Infrastructure/Messaging/OrderEventsProcessor.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:messaging"},
-    ("src/Acme.Billing.Application/Orders/OrderService.cs", "private readonly IIntegrationEventPublisher integrationEventPublisher;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:messaging"},
-    ("src/Acme.Billing.Application/Orders/OrderPlacedReaction.cs", "internal sealed class OrderPlacedReaction : IIntegrationEventHandler<OrderPlacedEvent>"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events"},
+    ("src/Acme.Billing.Application/Orders/OrderService.cs", "private readonly IIntegrationEventPublisher integrationEventPublisher;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:messaging", "dotnet:dtos"},
+    ("src/Acme.Billing.Application/Orders/OrderPlacedReaction.cs", "internal sealed class OrderPlacedReaction : IIntegrationEventHandler<OrderPlacedEvent>"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-events", "dotnet:dtos"},
     ("src/Acme.Billing.Domain/Invoice.cs", "    /// <summary>The issued invoice.</summary>"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:comments"},
     ("src/Acme.Billing.Infrastructure/Startup/ModuleRegistration.cs", "services.AddScoped<IOrderRepository, OrderRepository>();"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:dependency-injection"},
-    ("src/Acme.Billing.Application/Pricing/DiscountResolver.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators"},
+    ("src/Acme.Billing.Application/Pricing/DiscountResolver.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:dtos"},
     ("src/Acme.Billing.Domain/Order.cs", "public sealed class Order : IAggregateRoot"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-ddd"},
     ("src/Acme.Billing.Domain/Money.cs", "public readonly record struct Money(decimal Amount);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-values"},
     ("src/Acme.Billing.Domain/Sku.cs", "public static bool TryParse(string? text, [MaybeNullWhen(false)] out Sku sku)"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-values"},
     ("src/Acme.Billing.Domain/Invoices/InvoiceEntity.cs", "public sealed class InvoiceEntity : BaseEntity<Guid>"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-ddd"},
-    ("src/Acme.Billing.Application/Orders/OrderLookup.cs", "var error = await lookup.FindAsync(id).MapError(OrderErrors.From);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors-carriers"},
+    ("src/Acme.Billing.Application/Orders/OrderLookup.cs", "var error = await lookup.FindAsync(id).MapError(OrderErrors.From);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors-carriers", "dotnet:dtos"},
     ("src/Acme.Billing.Infrastructure/Configurations/InvoiceConfiguration.cs", "builder.HasQueryFilter(invoice => !invoice.IsDeleted);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules"},
-    ("src/Acme.Billing.Application/Orders/OrderService.cs", "public async Task<Result<Order, PlaceOrderError>> PlaceAsync()"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-carriers"},
-    ("src/Acme.Billing.Application/Orders/PlaceOrderError.cs", "public partial record PlaceOrderError : IError"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-results"},
+    ("src/Acme.Billing.Application/Orders/OrderService.cs", "public async Task<Result<Order, PlaceOrderError>> PlaceAsync()"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-carriers", "dotnet:dtos"},
+    ("src/Acme.Billing.Application/Orders/PlaceOrderError.cs", "public partial record PlaceOrderError : IError"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:errors", "dotnet:errors-results", "dotnet:dtos"},
     ("src/Acme.Billing.Web/Orders/OrdersController.cs", "return result.ToOkOrProblem();"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:http-api", "dotnet:errors-terminals"},
     ("src/Acme.Billing.Infrastructure/Fulfilment/FulfilmentRegistration.cs", "services.AddKeyedScoped<IFulfilmentStep, CourierStep>(FulfilmentMode.Courier);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:keyed-strategies"},
     ("src/Acme.Billing.Infrastructure/Fulfilment/FulfilmentRegistration.Unions.cs", "    .Case<IFulfilToAddress>(arm => arm.Use<CourierFulfil>(FulfilmentMode.Courier))"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:keyed-unions"},
@@ -90,14 +90,20 @@ CARVED_TREE = {
     ("Acme.Shop.slnx", '<Solution>\n  <Project Path="Billing/Modules/Invoices/Acme.Shop.Billing.Invoices.Application/Acme.Shop.Billing.Invoices.Application.csproj" />\n</Solution>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure"},
     ("Acme.Platform.slnx", '<Solution>\n  <Project Path="src/Acme.Ledger.Application/Acme.Ledger.Application.csproj" />\n  <Project Path="src/Acme.Audit.Application/Acme.Audit.Application.csproj" />\n</Solution>'): {"dotnet:build", "dotnet:libraries", "dotnet:structure"},
     ("src/Acme.Billing.Domain/Orders/Order.cs", "public sealed class Order(Guid id) : Entity<Guid>(id)"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:domain-design", "dotnet:domain-ddd"},
-    ("src/Acme.Billing.Application/Payments/PaymentSession.cs", "public static bool TryCreate(\n    string reference,\n    out PaymentSession session)"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-values"},
+    ("src/Acme.Billing.Application/Payments/PaymentSession.cs", "public static bool TryCreate(\n    string reference,\n    out PaymentSession session)"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:domain-values", "dotnet:dtos"},
     ("src/Acme.Billing.Infrastructure/Data/TenantFilters.cs", "builder.HasQueryFilter(Key, entity =>\n    entity.TenantId == context.TenantId);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:multitenancy"},
     ("src/Acme.Billing.Infrastructure/Repositories/ScopedRepository.cs", "internal interface IScopedRepository<TEntity> where TEntity : class, IEntity<Guid>;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:repositories"},
-    ("src/Acme.Billing.Application/Fulfilment/IFulfilmentUnionFactory.cs", "internal interface IFulfilmentUnionFactory;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators", "dotnet:keyed-unions"},
-    ("src/Acme.Billing.Infrastructure/Specifications/OrdersByStatusSpecification.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators", "efcore:specification"},
-    ("src/Acme.Billing.Infrastructure/Queries/OrderQueryBuilder.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:naming-collaborators", "efcore:query-building"},
+    ("src/Acme.Billing.Application/Fulfilment/IFulfilmentUnionFactory.cs", "internal interface IFulfilmentUnionFactory;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:keyed-unions", "dotnet:dtos"},
+    ("src/Acme.Billing.Infrastructure/Specifications/OrdersByStatusSpecification.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:specification"},
+    ("src/Acme.Billing.Infrastructure/Queries/OrderQueryBuilder.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:query-building"},
     ("src/Acme.Billing.Infrastructure/Interceptors/DispatchInterceptor.cs", "internal sealed class DispatchInterceptor : SaveChangesInterceptor;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:persistence", "efcore:event-dispatch"},
     ("src/Acme.Billing.Infrastructure/Repositories/EfInvoiceRepository.cs", "return await query.ToListAsync(ct);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:repositories", "efcore:persistence"},
+    ("src/Acme.Billing.Application/Access/AccessReviewService.cs", "private readonly IUserService userService;"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:dtos"},
+    ("src/Acme.Billing.Application/Access/IUserService.cs", "public interface IUserService"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:dtos"},
+    ("src/Acme.Billing.Api/Venues/VenueSummary.cs", "public sealed record VenueSummary(Guid Id);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:dtos"},
+    ("src/Acme.Billing.Infrastructure/Venues/VenueProjection.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:repositories"},
+    ("src/Acme.Billing.Infrastructure/Persistence/UnitOfWork.cs", "internal sealed class UnitOfWork : IUnitOfWork"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:persistence", "dotnet:unit-of-work"},
+    ("src/Acme.Billing.Infrastructure/Backups/BackupRestore.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules"},
     ("plans/skill-routes/PLAN.md", ""): {"engineering:plans"},
     ("reviews/Feature-SkillRoutes/REVIEW.md", ""): {"engineering:review-lifecycle"},
     ("AGENTS.md", ""): {"engineering:docs"},
@@ -157,7 +163,7 @@ class RouteDerivationTests(unittest.TestCase):
             )
             self.assertTrue(fired, f"route {index} ({route['path']}) matches nothing in the simulated tree")
 
-    def test_every_contract_skill_has_an_evidence_row(self) -> None:
+    def test_every_contract_skill_is_routed_or_design_time(self) -> None:
         routed = {
             identifier
             for route in generator.routes("efcore-service")["routes"]
@@ -168,9 +174,47 @@ class RouteDerivationTests(unittest.TestCase):
             f"{plugin}:" + re.search(r"^name: (.+)$", path.read_text(encoding="utf-8"), re.M).group(1)
             for plugin in ("dotnet", "efcore")
             for path in (ROOT / f".agents/{plugin}/contract").rglob("SKILL.md")
-        } - {"dotnet:explanation"}
+        }
+        design_time = set(generator.DESIGN_TIME)
         self.assertTrue(contracts)
-        self.assertEqual(set(), contracts - routed)
+        self.assertEqual(set(), contracts - routed - design_time)
+        self.assertEqual(set(), routed & design_time)
+        self.assertEqual(set(), design_time - contracts)
+        self.assertTrue(all(reason.strip() for reason in generator.DESIGN_TIME.values()))
+
+    def test_floor_denies_a_collaborator_field_not_named_for_its_type(self) -> None:
+        floor = next(route for route in generator.routes("dotnet-service")["routes"] if route["path"] == generator.CS_PATH)
+        pattern = re.compile(floor["deny"][0]["pattern"])
+        denied = (
+            "private readonly IUserService users;",
+            "private readonly IUserService _users;",
+            "private readonly IUserService service;",
+            "private readonly IOrderRepository repo = repo;",
+            "private readonly IUserService? users;",
+        )
+        allowed = (
+            "private readonly IUserService userService;",
+            "private readonly IUserService _userService;",
+            "private readonly IExchangeRatesResolver fallbackExchangeRatesResolver;",
+            "private readonly ILogger<OrderService> logger;",
+            "private readonly IOptions<VenueOptions> options;",
+            "private readonly IReadOnlyList<Order> orders;",
+            "private readonly IEqualityComparer<string> comparer;",
+            "private readonly IDictionary<string, int> counts = new Dictionary<string, int>();",
+            "private readonly IPAddress ipAddress;",
+            "private readonly int count;",
+            "private readonly Inventory inventory;",
+            "private readonly IPAddress address;",
+            "private readonly IDisposable subscription;",
+            "private readonly IServiceScopeFactory serviceScopeFactory;",
+            "private readonly IUserService? userService;",
+        )
+        for line in denied:
+            with self.subTest(denied=line):
+                self.assertIsNotNone(pattern.search(line))
+        for line in allowed:
+            with self.subTest(allowed=line):
+                self.assertIsNone(pattern.search(line))
 
     def test_generic_dotnet_routes_do_not_require_efcore(self) -> None:
         declaration = generator.routes("dotnet-service")

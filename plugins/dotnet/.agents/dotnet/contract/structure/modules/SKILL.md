@@ -54,8 +54,7 @@ When each layer is warranted:
 - **Api** — it exposes HTTP endpoints.
 
 An application service in `Application` orchestrates one use case: `OrderService.PlaceAsync` returns the
-operation value or completion, with the use case's expected failures. The collaborators it composes take
-their roles from `dotnet:naming-collaborators`.
+operation value or completion, with the use case's expected failures.
 
 ## Time
 

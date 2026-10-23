@@ -11,6 +11,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `domain-design` — contract — core — `.agents/dotnet/contract/domain/design/SKILL.md`
 - `domain-events` — contract — domain-model — `.agents/dotnet/contract/domain/events/SKILL.md`
 - `domain-values` — contract — patterns — `.agents/dotnet/contract/domain/values/SKILL.md`
+- `dtos` — contract — core — `.agents/dotnet/contract/dtos/SKILL.md`
 - `errors` — contract — core — `.agents/dotnet/contract/errors/SKILL.md`
 - `errors-carriers` — contract — results — `.agents/dotnet/contract/errors/carriers/SKILL.md`
 - `errors-results` — contract — results — `.agents/dotnet/contract/errors/results/SKILL.md`
@@ -27,8 +28,6 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `messaging` — contract — distributed-services — `.agents/dotnet/contract/messaging/SKILL.md`
 - `microservice-boundaries` — contract — distributed-services — `.agents/dotnet/contract/microservice/boundaries/SKILL.md`
 - `naming` — contract — core — `.agents/dotnet/contract/naming/SKILL.md`
-- `naming-collaborators` — contract — core — `.agents/dotnet/contract/naming/collaborators/SKILL.md`
-- `naming-dtos` — contract — core — `.agents/dotnet/contract/naming/dtos/SKILL.md`
 - `proto` — contract — distributed-services — `.agents/dotnet/contract/proto/SKILL.md`
 - `repositories` — contract — core — `.agents/dotnet/contract/repositories/SKILL.md`
 - `seeding` — contract — seeding — `.agents/dotnet/contract/seeding/SKILL.md`
@@ -40,6 +39,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `testing-e2e` — contract — e2e — `.agents/dotnet/contract/testing/e2e/SKILL.md`
 - `testing-integration` — contract — integration-testing — `.agents/dotnet/contract/testing/integration/SKILL.md`
 - `testing-unit` — contract — unit-testing — `.agents/dotnet/contract/testing/unit/SKILL.md`
+- `unit-of-work` — contract — core — `.agents/dotnet/contract/unit-of-work/SKILL.md`
 - `validation` — contract — validation — `.agents/dotnet/contract/validation/SKILL.md`
 - `direction` — knowledge — knowledge — `.agents/dotnet/knowledge/direction/SKILL.md`
 - `knowledge` — knowledge — knowledge — `.agents/dotnet/knowledge/knowledge/SKILL.md`

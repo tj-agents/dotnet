@@ -29,6 +29,12 @@
         "dotnet:style",
         "dotnet:naming",
         "dotnet:fields"
+      ],
+      "deny": [
+        {
+          "pattern": "\\bprivate\\s+(?:static\\s+)?readonly\\s+I(?!(?:ReadOnly|Async)?(?:Enumerable|Collection|List|Set|Dictionary)\\b|(?:Equality)?Comparer\\b|(?:Async)?Disposable\\b|PAddress\\b)(?P<subject>[A-Z][A-Za-z0-9]*)(?:<[^;=()]*>)?\\??\\s+(?i:(?!\\w*(?P=subject)\\s*[;=])\\w+)\\s*[;=]",
+          "reason": "A field holding a collaborator is named for that collaborator's subject and role without the `I`: `private readonly IUserService userService;` (dotnet:naming)."
+        }
       ]
     },
     {
@@ -96,13 +102,19 @@
       ]
     },
     {
-      "path": "(?i:\\.contracts/.*\\.cs$|(dto|request|response)s?\\.cs$)",
+      "path": "(?i:\\.(application|contracts)/.*\\.cs$)|(?-i:[a-z0-9](Dto|DTO|Summary|Summaries)s?\\.cs$|(^|/)I?Pagination\\.cs$)",
       "skills": [
-        "dotnet:naming-dtos"
+        "dotnet:dtos"
       ]
     },
     {
-      "path": "(?i:(repository|repositories)\\.cs$)",
+      "path": "(?i:(request|response)s?\\.cs$)",
+      "skills": [
+        "dotnet:http-api"
+      ]
+    },
+    {
+      "path": "(?i:(repository|repositories)\\.cs$)|(?-i:[a-z0-9](Store|Stores|Projection|Projections)\\.cs$)",
       "skills": [
         "dotnet:repositories"
       ]
@@ -173,7 +185,6 @@
     {
       "path": "(?i:(publisher|consumer|handler)s?\\.cs$)",
       "skills": [
-        "dotnet:naming-collaborators",
         "dotnet:domain-events"
       ]
     },
@@ -198,9 +209,16 @@
       ]
     },
     {
-      "path": "(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|querybuilder|committer)s?\\.cs$)",
+      "path": "(?i:unitofworks?\\.cs$)",
       "skills": [
-        "dotnet:naming-collaborators"
+        "dotnet:unit-of-work"
+      ]
+    },
+    {
+      "path": "(?i:\\.cs$)(?#unit-of-work)",
+      "content_requires": "(?i:\\biunitofwork\\b)",
+      "skills": [
+        "dotnet:unit-of-work"
       ]
     },
     {

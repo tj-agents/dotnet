@@ -49,9 +49,8 @@ The key therefore crosses exactly one boundary — registration into the factory
 covers the strategy half too: a `mode` in a handler, mapper, service, or `when` guard means the capability did
 not reach far enough.
 
-2026-10-13: the union is named `Fulfilment`, not `Fulfil` — a case cannot share its enclosing union's name
-(`Fulfil.Fulfil` does not compile, CS0542), which is exactly the `Operation.Operation` shape this document's
-own naming rule says to avoid.
+The union takes a noun distinct from every case name (`Fulfilment`): a case cannot share its enclosing
+union's name (CS0542).
 
 ## The registration block is the partition
 

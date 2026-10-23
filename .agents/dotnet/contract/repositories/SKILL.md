@@ -1,6 +1,6 @@
 ---
 name: repositories
-description: Canonical C# repository contracts independent of an ORM — the entity a repository persists, query and write verbs, nullable single-row results, collections and predicates, locking suffixes, and the boundary to application resolvers and result carriers. Use when naming or reviewing a repository, persistence method, or extracted application collaborator.
+description: Canonical C# repository contracts independent of an ORM — `XRepository` vs `XStore` vs `XProjection`, the entity a repository persists, query and write verbs, nullable single-row results, collections and predicates, locking suffixes, and the boundary to application resolvers and result carriers. Use when naming or reviewing a repository, persistence method, or extracted application collaborator.
 kind: contract
 domain: dotnet
 profile: core
@@ -31,10 +31,15 @@ These house conventions apply wherever a project exposes repositories. Shared id
 product's own repository base hierarchy belongs to that product's standards. A project
 can use this naming contract without choosing EF Core, tenancy, a result library or a dispatch architecture.
 
-## Name the entity it persists
+## Repository, store and projection
 
-Name a repository for the established entity or read-model subject and its role: `IOrderRepository` /
-`OrderRepository`. A narrower interface can be implemented by its existing repository when that repository
+| Word | Use when |
+|---|---|
+| `OrderRepository` | Collection-like access to entities your own database owns |
+| `OrderStore` | An adapter over storage the domain does not own as entities: blobs, keys, an identity or authorization store (`IUserStore`, `RoleStore`) |
+| `OrderProjection` | A query returns an intermediate shape its caller must still map or enrich; otherwise return the entity or final shape directly |
+
+A narrower interface can be implemented by its existing repository when that repository
 owns the capability. The interface's operations determine its capability — read, write or both — including when a
 query enlists a writable context in an existing transaction. Transaction participation and use by an authorization
 operation preserve that persistence role. Framework-owned repository interfaces keep their framework
@@ -44,7 +49,7 @@ contracts.
 
 | Operation | Name form | Returned contract |
 |---|---|---|
-| Retrieve one persisted row or projection | `GetByIdAsync`, `GetDetailsByCustomerIdAsync` | The value or `null` when no row matches |
+| Retrieve one persisted row or projection | `GetByIdAsync`, `GetSummaryByCustomerIdAsync` | The value or `null` when no row matches |
 | Retrieve zero or more values | `GetByCustomerIdAsync`, qualified by the returned shape when needed | A read-only collection; no matches is empty |
 | Retrieve unique values | `GetExistingIdsAsync` | A read-only set |
 | Test existence | `ExistsByCustomerIdAsync` | `bool` |
@@ -53,10 +58,10 @@ contracts.
 
 Select distinguishing names from the actual parameters and output. Where a single-row and collection
 query would otherwise have identical names and parameters, expose their shape or cardinality clearly.
-Every asynchronous operation uses `Async`, accepts cancellation when it can reach I/O and propagates it.
+Every asynchronous operation accepts cancellation when it can reach I/O and propagates it.
 
 Expose locking guarantees callers must rely on, such as `GetByIdForUpdateAsync` or
-`GetSnapshotsByIdsForShareAsync`. The suffix names the SQL locking clause (`FOR UPDATE`, `FOR SHARE`)
+`GetByIdsForShareAsync`. The suffix names the SQL locking clause (`FOR UPDATE`, `FOR SHARE`)
 taken with the returned row, not the caller's purpose — the contract is the lock, whatever the caller
 does next. A composite identity can use an established domain key as a whole:
 `idempotencyKeys.GetByRequestForUpdateAsync(tenantId, operation, requestId, ct)`. Preserve every identity
@@ -65,13 +70,10 @@ predicate; spell out component names when they distinguish different queries.
 ## Persistence and application boundaries
 
 Repositories own storage queries, filtering, projection, persistence and the locks/enlistment supporting
-those operations. Returned payload names follow
-`dotnet:naming-dtos`; a final `OrderSummary` retains that name
-when a repository projects it directly.
+those operations. Returned shape names follow `dotnet:dtos`.
 
-Application selection, resolution rules and the interpretation of several persisted inputs belong to
-the appropriate collaborator under `dotnet:naming-collaborators`.
-That collaborator consumes repository queries and exposes its own operation and returned outcomes.
+Application selection, resolution rules and the interpretation of several persisted inputs belong to an
+application collaborator, which consumes repository queries and exposes its own operation and outcomes.
 A project location named Infrastructure can contain implementations on both sides of this boundary.
 
 Repository single-row absence remains nullable. The consuming application boundary converts that

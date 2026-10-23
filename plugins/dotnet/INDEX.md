@@ -7,6 +7,7 @@
 - `domain-design` — contract — core
 - `domain-events` — contract — domain-model
 - `domain-values` — contract — patterns
+- `dtos` — contract — core
 - `errors` — contract — core
 - `errors-carriers` — contract — results
 - `errors-results` — contract — results
@@ -23,8 +24,6 @@
 - `messaging` — contract — distributed-services
 - `microservice-boundaries` — contract — distributed-services
 - `naming` — contract — core
-- `naming-collaborators` — contract — core
-- `naming-dtos` — contract — core
 - `proto` — contract — distributed-services
 - `repositories` — contract — core
 - `seeding` — contract — seeding
@@ -36,6 +35,7 @@
 - `testing-e2e` — contract — e2e
 - `testing-integration` — contract — integration-testing
 - `testing-unit` — contract — unit-testing
+- `unit-of-work` — contract — core
 - `validation` — contract — validation
 - `direction` — knowledge — knowledge
 - `knowledge` — knowledge — knowledge
