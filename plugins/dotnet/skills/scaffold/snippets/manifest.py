@@ -30,8 +30,8 @@ SNIPPETS: list[Snippet] = [
           header="internal interface IUserService { }\n\n#pragma warning disable CS0169, CS8618\n\ninternal sealed class InvoiceSender\n{\n",
           footer="\n}\n\n#pragma warning restore CS0169, CS8618\n"),
     entry("fields-01-private-fields", "fields/SKILL.md", 1, "infrastructure", "SnippetFixtures.Fields01",
-          header="internal sealed class OrderDbContext;\n\n#pragma warning disable CS0169, CS8618\n\ninternal sealed class OrderService\n{\n",
-          footer="\n}\n\n#pragma warning restore CS0169, CS8618\n"),
+          header="internal sealed class OrderDbContext;\n\n#pragma warning disable CS0169, CS8618, IDE1006\n\ninternal sealed class OrderService\n{\n",
+          footer="\n}\n\n#pragma warning restore CS0169, CS8618, IDE1006\n"),
     entry("fields-02-no-shadow", "fields/SKILL.md", 2, "infrastructure", "SnippetFixtures.Fields02",
           header=(
               "internal sealed class StockCatalog;\n"
