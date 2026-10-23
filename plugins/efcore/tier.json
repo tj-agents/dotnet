@@ -17,5 +17,46 @@
         "pattern": "(?i)Microsoft\\.EntityFrameworkCore|Npgsql\\.EntityFrameworkCore|Pomelo\\.EntityFrameworkCore"
       }
     ]
-  }
+  },
+  "routes": [
+    {
+      "path": "(?i:dbcontext\\.cs$|(^|/)(migrations|persistence)/.*\\.cs$)",
+      "skills": [
+        "efcore:persistence"
+      ]
+    },
+    {
+      "path": "(?i:\\.cs$)(?#efcore-persistence)",
+      "content_requires": "(?i:\\b(dbcontext|dbset|savechangesasync|savechangesinterceptor)\\b|microsoft\\.entityframeworkcore|\\.(tolistasync|singleordefaultasync|asnotracking)\\()",
+      "skills": [
+        "efcore:persistence"
+      ]
+    },
+    {
+      "path": "(?i:specifications?\\.cs$)",
+      "skills": [
+        "efcore:specification"
+      ]
+    },
+    {
+      "path": "(?i:querybuilders?\\.cs$)",
+      "skills": [
+        "efcore:query-building"
+      ]
+    },
+    {
+      "path": "(?i:\\.cs$)(?#efcore-event-dispatch)",
+      "content_requires": "(?i:\\bsavechangesinterceptor\\b|\\b(savingchanges|savedchanges)(async)?\\b)",
+      "skills": [
+        "efcore:event-dispatch"
+      ]
+    },
+    {
+      "path": "(?i:\\.cs$)(?#multitenancy)",
+      "content_requires": "(?i:\\b(itenantcontext|imultitenantcontextaccessor|icurrenttenant)\\b|\\.hasqueryfilter\\([^)]{0,300}?tenant|\\.ignorequeryfilters\\()",
+      "skills": [
+        "efcore:multitenancy"
+      ]
+    }
+  ]
 }
