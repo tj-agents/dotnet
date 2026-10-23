@@ -23,7 +23,7 @@ E2E_TEST_PATH = r"(?i:(tests\.e2e|e2etests)[./]|\.feature$)"
 DOMAIN_LAYER_PATH = r"(?i:\.domain/.*\.cs$)"
 MODULE_LAYER_PATH = r"(?i:\.(application|infrastructure)/.*\.cs$)"
 HTTP_EDGE_PATH = r"(?i:(controller|endpoint)s?\.cs$)"
-DTO_PATH = r"(?i:\.contracts/.*\.cs$|(dto|request|response)s?\.cs$)"
+DTO_PATH = r"(?i:\.contracts/.*\.cs$|(dto|request|response|snapshot|summary|details|projection|decision|evidence|proof|descriptor|catalog|binding|(?<!db)context)s?\.cs$)"
 REPOSITORY_PATH = r"(?i:(repository|repositories)\.cs$)"
 PERSISTENCE_PATH = r"(?i:dbcontext\.cs$|(^|/)(migrations|persistence)/.*\.cs$)"
 COMPOSITION_PATH = r"(?i:(^|/)program\.cs$|(servicecollection|dependencyinjection)[^/]*\.cs$)"
@@ -45,7 +45,8 @@ COMMENTS_CONTENT = r"(?m:^[ \t]*//)"
 EXTENSIONS_PATH = r"(?i:extensions?\.cs$)"
 DEPENDENCY_INJECTION_CS_PATH = r"(?i:(\.c)s$)"
 DEPENDENCY_INJECTION_CONTENT = r"(?i:\biservicecollection\b|\.add(scoped|singleton|transient)\b)"
-COLLABORATOR_PATH = r"(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|querybuilder|committer)s?\.cs$)"
+COLLABORATOR_PATH = r"(?i:(resolver|validator|factory|builder|calculator|client|store|provider|accessor|evaluator|policy|specification|registry|session|runner|committer)s?\.cs$)"
+INTERFACE_CONTENT = r"(?m:^[ \t]*(?:(?:public|internal|private|protected|file|partial)[ \t]+)*interface[ \t]+I[A-Z])"
 SPECIFICATION_PATH = r"(?i:specifications?\.cs$)"
 QUERY_BUILDER_PATH = r"(?i:querybuilders?\.cs$)"
 EF_PERSISTENCE_CONTENT = r"(?i:\b(dbcontext|dbset|savechangesasync|savechangesinterceptor)\b|microsoft\.entityframeworkcore|\.(tolistasync|singleordefaultasync|asnotracking)\()"
@@ -72,6 +73,9 @@ def cs_content_path(skill: str) -> str:
 
 
 KINDS = ("dotnet-service", "efcore-service")
+DESIGN_TIME = {
+    "dotnet:explanation": "Governs how C# is quoted in a chat explanation; no file write reveals it.",
+}
 REGISTRY = {
     "infonetica/cris-authz": "dotnet-service",
 }
@@ -118,6 +122,7 @@ def routes(kind: str) -> dict:
         {"path": MESSAGING_CS_PATH, "content_requires": MESSAGING_CONTENT, "skills": ["dotnet:messaging"]},
         {"path": DEPENDENCY_INJECTION_CS_PATH, "content_requires": DEPENDENCY_INJECTION_CONTENT, "skills": ["dotnet:dependency-injection"]},
         {"path": COLLABORATOR_PATH, "skills": ["dotnet:naming-collaborators"]},
+        {"path": cs_content_path("naming-collaborators"), "content_requires": INTERFACE_CONTENT, "skills": ["dotnet:naming-collaborators"]},
         {"path": cs_content_path("domain-ddd"), "content_requires": DDD_CONTENT, "skills": ["dotnet:domain-ddd"]},
         {"path": cs_content_path("domain-values"), "content_requires": VALUES_CONTENT, "skills": ["dotnet:domain-values"]},
         {"path": cs_content_path("errors-carriers"), "content_requires": CARRIERS_CONTENT, "skills": ["dotnet:errors-carriers"]},

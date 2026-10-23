@@ -1,6 +1,6 @@
 ---
 name: naming
-description: Shared C# naming conventions — domain vocabulary, namespace-aware identifiers, interface/type pairing and readable method names. Routes domain modeling, value construction, collaborator responsibility, return contracts, validation, persistence, DTOs, mapping and transport naming to their owning standards. Use for shared identifier decisions or to locate the naming standard for the concern being changed.
+description: Generic C# identifier naming — every field, parameter and local named for what it holds (`IUserService userService`), casing and affixes, nouns for types and verbs for methods, interface/implementation pairs, role nouns matching their verb, one subject word per concept, booleans and namespace-aware type names. Use when naming or reviewing any C# type, member, field, parameter or local.
 kind: contract
 domain: dotnet
 profile: core
@@ -9,7 +9,7 @@ requires: none
 provenance: language, house
 ---
 
-# Shared C# naming
+# C# naming
 
 Read and follow the [canonical definition](../../.agents/dotnet/contract/naming/SKILL.md) in full.
 This discovery entry is generated; edit the referenced `.agents/` definition.

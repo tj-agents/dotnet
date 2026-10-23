@@ -53,7 +53,7 @@ contracts.
 
 Select distinguishing names from the actual parameters and output. Where a single-row and collection
 query would otherwise have identical names and parameters, expose their shape or cardinality clearly.
-Every asynchronous operation uses `Async`, accepts cancellation when it can reach I/O and propagates it.
+Every asynchronous operation accepts cancellation when it can reach I/O and propagates it.
 
 Expose locking guarantees callers must rely on, such as `GetByIdForUpdateAsync` or
 `GetSnapshotsByIdsForShareAsync`. The suffix names the SQL locking clause (`FOR UPDATE`, `FOR SHARE`)

@@ -40,8 +40,7 @@ that guarantee. A summary or selection remains named for its represented meaning
 merely its implementation shape.
 
 The entity's domain name, with `Dto` where needed to distinguish it, identifies the shape that models
-that entity. A partial shape gets the name of the part it represents. Use the same noun for the same
-concept across application and internal module boundaries.
+that entity. A partial shape gets the name of the part it represents.
 
 ## DTOs describe the application contract
 
@@ -49,7 +48,7 @@ Use `Dto` where it distinguishes a transfer contract from a same-named entity or
 noun alone where the contract is already unambiguous. A meaning-bearing suffix already marks the shape:
 `OrderSnapshot` is a DTO on its own, and `OrderSnapshotDto` is redundant unless the domain itself owns
 an `OrderSnapshot` to distinguish from. Keep names stable when the same application shape is consumed
-from different transports. Resolve an SDK name collision with a local `using` alias.
+from different transports.
 
 Application input types name the accepted operation or reusable input shape. Endpoint-specific naming
 and wire shaping follow `dotnet:http-api` for HTTP or

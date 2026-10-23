@@ -26,6 +26,9 @@ def entry(
 
 
 SNIPPETS: list[Snippet] = [
+    entry("naming-01-collaborator-field", "naming/SKILL.md", 1, "infrastructure", "SnippetFixtures.Naming01",
+          header="internal interface IUserService { }\n\n#pragma warning disable CS0169, CS8618\n\ninternal sealed class InvoiceSender\n{\n",
+          footer="\n}\n\n#pragma warning restore CS0169, CS8618\n"),
     entry("fields-01-private-fields", "fields/SKILL.md", 1, "infrastructure", "SnippetFixtures.Fields01",
           header="internal sealed class OrderDbContext;\n\n#pragma warning disable CS0169, CS8618\n\ninternal sealed class OrderService\n{\n",
           footer="\n}\n\n#pragma warning restore CS0169, CS8618\n"),
