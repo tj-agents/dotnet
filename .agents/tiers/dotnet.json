@@ -32,7 +32,7 @@
       ],
       "deny": [
         {
-          "pattern": "\\bprivate\\s+(?:static\\s+)?readonly\\s+I(?!(?:ReadOnly|Async)?(?:Enumerable|Collection|List|Set|Dictionary)\\b|(?:Equality)?Comparer\\b)(?P<subject>[A-Z][A-Za-z0-9]*)(?:<[^;=()]*>)?\\s+(?i:(?!\\w*(?P=subject)\\s*[;=])\\w+)\\s*[;=]",
+          "pattern": "\\bprivate\\s+(?:static\\s+)?readonly\\s+I(?!(?:ReadOnly|Async)?(?:Enumerable|Collection|List|Set|Dictionary)\\b|(?:Equality)?Comparer\\b|(?:Async)?Disposable\\b|PAddress\\b)(?P<subject>[A-Z][A-Za-z0-9]*)(?:<[^;=()]*>)?\\??\\s+(?i:(?!\\w*(?P=subject)\\s*[;=])\\w+)\\s*[;=]",
           "reason": "A field holding a collaborator is named for that collaborator's subject and role without the `I`: `private readonly IUserService userService;` (dotnet:naming)."
         }
       ]
@@ -114,7 +114,7 @@
       ]
     },
     {
-      "path": "(?i:(repository|repositories|stores?|projections?)\\.cs$)",
+      "path": "(?i:(repository|repositories)\\.cs$)|(?-i:[a-z0-9](Store|Stores|Projection|Projections)\\.cs$)",
       "skills": [
         "dotnet:repositories"
       ]

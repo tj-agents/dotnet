@@ -14,14 +14,14 @@ internal interface IFulfilmentStrategyFactory<TStrategy>
 internal sealed class FulfilmentStrategyFactory<TStrategy> : IFulfilmentStrategyFactory<TStrategy>
     where TStrategy : class
 {
-    private readonly IKeyedServiceProvider services;
+    private readonly IKeyedServiceProvider keyedServiceProvider;
 
-    public FulfilmentStrategyFactory(IKeyedServiceProvider services)
+    public FulfilmentStrategyFactory(IKeyedServiceProvider keyedServiceProvider)
     {
-        this.services = services;
+        this.keyedServiceProvider = keyedServiceProvider;
     }
 
     public TStrategy Create(FulfilmentMode mode) =>
-        services.GetRequiredKeyedService<TStrategy>(mode);
+        keyedServiceProvider.GetRequiredKeyedService<TStrategy>(mode);
 }
 // snippet:end
