@@ -96,7 +96,7 @@
       ]
     },
     {
-      "path": "(?i:\\.contracts/.*\\.cs$|(dto|request|response)s?\\.cs$)",
+      "path": "(?i:\\.contracts/.*\\.cs$|(dto|request|response|snapshot|summary|details|projection|decision|evidence|proof|descriptor|catalog|binding|(?<!db)context)s?\\.cs$)",
       "skills": [
         "dotnet:naming-dtos"
       ]
@@ -198,7 +198,14 @@
       ]
     },
     {
-      "path": "(?i:(resolver|factory|calculator|provider|policy|evaluator|specification|querybuilder|committer)s?\\.cs$)",
+      "path": "(?i:(resolver|validator|factory|builder|calculator|client|store|provider|accessor|evaluator|policy|specification|registry|session|runner|committer)s?\\.cs$)",
+      "skills": [
+        "dotnet:naming-collaborators"
+      ]
+    },
+    {
+      "path": "(?i:\\.cs$)(?#naming-collaborators)",
+      "content_requires": "(?m:^[ \\t]*(?:(?:public|internal|private|protected|file|partial)[ \\t]+)*interface[ \\t]+I[A-Z])",
       "skills": [
         "dotnet:naming-collaborators"
       ]

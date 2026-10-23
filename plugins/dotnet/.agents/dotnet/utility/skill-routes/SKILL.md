@@ -31,6 +31,9 @@ The `routes` in the shipped `dotnet` and `efcore` tier declarations are what gat
 table of its own, so every repository the tier detects is gated without a per-repository step. Rerun
 `--emit-tiers` after changing a row.
 
+Every contract skill is named by a row or listed with its reason in the generator's `DESIGN_TIME`, when no
+path or content can reveal its concern; the route test fails on a contract that is neither.
+
 The `--into` table is the mechanism the router resolves today; the emitted registry becomes live only
 once a routes directory ships beside the installed router. Adding a consumer repo is one `REGISTRY`
 row in the generator.

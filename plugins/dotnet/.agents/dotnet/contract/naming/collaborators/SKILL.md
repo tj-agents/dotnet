@@ -34,11 +34,7 @@ owner before applying collaborator roles. Value construction follows
 
 Read the implementation and production callers. Establish these five parts before naming the type:
 
-1. Subject: the established domain concept the caller works with. Collaborators for the same concept
-   use the same subject word, including exact plurality, in `<Subject><Role>`. Collaborators for distinct
-   concepts may use different subjects, even in the same folder.
-   A field or parameter holding an injected collaborator keeps the type's subject and role:
-   `IExchangeRatesResolver exchangeRatesResolver`.
+1. Subject: the established domain concept the caller works with, in `<Subject><Role>`.
 2. Responsibility: the work this component owns and the work supplied by its dependencies.
 3. Operation: the action and, when useful, the particular returned shape.
 4. Success value: the thing produced, selected, transformed or assessed.
@@ -54,16 +50,13 @@ Creating an object can be one step in a calculation. Name the complete responsib
 |---|---|---|
 | Select or derive a usable value from inputs, candidates or current state | `OrderResolver.ResolveSnapshotAsync` | The resolved `OrderSnapshot`, with absence or rejection when the contract permits them |
 | Assess a supplied candidate against rules | `OrderValidator.ValidateCheckoutAsync` | Validation decision and diagnostics; the supplied candidate remains the candidate |
-| Compute a value | `TaxCalculator.Calculate` | The computed amount; any expected failure belongs to the calculation contract |
-| Construct an instance or component | `ConnectionFactory.Create` | The constructed instance |
+| Construct an instance or component in one call | `ConnectionFactory.Create` | The constructed instance |
 | Accumulate construction steps | `DocumentBuilder.Build` | The completed object produced from the accumulated state |
-| Generate a value or artifact | `ReferenceGenerator.Generate` | The generated reference or artifact |
 | Call an external API | `ShippingClient.GetTrackingAsync` | The external capability, with outcomes translated at the client boundary |
 | Read or write opaque bytes or blobs | `DocumentStore.ReadAsync` / `WriteAsync` | Stored content or write completion |
 | Supply a value or pluggable strategy | `TimeProvider.GetUtcNow` | The supplied value under the provider's stated guarantee |
 | Expose a current or ambient value | `RequestContextAccessor.Current` | The value already associated with that context |
 | React to an event or message | `OrderPlacedHandler.HandleAsync` | Handling completion under the messaging contract |
-| Render, serialize or export | `InvoiceRenderer.Render`, `OrderSerializer.Serialize`, `ReportExporter.Export` | The rendered or encoded representation |
 | Decide an outcome by applying declared rules | `TransitionEvaluator.Evaluate`, `ShipmentReleaseEvaluator.EvaluateAsync` | The decision as a verdict type, over the inputs and any state the rules require |
 | Declare a named rule with no side effects | `ShipmentGrantPolicy` | The rule as data or expression; an evaluator or filter composition enforces it |
 | Test a candidate against a composable predicate | `OverdueOrderSpecification.IsSatisfiedBy` | Whether the candidate satisfies the specification |
@@ -100,8 +93,8 @@ resolver contract even when its implementation lives in an Infrastructure projec
 ## Validator contracts
 
 A validator assesses an existing candidate and reports whether its rules hold. Name its operation
-`Validate` or `Validate` plus the assessed intent, with `Async` for asynchronous work. An actual boolean
-capability question uses `Can`, `Is` or `Has` and returns `bool`.
+`Validate` or `Validate` plus the assessed intent. An actual capability question is a `bool` predicate,
+not a validator.
 
 Projects selecting `dotnet:validation` use that owner's separate input-shape
 and domain-eligibility contracts, including their validation result types. Library-owned validator
@@ -188,6 +181,5 @@ production call site together.
 A role change includes the responsibilities and dependencies that establish it. Moving a persistence
 operation into an application collaborator also changes its boundary contract and invokes the selected
 carrier rules. Preserve transaction, cancellation and authorization guarantees through that change.
-Keep protocol-specific failure mapping at its owning boundary. Compare subject spelling and plurality
-with sibling collaborators for the same concept. Confirm that the resulting call reads as the domain
-subject performing its operation and producing the documented outcome.
+Keep protocol-specific failure mapping at its owning boundary. Confirm that the resulting call reads as
+the domain subject performing its operation and producing the documented outcome.

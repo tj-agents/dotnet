@@ -1,6 +1,6 @@
 ---
 name: fields
-description: How a C# type names, declares and reaches its own state — private fields without an underscore prefix, `this.` only where a constructor parameter shadows the member it fills, explicit `private readonly` fields instead of primary-constructor captures, and `base.`-qualified inherited calls. Use when declaring a field, writing a constructor, choosing between a primary constructor and explicit fields, or calling an inherited member.
+description: The house convention for how a C# type spells, declares and reaches its own state — private fields without an underscore prefix, `this.` only where a constructor parameter shadows the member it fills, explicit `private readonly` fields instead of primary-constructor captures, and `base.`-qualified inherited calls. Use when declaring a field, writing a constructor, choosing between a primary constructor and explicit fields, or calling an inherited member.
 kind: contract
 domain: dotnet
 profile: core
@@ -11,12 +11,15 @@ provenance: house
 
 # Fields and member qualification
 
-Owns how a type names, declares and qualifies its own state and inherited members.
+Owns how a type spells, declares and qualifies its own state and inherited members. What a field is
+called is `dotnet:naming`'s; this skill owns only its spelling.
 
 ## Applicability
 
-This contract applies to every C#/.NET repository and has no application-stack prerequisite. The
-repository's `.editorconfig` carries the enforceable half — the private-field naming rule and
+This contract has no application-stack prerequisite. It is house: Microsoft's default spells private
+fields `_camelCase`, `s_camelCase` and `t_camelCase`, so a codebase following that default replaces this
+skill and keeps `dotnet:naming`. The repository's `.editorconfig` carries the enforceable half — the
+private-field `camel_case` naming rule with `dotnet_diagnostic.IDE1006.severity = error`, and
 `dotnet_style_qualification_for_field = false:error` — and `dotnet:scaffold` writes both.
 
 ## Private fields carry no underscore prefix; `this.` disambiguates a shadowed constructor parameter

@@ -34,8 +34,7 @@ public interface IIntegrationEventPublisher
 ```
 
 2026-10-13: `IIntegrationEventPublisher` is the one broker-abstraction role per solution — generic over
-the event type, never per subject (`INoteEventPublisher` names the subject, not the role). A field or
-parameter holding it is `integrationEventPublisher`, per `dotnet:naming-collaborators`' subject+role rule.
+the event type, never per subject (`INoteEventPublisher` names the subject, not the role).
 
 ## The Processor pumps a subscription, the Handler reacts to it
 

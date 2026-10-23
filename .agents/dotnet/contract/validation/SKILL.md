@@ -63,8 +63,8 @@ Each top-level type has its matching file, following
 | Input shape under FluentValidation | `Validate` / `ValidateAsync` on `IValidator<T>` | FluentValidation validation result |
 | Domain eligibility under Reunion | `ValidateCheckout` / `ValidateCheckoutAsync` on the domain validator | `Reunion.Validation.ValidationResult` |
 
-Both report validity and diagnostics about the supplied candidate. A boolean capability predicate uses
-`Can`, `Is` or `Has` and returns `bool`. A collaborator returning a selected or resolved application value
+Both report validity and diagnostics about the supplied candidate. A capability question is a `bool`
+predicate, not a validator. A collaborator returning a selected or resolved application value
 uses its resolver contract, including the presence/failure carrier from
 `dotnet:errors-carriers`. Loading data and checking rules can occur in either
 implementation; the responsibility and returned outcome establish which contract the caller consumes.
