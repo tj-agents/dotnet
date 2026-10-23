@@ -48,16 +48,16 @@ role), `Consumer` (already the Handler's role in some broker SDKs), `Worker` (no
 internal sealed class OrderEventsProcessor : BackgroundService
 {
     private readonly ServiceBusProcessor processor;
-    private readonly IServiceScopeFactory scopeFactory;
+    private readonly IServiceScopeFactory serviceScopeFactory;
     private readonly ILogger<OrderEventsProcessor> logger;
 
     public OrderEventsProcessor(
         ServiceBusProcessor processor,
-        IServiceScopeFactory scopeFactory,
+        IServiceScopeFactory serviceScopeFactory,
         ILogger<OrderEventsProcessor> logger)
     {
         this.processor = processor;
-        this.scopeFactory = scopeFactory;
+        this.serviceScopeFactory = serviceScopeFactory;
         this.logger = logger;
         processor.ProcessMessageAsync += HandleMessageAsync;
         processor.ProcessErrorAsync += HandleErrorAsync;
@@ -76,7 +76,7 @@ internal sealed class OrderEventsProcessor : BackgroundService
     {
         var integrationEvent = args.Message.Body.ToObjectFromJson<OrderPlacedEvent>();
 
-        var scope = scopeFactory.CreateAsyncScope();
+        var scope = serviceScopeFactory.CreateAsyncScope();
         await using (scope.ConfigureAwait(false))
         {
             var handler = scope.ServiceProvider.GetRequiredService<IIntegrationEventHandler<OrderPlacedEvent>>();

@@ -103,6 +103,7 @@ CARVED_TREE = {
     ("src/Acme.Billing.Api/Venues/VenueSummary.cs", "public sealed record VenueSummary(Guid Id);"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:dtos"},
     ("src/Acme.Billing.Infrastructure/Venues/VenueProjection.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "dotnet:repositories"},
     ("src/Acme.Billing.Infrastructure/Persistence/UnitOfWork.cs", "internal sealed class UnitOfWork : IUnitOfWork"): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules", "efcore:persistence", "dotnet:unit-of-work"},
+    ("src/Acme.Billing.Infrastructure/Backups/BackupRestore.cs", ""): {"dotnet:style", "dotnet:naming", "dotnet:fields", "dotnet:structure-modules"},
     ("plans/skill-routes/PLAN.md", ""): {"engineering:plans"},
     ("reviews/Feature-SkillRoutes/REVIEW.md", ""): {"engineering:review-lifecycle"},
     ("AGENTS.md", ""): {"engineering:docs"},
@@ -189,6 +190,7 @@ class RouteDerivationTests(unittest.TestCase):
             "private readonly IUserService _users;",
             "private readonly IUserService service;",
             "private readonly IOrderRepository repo = repo;",
+            "private readonly IUserService? users;",
         )
         allowed = (
             "private readonly IUserService userService;",
@@ -202,6 +204,10 @@ class RouteDerivationTests(unittest.TestCase):
             "private readonly IPAddress ipAddress;",
             "private readonly int count;",
             "private readonly Inventory inventory;",
+            "private readonly IPAddress address;",
+            "private readonly IDisposable subscription;",
+            "private readonly IServiceScopeFactory serviceScopeFactory;",
+            "private readonly IUserService? userService;",
         )
         for line in denied:
             with self.subTest(denied=line):
