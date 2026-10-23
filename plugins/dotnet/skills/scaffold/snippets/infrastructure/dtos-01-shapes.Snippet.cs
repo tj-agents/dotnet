@@ -5,5 +5,5 @@ public sealed record VenueSummary(Guid Id, string Name);
 
 public sealed record VenueDto(Guid Id, string Name, string City);
 
-public sealed record Page<T>(IReadOnlyList<T> Items, int TotalCount);
+public sealed record Pagination<T>(IReadOnlyList<T> Items, int TotalCount, int PageNumber, int PageSize);
 // snippet:end
