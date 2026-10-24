@@ -706,7 +706,6 @@ def prepare_standards(adopter: Path, options: Mapping[str, Any]) -> Dict[str, st
         stage = Path(temporary)
         command = [
             sys.executable, "-B", str(adopter), "--root", str(stage),
-            "--stack", "azure" if options["cloud"] == "azure" else "dotnet",
         ]
         for identity in (*CORE_PLUGIN_IDS, *required_plugins):
             command.extend(["--plugin", identity])
