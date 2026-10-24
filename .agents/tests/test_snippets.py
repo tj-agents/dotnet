@@ -50,7 +50,6 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", required=True)
-    parser.add_argument("--stack", required=True)
     parser.add_argument("--plugin", action="append", default=[])
     parser.add_argument("--mode", required=True)
     args = parser.parse_args()

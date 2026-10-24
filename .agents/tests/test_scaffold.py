@@ -122,7 +122,6 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
     def main():
         parser = argparse.ArgumentParser()
         parser.add_argument("--root", required=True)
-        parser.add_argument("--stack", required=True)
         parser.add_argument("--plugin", action="append", default=[])
         parser.add_argument("--mode", required=True)
         args = parser.parse_args()
@@ -141,8 +140,6 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
         root = Path(args.root)
         plugins = ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents", "dotnet@tj-agents"]
         plugins.extend(plugin for plugin in args.plugin if plugin not in plugins)
-        if args.stack == "azure":
-            plugins.append("azure@tj-agents")
         omitted = os.environ.get("FAKE_STANDARDS_OMIT_PLUGIN")
         if omitted:
             plugins = [plugin for plugin in plugins if plugin != omitted]
@@ -493,7 +490,7 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(0, azure.returncode, azure.stderr)
             calls = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
             self.assertEqual(["write", "check", "write", "check"], [call[call.index("--mode") + 1] for call in calls])
-            self.assertEqual(["dotnet", "dotnet", "azure", "azure"], [call[call.index("--stack") + 1] for call in calls])
+            self.assertTrue(all("--stack" not in call for call in calls))
             self.assertTrue(all("--marketplace-revision" not in call for call in calls))
             for index, call in enumerate(calls):
                 expected = [*SCAFFOLD.CORE_PLUGIN_IDS, "dotnet@tj-agents"]
