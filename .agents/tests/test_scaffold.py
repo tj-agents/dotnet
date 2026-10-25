@@ -426,7 +426,7 @@ class ScaffoldTests(unittest.TestCase):
 
     def test_documented_new_examples_execute_with_fixture_substitutions(self) -> None:
         standard_flags = (
-            " --plugin-selection-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py"
+            " --plugin-selection-adopter <agent-plugins-skill-directory>/scripts/adopt_plugins.py"
         )
         updated = SCAFFOLD_SKILL.read_text(encoding="utf-8")
         previous = updated.replace(standard_flags, "")
@@ -440,7 +440,7 @@ class ScaffoldTests(unittest.TestCase):
             updated_skill.write_text(updated, encoding="utf-8")
             replacements = (
                 ("<skill-directory>/scripts/scaffold.py", SCRIPT.as_posix()),
-                ("<machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py", self.standards_adopter.as_posix()),
+                ("<agent-plugins-skill-directory>/scripts/adopt_plugins.py", self.standards_adopter.as_posix()),
                 ("~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py", azure_script.as_posix()),
                 ("~/source/repos", destination.as_posix()),
             )
