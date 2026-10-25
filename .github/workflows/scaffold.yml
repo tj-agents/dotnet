@@ -23,11 +23,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
-          repository: tj-agents/core
+          repository: tj-agents/agent
           ref: main
-          path: .core
+          path: .agent
+          persist-credentials: false
       - uses: actions/checkout@v4
         with:
           repository: tj-agents/azure
@@ -48,4 +49,4 @@ jobs:
       - run: python -B .agents/dotnet/utility/scaffold/scripts/verify.py
         env:
           AZURE_SCAFFOLD: ${{ github.workspace }}/.azure/.agents/azure/utility/scaffold/scripts/scaffold.py
-          PLUGIN_SELECTION_ADOPTER: ${{ github.workspace }}/.core/.agents/machine/utility/plugin-selection/scripts/adopt_plugins.py
+          PLUGIN_SELECTION_ADOPTER: ${{ github.workspace }}/.agent/.agents/agent/utility/plugins/scripts/adopt_plugins.py
