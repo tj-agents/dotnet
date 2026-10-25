@@ -63,7 +63,10 @@ class CoreProfilePinTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         config = generator.load_config(ROOT)
-        cls.skills = generator.discover(ROOT, config["namespace"])["dotnet"]
+        payloads = generator.load(ROOT / ".agents/plugins/payloads.json")
+        cls.skills = generator.discover(
+            ROOT, config["namespace"], generator.mapped_resource_directories(payloads)
+        )["dotnet"]
 
     def test_core_profile_is_exactly_the_stack_free_hubs(self) -> None:
         core = {name for name, skill in self.skills.items() if skill["metadata"]["profile"] == "core"}
@@ -86,7 +89,10 @@ class EfCoreOwnershipTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         config = generator.load_config(ROOT)
-        cls.plugins = generator.discover(ROOT, config["namespace"])
+        payloads = generator.load(ROOT / ".agents/plugins/payloads.json")
+        cls.plugins = generator.discover(
+            ROOT, config["namespace"], generator.mapped_resource_directories(payloads)
+        )
 
     def test_efcore_contracts_have_one_explicit_owner_and_prerequisite(self) -> None:
         skills = self.plugins["efcore"]
