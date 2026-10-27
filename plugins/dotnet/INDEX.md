@@ -45,4 +45,3 @@
 - `debug-e2e-ui` — operation — e2e
 - `debug-integration` — operation — integration-testing
 - `scaffold` — utility — scaffold
-- `skill-routes` — utility — skill-routes
