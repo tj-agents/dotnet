@@ -80,9 +80,6 @@
     "single-service": [
       "structure-single-service"
     ],
-    "skill-routes": [
-      "skill-routes"
-    ],
     "unit-testing": [
       "testing-unit"
     ],
@@ -622,20 +619,6 @@
       ],
       "provenance": [
         "library",
-        "house"
-      ]
-    },
-    {
-      "name": "skill-routes",
-      "kind": "utility",
-      "profile": "skill-routes",
-      "applicability": [
-        ".NET consumer repositories wired for skill routing"
-      ],
-      "requires": [
-        "dotnet"
-      ],
-      "provenance": [
         "house"
       ]
     },
