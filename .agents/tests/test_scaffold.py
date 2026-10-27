@@ -505,8 +505,6 @@ class ScaffoldTests(unittest.TestCase):
                 selected = SCAFFOLD.standards_plugin_ids(options)
                 self.assertEqual(data in ("efcore", "efcore+dapper"), "efcore@tj-agents" in selected)
                 self.assertIn("dotnet@tj-agents", selected)
-                routes = SCAFFOLD.skill_routes_document(options)
-                self.assertEqual(data in ("efcore", "efcore+dapper"), "efcore" in routes["layers"])
 
     def test_standards_files_are_copied_and_listed_by_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -637,7 +635,6 @@ class ScaffoldTests(unittest.TestCase):
     def test_presets_generate_exact_file_lists(self) -> None:
         expected = {
             "minimal": [
-                ".agents/skill-routes.json",
                 ".editorconfig",
                 ".gitattributes",
                 ".github/workflows/ci.yml",
@@ -656,7 +653,6 @@ class ScaffoldTests(unittest.TestCase):
                 "src/Example.Web/appsettings.json",
             ],
             "web": [
-                ".agents/skill-routes.json",
                 ".editorconfig",
                 ".gitattributes",
                 ".github/workflows/ci.yml",
@@ -679,7 +675,6 @@ class ScaffoldTests(unittest.TestCase):
                 "tests/Example.UnitTests/Example.UnitTests.csproj",
             ],
             "dapper-sqlserver": [
-                ".agents/skill-routes.json",
                 ".editorconfig",
                 ".gitattributes",
                 ".github/workflows/ci.yml",
@@ -790,7 +785,6 @@ class ScaffoldTests(unittest.TestCase):
             generated = sorted(path.relative_to(project).as_posix() for path in project.rglob("*") if path.is_file())
             self.assertEqual(
                 sorted([
-                    ".agents/skill-routes.json",
                     ".editorconfig", ".gitattributes", ".github/workflows/ci.yml", ".gitignore", ".scaffold.json",
                     "AGENTS.md", "BannedSymbols.txt", "CLAUDE.md", "Directory.Build.props", "Directory.Packages.props",
                     "Sandbox.slnx", "global.json",
@@ -1229,31 +1223,6 @@ class ScaffoldTests(unittest.TestCase):
             if name not in azure_components:
                 continue
             self.assertEqual("azure", manifest.get("when", {}).get("cloud"), f"component {name} when: {manifest.get('when')}")
-
-    def test_generated_repo_carries_the_skill_route_table(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            result = self.create(root, "Routed", "web")
-
-            self.assertEqual(0, result.returncode, result.stderr)
-            routes_path = root / "Routed" / ".agents" / "skill-routes.json"
-            self.assertTrue(routes_path.is_file())
-            table = json.loads(routes_path.read_text(encoding="utf-8"))
-            self.assertEqual("efcore-service", table["kind"])
-            self.assertIn("efcore", table["layers"])
-            routes_module_spec = importlib.util.spec_from_file_location(
-                "dotnet_gen_skill_routes", SCRIPT.parent.parent.parent / "skill-routes" / "scripts" / "gen_skill_routes.py"
-            )
-            routes_module = importlib.util.module_from_spec(routes_module_spec)
-            routes_module_spec.loader.exec_module(routes_module)
-            for path, skill in (
-                ("tests/Routed.UnitTests/FooTests.cs", "dotnet:testing-unit"),
-                ("tests/Routed.IntegrationTests/FooApiTests.cs", "dotnet:testing-integration"),
-                ("tests/Routed.E2ETests/Foo.feature", "dotnet:testing-e2e"),
-            ):
-                matched = routes_module.skills_for("dotnet-service", path)
-                self.assertIn("dotnet:testing", matched)
-                self.assertIn(skill, matched)
 
 
 if __name__ == "__main__":
