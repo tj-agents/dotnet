@@ -6,6 +6,7 @@
   ],
   "profiles": {
     "aspnet": [
+      "authorization",
       "http-api"
     ],
     "core": [
@@ -89,6 +90,21 @@
   },
   "compatibilitySkillAliases": {},
   "skills": [
+    {
+      "name": "authorization",
+      "kind": "contract",
+      "profile": "aspnet",
+      "applicability": [
+        "ASP.NET Core services that authorize users"
+      ],
+      "requires": [
+        "aspnet-core"
+      ],
+      "provenance": [
+        "framework",
+        "house"
+      ]
+    },
     {
       "name": "build",
       "kind": "contract",
