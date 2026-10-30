@@ -4,6 +4,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 
 ## dotnet
 
+- `authorization` — contract — aspnet — `.agents/dotnet/contract/authorization/SKILL.md`
 - `build` — contract — core — `.agents/dotnet/contract/build/SKILL.md`
 - `comments` — contract — core — `.agents/dotnet/contract/comments/SKILL.md`
 - `dependency-injection` — contract — extensions — `.agents/dotnet/contract/dependency-injection/SKILL.md`
