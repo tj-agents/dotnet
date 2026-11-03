@@ -44,7 +44,9 @@ noun is the agent noun of the one operation it performs — `TaxCalculator.Calcu
 `ConnectionFactory.Create`, `InvoiceRenderer.Render` — so the call reads as the subject doing its job. A type
 whose job takes two verbs to describe is two types.
 
-Capability interfaces name the capability, such as `IDisposable` or `IPausable`; their implementations name
+A single-method interface is a role with two or more implementations or a real seam (a handler, strategy, guard
+or factory), never a pass-through to one implementation. Capability interfaces name the capability, such as
+`IDisposable` or `IPausable`; their implementations name
 their own subject and responsibility, such as `HostPauser`. Qualify an implementation only when callers
 distinguish a real alternative.
 

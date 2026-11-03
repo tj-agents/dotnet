@@ -18,7 +18,7 @@ Families are folders, family first; a skill's name is its folder path joined by 
 - Keyed: `dotnet:keyed-strategies`, `dotnet:keyed-unions`.
 - Other contracts: `dotnet:build`, `dotnet:dependency-injection`, `dotnet:http-api`, `dotnet:logging`,
   `dotnet:mapping`, `dotnet:messaging`, `dotnet:microservice-boundaries`, `dotnet:proto`, `dotnet:repositories`, `dotnet:seeding`, `dotnet:unit-of-work`, `dotnet:validation`.
-- EF Core: `efcore:persistence`, `efcore:multitenancy`, `efcore:specification`, `efcore:query-building`,
+- EF Core: `efcore:persistence`, `efcore:concurrency`, `efcore:multitenancy`, `efcore:specification`, `efcore:query-building`,
   `efcore:event-dispatch`. Install this plugin only for EF Core projects; it depends on `dotnet`.
 - Operations: `dotnet:debug-integration`, `dotnet:debug-e2e`, `dotnet:debug-e2e-api`, `dotnet:debug-e2e-ui`.
 - Utilities: `dotnet:scaffold`.
