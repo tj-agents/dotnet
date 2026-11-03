@@ -389,6 +389,63 @@ SNIPPETS: list[Snippet] = [
           ),
           footer="\n}\n"),
 
+    entry("efcore-concurrency-01-token", "concurrency/SKILL.md", 1, "infrastructure", "SnippetFixtures.Concurrency01", owner="efcore",
+          header=(
+              "using Microsoft.EntityFrameworkCore;\nusing Microsoft.EntityFrameworkCore.Metadata.Builders;\n\n"
+              "internal sealed class Membership { public uint Version { get; set; } }\n"
+              "internal static class MembershipErrors { public const string Superseded = \"superseded\"; }\n\n"
+              "internal sealed class MembershipWriter\n{\n"
+              "    public async Task<string?> SaveAsync(EntityTypeBuilder<Membership> builder, DbContext context, CancellationToken ct)\n    {\n"
+          ),
+          footer="\n\n        return null;\n    }\n}\n"),
+    entry("efcore-concurrency-02-row-lock", "concurrency/SKILL.md", 2, "infrastructure", "SnippetFixtures.Concurrency02", owner="efcore",
+          header=(
+              "using Microsoft.EntityFrameworkCore;\n\n"
+              "internal sealed class TenantEntity { public Guid Id { get; set; } }\n"
+              "internal sealed class TenantDbContext : DbContext { public DbSet<TenantEntity> Tenants => Set<TenantEntity>(); }\n\n"
+              "internal sealed class TenantRepository\n{\n"
+              "    private readonly TenantDbContext context;\n\n"
+              "    public TenantRepository(TenantDbContext context) => this.context = context;\n\n"
+          ),
+          footer="\n}\n"),
+    entry("efcore-concurrency-03-advisory-lock", "concurrency/SKILL.md", 3, "infrastructure", "SnippetFixtures.Concurrency03", owner="efcore",
+          header=(
+              "using Microsoft.EntityFrameworkCore;\n\n"
+              "internal sealed class InvoiceRepository\n{\n"
+              "    private readonly DbContext context;\n\n"
+              "    public InvoiceRepository(DbContext context) => this.context = context;\n\n"
+          ),
+          footer="\n}\n"),
+
+    entry("authorization-01-endpoint-permission", "authorization/SKILL.md", 1, "web", "SnippetFixtures.Authorization01",
+          header=(
+              "using Microsoft.AspNetCore.Authorization;\nusing Microsoft.AspNetCore.Mvc;\n\n"
+              "internal sealed class HasPermissionAttribute(string permission) : AuthorizeAttribute(permission);\n\n"
+              "internal static class Permission\n{\n    public const string SettlementTriggerName = \"settlement.trigger\";\n}\n\n"
+              "internal sealed record SettlementDto;\n\n"
+              "internal interface ISettlementService\n{\n"
+              "    Task<SettlementDto> TriggerAsync(Guid concertId, CancellationToken ct);\n}\n\n"
+              "[ApiController]\n"
+              "internal sealed class SettlementController : ControllerBase\n{\n"
+              "    private readonly ISettlementService settlements;\n\n"
+              "    public SettlementController(ISettlementService settlements) => this.settlements = settlements;\n\n"
+          ),
+          footer="\n}\n"),
+    entry("authorization-02-permission-catalog", "authorization/SKILL.md", 2, "infrastructure", "SnippetFixtures.Authorization02",
+          header="using System.Collections.Frozen;\n\n"),
+    entry("authorization-03-fallback-policy", "authorization/SKILL.md", 3, "web", "SnippetFixtures.Authorization03",
+          header=(
+              "using Microsoft.AspNetCore.Authorization;\nusing Microsoft.Extensions.DependencyInjection;\n\n"
+              "internal static class AuthorizationRegistration\n{\n"
+              "    public static void Register(IServiceCollection services)\n    {\n"
+          ),
+          footer="\n    }\n}\n"),
+    entry("authorization-04-access-decision", "authorization/SKILL.md", 4, "infrastructure", "SnippetFixtures.Authorization04",
+          header=(
+              "public readonly record struct Permission(string Value);\n\n"
+              "public sealed record ResourceAddress(string Type, Guid Id);\n\n"
+          )),
+
     entry("explanation-01-quoting", "explanation/SKILL.md", 1, "infrastructure", "SnippetFixtures.Explanation01",
           skip="`...` stands in for elided usings/body lines in an explanation quote; it is not valid C# syntax."),
     entry("proto-01-naming", "proto/SKILL.md", 1, "infrastructure", "SnippetFixtures.Proto01",
