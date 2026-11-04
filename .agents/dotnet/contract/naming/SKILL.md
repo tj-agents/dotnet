@@ -44,6 +44,10 @@ noun is the agent noun of the one operation it performs — `TaxCalculator.Calcu
 `ConnectionFactory.Create`, `InvoiceRenderer.Render` — so the call reads as the subject doing its job. A type
 whose job takes two verbs to describe is two types.
 
+Name a type for what it holds. A collective noun standing in for that — `Catalog`, `Model`, `Manager`,
+`Helper`, `Data`, `Info` — is padding; a type whose members need different nouns is several types. A value is
+named for what it is: a content hash is a `Fingerprint`, not a `Revision`.
+
 A single-method interface is a role with two or more implementations or a real seam (a handler, strategy, guard
 or factory), never a pass-through to one implementation. Capability interfaces name the capability, such as
 `IDisposable` or `IPausable`; their implementations name
