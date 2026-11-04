@@ -56,7 +56,8 @@ public Task<TenantEntity?> GetByIdWithKeyShareLockAsync(Guid tenantId, Cancellat
 Take a pessimistic row lock only for a short transaction that is hard to retry, in the repository of the
 module that owns the rows, never in a service, handler or another module's repository. Where the product's
 shared data-access layer provides a query-level lock operator, use it instead of `FromSql`, so no consumer
-writes lock SQL or table names. Use
+writes lock SQL or table names. Lock, then load in a separate statement: a locking query that joins returns
+stale joined rows after a lock wait, because PostgreSQL rechecks only the locked row. Use
 the weakest mode that holds the invariant: `FOR KEY SHARE` fences a delete or key change, `FOR NO KEY UPDATE`
 serializes ordinary updates, `FOR UPDATE` only when the transaction deletes the row or changes its key. Encode the lock order inside the
 repository that takes several locks, so no caller can acquire them in another order.
