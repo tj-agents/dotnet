@@ -15,7 +15,9 @@ Owns C# style: field/constructor shape, braces, optional parameters, `#region` a
 
 ## Applicability
 
-This contract applies to every C#/.NET repository and has no application-stack prerequisite.
+This contract applies to every C#/.NET repository and has no application-stack prerequisite. A file in a
+repository with its own established, consistently-applied field convention (e.g. underscore-prefixed
+fields) follows that convention instead — this contract governs new repositories and files with none.
 
 Style rules an analyzer can express belong in `.editorconfig`, not here. Configure these at
 `severity = error` and the prose below shrinks to the diagnostic ID:
