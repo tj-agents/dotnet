@@ -1,6 +1,6 @@
 ---
 name: naming
-description: Generic C# identifier naming — every field, parameter and local named for what it holds (`IUserService userService`), casing and affixes, nouns for types and verbs for methods, interface/implementation pairs, the pattern words (`Factory`, `Builder`, `Provider`, `Accessor`, `Resolver`, `Registry`, `Policy`), one subject word per concept, booleans and namespace-aware type names. Use when naming or reviewing any C# type, member, field, parameter or local.
+description: Generic C# identifier naming — every field, parameter and local named for what it holds (`IUserService userService`), casing and affixes, nouns for types and verbs for methods, interface/implementation pairs, the pattern words (`Factory`, `Builder`, `Provider`, `Accessor`, `Resolver`, `Registry`, `Policy`, `Context`), one subject word per concept, booleans and namespace-aware type names. Use when naming or reviewing any C# type, member, field, parameter or local.
 kind: contract
 domain: dotnet
 profile: core
@@ -41,9 +41,16 @@ Use noun phrases for types and verb phrases for methods
 ([Microsoft](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-classes-structs-and-interfaces)).
 An interface/implementation pair shares its subject and role: `IOrderRepository` / `OrderRepository`. A role
 noun is the agent noun of the one operation it performs — `TaxCalculator.Calculate`,
-`ConnectionFactory.Create`, `InvoiceRenderer.Render` — so the call reads as the subject doing its job.
+`ConnectionFactory.Create`, `InvoiceRenderer.Render` — so the call reads as the subject doing its job. A type
+whose job takes two verbs to describe is two types.
 
-Capability interfaces name the capability, such as `IDisposable` or `IPausable`; their implementations name
+Name a type for what it holds. A collective noun standing in for that — `Catalog`, `Model`, `Manager`,
+`Helper`, `Data`, `Info` — is padding; a type whose members need different nouns is several types. A value is
+named for what it is: a content hash is a `Fingerprint`, not a `Revision`.
+
+A single-method interface is a role with two or more implementations or a real seam (a handler, strategy, guard
+or factory), never a pass-through to one implementation. Capability interfaces name the capability, such as
+`IDisposable` or `IPausable`; their implementations name
 their own subject and responsibility, such as `HostPauser`. Qualify an implementation only when callers
 distinguish a real alternative.
 
@@ -58,9 +65,11 @@ distinguish a real alternative.
 | `Resolver` | Turns a reference — a name, key or type — into the thing it denotes by rules; finding nothing is a valid answer |
 | `Registry` | Holds a keyed collection filled at startup and looked up by key |
 | `Policy` | Is a side-effect-free rule a mechanism consults |
+| `Context` | Holds the ambient state of the current request or operation for consumers to read, and does no I/O |
 
 A class that fits none takes the agent noun of what it does. Sources: .NET's `IHttpClientFactory`,
-`WebApplicationBuilder`, `TimeProvider`, `IHttpContextAccessor`, `IJsonTypeInfoResolver`, `AuthorizationPolicy`;
+`WebApplicationBuilder`, `TimeProvider`, `IHttpContextAccessor`, `IJsonTypeInfoResolver`, `AuthorizationPolicy`,
+`HttpContext`;
 Polly's `ResiliencePipelineRegistry`.
 
 ## One word per concept
@@ -74,14 +83,20 @@ transaction or registration keeps its semantics.
 ## Use the containing namespace when naming a type
 
 Read a proposed type name with its namespace and existing responsibility owner. Add a subject or qualifier
-only when it names a domain concept, responsibility, contract or real distinction; the namespace already
+only when it names a domain concept, responsibility, contract or a real distinction from another type, never how a
+value was produced; the namespace already
 supplies module, layer and product. For example, `Billing.IntegrationTests.ApiFixture` is clear without `BillingApiFixture`;
 `OrderRepository` still names the repository's subject and role.
 
 Apply the same rule to fixtures, test types and names proposed in code or plan snippets. Preserve
 framework-defined and published contract names, and keep qualifiers that distinguish actual strategies or
-capabilities. When two otherwise appropriate simple names collide at a rare call site, qualify the reference
-or use a local `using` alias there.
+capabilities. A collision never chooses or rejects a name: when two otherwise appropriate simple names collide
+at a rare call site, qualify the reference or use a local `using` alias there.
+
+```text
+PermissionSet, although System.Security.PermissionSet exists: alias the legacy type where both meet.
+Not EffectivePermissions: "effective" says how the roles were merged, not what distinguishes the type.
+```
 
 ## Read the name in context
 
@@ -91,5 +106,6 @@ Include distinctions the caller needs, such as scope, locking, units or revision
 for information it already supplies.
 
 Qualify an operation by a meaningful returned shape, such as `GetSummaryAsync`, or by a distinguishing
-input key, such as `GetByCustomerIdAsync`. Boolean members and questions use `Is`, `Has` or `Can`. A shared
+input key, such as `GetByCustomerIdAsync`. Boolean members and questions use `Is`, `Has` or `Can`; `Try…` is
+only the BCL shape, a `bool` with an `out` value, such as `TryGetMembership(tenantId, out var membership)`. A shared
 implementation step may use `Core` when a wrapper gives that step a different contract.
