@@ -44,17 +44,19 @@ Why: EF Core ships optimistic concurrency and no lock API; a token costs nothing
 Sources: [EF concurrency](https://learn.microsoft.com/en-us/ef/core/saving/concurrency),
 [Npgsql concurrency](https://www.npgsql.org/efcore/modeling/concurrency.html).
 
-## A row lock is raw SQL in the owning repository
+## A row lock is taken in the owning repository
 
 ```csharp
-public Task<TenantEntity?> GetByIdForKeyShareAsync(Guid tenantId, CancellationToken ct = default) =>
+public Task<TenantEntity?> GetByIdWithKeyShareLockAsync(Guid tenantId, CancellationToken ct = default) =>
     context.Tenants
         .FromSql($"""SELECT * FROM tenant."Tenants" WHERE "Id" = {tenantId} FOR KEY SHARE""")
         .SingleOrDefaultAsync(ct);
 ```
 
-Take a pessimistic row lock only for a short transaction that is hard to retry. Write it as `FromSql` in the
-repository of the module that owns the rows, never in a service, handler or another module's repository. Use
+Take a pessimistic row lock only for a short transaction that is hard to retry, in the repository of the
+module that owns the rows, never in a service, handler or another module's repository. Where the product's
+shared data-access layer provides a query-level lock operator, use it instead of `FromSql`, so no consumer
+writes lock SQL or table names. Use
 the weakest mode that holds the invariant: `FOR KEY SHARE` fences a delete or key change, `FOR NO KEY UPDATE`
 serializes ordinary updates, `FOR UPDATE` only when the transaction deletes the row or changes its key. Encode the lock order inside the
 repository that takes several locks, so no caller can acquire them in another order.
