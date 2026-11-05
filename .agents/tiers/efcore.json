@@ -1,20 +1,23 @@
 {
-  "schema_version": 1,
   "tier": "efcore",
   "stack": "EF Core",
   "applies": "stack-present",
-  "owner_repository": [
-    "tj-agents/dotnet"
-  ],
   "detect": {
-    "content": [
+    "any": [
       {
-        "glob": "*.csproj",
-        "pattern": "(?i)Microsoft\\.EntityFrameworkCore|Npgsql\\.EntityFrameworkCore|Pomelo\\.EntityFrameworkCore"
+        "content": {
+          "glob": "*.csproj",
+          "pattern": "(?i)Microsoft\\.EntityFrameworkCore|Npgsql\\.EntityFrameworkCore|Pomelo\\.EntityFrameworkCore"
+        }
       },
       {
-        "glob": "Directory.Packages.props",
-        "pattern": "(?i)Microsoft\\.EntityFrameworkCore|Npgsql\\.EntityFrameworkCore|Pomelo\\.EntityFrameworkCore"
+        "content": {
+          "glob": "Directory.Packages.props",
+          "pattern": "(?i)Microsoft\\.EntityFrameworkCore|Npgsql\\.EntityFrameworkCore|Pomelo\\.EntityFrameworkCore"
+        }
+      },
+      {
+        "remote": "^tj\\-agents/dotnet$"
       }
     ]
   }
