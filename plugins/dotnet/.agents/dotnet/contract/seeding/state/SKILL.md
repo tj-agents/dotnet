@@ -13,19 +13,11 @@ provenance: library, house
 
 Owns how seed state is built: constructor-built seed state, factory `Seed` statics, one canonical model, and idempotency.
 
-```csharp
-public static class OrderFactory
-{
-    public static Order Create(CustomerId customerId, Money total) =>
-        Order.Create(customerId, total);
-
-    public static Order Seed(Guid id, CustomerId customerId, Money total)
-    {
-        var order = Create(customerId, total).With(nameof(Order.Id), id);
-        order.ClearDomainEvents();
-        return order;
-    }
-}
+```text
+Need:   a seeded Order with a fixed id.
+Write:  OrderFactory.Seed(OrderIds.First, customer, total), which chains With(nameof(Order.Id), id)
+        over Order.Create and then clears the domain events.
+Never:  a Seed static on Order itself, or a seeder assigning to seed state.
 ```
 
 `Seed` chains a reflection `With(nameof(Order.Id), id)` over the real `Create` method so every invariant

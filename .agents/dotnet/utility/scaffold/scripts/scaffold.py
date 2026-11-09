@@ -40,7 +40,7 @@ CSHARP_INTRINSICS = {"__arglist", "__makeref", "__reftype", "__refvalue"}
 AZURE_SET_PREFIX = "azure."
 CLOUD_NAME = re.compile(r"^[a-z][a-z0-9]{0,11}$")
 SHELL_SPECIAL = re.compile(r"""[\s"'\\$`|&;<>()\[\]{}*?!~#%^]""")
-CORE_PLUGIN_IDS = ("base@tj-agents", "engineering@tj-agents", "machine@tj-agents")
+CORE_PLUGIN_IDS = ("base@tj-agents", "engineering@tj-agents")
 REQUIRED_STANDARDS_OUTPUTS = (
     ".agents/plugins.json",
     ".claude/settings.json",
