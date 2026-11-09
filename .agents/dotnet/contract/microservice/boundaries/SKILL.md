@@ -29,7 +29,7 @@ This contract applies only to distributed services. It requires `distributed-ser
 
 Where a standalone host lacks another data service's events at seed time, the producing service ships a seeding
 simulator that replays them — never run the other data service to fix it, and never write the projected rows
-directly. See the `seeding` skill.
+directly. See the `seeding-scope` skill.
 
 Shared code consumed by *every* service models the **intersection** of what its consumers need, never the
 union. A member only ever populated or meaningful for one audience — dead weight for another — does not belong

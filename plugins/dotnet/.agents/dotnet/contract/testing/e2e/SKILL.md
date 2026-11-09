@@ -104,7 +104,7 @@ fast-forward `Given`, not UI steps.
 By default a setup `Given` reads pre-seeded data off the suite's fixture and puts the id on scenario state — no
 navigation, no clicks. Where the starting state does not exist yet, add the seeded state plus a `Given`.
 
-Where the `seeding` rules forbid seeding that lifecycle row — an invitation, say — create the prerequisite
+Where the `seeding-scope` rules forbid seeding that lifecycle row — an invitation, say — create the prerequisite
 through its **real production API or handler** from a non-UI `Given`. Never replay browser UI to build setup, and
 never insert the row directly.
 

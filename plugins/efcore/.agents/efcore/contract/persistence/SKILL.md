@@ -101,6 +101,6 @@ public async Task SeedAsync(CancellationToken ct)
 }
 ```
 
-`dotnet:seeding` owns what may be seeded, canonical seed state and sentinel selection. This EF example
-applies only when a whole-table guard is valid; event-created rows require the specific sentinel defined
-by that contract.
+`dotnet:seeding-scope` owns what may be seeded; `dotnet:seeding-state` owns canonical seed state and sentinel
+selection. This EF example applies only when a whole-table guard is valid; event-created rows require the
+specific sentinel defined by that contract.

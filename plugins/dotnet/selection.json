@@ -72,7 +72,8 @@
       "scaffold"
     ],
     "seeding": [
-      "seeding"
+      "seeding-scope",
+      "seeding-state"
     ],
     "selected-stack": [
       "libraries-selected"
@@ -608,7 +609,22 @@
       ]
     },
     {
-      "name": "seeding",
+      "name": "seeding-scope",
+      "kind": "contract",
+      "profile": "seeding",
+      "applicability": [
+        ".NET projects with development or test seeders"
+      ],
+      "requires": [
+        "seeding"
+      ],
+      "provenance": [
+        "library",
+        "house"
+      ]
+    },
+    {
+      "name": "seeding-state",
       "kind": "contract",
       "profile": "seeding",
       "applicability": [

@@ -337,7 +337,7 @@ SNIPPETS: list[Snippet] = [
     entry("dtos-01-shapes", "dtos/SKILL.md", 1, "infrastructure", "SnippetFixtures.Dtos01"),
     entry("repositories-01-contract", "repositories/SKILL.md", 1, "infrastructure", "SnippetFixtures.Repositories01",
           header="public sealed record Order(Guid Id);\n\n"),
-    entry("seeding-02-event-path", "seeding/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding02",
+    entry("seeding-02-event-path", "seeding/scope/SKILL.md", 1, "infrastructure", "SnippetFixtures.Seeding02",
           header=(
               "public sealed record OrderCreatedEvent(Guid Id) : IIntegrationEvent;\n\n"
               "public sealed class OrderSeedState\n{\n"

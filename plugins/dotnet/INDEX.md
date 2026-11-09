@@ -26,7 +26,8 @@
 - `naming` — contract — core
 - `proto` — contract — distributed-services
 - `repositories` — contract — core
-- `seeding` — contract — seeding
+- `seeding-scope` — contract — seeding
+- `seeding-state` — contract — seeding
 - `structure` — contract — core
 - `structure-modules` — contract — modular-services
 - `structure-single-service` — contract — single-service
