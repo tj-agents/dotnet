@@ -30,7 +30,8 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `naming` — contract — core — `.agents/dotnet/contract/naming/SKILL.md`
 - `proto` — contract — distributed-services — `.agents/dotnet/contract/proto/SKILL.md`
 - `repositories` — contract — core — `.agents/dotnet/contract/repositories/SKILL.md`
-- `seeding` — contract — seeding — `.agents/dotnet/contract/seeding/SKILL.md`
+- `seeding-scope` — contract — seeding — `.agents/dotnet/contract/seeding/scope/SKILL.md`
+- `seeding-state` — contract — seeding — `.agents/dotnet/contract/seeding/state/SKILL.md`
 - `structure` — contract — core — `.agents/dotnet/contract/structure/SKILL.md`
 - `structure-modules` — contract — modular-services — `.agents/dotnet/contract/structure/modules/SKILL.md`
 - `structure-single-service` — contract — single-service — `.agents/dotnet/contract/structure/single-service/SKILL.md`
