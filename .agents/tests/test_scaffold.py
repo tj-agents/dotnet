@@ -138,7 +138,7 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
         if args.mode == "check":
             return 0
         root = Path(args.root)
-        plugins = ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents", "dotnet@tj-agents"]
+        plugins = ["base@tj-agents", "engineering@tj-agents", "dotnet@tj-agents"]
         plugins.extend(plugin for plugin in args.plugin if plugin not in plugins)
         omitted = os.environ.get("FAKE_STANDARDS_OMIT_PLUGIN")
         if omitted:

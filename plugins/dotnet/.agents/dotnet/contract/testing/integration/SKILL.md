@@ -125,8 +125,8 @@ members of that library:
 Only genuinely service-specific wiring — an identity provider's UI stack, an in-process dependency, provider
 fakes, per-service mocks and seeders — stays in the service's own fixture.
 
-Seeding rules, including the factory `Seed` pattern and the sentinel guard, are in the `seeding` skill and apply
-to test seeders too.
+Seeding rules, including the factory `Seed` pattern and the sentinel guard, are in the `seeding-state` skill
+(what may be seeded at all is `seeding-scope`'s) and apply to test seeders too.
 
 ## Adding a test
 
