@@ -21,5 +21,6 @@
     "category": "Productivity",
     "capabilities": [],
     "defaultPrompt": "Apply the relevant EF Core standard to this task."
-  }
+  },
+  "version": "1b84ac435918"
 }
