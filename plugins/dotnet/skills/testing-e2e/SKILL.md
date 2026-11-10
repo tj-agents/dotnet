@@ -1,6 +1,6 @@
 ---
 name: testing-e2e
-description: Authoring rules for browser E2E scenarios (Gherkin bound with Reqnroll, driven through Playwright) — a scenario tests one behaviour and starts at the nearest already-verified state, fast-forwarding through seeded data rather than replaying earlier stages through the UI, creating a prerequisite through its real production API or handler where seeding rules forbid seeding that row, splitting a scenario whose assertion needs genuine external-provider state, keeping a trusted baseline file's scenario lists and counts reconciled, and running headless by default. Use when writing or reviewing a UI E2E scenario, adding setup steps to reach a starting state, or reconciling a suite's pass/fail baseline.
+description: Use when authoring selected .NET browser E2E scenarios, shared fixtures, page objects or assertions against a deployed full stack.
 kind: contract
 domain: dotnet
 profile: e2e
