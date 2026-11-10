@@ -1,6 +1,6 @@
 ---
 name: logging
-description: Use when adding .NET logs or tracing a failure with the selected logging stack; use source-generated messages and deliberate observability.
+description: Use for Microsoft.Extensions.Logging changes, tracing or review, and Log.cs setup; apply source-generated logging and remove temporary probes.
 kind: contract
 domain: dotnet
 profile: extensions

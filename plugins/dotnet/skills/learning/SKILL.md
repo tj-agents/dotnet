@@ -1,6 +1,6 @@
 ---
 name: learning
-description: Use for .NET teaching, progress or convention changes; preserve the subject's evidence and explicit delivery/study boundary.
+description: Use for every .NET task, explanation, review or handoff; choose learning mode or explicitly requested delivery mode, and record convention changes.
 kind: knowledge
 domain: dotnet
 profile: knowledge
