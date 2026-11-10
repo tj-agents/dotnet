@@ -77,3 +77,6 @@ dotnet restore MyService.slnx
 dotnet build MyService.slnx --configuration Release
 dotnet test MyService.slnx --configuration Release
 ```
+
+Analyzer diagnostics are enforced by `dotnet build` with `TreatWarningsAsErrors` and
+`EnforceCodeStyleInBuild`. `dotnet:fields` records the field-qualification exception.
