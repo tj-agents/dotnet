@@ -1,6 +1,6 @@
 ---
 name: libraries-selected
-description: Tommy's optional selected .NET application stack, mapping each job to one chosen library or platform facility and recording deliberate exclusions. Apply only when a repository selects this profile; use core C# guidance without it.
+description: Use when a repository explicitly adopts Tommy's .NET application stack and needs the chosen library or platform facility for a job.
 kind: contract
 domain: dotnet
 profile: selected-stack

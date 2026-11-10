@@ -1,6 +1,6 @@
 ---
 name: unit-of-work
-description: The unit of work for a .NET service, independent of an ORM — repositories and the outbox stage changes, the use case commits once through `IUnitOfWork.SaveChangesAsync`, `ExecuteAsync` runs caller-supplied work inside the transaction envelope, and one unit of work covers one service's database. Use when committing, opening a transaction, wrapping work in a retry or transaction envelope, or deciding who saves.
+description: Use when a .NET use case stages writes, owns a commit or executes work in a transaction/retry envelope within one service.
 kind: contract
 domain: dotnet
 profile: core
