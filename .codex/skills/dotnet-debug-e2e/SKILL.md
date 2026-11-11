@@ -1,6 +1,6 @@
 ---
 name: debug-e2e
-description: Run a repository's service and browser end-to-end tiers in dependency order, driving the service tier green before the browser tier and reporting both against one source revision. Use only when both selected tiers need a complete sweep.
+description: Use when both .NET service and browser E2E tiers must be repaired; run the backend tier first and compare both at one revision.
 kind: operation
 domain: dotnet
 profile: e2e

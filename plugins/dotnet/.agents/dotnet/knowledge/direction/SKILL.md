@@ -1,6 +1,6 @@
 ---
 name: direction
-description: Where Tommy is headed with .NET — the goal, the skill tree being worked through, and the references every explanation and convention cites. Use when choosing or sequencing what to learn next, or when sourcing a .NET explanation or a proposed convention.
+description: Use when planning .NET lessons or sourcing explanations and convention proposals; read the agreed goal, curriculum and references.
 kind: knowledge
 domain: dotnet
 profile: knowledge
@@ -32,3 +32,9 @@ not. Check that it landed: ask them to explain it back, or to write the next pie
 ## References
 
 _None agreed yet._ Explanations and conventions cite only the references listed here.
+
+## Example
+
+```text
+New lesson -> agree the goal -> use an agreed reference -> ask Tommy to explain it back.
+```

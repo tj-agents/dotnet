@@ -1,6 +1,6 @@
 ---
 name: debug-e2e-api
-description: Run and repair a repository's service-level end-to-end tier through its own full-stack harness, separating response mismatches, polling timeouts and wrong completed values, tracing missing state to the responsible resource, and verifying the exact scenario plus its owning scope. Use when a service E2E scenario or backend full-stack CI job fails.
+description: Use when a .NET service E2E scenario fails; trace responses, async state and resource logs through the repository's full-stack harness.
 kind: operation
 domain: dotnet
 profile: e2e

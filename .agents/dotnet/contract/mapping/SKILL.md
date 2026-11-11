@@ -1,6 +1,6 @@
 ---
 name: mapping
-description: C# mapping and extension conventions — subject-owned XMappers families, target-named conversions, receiver-owned XExtensions, C# 14 `extension()` blocks, and choosing an exhaustive conversion or a data lookup. Use when mapping between types, naming mapping methods, adding or editing an extension member, or locating pure conversion logic.
+description: Use when designing C# conversions, mapper families or receiver-owned extensions, including extension-block syntax and pure-query boundaries.
 kind: contract
 domain: dotnet
 profile: core

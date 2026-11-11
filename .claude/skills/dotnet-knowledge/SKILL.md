@@ -1,6 +1,6 @@
 ---
 name: knowledge
-description: Tommy's proven .NET level — what they are fluent with (✅) and what they have met but are shaky on (🟡). The only source of truth for what Tommy knows in .NET; read it before teaching, reviewing or handing over .NET work, and change it only under `dotnet:learning`'s Progress rules.
+description: Use before tailoring a .NET lesson or changing progress; rely on demonstrated competency rather than existing code or delivery work.
 kind: knowledge
 domain: dotnet
 profile: knowledge
