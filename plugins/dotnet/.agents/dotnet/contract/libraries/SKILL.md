@@ -1,6 +1,6 @@
 ---
 name: libraries
-description: Tommy's agreed .NET dependency policy — when to take a dependency and which are chosen. Read before writing or reviewing .NET that touches it; nothing applies until it is recorded here.
+description: Use when adding or replacing a .NET dependency; keep one library per job and apply only explicitly selected stack defaults.
 kind: contract
 domain: dotnet
 profile: core
@@ -22,3 +22,9 @@ The concrete chosen libraries for Tommy's full selected .NET application stack a
 ## Agreed
 
 _Nothing yet further._ Propose a rule through `dotnet:learning`'s convention procedure.
+
+## Example
+
+```text
+Existing library already does the job -> replace it, or do not add a second library.
+```

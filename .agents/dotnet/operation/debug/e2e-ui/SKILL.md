@@ -1,6 +1,6 @@
 ---
 name: debug-e2e-ui
-description: Run and repair a repository's browser end-to-end tier through its own full-stack harness, checking readiness and server or RPC failures before browser console, UI and screenshot evidence, while preserving scenario semantics. Use when a browser E2E scenario or UI full-stack CI job fails.
+description: Use when a .NET browser E2E scenario fails; check stack readiness, transport/server faults, console output and the real trace or screenshot.
 kind: operation
 domain: dotnet
 profile: e2e
@@ -30,3 +30,9 @@ entrypoint, scenario filters, resource logs, and artifact locations.
 
 Use `engineering:failing-tests`, `engineering:failure-provenance`, and `engineering:remote-validation` for the
 shared delivery rules. Use `dotnet:testing-e2e` for scenario authoring.
+
+## Example
+
+```text
+Browser timeout -> confirm stack readiness -> inspect HTTP, RPC, and resource logs -> inspect the trace.
+```

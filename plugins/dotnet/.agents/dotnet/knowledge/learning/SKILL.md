@@ -1,6 +1,6 @@
 ---
 name: learning
-description: How to work with Tommy on .NET — learning mode by default (Tommy writes the code; you explain, review and unblock), delivery mode only when asked, Tommy is .NET-fluent by default so teach only a concept `dotnet:knowledge` records as shaky or where he otherwise shows a gap, and the procedure by which a .NET convention is agreed and recorded. Use for any .NET task, explanation, review or handoff, and whenever a .NET convention is proposed or changed.
+description: Use for every .NET task, explanation, review or handoff; choose learning mode or explicitly requested delivery mode, and record convention changes.
 kind: knowledge
 domain: dotnet
 profile: knowledge
