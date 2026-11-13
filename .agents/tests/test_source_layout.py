@@ -36,6 +36,7 @@ CORE_MEMBERS = {
 }
 ALLOWED_CORE_REQUIRES = {"none", "dotnet"}
 PREREQUISITE_BEARING = (
+    "authorization",
     "http-api",
     "microservice-boundaries",
     "messaging",
@@ -97,7 +98,7 @@ class EfCoreOwnershipTests(unittest.TestCase):
 
     def test_efcore_contracts_have_one_explicit_owner_and_prerequisite(self) -> None:
         skills = self.plugins["efcore"]
-        self.assertEqual({"persistence", "multitenancy", "specification", "query-building", "event-dispatch"}, set(skills))
+        self.assertEqual({"persistence", "concurrency", "multitenancy", "specification", "query-building", "event-dispatch"}, set(skills))
         for name, skill in skills.items():
             with self.subTest(name=name):
                 self.assertIn("ef-core", {item.strip() for item in skill["metadata"]["requires"].split(",")})
