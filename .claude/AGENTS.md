@@ -1,24 +1,5 @@
 # Global instructions (Tommy)
 
-## Work vs personal repos — the Azure-DevOps / PR skills are WORK-ONLY
-
-The skills **`create-devops-item`**, **`create-gh-pr`**, **`ship`**, and **`implement`** are
-Infonetica **work** tools: they create Azure DevOps work items in the ERM project / CRIS Team,
-link `AB#` items, set assignees, and open PRs wired to all of that.
-
-They are physically scoped to work repos: they live in
-`C:\Users\TommySeery\source\repos\infonetica\.claude\skills` and reach each work repo via an NTFS
-junction at `<repo>\.claude\skills` (per-skill junctions in `cris-preaward-app`, which has its own
-project skills). They are NOT in `~/.claude/skills`, so they simply don't exist in personal
-projects. When adding a work repo, junction its `.claude\skills` to the shared folder and add the
-path to `.git/info/exclude`.
-
-In a personal repo (e.g. `Concertable`, or anything under `C:\Users\TommySeery\source\repos` that
-isn't under `infonetica\`):
-
-- Open PRs with **plain `gh pr create`** (GitHub only) — no work item, no `AB#`, no assignee.
-- Commit / push with plain `git` or the generic `commit` / `push` skills.
-
 ## Don't park finished work or invent PR/branch strategy — commit it and push it on the CURRENT branch
 
 Default for any change: apply it to the branch/PR **already in context**, commit it, and **push it there**.
@@ -35,7 +16,7 @@ Two failure modes that have wasted real time — never do either:
    If you genuinely think a split is warranted, say so in **one line** and keep going on the current
    branch unless I say otherwise.
 
-## Committing and pushing are free in personal repos (work repos tighten it — they gate both)
+## Committing and pushing are free in personal repos
 
 **`git commit`** — fine by default; it's a local, reversible checkpoint, not a publish. Commit at
 natural boundaries (a completed change, a finished plan phase) **without asking** — "should I commit?"
@@ -46,8 +27,6 @@ is not a question to raise, and never leave completed, verified work sitting unc
 writing / refactoring, applying a fix, executing a plan's code steps is the *default action*, never a
 "should I?" question and never a "just report / do nothing" option in a menu.
 
-**Work repos override this — stricter.** Infonetica repos (under `source\repos\infonetica\`) require
-Tommy's explicit go-ahead before **committing too**, not just pushing — see `infonetica\CLAUDE.md`.
 The commit-freely default above is for personal projects (Concertable, Vel, cpp, …).
 
 ## Don't fuss about the commit-state of docs — "pushed" means the CODE
