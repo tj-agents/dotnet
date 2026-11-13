@@ -125,6 +125,9 @@ unit and integration test projects. A shared library takes the same per-layer fo
   add one, not even for integration fixtures; each fixture reads back through the owning module's own context.
 - **Cross-module communication is a facade or an event** — an `IXModule` facade in Contracts for commands and
   narrow queries, or an integration event for fan-out.
+- **A module never locks another module's rows.** The owner enforces its own invariant, through a role interface
+  it calls that the other modules implement over their own data, or through an event; a facade exposes a use
+  case, never a lock.
 - **Cross-module foreign keys are plain primitives** (`int WarehouseId`, `Guid UserId`) — never a navigation
   property across a boundary.
 - **Shared reference vocabulary is an enum in the shared contracts package**, not a table every module keys

@@ -1,9 +1,9 @@
 namespace SnippetFixtures.Fields02;
 
-internal sealed class StockCatalog;
-internal sealed class Inventory(StockCatalog catalog)
+internal sealed class StockLevels;
+internal sealed class Inventory(StockLevels stockLevels)
 {
-    private readonly StockCatalog catalog = catalog;
+    private readonly StockLevels stockLevels = stockLevels;
 }
 
 internal sealed class InventoryTests
@@ -14,7 +14,7 @@ private readonly Inventory inventory;
 
 public InventoryTests()
 {
-    inventory = new Inventory(new StockCatalog());
+    inventory = new Inventory(new StockLevels());
 }
 // snippet:end
 
