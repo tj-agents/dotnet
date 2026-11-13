@@ -25,7 +25,7 @@ public sealed class InventoryTests
 
     public InventoryTests()
     {
-        inventory = new Inventory(new StockCatalog());
+        inventory = new Inventory(new StockLevels());
     }
 
     #region Receive
@@ -107,7 +107,7 @@ from those fields.
   living as constructor-built fields. If you're about to write one, put its body in the constructor
   instead and reference the fields directly.
 - **Prefer real collaborators over mocks** where they are cheap and deterministic — `new Inventory(new
-  StockCatalog())`, not a mocked catalog. Reach for a test double only at a genuine boundary: I/O, time,
+  StockLevels())`, not mocked stock levels. Reach for a test double only at a genuine boundary: I/O, time,
   randomness, or an expensive/nondeterministic dependency, and only when the SUT still owns substantial
   isolated logic. Several mocked collaborators are a strong signal that the test belongs in the integration
   tier.
