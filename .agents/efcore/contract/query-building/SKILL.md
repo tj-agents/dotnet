@@ -102,6 +102,3 @@ not leaf specifications; use `dotnet:dependency-injection` for registration conv
 and [short-lived, non-thread-safe contexts](https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/).
 Those facts establish the composition/execution boundary; [Ardalis's evaluator example](https://specification.ardalis.com/usage/use-specification-repository-pattern.html)
 illustrates applying criteria without placing service resolution inside them.
-
-Tommy, 2026-10-18: canonical EF query-building guidance accompanies constructor-bound specifications.
-The examples make the house role name, input ownership and DI lifetime concrete.

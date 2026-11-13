@@ -1,6 +1,6 @@
 ---
 name: proto
-description: gRPC and Protobuf standard for .NET services — proto message naming vs the C# payload type, XMappers extension methods for proto-to-domain conversion, what may cross the wire (open string code, published message, semantic kind — never a union type or Result), total client error mapping via a FrozenDictionary of reconstructible cases, contract-mismatch handling for unknown codes, and cancellation precedence. Use when adding or changing a .proto file, writing or reviewing a gRPC client or server implementation, mapping proto messages to domain types, mapping RpcException to a typed error, or deciding whether a failure case can cross a service boundary.
+description: Use when defining .NET protobuf/RPC contracts, generated clients or typed failure mappings across service boundaries.
 kind: contract
 domain: dotnet
 profile: distributed-services
@@ -25,8 +25,7 @@ hop is gRPC at all — is a separate decision and is not this skill's concern.
 A `.proto` message keeps the native RPC `*Response` / `*Request` naming. That name is generated,
 wire-only, and never surfaces as the application payload type.
 
-The application C# payload follows `dotnet:naming-dtos`,
-including shape names and local aliases for SDK collisions. Generated RPC payloads retain their
+The application C# payload follows `dotnet:dtos`. Generated RPC payloads retain their
 protocol-owned `Request` / `Response` names.
 
 ```csharp

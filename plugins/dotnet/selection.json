@@ -2,8 +2,7 @@
   "plugin": "dotnet",
   "dependencies": [
     "tj-agents/base",
-    "tj-agents/engineering",
-    "tj-agents/machine"
+    "tj-agents/engineering"
   ],
   "profiles": {
     "aspnet": [
@@ -13,18 +12,18 @@
       "build",
       "comments",
       "domain-design",
+      "dtos",
       "errors",
       "explanation",
       "fields",
       "libraries",
       "mapping",
       "naming",
-      "naming-collaborators",
-      "naming-dtos",
       "repositories",
       "structure",
       "style",
-      "testing"
+      "testing",
+      "unit-of-work"
     ],
     "distributed-services": [
       "messaging",
@@ -73,16 +72,14 @@
       "scaffold"
     ],
     "seeding": [
-      "seeding"
+      "seeding-scope",
+      "seeding-state"
     ],
     "selected-stack": [
       "libraries-selected"
     ],
     "single-service": [
       "structure-single-service"
-    ],
-    "skill-routes": [
-      "skill-routes"
     ],
     "unit-testing": [
       "testing-unit"
@@ -278,6 +275,20 @@
       "provenance": [
         "language",
         "pattern",
+        "house"
+      ]
+    },
+    {
+      "name": "dtos",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "all C# and .NET code"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
         "house"
       ]
     },
@@ -552,36 +563,6 @@
       ]
     },
     {
-      "name": "naming-collaborators",
-      "kind": "contract",
-      "profile": "core",
-      "applicability": [
-        "all C# and .NET code"
-      ],
-      "requires": [
-        "none"
-      ],
-      "provenance": [
-        "language",
-        "house"
-      ]
-    },
-    {
-      "name": "naming-dtos",
-      "kind": "contract",
-      "profile": "core",
-      "applicability": [
-        "all C# and .NET code"
-      ],
-      "requires": [
-        "none"
-      ],
-      "provenance": [
-        "language",
-        "house"
-      ]
-    },
-    {
       "name": "proto",
       "kind": "contract",
       "profile": "distributed-services",
@@ -628,7 +609,7 @@
       ]
     },
     {
-      "name": "seeding",
+      "name": "seeding-scope",
       "kind": "contract",
       "profile": "seeding",
       "applicability": [
@@ -643,16 +624,17 @@
       ]
     },
     {
-      "name": "skill-routes",
-      "kind": "utility",
-      "profile": "skill-routes",
+      "name": "seeding-state",
+      "kind": "contract",
+      "profile": "seeding",
       "applicability": [
-        ".NET consumer repositories wired for skill routing"
+        ".NET projects with development or test seeders"
       ],
       "requires": [
-        "dotnet"
+        "seeding"
       ],
       "provenance": [
+        "library",
         "house"
       ]
     },
@@ -775,6 +757,22 @@
       ],
       "provenance": [
         "library",
+        "house"
+      ]
+    },
+    {
+      "name": "unit-of-work",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "C# projects that persist state",
+        "regardless of persistence library"
+      ],
+      "requires": [
+        "none"
+      ],
+      "provenance": [
+        "pattern",
         "house"
       ]
     },

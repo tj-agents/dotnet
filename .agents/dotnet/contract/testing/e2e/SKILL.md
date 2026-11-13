@@ -1,6 +1,6 @@
 ---
 name: testing-e2e
-description: Authoring rules for browser E2E scenarios (Gherkin bound with Reqnroll, driven through Playwright) — a scenario tests one behaviour and starts at the nearest already-verified state, fast-forwarding through seeded data rather than replaying earlier stages through the UI, creating a prerequisite through its real production API or handler where seeding rules forbid seeding that row, splitting a scenario whose assertion needs genuine external-provider state, keeping a trusted baseline file's scenario lists and counts reconciled, and running headless by default. Use when writing or reviewing a UI E2E scenario, adding setup steps to reach a starting state, or reconciling a suite's pass/fail baseline.
+description: Use when authoring selected .NET browser E2E scenarios, shared fixtures, page objects or assertions against a deployed full stack.
 kind: contract
 domain: dotnet
 profile: e2e
@@ -79,9 +79,8 @@ tier — `Elapsed` the behaviour under test, `PastStart` the input state, `Retur
 and its `Examples` table keeps `expected` as the last column, exactly like a `[Theory]`'s last parameter.
 `ClockSteps` builds its `IPage` and fixture as constructor-assigned `private readonly` fields with
 `this.` (both parameters shadow their fields), uses no `this.` inside a step method, and groups its
-`Given`/`When`/`Then` steps under one `#region` per behaviour under test. Tommy, 2026-10-13: a generic
-opening example, not a product-named one, carries every convention a Gherkin/Reqnroll suite can show,
-without prose — and obeys this contract's own rules, not only the others': the `Given` fast-forwards by
+`Given`/`When`/`Then` steps under one `#region` per behaviour under test. It also obeys
+this contract's own rules: the `Given` fast-forwards by
 reading the already-seeded clock's id off the fixture onto scenario state, with no navigation or clicks;
 only the `When` drives the browser, for the behaviour the scenario titles as under test; and the `Then`
 asserts page state with Playwright's auto-retrying `Expect`, never a one-shot read.
@@ -105,7 +104,7 @@ fast-forward `Given`, not UI steps.
 By default a setup `Given` reads pre-seeded data off the suite's fixture and puts the id on scenario state — no
 navigation, no clicks. Where the starting state does not exist yet, add the seeded state plus a `Given`.
 
-Where the `seeding` rules forbid seeding that lifecycle row — an invitation, say — create the prerequisite
+Where the `seeding-scope` rules forbid seeding that lifecycle row — an invitation, say — create the prerequisite
 through its **real production API or handler** from a non-UI `Given`. Never replay browser UI to build setup, and
 never insert the row directly.
 

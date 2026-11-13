@@ -1,6 +1,6 @@
 ---
 name: errors-carriers
-description: Choosing and using the Reunion Result/Option carriers in a .NET service — the table that picks `Result<TValue, TError>` / `UnitResult<TError>` / `Option<T>` / `T?` / `IReadOnlyList<T>` / plain value from the decisions a caller must make, where each carrier may and may not appear (never in HTTP DTOs, protobuf, events, entities, or config), target-typed construction versus named cases versus factories, observation through `Match`/`TryGetValue` with no throwing accessor, composition with `Map`/`Bind`/`MapError`/`Ensure`/`OrFailure`/`ValueOr`/`Sequence`/`Traverse`, and .NET 11 native-union matching. Use when defining or moving a collaborator contract, picking a return type for a new method, converting a nullable to an Option, composing a chain of fallible operations, or reviewing code that reaches for a bool, an enum, or an exception where a Result belongs.
+description: Use when selected Reunion code chooses or converts Result, Option, validation or typed error carriers across an operation boundary.
 kind: contract
 domain: dotnet
 profile: results
@@ -61,8 +61,7 @@ The exposed responsibility and caller decisions select the carrier. A project or
 Infrastructure can implement both persistence and application collaborators. Repository/provider lookups
 return `T?`; application resolver, service, domain, module-facade and published client contracts expose
 intentional present-or-absent outcomes as `Option<T>`. Moving an operation across that boundary includes
-its return contract and all observers. The role and method are selected by
-`dotnet:naming-collaborators`. Commands
+its return contract and all observers. Commands
 and queries with named rejections use a Result. A guaranteed value stays a plain value, and an optional
 property on a DTO stays nullable rather than wrapping each field in an Option — converted once at that
 boundary, and grouped so values sharing a lifetime become one nullable value object rather than several

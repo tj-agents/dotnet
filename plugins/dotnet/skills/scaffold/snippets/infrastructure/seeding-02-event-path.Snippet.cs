@@ -10,16 +10,16 @@ public sealed class OrderSeedState
 // snippet:begin
 public sealed class OrderSeedSimulator
 {
-    private readonly IIntegrationEventPublisher publisher;
+    private readonly IIntegrationEventPublisher integrationEventPublisher;
     private readonly OrderSeedState seedState;
 
-    public OrderSeedSimulator(IIntegrationEventPublisher publisher, OrderSeedState seedState)
+    public OrderSeedSimulator(IIntegrationEventPublisher integrationEventPublisher, OrderSeedState seedState)
     {
-        this.publisher = publisher;
+        this.integrationEventPublisher = integrationEventPublisher;
         this.seedState = seedState;
     }
 
     public Task SeedAsync(CancellationToken ct = default) =>
-        publisher.PublishAsync(seedState.OrderCreated, ct);
+        integrationEventPublisher.PublishAsync(seedState.OrderCreated, ct);
 }
 // snippet:end

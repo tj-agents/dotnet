@@ -1,6 +1,6 @@
 ---
 name: testing-integration
-description: Integration-test standard for .NET services — each service owns a fixture project that boots its real `Program` through `WebApplicationFactory` against a containerized database reset between tests, every service-agnostic setup step lifted into a shared testing library instead of copy-pasted per fixture, header-based test authentication, dispatching integration events straight to their handlers in one scope through an `IScoped<T>` abstraction rather than hand-rolled `CreateScope`, environment names as extension members rather than raw literals, one `<Resource><Qualifier>ApiTests` class per public resource with a `#region` per operation and a real reason required before splitting, each endpoint test proving its own observable contract rather than a routes-all-return-OK sweep, module tests staying at their owning public boundary while cross-module journeys go to the process integration tier, and deterministic-failure and locking helpers staying fixture infrastructure rather than production DbContext members. Use when adding an integration test or fixture, wiring shared test setup, resolving scoped services or handlers in a test, or deciding whether a test earns a new class.
+description: Use when authoring ASP.NET integration tests with the selected database harness, reset lifecycle, authentication or scoped services.
 kind: contract
 domain: dotnet
 profile: integration-testing
@@ -71,9 +71,7 @@ public sealed class CalculatorApiTests
 constructor-built `private readonly` fixture field assigned with `this.` rather than a primary-constructor
 capture, no `this.` inside a test method, `Method_Scenario_ExpectedBehaviour` naming, Arrange/Act/Assert
 separated by blank lines, Shouldly throughout, a `[Theory]` with the expected value last, and a `#region`
-per operation. Tommy, 2026-10-13: a generic opening example, not a product-named one, demonstrates every
-convention without prose, and the fixture is an explicit field — the prior `ShipmentApiTests(ShipmentApiFixture
-fixture)` primary-constructor capture and its mixed `Assert.*`/`ShouldBe` are gone.
+per operation.
 
 An integration test boots the service's **real `Program`** through `WebApplicationFactory<Program>`
 (`Microsoft.AspNetCore.Mvc.Testing`) and exercises it over HTTP against a real database. For pure in-memory
@@ -127,8 +125,8 @@ members of that library:
 Only genuinely service-specific wiring — an identity provider's UI stack, an in-process dependency, provider
 fakes, per-service mocks and seeders — stays in the service's own fixture.
 
-Seeding rules, including the factory `Seed` pattern and the sentinel guard, are in the `seeding` skill and apply
-to test seeders too.
+Seeding rules, including the factory `Seed` pattern and the sentinel guard, are in the `seeding-state` skill
+(what may be seeded at all is `seeding-scope`'s) and apply to test seeders too.
 
 ## Adding a test
 

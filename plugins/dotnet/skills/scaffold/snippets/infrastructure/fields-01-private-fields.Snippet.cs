@@ -2,7 +2,7 @@ namespace SnippetFixtures.Fields01;
 
 internal sealed class OrderDbContext;
 
-#pragma warning disable CS0169, CS8618
+#pragma warning disable CS0169, CS8618, IDE1006
 
 internal sealed class OrderService
 {
@@ -21,4 +21,4 @@ private readonly OrderDbContext _context;
 
 }
 
-#pragma warning restore CS0169, CS8618
+#pragma warning restore CS0169, CS8618, IDE1006

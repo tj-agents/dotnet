@@ -34,7 +34,7 @@ The machine plugin-selection roster in `tj-agents/core` also needs `efcore: [dot
 worktree does not edit those repositories or installed caches.
 
 After both producers publish, consumer adoption is `python -B <machine-plugin-selection>/scripts/adopt_plugins.py
---root <consumer> --stack dotnet --plugin efcore@tj-agents --mode write`, then the same command with
+--root <consumer> --plugin efcore@tj-agents --mode write`, then the same command with
 `--mode check`. EF route generation is `gen_skill_routes.py --kind efcore-service --into <consumer>`.
 
 ## Validation checkpoint

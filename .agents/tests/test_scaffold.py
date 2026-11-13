@@ -122,7 +122,6 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
     def main():
         parser = argparse.ArgumentParser()
         parser.add_argument("--root", required=True)
-        parser.add_argument("--stack", required=True)
         parser.add_argument("--plugin", action="append", default=[])
         parser.add_argument("--mode", required=True)
         args = parser.parse_args()
@@ -139,10 +138,8 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
         if args.mode == "check":
             return 0
         root = Path(args.root)
-        plugins = ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents", "dotnet@tj-agents"]
+        plugins = ["base@tj-agents", "engineering@tj-agents", "dotnet@tj-agents"]
         plugins.extend(plugin for plugin in args.plugin if plugin not in plugins)
-        if args.stack == "azure":
-            plugins.append("azure@tj-agents")
         omitted = os.environ.get("FAKE_STANDARDS_OMIT_PLUGIN")
         if omitted:
             plugins = [plugin for plugin in plugins if plugin != omitted]
@@ -429,7 +426,7 @@ class ScaffoldTests(unittest.TestCase):
 
     def test_documented_new_examples_execute_with_fixture_substitutions(self) -> None:
         standard_flags = (
-            " --plugin-selection-adopter <machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py"
+            " --plugin-selection-adopter <agent-plugins-skill-directory>/scripts/adopt_plugins.py"
         )
         updated = SCAFFOLD_SKILL.read_text(encoding="utf-8")
         previous = updated.replace(standard_flags, "")
@@ -443,7 +440,7 @@ class ScaffoldTests(unittest.TestCase):
             updated_skill.write_text(updated, encoding="utf-8")
             replacements = (
                 ("<skill-directory>/scripts/scaffold.py", SCRIPT.as_posix()),
-                ("<machine-plugin-selection-skill-directory>/scripts/adopt_plugins.py", self.standards_adopter.as_posix()),
+                ("<agent-plugins-skill-directory>/scripts/adopt_plugins.py", self.standards_adopter.as_posix()),
                 ("~/source/repos/tj-agents/azure/.agents/azure/utility/scaffold/scripts/scaffold.py", azure_script.as_posix()),
                 ("~/source/repos", destination.as_posix()),
             )
@@ -493,7 +490,7 @@ class ScaffoldTests(unittest.TestCase):
             self.assertEqual(0, azure.returncode, azure.stderr)
             calls = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines()]
             self.assertEqual(["write", "check", "write", "check"], [call[call.index("--mode") + 1] for call in calls])
-            self.assertEqual(["dotnet", "dotnet", "azure", "azure"], [call[call.index("--stack") + 1] for call in calls])
+            self.assertTrue(all("--stack" not in call for call in calls))
             self.assertTrue(all("--marketplace-revision" not in call for call in calls))
             for index, call in enumerate(calls):
                 expected = [*SCAFFOLD.CORE_PLUGIN_IDS, "dotnet@tj-agents"]
@@ -508,8 +505,6 @@ class ScaffoldTests(unittest.TestCase):
                 selected = SCAFFOLD.standards_plugin_ids(options)
                 self.assertEqual(data in ("efcore", "efcore+dapper"), "efcore@tj-agents" in selected)
                 self.assertIn("dotnet@tj-agents", selected)
-                routes = SCAFFOLD.skill_routes_document(options)
-                self.assertEqual(data in ("efcore", "efcore+dapper"), "efcore" in routes["layers"])
 
     def test_standards_files_are_copied_and_listed_by_dry_run(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -640,7 +635,6 @@ class ScaffoldTests(unittest.TestCase):
     def test_presets_generate_exact_file_lists(self) -> None:
         expected = {
             "minimal": [
-                ".agents/skill-routes.json",
                 ".editorconfig",
                 ".gitattributes",
                 ".github/workflows/ci.yml",
@@ -659,7 +653,6 @@ class ScaffoldTests(unittest.TestCase):
                 "src/Example.Web/appsettings.json",
             ],
             "web": [
-                ".agents/skill-routes.json",
                 ".editorconfig",
                 ".gitattributes",
                 ".github/workflows/ci.yml",
@@ -682,7 +675,6 @@ class ScaffoldTests(unittest.TestCase):
                 "tests/Example.UnitTests/Example.UnitTests.csproj",
             ],
             "dapper-sqlserver": [
-                ".agents/skill-routes.json",
                 ".editorconfig",
                 ".gitattributes",
                 ".github/workflows/ci.yml",
@@ -793,7 +785,6 @@ class ScaffoldTests(unittest.TestCase):
             generated = sorted(path.relative_to(project).as_posix() for path in project.rglob("*") if path.is_file())
             self.assertEqual(
                 sorted([
-                    ".agents/skill-routes.json",
                     ".editorconfig", ".gitattributes", ".github/workflows/ci.yml", ".gitignore", ".scaffold.json",
                     "AGENTS.md", "BannedSymbols.txt", "CLAUDE.md", "Directory.Build.props", "Directory.Packages.props",
                     "Sandbox.slnx", "global.json",
@@ -1232,31 +1223,6 @@ class ScaffoldTests(unittest.TestCase):
             if name not in azure_components:
                 continue
             self.assertEqual("azure", manifest.get("when", {}).get("cloud"), f"component {name} when: {manifest.get('when')}")
-
-    def test_generated_repo_carries_the_skill_route_table(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            result = self.create(root, "Routed", "web")
-
-            self.assertEqual(0, result.returncode, result.stderr)
-            routes_path = root / "Routed" / ".agents" / "skill-routes.json"
-            self.assertTrue(routes_path.is_file())
-            table = json.loads(routes_path.read_text(encoding="utf-8"))
-            self.assertEqual("efcore-service", table["kind"])
-            self.assertIn("efcore", table["layers"])
-            routes_module_spec = importlib.util.spec_from_file_location(
-                "dotnet_gen_skill_routes", SCRIPT.parent.parent.parent / "skill-routes" / "scripts" / "gen_skill_routes.py"
-            )
-            routes_module = importlib.util.module_from_spec(routes_module_spec)
-            routes_module_spec.loader.exec_module(routes_module)
-            for path, skill in (
-                ("tests/Routed.UnitTests/FooTests.cs", "dotnet:testing-unit"),
-                ("tests/Routed.IntegrationTests/FooApiTests.cs", "dotnet:testing-integration"),
-                ("tests/Routed.E2ETests/Foo.feature", "dotnet:testing-e2e"),
-            ):
-                matched = routes_module.skills_for("dotnet-service", path)
-                self.assertIn("dotnet:testing", matched)
-                self.assertIn(skill, matched)
 
 
 if __name__ == "__main__":

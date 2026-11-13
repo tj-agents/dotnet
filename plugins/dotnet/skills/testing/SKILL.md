@@ -1,6 +1,6 @@
 ---
 name: testing
-description: Tommy's agreed .NET testing — test tiers, their naming, layout and fixtures. Read before writing or reviewing .NET that touches it; nothing applies until it is recorded here.
+description: Use when choosing .NET test tiers, shared test names or each tier's assertion library; follow the relevant tier's authoring contract.
 kind: contract
 domain: dotnet
 profile: core
