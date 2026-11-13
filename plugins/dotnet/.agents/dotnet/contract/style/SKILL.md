@@ -1,6 +1,6 @@
 ---
 name: style
-description: General C# style any codebase follows — enforceable rules live in `.editorconfig`, an enum is a genuine closed choice, a plain null check on a variable, `null!` rather than `string.Empty` for populated-later members, brace and empty-block shape, and when an optional parameter has stopped paying for itself. Use when writing or reviewing any C# type, adding a parameter to an existing signature, or deciding whether a style rule belongs in prose or in `.editorconfig`.
+description: General C# style any codebase follows — enforceable rules live in `.editorconfig`, an enum is a genuine closed choice, a plain null check on a variable, `null!` rather than `string.Empty` for populated-later members, brace and empty-block shape, when an optional parameter has stopped paying for itself, and a repeated literal becoming a named constant in a plural-noun vocabulary class. Use when writing or reviewing any C# type, adding a parameter to an existing signature, repeating a literal, or deciding whether a style rule belongs in prose or in `.editorconfig`.
 kind: contract
 domain: dotnet
 profile: core
@@ -102,3 +102,27 @@ var id = await PlaceAsync(cartId, buyer: "Ada");
 // CORRECT — the one caller that needs a distinct buyer does the call inline
 await client.PostAsync($"/api/orders/{cartId}", new { buyer = "Ada" });
 ```
+
+## A repeated literal becomes a named constant on its second use
+
+```csharp
+internal static class PaymentMetadataKeys
+{
+    public const string OrderId = "order_id";
+    public const string TenantId = "tenant_id";
+}
+```
+
+A literal that means something — an event type, a metadata key, a third-party status value, a policy name —
+is extracted the moment a second call site types it, and every call site references the constant. Group a
+cohesive vocabulary in one small `static class` named as a plural noun (`PaymentMetadataKeys`, not
+`PaymentMetadataKey`), at the root of the project that owns it: `public` in the shared contracts project
+when the value crosses a project boundary, `internal` in the consuming project otherwise. One class per
+vocabulary, never a catch-all `Constants.cs`.
+
+A value already held as the keys of a `FrozenDictionary` or `FrozenSet` translation table under
+`dotnet:mapping` gets no duplicate constants class, and a value whose outcomes are behaviour is a keyed
+strategy under `dotnet:keyed-strategies`, not a constant to switch on.
+
+Why: two identical literals are a spelling mistake waiting to happen that no compiler catches, and a grab-bag
+file answers "is there a constant for this?" only by reading all of it.

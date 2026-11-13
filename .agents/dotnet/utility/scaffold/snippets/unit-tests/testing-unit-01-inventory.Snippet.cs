@@ -2,11 +2,11 @@ namespace SnippetFixtures.TestingUnit01;
 
 using Xunit;
 
-internal sealed class StockCatalog;
+internal sealed class StockLevels;
 
-internal sealed class Inventory(StockCatalog catalog)
+internal sealed class Inventory(StockLevels stockLevels)
 {
-    private readonly StockCatalog catalog = catalog;
+    private readonly StockLevels stockLevels = stockLevels;
     private readonly Dictionary<string, int> stock = [];
 
     public void Receive(string sku, int quantity) => stock[sku] = stock.GetValueOrDefault(sku) + quantity;
@@ -21,7 +21,7 @@ public sealed class InventoryTests
 
     public InventoryTests()
     {
-        inventory = new Inventory(new StockCatalog());
+        inventory = new Inventory(new StockLevels());
     }
 
     #region Receive

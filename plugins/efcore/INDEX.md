@@ -1,5 +1,6 @@
 # efcore package capabilities
 
+- `concurrency` — contract — ef-core
 - `event-dispatch` — contract — domain-model
 - `multitenancy` — contract — multitenancy
 - `persistence` — contract — ef-core

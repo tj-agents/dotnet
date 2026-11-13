@@ -60,11 +60,15 @@ Select distinguishing names from the actual parameters and output. Where a singl
 query would otherwise have identical names and parameters, expose their shape or cardinality clearly.
 Every asynchronous operation accepts cancellation when it can reach I/O and propagates it.
 
-Expose locking guarantees callers must rely on, such as `GetByIdForUpdateAsync` or
-`GetByIdsForShareAsync`. The suffix names the SQL locking clause (`FOR UPDATE`, `FOR SHARE`)
-taken with the returned row, not the caller's purpose — the contract is the lock, whatever the caller
-does next. A composite identity can use an established domain key as a whole:
-`idempotencyKeys.GetByRequestForUpdateAsync(tenantId, operation, requestId, ct)`. Preserve every identity
+Name a query that loads related entities beyond the bare aggregate for the navigations it actually joins,
+such as `GetWithLinesAndCustomerByIdAsync`, never for a bucket word with no matching type
+(`GetFullByIdAsync`) or for the use case the join serves (`GetForInvoicingByIdAsync`).
+
+Expose locking guarantees callers must rely on, such as `GetByIdWithRowLockAsync` or
+`GetByIdsWithKeyShareLockAsync`. The suffix names the lock taken with the returned rows — `WithRowLock` for
+the ordinary write lock, `With<Mode>Lock` for any other mode — not the caller's purpose: the contract is the
+lock, whatever the caller does next. A composite identity can use an established domain key as a whole:
+`idempotencyKeys.GetByRequestWithRowLockAsync(tenantId, operation, requestId, ct)`. Preserve every identity
 predicate; spell out component names when they distinguish different queries.
 
 ## Persistence and application boundaries
