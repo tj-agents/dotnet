@@ -1,11 +1,14 @@
 namespace SnippetFixtures.ErrorsCarriers08;
 
+internal sealed record Refund(Guid RefundId);
+internal sealed record RefundResponse(Guid RefundId);
+
 internal static class Example
 {
-    public static void Run(Option<string> option)
+    public static void Run(Option<Refund> refundOption)
     {
 // snippet:begin
-string? redirect = option.Match<string?>(static value => value, static () => null);
+RefundResponse? refund = refundOption.ToNullable(value => new RefundResponse(value.RefundId));
 // snippet:end
 
     }

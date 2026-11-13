@@ -34,9 +34,9 @@ SNIPPETS: list[Snippet] = [
           footer="\n}\n\n#pragma warning restore CS0169, CS8618, IDE1006\n"),
     entry("fields-02-no-shadow", "fields/SKILL.md", 2, "infrastructure", "SnippetFixtures.Fields02",
           header=(
-              "internal sealed class StockCatalog;\n"
-              "internal sealed class Inventory(StockCatalog catalog)\n{\n"
-              "    private readonly StockCatalog catalog = catalog;\n}\n\n"
+              "internal sealed class StockLevels;\n"
+              "internal sealed class Inventory(StockLevels stockLevels)\n{\n"
+              "    private readonly StockLevels stockLevels = stockLevels;\n}\n\n"
               "internal sealed class InventoryTests\n{\n"
           ),
           footer="\n}\n"),
@@ -48,6 +48,7 @@ SNIPPETS: list[Snippet] = [
           skip="a bare `catch` clause with no preceding `try` is a hard syntax error (not a warning), so it cannot share a compilable method body with the preceding guard-clause example without altering the verbatim text."),
     entry("style-04-optional-param", "style/SKILL.md", 4, "infrastructure", "SnippetFixtures.Style04",
           skip="`private Task<int> PlaceAsync(...);` is a body-less signature (illustrating a name only), which is not a legal member on a concrete class; it is pseudocode, not compilable C#."),
+    entry("style-05-constants", "style/SKILL.md", 5, "infrastructure", "SnippetFixtures.Style05"),
     entry("fields-03-base-call", "fields/SKILL.md", 3, "infrastructure", "SnippetFixtures.Fields03",
           header=(
               "using Microsoft.EntityFrameworkCore;\n\n"
@@ -231,7 +232,11 @@ SNIPPETS: list[Snippet] = [
           ),
           footer="\n}\n"),
     entry("errors-carriers-08-nullcoalesce", "errors/carriers/SKILL.md", 8, "infrastructure", "SnippetFixtures.ErrorsCarriers08",
-          header="internal static class Example\n{\n    public static void Run(Option<string> option)\n    {\n",
+          header=(
+              "internal sealed record Refund(Guid RefundId);\n"
+              "internal sealed record RefundResponse(Guid RefundId);\n\n"
+              "internal static class Example\n{\n    public static void Run(Option<Refund> refundOption)\n    {\n"
+          ),
           footer="\n    }\n}\n"),
     entry("errors-carriers-09-native-union", "errors/carriers/SKILL.md", 9, "infrastructure", "SnippetFixtures.ErrorsCarriers09",
           skip="documents a net11.0-only Reunion feature (compiler-recognized native unions); the scaffold targets net10.0 exclusively, so this cannot compile under it."),
@@ -306,8 +311,8 @@ SNIPPETS: list[Snippet] = [
           header="using Xunit;\n\ninternal sealed class Calculator\n{\n    public int Add(int left, int right) => left + right;\n}\n\npublic sealed class CalculatorNamingExample\n{\n    private readonly Calculator calculator = new();\n\n    [Theory]\n    [InlineData(2, 3, 5)]\n    ",
           footer="\n    {\n        var result = calculator.Add(left, right);\n\n        Assert.Equal(expected, result);\n    }\n}\n"),
     entry("testing-unit-01-inventory", "testing/unit/SKILL.md", 1, "unit-tests", "SnippetFixtures.TestingUnit01",
-          header="using Xunit;\n\ninternal sealed class StockCatalog;\n\ninternal sealed class Inventory(StockCatalog catalog)\n{\n"
-                "    private readonly StockCatalog catalog = catalog;\n"
+          header="using Xunit;\n\ninternal sealed class StockLevels;\n\ninternal sealed class Inventory(StockLevels stockLevels)\n{\n"
+                "    private readonly StockLevels stockLevels = stockLevels;\n"
                 "    private readonly Dictionary<string, int> stock = [];\n\n"
                 "    public void Receive(string sku, int quantity) => stock[sku] = stock.GetValueOrDefault(sku) + quantity;\n\n"
                 "    public int StockOf(string sku) => stock.GetValueOrDefault(sku);\n}\n\n"),
@@ -389,6 +394,63 @@ SNIPPETS: list[Snippet] = [
           ),
           footer="\n}\n"),
 
+    entry("efcore-concurrency-01-token", "concurrency/SKILL.md", 1, "infrastructure", "SnippetFixtures.Concurrency01", owner="efcore",
+          header=(
+              "using Microsoft.EntityFrameworkCore;\nusing Microsoft.EntityFrameworkCore.Metadata.Builders;\n\n"
+              "internal sealed class Membership { public uint Version { get; set; } }\n"
+              "internal static class MembershipErrors { public const string Superseded = \"superseded\"; }\n\n"
+              "internal sealed class MembershipWriter\n{\n"
+              "    public async Task<string?> SaveAsync(EntityTypeBuilder<Membership> builder, DbContext context, CancellationToken ct)\n    {\n"
+          ),
+          footer="\n\n        return null;\n    }\n}\n"),
+    entry("efcore-concurrency-02-row-lock", "concurrency/SKILL.md", 2, "infrastructure", "SnippetFixtures.Concurrency02", owner="efcore",
+          header=(
+              "using Microsoft.EntityFrameworkCore;\n\n"
+              "internal sealed class TenantEntity { public Guid Id { get; set; } }\n"
+              "internal sealed class TenantDbContext : DbContext { public DbSet<TenantEntity> Tenants => Set<TenantEntity>(); }\n\n"
+              "internal sealed class TenantRepository\n{\n"
+              "    private readonly TenantDbContext context;\n\n"
+              "    public TenantRepository(TenantDbContext context) => this.context = context;\n\n"
+          ),
+          footer="\n}\n"),
+    entry("efcore-concurrency-03-advisory-lock", "concurrency/SKILL.md", 3, "infrastructure", "SnippetFixtures.Concurrency03", owner="efcore",
+          header=(
+              "using Microsoft.EntityFrameworkCore;\n\n"
+              "internal sealed class InvoiceRepository\n{\n"
+              "    private readonly DbContext context;\n\n"
+              "    public InvoiceRepository(DbContext context) => this.context = context;\n\n"
+          ),
+          footer="\n}\n"),
+
+    entry("authorization-01-endpoint-permission", "authorization/SKILL.md", 1, "web", "SnippetFixtures.Authorization01",
+          header=(
+              "using Microsoft.AspNetCore.Authorization;\nusing Microsoft.AspNetCore.Mvc;\n\n"
+              "internal sealed class HasPermissionAttribute(string permission) : AuthorizeAttribute(permission);\n\n"
+              "internal static class Permission\n{\n    public const string SettlementTriggerName = \"settlement.trigger\";\n}\n\n"
+              "internal sealed record SettlementDto;\n\n"
+              "internal interface ISettlementService\n{\n"
+              "    Task<SettlementDto> TriggerAsync(Guid concertId, CancellationToken ct);\n}\n\n"
+              "[ApiController]\n"
+              "internal sealed class SettlementController : ControllerBase\n{\n"
+              "    private readonly ISettlementService settlementService;\n\n"
+              "    public SettlementController(ISettlementService settlementService) => this.settlementService = settlementService;\n\n"
+          ),
+          footer="\n}\n"),
+    entry("authorization-02-permission-catalog", "authorization/SKILL.md", 2, "infrastructure", "SnippetFixtures.Authorization02",
+          header="using System.Collections.Frozen;\n\n"),
+    entry("authorization-03-fallback-policy", "authorization/SKILL.md", 3, "web", "SnippetFixtures.Authorization03",
+          header=(
+              "using Microsoft.AspNetCore.Authorization;\nusing Microsoft.Extensions.DependencyInjection;\n\n"
+              "internal static class AuthorizationRegistration\n{\n"
+              "    public static void Register(IServiceCollection services)\n    {\n"
+          ),
+          footer="\n    }\n}\n"),
+    entry("authorization-04-access-decision", "authorization/SKILL.md", 4, "infrastructure", "SnippetFixtures.Authorization04",
+          header=(
+              "public sealed record Permission(string Value);\n\n"
+              "public sealed record ResourceAddress(string Type, Guid Id);\n\n"
+          )),
+
     entry("explanation-01-quoting", "explanation/SKILL.md", 1, "infrastructure", "SnippetFixtures.Explanation01",
           skip="`...` stands in for elided usings/body lines in an explanation quote; it is not valid C# syntax."),
     entry("proto-01-naming", "proto/SKILL.md", 1, "infrastructure", "SnippetFixtures.Proto01",
@@ -424,6 +486,36 @@ SNIPPETS: list[Snippet] = [
               "internal sealed class VenueController(IVenueService venueService) : ControllerBase\n{\n"
           ),
           footer="\n}\n"),
+    entry("http-api-02-plain-attachment", "http-api/SKILL.md", 2, "web", "SnippetFixtures.HttpApi02",
+          header=(
+              "public sealed record OrderDto(Guid Id);\n\n"
+              "public sealed record OrderRequest\n{\n    public required string Reference { get; init; }\n}\n\n"
+          )),
+    entry("http-api-03-route-segment", "http-api/SKILL.md", 3, "web", "SnippetFixtures.HttpApi03",
+          header=(
+              "using Microsoft.AspNetCore.Mvc;\n\n"
+              "internal sealed record WarehouseDto(Guid Id, string Name);\n\n"
+              "internal interface IWarehouseService\n{\n"
+              "    Task<WarehouseDto> GetCurrentAsync(CancellationToken ct);\n}\n\n"
+          )),
+    entry("http-api-04-rate-limit-policies", "http-api/SKILL.md", 4, "web", "SnippetFixtures.HttpApi04",
+          header=(
+              "using System.Security.Claims;\nusing System.Threading.RateLimiting;\n"
+              "using Microsoft.AspNetCore.Http;\nusing Microsoft.Extensions.DependencyInjection;\n\n"
+              "internal static class RateLimitPolicies\n{\n"
+              "    public const string SignIn = \"sign-in\";\n"
+              "    public const string BulkExport = \"bulk-export\";\n}\n\n"
+              "internal static class RateLimitRegistration\n{\n"
+              "    public static void Register(\n"
+              "        IServiceCollection services,\n"
+              "        FixedWindowRateLimiterOptions signInWindow,\n"
+              "        FixedWindowRateLimiterOptions bulkExportWindow)\n    {\n"
+          ),
+          footer=(
+              "\n    }\n\n"
+              "    private static string ClientAddress(HttpContext context) =>\n"
+              "        context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;\n}\n"
+          )),
     entry("microservice-boundaries-01-grpc-client", "microservice/boundaries/SKILL.md", 1, "infrastructure", "SnippetFixtures.MicroserviceBoundaries01",
           header=(
               "using Grpc.Net.ClientFactory;\nusing Microsoft.Extensions.DependencyInjection;\n\n"

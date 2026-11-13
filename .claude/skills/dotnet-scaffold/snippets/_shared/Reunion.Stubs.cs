@@ -115,6 +115,24 @@ public readonly struct Option<T>
     public T ValueOr(T fallback) => hasValue ? value! : fallback;
 }
 
+public static class OptionReferenceNullableExtensions
+{
+    public static T? ToNullable<T>(this Option<T> option) where T : class =>
+        option.Match<T?>(static value => value, static () => null);
+
+    public static TResult? ToNullable<T, TResult>(this Option<T> option, Func<T, TResult> projection) where TResult : class =>
+        option.Match<TResult?>(value => projection(value), static () => null);
+}
+
+public static class OptionValueNullableExtensions
+{
+    public static T? ToNullable<T>(this Option<T> option) where T : struct =>
+        option.Match<T?>(static value => value, static () => null);
+
+    public static TResult? ToNullable<T, TResult>(this Option<T> option, Func<T, TResult> projection) where TResult : struct =>
+        option.Match<TResult?>(value => projection(value), static () => null);
+}
+
 public static class OptionTaskExtensions
 {
     extension<T>(Task<Option<T>> task)

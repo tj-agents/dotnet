@@ -23,6 +23,10 @@ follow `dotnet:naming`, and result shapes follow `dotnet:dtos`.
 Place type-to-type conversions in a static `XMappers` class with extension methods named for the target.
 `X` is the mapped subject and covers its related shapes and both directions: `PaymentMappers` owns the
 payment mapping family. Each family has one source owner. Consumers call its conversions directly.
+`X` is the subject, never a payload word: the family producing `ShipmentDto` is `ShipmentMappers`, not
+`ShipmentDtoMappers`, and an injected mapper producing it is a `ShipmentMapper`, not a `ShipmentDtoMapper`.
+A type-to-type conversion is a mapping-family member, never a `Create` on the target contract: a pure data
+payload has no invariant to guard, and a `Create` that knows the source type leaks mapping into the contract.
 
 ```csharp
 internal static class ShipmentMappers
