@@ -1,6 +1,6 @@
 ---
 name: messaging
-description: Integration-event messaging roles — the one generic `IIntegrationEventPublisher` per solution, staging events in the caller's unit of work, and the `<Subscription>Processor` `BackgroundService` that pumps one broker subscription, dispatches each message to its `<Event>Handler` in a fresh scope and settles it. Use when publishing an integration event, consuming a broker subscription, or naming either role.
+description: Use when .NET services publish integration events or pump broker subscriptions; preserve publisher, handler, scope and settlement ownership.
 kind: contract
 domain: dotnet
 profile: distributed-services

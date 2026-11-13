@@ -1,6 +1,6 @@
 ---
 name: scaffold
-description: Create a new .NET project in the File structure `dotnet:structure-single-service` records. Use when starting a .NET project; it creates nothing until that File structure is agreed.
+description: Use when creating a new .NET service from the selected scaffold preset and wiring its hosts, infrastructure, tests and checks.
 kind: utility
 domain: dotnet
 profile: scaffold
@@ -77,3 +77,6 @@ dotnet restore MyService.slnx
 dotnet build MyService.slnx --configuration Release
 dotnet test MyService.slnx --configuration Release
 ```
+
+Analyzer diagnostics are enforced by `dotnet build` with `TreatWarningsAsErrors` and
+`EnforceCodeStyleInBuild`. `dotnet:fields` records the field-qualification exception.

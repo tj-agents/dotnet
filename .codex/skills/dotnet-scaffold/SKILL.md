@@ -1,6 +1,6 @@
 ---
 name: scaffold
-description: Create a new .NET project in the File structure `dotnet:structure-single-service` records. Use when starting a .NET project; it creates nothing until that File structure is agreed.
+description: Use when creating a new .NET service from the selected scaffold preset and wiring its hosts, infrastructure, tests and checks.
 kind: utility
 domain: dotnet
 profile: scaffold

@@ -1,0 +1,98 @@
+[project]
+name = "tj-agents-dotnet"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = ["mypy>=2.4.1", "pytest>=9.1.1", "pytest-socket>=0.7.0", "ruff>=0.17.4"]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+extend-exclude = [".agents/sync_generated.py", ".agents/dependencies", ".codex/skills", ".claude/skills", ".codex/hooks/snapshot.py", ".codex/hooks/bootstrap.py", ".worktrees", ".template", "plugins"]
+include = ["*.py", "*.pyi"]
+
+[tool.ruff.lint]
+preview = true
+explicit-preview-rules = true
+select = ["E", "W", "F", "I", "N", "UP", "B", "A", "BLE", "C4", "SIM", "PTH", "PIE", "RET", "RUF", "PGH004", "ANN401", "G004", "PLW1514", "LOG002", "LOG015", "PLC2701", "ICN001", "TID251", "TRY300", "PT009", "PT011", "PT006", "PLR6301"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"sys.path" = { "msg" = "Install the declared dependency; do not modify the import search path." }
+"importlib.util.spec_from_file_location" = { "msg" = "Import the installed public API; do not load another checkout by path." }
+"unittest.TestCase" = { "msg" = "Use plain pytest functions and bare assertions." }
+
+[tool.ruff.lint.flake8-pytest-style]
+raises-require-match-for = ["*"]
+
+[tool.mypy]
+exclude = ["(^|/)(?:\\.agents/sync_generated\\.py|\\.agents/dependencies/|\\.codex/skills/|\\.claude/skills/|\\.codex/hooks/(?:snapshot|bootstrap)\\.py|\\.worktrees/|\\.template/)", "^plugins/"]
+explicit_package_bases = true
+strict = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "exhaustive-match"]
+files = [".agents"]
+
+[tool.pytest]
+strict = true
+testpaths = [".agents/tests"]
+addopts = ["--import-mode=importlib", "--disable-socket", "-ra"]
+filterwarnings = ["error"]
+
+[tool.ruff.lint.per-file-ignores]
+".agents/tests/test_source_layout.py" = ["E501", "I001", "PT009", "TID251"]
+".agents/tests/test_snippets.py" = ["E501", "I001", "ICN001", "PT009", "TID251"]
+".agents/tests/test_scaffold.py" = ["C420", "E501", "I001", "ICN001", "N818", "PT009", "SIM117", "TID251"]
+".agents/dotnet/utility/scaffold/snippets/manifest.py" = ["A002", "E501", "UP045"]
+".agents/dotnet/utility/scaffold/snippets/gen_snippets.py" = ["E501", "TID251"]
+".agents/dotnet/utility/scaffold/scripts/verify.py" = ["E501", "I001", "UP012", "UP035"]
+".agents/dotnet/utility/scaffold/scripts/scaffold.py" = ["ANN401", "C401", "C405", "C420", "E501", "I001", "RUF059", "UP006", "UP035", "UP045"]
+
+[tool.ruff.format]
+exclude = [".agents/dotnet/utility/scaffold/scripts/scaffold.py", ".agents/dotnet/utility/scaffold/scripts/verify.py", ".agents/dotnet/utility/scaffold/snippets/gen_snippets.py", ".agents/dotnet/utility/scaffold/snippets/manifest.py", ".agents/tests/test_scaffold.py", ".agents/tests/test_snippets.py", ".agents/tests/test_source_layout.py"]
+
+[[tool.mypy.overrides]]
+module = "gen_snippets"
+disable_error_code = ["no-any-return"]
+
+[[tool.mypy.overrides]]
+module = "scaffold"
+disable_error_code = ["no-any-return", "type-arg"]
+
+[[tool.mypy.overrides]]
+module = "test_scaffold"
+disable_error_code = ["no-untyped-call"]
+
+[[tool.mypy.overrides]]
+module = "test_snippets"
+disable_error_code = ["no-untyped-def"]
+
+[[tool.mypy.overrides]]
+module = "test_source_layout"
+disable_error_code = ["arg-type", "attr-defined", "no-untyped-def"]
+
+[[tool.mypy.overrides]]
+module = "verify"
+disable_error_code = ["type-arg"]
+
+[[tool.python-standards.exceptions]]
+path = ".agents/dotnet/utility/scaffold/scripts/scaffold.py"
+rule = "PY016"
+reason = "Legacy host integration reads process state while resolving native configuration."
+
+[[tool.python-standards.exceptions]]
+path = ".agents/dotnet/utility/scaffold/scripts/verify.py"
+rule = "PY016"
+reason = "Legacy host integration reads process state while resolving native configuration."
+
+[[tool.python-standards.exceptions]]
+path = ".agents/tests/test_scaffold.py"
+rule = "PY016"
+reason = "Existing test reads or replaces process state at a command boundary."
+
+[[tool.python-standards.exceptions]]
+path = ".agents/tests/test_snippets.py"
+rule = "PY016"
+reason = "Existing test reads or replaces process state at a command boundary."

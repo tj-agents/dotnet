@@ -1,6 +1,6 @@
 ---
 name: seeding-state
-description: How a .NET seeder's seed state is built — a constructor-built singleton with get-only properties built from compile-time-deterministic inputs, and per-aggregate factory `Seed` statics chaining a reflection `With(nameof(X.Id), id)` over the real `Create` method, then clearing the resulting domain events. Covers one canonical seed-state model shared by producer and consumer, never a `Snapshot` or mirror hierarchy, plus idempotency and sentinel guards. Use when writing seed state, when a seed-state type collides on a name with a domain type, or reviewing a seeder's existence guard.
+description: Use when building deterministic .NET seed state, factory Seed methods, shared catalogs or idempotency sentinels.
 kind: contract
 domain: dotnet
 profile: seeding
