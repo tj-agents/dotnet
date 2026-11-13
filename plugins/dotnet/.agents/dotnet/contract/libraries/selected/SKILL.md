@@ -1,6 +1,6 @@
 ---
 name: libraries-selected
-description: Tommy's optional selected .NET application stack, mapping each job to one chosen library or platform facility and recording deliberate exclusions. Apply only when a repository selects this profile; use core C# guidance without it.
+description: Use when a repository explicitly adopts Tommy's .NET application stack and needs the chosen library or platform facility for a job.
 kind: contract
 domain: dotnet
 profile: selected-stack
@@ -58,9 +58,7 @@ Each row has a skill covering *how* to use it well; this file only decides *what
 | Package versioning | **MinVer**, from the tag | — |
 | Analyzers | **Meziantou.Analyzer** + **BannedApiAnalyzers** | `scaffold` |
 
-2026-10-13: the stack selected xUnit, Reqnroll and Playwright without ever recording which library proves
-an assertion, so this table is the one place that decision lives — `dotnet:testing` owns the per-tier
-split, this row only points there.
+`dotnet:testing` owns the per-tier assertion split.
 
 ## Prefer the platform to a package
 

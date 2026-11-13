@@ -1,6 +1,6 @@
 ---
 name: repositories
-description: Canonical C# repository contracts independent of an ORM — the entity a repository persists, query and write verbs, nullable single-row results, collections and predicates, locking suffixes, and the boundary to application resolvers and result carriers. Use when naming or reviewing a repository, persistence method, or extracted application collaborator.
+description: Canonical C# repository contracts independent of an ORM — `XRepository` vs `XStore` vs `XProjection`, the entity a repository persists, query and write verbs, nullable single-row results, collections and predicates, locking suffixes, and the boundary to application resolvers and result carriers. Use when naming or reviewing a repository, persistence method, or extracted application collaborator.
 kind: contract
 domain: dotnet
 profile: core

@@ -26,27 +26,27 @@ public interface IRepository<TEntity, TKey> : IReadRepository<TEntity, TKey>, IW
 public abstract class ReadRepository<TEntity, TKey> : IReadRepository<TEntity, TKey>
     where TEntity : class
 {
-    private readonly IReadDbContext context;
+    private readonly IReadDbContext readDbContext;
 
-    protected ReadRepository(IReadDbContext context)
+    protected ReadRepository(IReadDbContext readDbContext)
     {
-        this.context = context;
+        this.readDbContext = readDbContext;
     }
 
-    protected IReadDbContext Context => context;
+    protected IReadDbContext Context => readDbContext;
 }
 
 public abstract class WriteRepository<TEntity> : IWriteRepository<TEntity>
     where TEntity : class
 {
-    private readonly IWriteDbContext context;
+    private readonly IWriteDbContext writeDbContext;
 
-    protected WriteRepository(IWriteDbContext context)
+    protected WriteRepository(IWriteDbContext writeDbContext)
     {
-        this.context = context;
+        this.writeDbContext = writeDbContext;
     }
 
-    protected IWriteDbContext Context => context;
+    protected IWriteDbContext Context => writeDbContext;
 
     public Task InsertAsync(TEntity entity, CancellationToken ct = default) => Task.CompletedTask;
     public Task AddAsync(TEntity entity, CancellationToken ct = default) => Task.CompletedTask;
@@ -56,14 +56,14 @@ public abstract class WriteRepository<TEntity> : IWriteRepository<TEntity>
 public abstract class Repository<TEntity, TKey> : IRepository<TEntity, TKey>
     where TEntity : class
 {
-    private readonly IDbContext context;
+    private readonly IDbContext dbContext;
 
-    protected Repository(IDbContext context)
+    protected Repository(IDbContext dbContext)
     {
-        this.context = context;
+        this.dbContext = dbContext;
     }
 
-    protected IDbContext Context => context;
+    protected IDbContext Context => dbContext;
 
     public Task InsertAsync(TEntity entity, CancellationToken ct = default) => Task.CompletedTask;
     public Task AddAsync(TEntity entity, CancellationToken ct = default) => Task.CompletedTask;

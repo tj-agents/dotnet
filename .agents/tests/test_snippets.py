@@ -50,12 +50,11 @@ FAKE_STANDARDS_ADOPTER = textwrap.dedent(
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", required=True)
-    parser.add_argument("--stack", required=True)
     parser.add_argument("--plugin", action="append", default=[])
     parser.add_argument("--mode", required=True)
     args = parser.parse_args()
     root = Path(args.root)
-    plugins = ["base@tj-agents", "engineering@tj-agents", "machine@tj-agents", "dotnet@tj-agents"]
+    plugins = ["base@tj-agents", "engineering@tj-agents", "dotnet@tj-agents"]
     plugins.extend(plugin for plugin in args.plugin if plugin not in plugins)
     files = {
         ".agents/plugins.json": json.dumps({"schema_version": 1, "marketplaces": {"tj-agents": {"repository": "tj-agents/marketplace"}}, "plugins": plugins}) + "\\n",

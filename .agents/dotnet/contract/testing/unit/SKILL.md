@@ -1,6 +1,6 @@
 ---
 name: testing-unit
-description: Unit-test standard for .NET — integration is the default for application services, handlers, controllers, repositories, DI, adapters and collaborator orchestration; unit tests are reserved for substantial deterministic core logic such as calculations, validators, decision tables, value objects and domain transitions, never mock-interaction coverage of guard clauses or delegation. Also owns xUnit shape, constructor-built SUTs, real collaborators and self-verifying architecture allowlists; test naming and the assertion library are owned by `dotnet:testing`. Use when adding or reviewing a test or deciding between the unit and integration tiers.
+description: Use when a .NET behaviour warrants a unit test; apply the selected xUnit shape, real-collaborator preference and architecture guards.
 kind: contract
 domain: dotnet
 profile: unit-testing
@@ -48,9 +48,7 @@ public sealed class InventoryTests
 
 `InventoryTests` is the whole standard in one place: `Method_Scenario_ExpectedBehaviour` naming, a
 constructor-built `private readonly` field, Arrange/Act/Assert separated by blank lines, xUnit's
-`Assert.*`, a `[Theory]` with the expected value last, and a `#region` per method under test. Tommy,
-2026-10-13: a generic opening example, not a product-named one, demonstrates every convention without
-prose and without a second vocabulary. Its parameterless constructor assigns `inventory` unqualified —
+`Assert.*`, a `[Theory]` with the expected value last, and a `#region` per method under test. Its parameterless constructor assigns `inventory` unqualified —
 per `dotnet:fields`, `this.` appears only where a constructor parameter shadows the field it
 fills, and nothing here does.
 

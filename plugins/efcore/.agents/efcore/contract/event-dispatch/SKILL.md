@@ -48,6 +48,3 @@ makes delivery atomic.
 distinguishes a save's implicit transaction from an explicit transaction spanning several saves.
 [SaveChanges interception](https://learn.microsoft.com/en-us/ef/core/logging-events-diagnostics/interceptors#savechanges-interception)
 documents the save callbacks; commit ownership remains with the selected persistence implementation.
-
-Tommy, 2026-10-18: EF Core-specific guidance has an `efcore` owner so generic domain events remain usable
-without EF Core. This is an ownership split, not a replacement event infrastructure.

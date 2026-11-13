@@ -20,5 +20,6 @@
     "category": "Productivity",
     "capabilities": [],
     "defaultPrompt": "Apply the relevant generic .NET standard to this task."
-  }
+  },
+  "version": "67f795bc3222"
 }

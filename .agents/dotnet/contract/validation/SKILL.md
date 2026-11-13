@@ -1,6 +1,6 @@
 ---
 name: validation
-description: Validation standard for .NET services — FluentValidation for input shape versus a hand-written domain-eligibility validator returning Reunion's `ValidationResult`, invariant-owning entity and value normalization, whether a validator is auto-validated by the MVC filter or injected and called explicitly (and why injecting one for an MVC-arriving type is unreachable code), accumulating independent field failures with `Combine`, mapping validation into an operation's own error at one boundary, and the validation-aware `Ensure` overload that preserves an existing success value. Use when adding or reviewing a validator, normalizing domain text, deciding which validation tool a rule belongs to, wiring validation into a worker/handler/gRPC path, or carrying field errors through a Result chain.
+description: Use when selected .NET code validates input shape or domain eligibility, invokes validators outside MVC, or maps validation to typed errors.
 kind: contract
 domain: dotnet
 profile: validation
@@ -55,16 +55,15 @@ equivalent.
 
 Use `XValidator` for the assessed subject or request: `PlaceOrderRequestValidator`, `OrderValidator`.
 Each top-level type has its matching file, following
-`dotnet:naming`. The collaborator role is defined by
-`dotnet:naming-collaborators`.
+`dotnet:naming`.
 
 | Validation responsibility | Operation | Result owner |
 |---|---|---|
 | Input shape under FluentValidation | `Validate` / `ValidateAsync` on `IValidator<T>` | FluentValidation validation result |
 | Domain eligibility under Reunion | `ValidateCheckout` / `ValidateCheckoutAsync` on the domain validator | `Reunion.Validation.ValidationResult` |
 
-Both report validity and diagnostics about the supplied candidate. A boolean capability predicate uses
-`Can`, `Is` or `Has` and returns `bool`. A collaborator returning a selected or resolved application value
+Both report validity and diagnostics about the supplied candidate. A capability question is a `bool`
+predicate, not a validator. A collaborator returning a selected or resolved application value
 uses its resolver contract, including the presence/failure carrier from
 `dotnet:errors-carriers`. Loading data and checking rules can occur in either
 implementation; the responsibility and returned outcome establish which contract the caller consumes.

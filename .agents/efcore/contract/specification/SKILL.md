@@ -45,8 +45,7 @@ copying discipline as collections. Keep captured criteria private/get-only.
 Compose predicates with the selected shared `And`, `Or` and `Not` API, which rebinds expression parameters.
 Do not compile predicates to delegates or introduce invocation nodes the selected EF provider cannot
 translate. The evaluator applies the description; it does not resolve request inputs. A library's
-`SpecificationEvaluator` names this query adapter, distinct from an application verdict evaluator under
-`dotnet:naming-collaborators`.
+`SpecificationEvaluator` names this query adapter.
 
 A predicate-only model leaves includes, projection and ordering with the query builder. A selected richer
 library may describe them in its specification. Preserve declared null/empty semantics: an omitted optional
@@ -56,7 +55,6 @@ nothing. Count/existence operations reuse criteria without accidentally applying
 Check provider translation and database behavior in the selected integration tier (`dotnet:testing`).
 LINQ-to-Objects checks alone cannot establish EF translation, null semantics or paging behavior.
 
-Tommy, 2026-10-18: specifications are constructor-bound parameter objects rather than DI services; the EF
-query convention has an `efcore` owner. [Ardalis constructor criteria](https://specification.ardalis.com/usage/create-specifications.html)
+Specifications are constructor-bound parameter objects, not DI services. [Ardalis constructor criteria](https://specification.ardalis.com/usage/create-specifications.html)
 and [stateless evaluation](https://specification.ardalis.com/usage/use-specification-repository-pattern.html)
 support that separation without requiring Ardalis. Specifications can also be used outside EF Core.

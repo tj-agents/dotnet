@@ -1,6 +1,6 @@
 ---
 name: fields
-description: How a C# type names, declares and reaches its own state — private fields without an underscore prefix, `this.` only where a constructor parameter shadows the member it fills, explicit `private readonly` fields instead of primary-constructor captures, and `base.`-qualified inherited calls. Use when declaring a field, writing a constructor, choosing between a primary constructor and explicit fields, or calling an inherited member.
+description: The house convention for how a C# type spells, declares and reaches its own state — private fields without an underscore prefix, `this.` only where a constructor parameter shadows the member it fills, explicit `private readonly` fields instead of primary-constructor captures, and `base.`-qualified inherited calls. Use when declaring a field, writing a constructor, choosing between a primary constructor and explicit fields, or calling an inherited member.
 kind: contract
 domain: dotnet
 profile: core

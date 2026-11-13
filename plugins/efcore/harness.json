@@ -15,7 +15,6 @@
       "tj-agents/efcore",
       "tj-agents/base",
       "tj-agents/engineering",
-      "tj-agents/machine",
       "tj-agents/dotnet"
     ],
     "hooks": [],
