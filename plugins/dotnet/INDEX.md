@@ -1,5 +1,6 @@
 # dotnet package capabilities
 
+- `authorization` — contract — aspnet
 - `build` — contract — core
 - `comments` — contract — core
 - `dependency-injection` — contract — extensions

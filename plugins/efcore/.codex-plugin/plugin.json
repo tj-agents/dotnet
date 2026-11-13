@@ -16,11 +16,11 @@
   "interface": {
     "displayName": "EF Core Standards",
     "shortDescription": "EF Core data-access conventions.",
-    "longDescription": "Load-on-demand EF Core standards for specifications, query builders, persistence, event dispatch and multitenancy.",
+    "longDescription": "Load-on-demand EF Core standards for specifications, query builders, persistence, concurrency, event dispatch and multitenancy.",
     "developerName": "Tommy Seery",
     "category": "Productivity",
     "capabilities": [],
     "defaultPrompt": "Apply the relevant EF Core standard to this task."
   },
-  "version": "bfc9b11eee5d"
+  "version": "381e254dbd1a"
 }

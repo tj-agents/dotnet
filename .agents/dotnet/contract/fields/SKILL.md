@@ -46,7 +46,7 @@ private readonly Inventory inventory;
 
 public InventoryTests()
 {
-    inventory = new Inventory(new StockCatalog());
+    inventory = new Inventory(new StockLevels());
 }
 ```
 

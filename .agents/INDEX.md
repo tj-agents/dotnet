@@ -4,6 +4,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 
 ## dotnet
 
+- `authorization` — contract — aspnet — `.agents/dotnet/contract/authorization/SKILL.md`
 - `build` — contract — core — `.agents/dotnet/contract/build/SKILL.md`
 - `comments` — contract — core — `.agents/dotnet/contract/comments/SKILL.md`
 - `dependency-injection` — contract — extensions — `.agents/dotnet/contract/dependency-injection/SKILL.md`
@@ -53,6 +54,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 
 ## efcore
 
+- `concurrency` — contract — ef-core — `.agents/efcore/contract/concurrency/SKILL.md`
 - `event-dispatch` — contract — domain-model — `.agents/efcore/contract/event-dispatch/SKILL.md`
 - `multitenancy` — contract — multitenancy — `.agents/efcore/contract/multitenancy/SKILL.md`
 - `persistence` — contract — ef-core — `.agents/efcore/contract/persistence/SKILL.md`

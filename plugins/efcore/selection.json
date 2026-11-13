@@ -10,6 +10,7 @@
       "event-dispatch"
     ],
     "ef-core": [
+      "concurrency",
       "persistence",
       "query-building",
       "specification"
@@ -20,6 +21,20 @@
   },
   "compatibilitySkillAliases": {},
   "skills": [
+    {
+      "name": "concurrency",
+      "kind": "contract",
+      "profile": "ef-core",
+      "applicability": [
+        "projects using EF Core"
+      ],
+      "requires": [
+        "ef-core"
+      ],
+      "provenance": [
+        "library"
+      ]
+    },
     {
       "name": "event-dispatch",
       "kind": "contract",

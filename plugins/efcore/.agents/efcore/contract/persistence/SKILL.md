@@ -17,7 +17,8 @@ Owns EF Core data-access practice: query surfaces, cancellation, table naming, c
 
 This contract applies only to projects using EF Core. It requires `ef-core`. Installing `efcore@tj-agents` makes this guidance available; it does not select those technologies for a consuming repository.
 
-`efcore:specification` owns parameterized criteria; `efcore:query-building` owns injected query composition.
+`efcore:specification` owns parameterized criteria; `efcore:query-building` owns injected query composition;
+`efcore:concurrency` owns concurrency tokens and row locks.
 `dotnet:repositories` owns repository names, query and write verbs, storage return shapes and the boundary
 to application collaborators. A product's own repository base hierarchy and unit-of-work types belong to
 that product's standards.
