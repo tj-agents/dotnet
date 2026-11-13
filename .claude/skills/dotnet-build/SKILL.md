@@ -1,6 +1,6 @@
 ---
 name: build
-description: Tommy's agreed .NET build — toolchain pin, build configuration, the verification gate and CI. Read before writing or reviewing .NET that touches it; nothing applies until it is recorded here.
+description: Use when adding .NET build guidance; no build rules are agreed yet.
 kind: contract
 domain: dotnet
 profile: core

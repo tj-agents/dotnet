@@ -1,6 +1,6 @@
 ---
 name: structure-single-service
-description: The approved .NET single-service repository tree, optional hosts and persistence, and project reference direction. Read when selecting or scaffolding the single-service architecture.
+description: Use when arranging a selected single-service .NET repository, including source projects, tests, hosts and infrastructure files.
 kind: contract
 domain: dotnet
 profile: single-service

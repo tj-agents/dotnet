@@ -1,6 +1,6 @@
 ---
 name: debug-integration
-description: Run and repair a repository's selected ASP.NET Core integration tier by discovering its own entrypoint and fixture contract, reproducing the narrowest failure, reading assertion and server output before the stack trace, separating environment, reset, seed, application and assertion faults, and verifying the exact test plus its owning project. Use when an integration test or integration CI job fails.
+description: Use when an ASP.NET integration test fails; isolate startup, fixture/reset, seed, application and assertion causes in its own harness.
 kind: operation
 domain: dotnet
 profile: integration-testing

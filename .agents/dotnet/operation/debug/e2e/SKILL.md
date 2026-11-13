@@ -1,6 +1,6 @@
 ---
 name: debug-e2e
-description: Run a repository's service and browser end-to-end tiers in dependency order, driving the service tier green before the browser tier and reporting both against one source revision. Use only when both selected tiers need a complete sweep.
+description: Use when both .NET service and browser E2E tiers must be repaired; run the backend tier first and compare both at one revision.
 kind: operation
 domain: dotnet
 profile: e2e
@@ -28,3 +28,9 @@ same stack. The consuming repository owns the concrete commands, topology, resou
 
 Use `engineering:failure-provenance` for pre-existing failures and `engineering:remote-validation` for the
 exact-head remote checkpoint.
+
+## Example
+
+```text
+Service tier -> repair every failure -> browser tier -> report both results at one source revision.
+```
