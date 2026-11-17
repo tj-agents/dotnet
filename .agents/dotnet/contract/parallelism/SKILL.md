@@ -36,13 +36,16 @@ public static async Task<UserEnsureOutcome> EnsureUsersAsync(
             else
                 failures.Add(new UserEnsureFailure(userId, $"Ensure returned {(int)response.StatusCode}."));
         }
-        catch (Exception exception) when (exception is not OperationCanceledException)
+        catch (Exception exception) when (exception is not OperationCanceledException || !token.IsCancellationRequested)
         {
             failures.Add(new UserEnsureFailure(userId, exception.Message));
         }
     });
 
-    return new UserEnsureOutcome(ensured, failures.OrderBy(failure => failure.UserId).ToList());
+    return new UserEnsureOutcome(ensured, failures
+        .OrderBy(failure => failure.UserId)
+        .ThenBy(failure => failure.Message, StringComparer.Ordinal)
+        .ToList());
 }
 ```
 
@@ -93,12 +96,14 @@ Sources: Microsoft [thread-safe collections](https://learn.microsoft.com/en-us/d
 
 For a best-effort batch of independent outcomes, handle unsuccessful responses and item exceptions
 inside the body, retaining the item's identity so its failure does not discard successful items.
-A broad catch belongs only at that explicit batch isolation boundary; exclude
-`OperationCanceledException` and let cancellation propagate. If the operation requires atomic success,
+A broad catch belongs only at that explicit batch isolation boundary. Let `OperationCanceledException`
+propagate when the body token is cancelled; an independent request timeout can throw the same type
+without cancelling that token and is an item failure. If the operation requires atomic success,
 preserve that failure contract instead of silently converting it to partial success.
 Why: item rejection and cancellation have different meanings.
 Sources: Microsoft [`WhenAll`](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.whenall),
-[task cancellation](https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/task-cancellation).
+[task cancellation](https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/task-cancellation),
+[`HttpClient.PostAsync` exceptions](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.postasync#exceptions).
 
 ## Review production volume and prove the limit
 
@@ -114,6 +119,7 @@ Where the bound protects capacity or completion time, test the real batch entry 
 than its limit. Use a controlled asynchronous downstream that counts in-flight calls and holds the
 first wave until the limit is reached; assert peak equals the limit and never exceeds it across later
 waves. Use signals and a bounded test timeout, not sleeps or a barrier waiting for every input item.
-Also prove an item failure preserves other outcomes, caller cancellation reaches active work, and
-reported ordering is stable. Follow `dotnet:testing` and the selected test tier for test shape.
+Also prove item failures and request timeouts preserve other outcomes, caller cancellation reaches
+active work, and reported ordering is stable with repeated keys. Follow `dotnet:testing` and the
+selected test tier for test shape.
 Why: a test that merely inspects the configured number proves no execution bound.
