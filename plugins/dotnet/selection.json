@@ -20,6 +20,7 @@
       "libraries",
       "mapping",
       "naming",
+      "parallelism",
       "repositories",
       "structure",
       "style",
@@ -576,6 +577,22 @@
       "provenance": [
         "language",
         "house"
+      ]
+    },
+    {
+      "name": "parallelism",
+      "kind": "contract",
+      "profile": "core",
+      "applicability": [
+        "writing or reviewing .NET collection loops",
+        "independent per-item I/O and async fan-out"
+      ],
+      "requires": [
+        "dotnet"
+      ],
+      "provenance": [
+        "house",
+        "platform"
       ]
     },
     {
