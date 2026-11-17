@@ -25,7 +25,7 @@ public static async Task<UserEnsureOutcome> EnsureUsersAsync(
     {
         try
         {
-            using var response = await httpClient.PostAsync($"users/{userId}/ensure", null, token);
+            using var response = await httpClient.PostAsync($"users/{userId}/ensure", null, token).ConfigureAwait(false);
             if (response.IsSuccessStatusCode)
                 Interlocked.Increment(ref ensured);
             else
@@ -35,7 +35,7 @@ public static async Task<UserEnsureOutcome> EnsureUsersAsync(
         {
             failures.Add(new UserEnsureFailure(userId, exception.Message));
         }
-    });
+    }).ConfigureAwait(false);
 
     return new UserEnsureOutcome(ensured, failures
         .OrderBy(failure => failure.UserId)
