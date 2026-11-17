@@ -14,6 +14,7 @@ Families are folders, family first; a skill's name is its folder path joined by 
 - Domain: `dotnet:domain-design`, `dotnet:domain-ddd`, `dotnet:domain-values`, `dotnet:domain-events`.
 - Errors: `dotnet:errors`, `dotnet:errors-results`, `dotnet:errors-carriers`, `dotnet:errors-terminals`.
 - Testing: `dotnet:testing`, `dotnet:testing-unit`, `dotnet:testing-integration`, `dotnet:testing-e2e`.
+- Parallelism: `dotnet:parallelism` for bounded per-item I/O and async fan-out.
 - Libraries: `dotnet:libraries`, `dotnet:libraries-selected`.
 - Keyed: `dotnet:keyed-strategies`, `dotnet:keyed-unions`.
 - Seeding: `dotnet:seeding-scope`, `dotnet:seeding-state`.
@@ -26,7 +27,7 @@ Families are folders, family first; a skill's name is its folder path joined by 
 
 ## Applicability
 
-The `core` profile holds only the family hubs and the naming and style skills: no application-stack
+The `core` profile holds the family hubs, naming, style and parallelism skills: no application-stack
 prerequisite. Each required hub's family members — DDD, value semantics, domain events, EF Core
 persistence, Reunion results and errors, ASP.NET Core, multitenancy, distributed services, every testing
 tier, and Tommy's selected full application stack — are independent profiles with their own prerequisite.

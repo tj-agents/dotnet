@@ -26,6 +26,15 @@ def entry(
 
 
 SNIPPETS: list[Snippet] = [
+    entry("parallelism-01-bounded-io", "parallelism/SKILL.md", 1, "infrastructure", "SnippetFixtures.Parallelism01",
+          header=(
+              "using System.Collections.Concurrent;\n"
+              "using System.Net.Http;\n\n"
+              "public sealed record UserEnsureFailure(int UserId, string Message);\n"
+              "public sealed record UserEnsureOutcome(int Ensured, IReadOnlyList<UserEnsureFailure> Failures);\n\n"
+              "public static class UserEnsurer\n{\n"
+          ),
+          footer="\n}\n"),
     entry("naming-01-collaborator-field", "naming/SKILL.md", 1, "infrastructure", "SnippetFixtures.Naming01",
           header="internal interface IUserService { }\n\n#pragma warning disable CS0169, CS8618\n\ninternal sealed class InvoiceSender\n{\n",
           footer="\n}\n\n#pragma warning restore CS0169, CS8618\n"),
