@@ -31,13 +31,16 @@ public static async Task<UserEnsureOutcome> EnsureUsersAsync(
             else
                 failures.Add(new UserEnsureFailure(userId, $"Ensure returned {(int)response.StatusCode}."));
         }
-        catch (Exception exception) when (exception is not OperationCanceledException)
+        catch (Exception exception) when (exception is not OperationCanceledException || !token.IsCancellationRequested)
         {
             failures.Add(new UserEnsureFailure(userId, exception.Message));
         }
     });
 
-    return new UserEnsureOutcome(ensured, failures.OrderBy(failure => failure.UserId).ToList());
+    return new UserEnsureOutcome(ensured, failures
+        .OrderBy(failure => failure.UserId)
+        .ThenBy(failure => failure.Message, StringComparer.Ordinal)
+        .ToList());
 }
 // snippet:end
 
