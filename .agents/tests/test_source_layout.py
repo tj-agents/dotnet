@@ -33,6 +33,7 @@ CORE_MEMBERS = {
     "testing",
     "build",
     "libraries",
+    "parallelism",
 }
 ALLOWED_CORE_REQUIRES = {"none", "dotnet"}
 PREREQUISITE_BEARING = (
