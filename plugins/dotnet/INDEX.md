@@ -25,6 +25,7 @@
 - `messaging` — contract — distributed-services
 - `microservice-boundaries` — contract — distributed-services
 - `naming` — contract — core
+- `parallelism` — contract — core
 - `proto` — contract — distributed-services
 - `repositories` — contract — core
 - `seeding-scope` — contract — seeding

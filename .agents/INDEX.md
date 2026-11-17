@@ -29,6 +29,7 @@ Generated from `.agents/<plugin>/<kind>/<family>/<member>/SKILL.md`; a skill's n
 - `messaging` — contract — distributed-services — `.agents/dotnet/contract/messaging/SKILL.md`
 - `microservice-boundaries` — contract — distributed-services — `.agents/dotnet/contract/microservice/boundaries/SKILL.md`
 - `naming` — contract — core — `.agents/dotnet/contract/naming/SKILL.md`
+- `parallelism` — contract — core — `.agents/dotnet/contract/parallelism/SKILL.md`
 - `proto` — contract — distributed-services — `.agents/dotnet/contract/proto/SKILL.md`
 - `repositories` — contract — core — `.agents/dotnet/contract/repositories/SKILL.md`
 - `seeding-scope` — contract — seeding — `.agents/dotnet/contract/seeding/scope/SKILL.md`
