@@ -96,3 +96,48 @@ B003 final diagnosis: fresh package/reflection probes identify the missing OpenT
 - **Verification evidence:** frozen d573967 security lens inspected exact installed assemblies, default credentials and HostPort-only conversion; network exploitability requires a started fixture and reachability. No live containers were started.
 
 B007 corrective evidence: the released four-file manifest3aa364769bc8c17a0381bb99c3a8ac3836c3a8d85732401852185d4c985f1209 matches parent source byte-for-byte after decoding its UTF8 BOM. All20 focused and36 current-core c91b60c9 repository tests pass. Both Dapper/PostgreSQL and hybrid/SQL Server build logs have zero warnings/errors and actual exit0; both offline binding tests pass without starting containers. Exact4.16 IL shows same-key port merge overwrites defaults, the converter emits one qualified binding, and parameter modifiers run after HostConfig conversion. Per-fixture24-byte CSPRNG passwords satisfy SQL complexity and127.0.0.1 limits publication. Final immutable independent review/platform qualification remain pending.
+
+
+## B008
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-13. The .NET-to-Azure scaffold writes two competing CI workflows. Real `new --preset minimal --set cloud=azure --azure-scaffold <Azure script>` produced the .NET project, then Azure failed with `already exists: .github/workflows/ci.yml`. Cause confirmed: .NET writes that file and the default Azure workflows=true plan also owns it; the isolated Azure dry-run uses an empty directory and misses this integration collision.
+- **Impact and priority:** P2; default chained cloud scaffolding fails after partial project creation. Repository standards injection succeeded before this independent component failure.
+- **Source owner:** tj-agents/dotnet scaffold Azure invocation/preflight; Azure owns its workflow generator.
+- **State:** open
+- **Repair link:** C:/Users/TommySeery/source/repos/tj-agents/docs/plans/never-again-standards/GOAL.md (observed during real injection acceptance); no separate repair launched.
+- **Next action:** reconcile the shared workflow owner and validate the actual combined file plan before publishing the new project.
+- **Resolution condition:** real default .NET cloud=azure scaffolding with the released Azure command completes, emits one intended CI workflow and passes an integration regression; collision failures occur before project publication.
+- **Verification evidence:** native disposable proof at C:/Users/TOMMYS~1/AppData/Local/Temp/never-again-real-snapshots-b3il2268/StandardsProof reproduces the failure. The separate supported azure.workflows=false case at StandardsTerraformProof completes with 46 files, required standards lock/catalog and both host settings, and real Azure Terraform files. That option qualifies this injection test, not a repair of the default workflow collision.
+
+## B009
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-14. The installed callout repair gate allowed direct `Get-Content` but denied the read-only `Get-Content ... | Select-Object -Last 15` inspection of `BUGS.md`. It also rejected a quoted `admission.py check` script path despite that validator being the required repair route. Cause confirmed: its command classifier permits only a single simple read command and requires an unquoted validator path; neither restriction protects a mutation or external action.
+- **Impact and priority:** P1; a called-out session cannot inspect or validate the repair record that the hook demands, while Stop re-injects the unresolved obligation as prompt spam.
+- **Source owner:** shared engineering callout PreToolUse/Stop enforcement and `engineering:self-repair`/`engineering:handoff` admission workflow.
+- **State:** deferred
+- **Repair link:** `plans/callout-admission-deadlock/GOAL.md`.
+- **Next action:** repair the command classifier, disposition evidence model, and stale-hook deduplication in the shared source, then run focused regressions.
+- **Resolution condition:** read-only PowerShell output pipelines and the exact validator form are admitted; unrelated mutations remain blocked; a repeated `(session_id, callout_id, prompt_sha256)` event produces no reply, action, or new binding.
+- **Verification evidence:** direct record reads succeeded; the equivalent output-only pipeline was denied. Source inspection confirms `callout_repair_gate.py` accepts reads only by a one-segment regex and its validator matcher rejects quoted script paths. The current validator also treats Python availability as resolving a host gate denial, so it cannot validate this deferred capability blocker.
+
+```agent-handoff-disposition
+{"schema_version":1,"record_id":"B009","kind":"bug","state":"deferred","callout":{"session_id":"01a1362c-5751-75f3-a54d-9bb37f25a41a","callout_id":"9c4f5441-05ea-4f6c-8928-b4ad73154ef1","prompt_sha256":"6f4ed91c3a8224e79afdb944f48f7c7783b0703d04075ac947b59bc3340ac34c"},"source_owner":"shared engineering callout PreToolUse/Stop enforcement and engineering:self-repair/engineering:handoff admission workflow","repair_goal":"C:\\Users\\TommySeery\\source\\repos\\tj-agents\\dotnet\\plans\\callout-admission-deadlock\\GOAL.md","disposition":"deferred","reason":"The gate falsely rejects a read-only PowerShell pipeline and quoted validator path; the validator cannot represent this host gate denial when Python itself is available.","blocked_by":"capability","resolver":"shared engineering callout-gate repair owner","resume_condition":"The gate admits declared read/validator forms and the validator distinguishes host command denial from missing executable availability.","next_action":"Repair the shared classifier, admission evidence model, and duplicate-hook handling with focused regressions.","evidence":{"kind":"executable-failure","executable":"python","operation":"execute","error":"The host gate denied the required validator form although Python is available."}}
+```
+
+## Historical duplicate of B009
+
+- **Kind:** bug
+- **Observed/reported:** 2026-10-14. The installed callout repair gate allowed direct `Get-Content` but denied the read-only `Get-Content ... | Select-Object -Last 15` inspection of `BUGS.md`. It also rejected a quoted `admission.py check` script path despite that validator being the required repair route. Cause confirmed: its command classifier permits only a single simple read command and requires an unquoted validator path; neither restriction protects a mutation or external action.
+- **Impact and priority:** P1; a called-out session cannot inspect or validate the repair record that the hook demands, while Stop re-injects the unresolved obligation as prompt spam.
+- **Source owner:** shared engineering callout PreToolUse/Stop enforcement and `engineering:self-repair`/`engineering:handoff` admission workflow.
+- **State:** deferred
+- **Repair link:** `plans/callout-admission-deadlock/GOAL.md`.
+- **Next action:** repair the command classifier, disposition evidence model, and stale-hook deduplication in the shared source, then run focused regressions.
+- **Resolution condition:** read-only PowerShell output pipelines and the exact validator form are admitted; unrelated mutations remain blocked; a repeated `(session_id, callout_id, prompt_sha256)` event produces no reply, action, or new binding.
+- **Verification evidence:** direct record reads succeeded; the equivalent output-only pipeline was denied. Source inspection confirms `callout_repair_gate.py` accepts reads only by a one-segment regex and its validator matcher rejects quoted script paths. The current validator also treats Python availability as resolving a host gate denial, so it cannot validate this deferred capability blocker.
+
+```text
+{"schema_version":1,"record_id":"B009","kind":"bug","state":"deferred","callout":{"session_id":"01a1362c-5751-75f3-a54d-9bb37f25a41a","callout_id":"9c4f5441-05ea-4f6c-8928-b4ad73154ef1","prompt_sha256":"6f4ed91c3a8224e79afdb944f48f7c7783b0703d04075ac947b59bc3340ac34c"},"source_owner":"shared engineering callout PreToolUse/Stop enforcement and engineering:self-repair/engineering:handoff admission workflow","repair_goal":"C:\\Users\\TommySeery\\source\\repos\\tj-agents\\dotnet\\plans\\callout-admission-deadlock\\GOAL.md","disposition":"deferred","reason":"The gate falsely rejects a read-only PowerShell pipeline and quoted validator path; the validator cannot represent this host gate denial when Python itself is available.","blocked_by":"capability","resolver":"shared engineering callout-gate repair owner","resume_condition":"The gate admits declared read/validator forms and the validator distinguishes host command denial from missing executable availability.","next_action":"Repair the shared classifier, admission evidence model, and duplicate-hook handling with focused regressions.","evidence":{"kind":"executable-failure","executable":"python","operation":"execute","error":"The host gate denied the required validator form although Python is available."}}
+```

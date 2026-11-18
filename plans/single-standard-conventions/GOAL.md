@@ -1,0 +1,363 @@
+# One standard for the dotnet conventions
+
+Status: in progress (2026-10-13). Decided by Tommy on 2026-10-13 and relayed by the sandbox-dotnet session
+from `tomjseery/sandbox-dotnet` wiring evidence. Owner: the standards-finish Codex session; canonical handoff at
+`C:\Users\TommySeery\.claude\plans\tj-agents\HANDOFF_STANDARDS_REMAINING.md`.
+
+## Rule for every slice
+
+Leave exactly one standard. Remove every superseded name, example and rule across contracts, scaffold
+components, templates, presets, tests, docs and generated plugin copies. Add no compatibility alias and no
+second vocabulary. Prove it with a repository-wide search before each PR. Record each contract change with
+its one-line why and the date, under `dotnet:learning`'s convention procedure.
+
+## Slices (one PR each, delivered in order)
+
+### A: single-service layers (`Refactor/SingleServiceLayers`)
+
+1. `dotnet:structure-single-service` replaces `<Name>.Core` with:
+   - `<Name>.Domain`: entities, value objects and domain events;
+   - `<Name>.Application`: services, repository interfaces, DTOs and requests, mappers.
+
+   It keeps `<Name>.Infrastructure` and renames the host `<Name>.Api` to `<Name>.Web`. Why: one vocabulary
+   with `dotnet:structure-modules`, where Domain already means entities only and Application holds services
+   and DTOs.
+2. Host naming rule, stated in both structure contracts: "Api" is a module's endpoint layer (as
+   `structure-modules`' `X.Api`); "Web" is the process host that serves the whole web API.
+3. Carry it through the scaffold:
+   - components, templates, presets, `verify.py` and tests;
+   - the cloud=azure profile's build commands and project paths (`src/<N>.Web`, and the migration bundle's
+     `--startup-project`).
+4. A repository-wide search finds no `<Name>.Core`, `$NAME$.Core` or single-service Api-host references.
+
+### B: testing and style, one standard each
+
+1. Test naming has one owner and one rule for every tier, and every example conforms. Today
+   `testing-unit` has `Method_Scenario_ExpectedBehaviour`, `naming` routes only unit-test naming there, and
+   `testing-integration`'s examples use two segments.
+2. The per-tier assertion library has one owner, and the examples obey it. Today `testing-integration`'s
+   example mixes `Assert.*` with `ShouldBe`.
+3. The scaffold's IntegrationTests project references Shouldly, and the per-tier library is build-gated as
+   the contract says.
+4. The `testing-integration` example uses explicit `private readonly` fields, not a primary-constructor
+   fixture capture, per `dotnet:style`.
+5. Tommy, 2026-10-13 (Option A): `this.` appears only where a constructor parameter shadows the field or
+   property it fills. Drop the every-field-access rule, set the scaffold `.editorconfig` to
+   `dotnet_style_qualification_for_field = false:error`, and add `EnforceCodeStyleInBuild` so the setting
+   actually runs at build time. Verified during implementation: this only gates the "add missing `this.`"
+   direction (IDE0009) — IDE0003 ("remove this.") does not fire as a build diagnostic in this SDK under
+   any configuration tried, so a stray `this.` outside a constructor is still caught by review and example,
+   not by `dotnet build`.
+6. The scaffold emits `.agents/skill-routes.json` (`gen_skill_routes.py --kind dotnet-service --into
+   <project>`), with a test. The route table sends every test tier to the single test-naming owner. Without
+   it, scaffolded repositories are born ungated, which is the root cause of the sandbox agent not loading
+   the standards.
+7. Tommy, 2026-10-13: every test tier's contract (unit, integration, e2e) opens with a full, generic,
+   domain-neutral example test class (no product context such as VAT) that demonstrates the conventions
+   by itself, without prose:
+   - `Method_Scenario_ExpectedBehaviour` names;
+   - constructor-built `private readonly` fields, `this.` only where a constructor parameter shadows one
+     (Option A, item 5), and no `this.` inside test methods;
+   - Arrange/Act/Assert separated by blank lines;
+   - the tier's assertion library (xUnit for unit, Shouldly for integration, Playwright `Expect` for e2e
+     page state and Shouldly for a value read outside the page);
+   - `[Theory]` with the expected value last;
+   - a `#region` per method under test.
+   The same rule applies to every contract's snippet: the code is the explanation, and it must obey every
+   contract that applies to it, including the one it sits in (M003: an earlier e2e example broke its own
+   contract's fast-forward and assertion rules).
+8. Tommy, 2026-10-13: record M002 in `MISTAKES.md`: a sandbox .NET slice was written without loading the
+   dotnet contracts. Item 6's route table must route by concern as well as by path (events,
+   publishers/consumers, logging, validation, errors, DI, endpoints, persistence, collaborators), so every
+   applicable contract is required before the write.
+9. Tommy, 2026-10-13 (relayed by sandbox-dotnet-17, proposal at
+   `C:\Users\TommySeery\.claude\plans\tj-agents\DOTNET_MESSAGING_ROLES_PROPOSAL.md`): `dotnet:naming-collaborators`
+   gains two canonical roles — publishing an integration event (`IIntegrationEventPublisher`, one per
+   solution, generic over the event) and pumping a broker subscription (`<Subscription>Processor :
+   BackgroundService`, dispatching to the existing Handler role and settling the message) — because the
+   sandbox invented `INoteEventPublisher` and a `HostedService` for exactly these with no role to reuse.
+   Each role gets a full, generic, domain-neutral snippet obeying every contract that applies to it; the Processor's
+   uses explicit `private readonly` fields assigned with `this.` in the constructor, never a
+   primary-constructor capture, and the receive source is the broker SDK's own type, not an invented
+   receiver role. `domain-events`' handler snippet drops `bus` for a constructor-assigned
+   `integrationEventPublisher` field. Item 8's concern routing sends publisher, processor and handler code
+   to `naming-collaborators` plus `domain-events`.
+10. Tommy, 2026-10-13: `dotnet:libraries-selected`'s table lists xUnit, Reqnroll and Playwright but no
+    assertion library, so it gains an Assertions row pointing to `dotnet:testing` — the one owner for
+    which library each tier uses — so no agent is ever asked this again.
+11. Negative-path scaffold gates: `verify.py` scaffolds one IntegrationTests configuration and asserts
+    `dotnet build` FAILS for a stray `Assert.*` in an integration test (`BannedApiAnalyzers`/RS0030),
+    restoring the file after. It also injects a stray `this.field` read outside a constructor and reports
+    the result either way: in the current SDK this one does not fail the build (see item 5's finding), so
+    it prints the finding rather than failing `verify.py` on a gate the toolchain doesn't support yet.
+
+### C: learning defaults and snippet-led conventions (lower priority)
+
+1. `dotnet:learning` must not default to treating Tommy as a .NET beginner, because he knows .NET well.
+   Correct the default.
+2. Conventions lead with code-snippet examples showing the rule, not prose, and every example obeys every
+   contract that applies to it, including the one it sits in. Record this in the convention procedure, and
+   apply it to the contracts slices A and B touch.
+
+### D: packaging identity and the core dependency (Tommy, 2026-10-13)
+
+1. `plugins/dotnet/harness.json` and its source declare the plugin as `dotagents/dotnet` and require
+   marketplace id `dotagents`. Make it `tj-agents` everywhere, and verify with a repository-wide search
+   that no `dotagents` remnant is left.
+2. "dotnet inherits core": `selection.json` has `"dependencies": []`, and the marketplace entry declares
+   none. Tommy widened this on 2026-10-13: it is systemic across every stack, and the kit/Template must
+   make a stack inherit core by default, with `kit:check` enforcing it. kit has its own live owner (the
+   Codex Template goal), so the requirement is written at
+   `C:\Users\TommySeery\.claude\plans\tj-agents\TEMPLATE_STACK_INHERITS_CORE.md` for Tommy to give it.
+   dotnet then picks the dependency up via `kit:update` and doesn't hand-declare it. Waits on that kit
+   release.
+3. The README gives a one-step install and use.
+4. Before changing the published identity, check what installed consumers of the legacy `dotagents`
+   marketplace rely on. The marketplace README says legacy marketplaces stay available, and core owns
+   release identities. If the change would break published installs or needs a core release-catalog
+   change, ask Tommy one line before merging.
+
+### E: folded into scaffold boilerplate item 0b (Tommy, 2026-10-13)
+
+Slice E is superseded by item 0b in the canonical standards handoff. After this snippet-gate fix
+merges, the dotnet scaffold will generate one Web API shape and always write its boilerplate app
+profile, including `verify` and `database.schemas`. It will emit no workflow and have no cloud switch.
+Azure remains a separate scaffold step, with workflows owned by the github-actions writer in item 0.
+
+## Lanes
+
+- Each slice is specified implementation at L4, run by one in-session lane agent as the only writer.
+  Tommy's limit is 7 sessions on this machine, so no extra CLI sessions.
+- Review is an independent lens per PR.
+
+## Progress
+
+- 2026-10-13: goal created on `Refactor/SingleServiceLayers` from main `a5b8a07` (after PR #48).
+- 2026-10-13: slice A was implemented in `c12e6f8`.
+  - The contracts (single-service, plus the host-naming rule in both structure contracts) and the scaffold
+    use Domain/Application/Web. The `hosts` value `api` became `web`, and so did the azure workload id.
+  - The searches find only the dated decision bullet.
+  - 42 unittests, sync and kit check pass, and all 8 verify.py configurations build and test, including
+    SandboxAzure with Terraform validate.
+  - Parent correction sent: rename the component folders and the `API_*` placeholders that still mean the
+    Web host. `ApiFixture` and the testing vocabulary are left for slice B.
+- 2026-10-13: `59308cd` renamed the component folders (`web`, `azure-web`, `azure-web-postgres`,
+  `azure-telemetry-web`) and `API_*` to `WEB_*`. The searches are clean, and 42 tests plus the SandboxAzure
+  verify pass.
+  - `test_route_cli.py`'s `engineering:docs` failure reproduces on main `a5b8a07`, so it's pre-existing and
+    unrelated.
+  - Next: rename the `api` preset and the `Api*Sample` verify names to Web.
+
+- 2026-10-13: **slice A merged** as tj-agents/dotnet#49 → `b5e395c`.
+  - It covers `59308cd` (component and placeholder renames) and `93eb064` (the preset and samples).
+  - The review approved with no findings, and CI was green, including the azure end-to-end run.
+  - sandbox-dotnet was notified.
+- 2026-10-13: slice B started on `Refactor/OneTestingStyleStandard` from `b5e395c`.
+- 2026-10-13: B9 added — `naming-collaborators` gained the Publisher and Processor roles, `domain-events`'
+  handler snippet now injects `IIntegrationEventPublisher`, and the route table sends publisher/processor/
+  handler code to `naming-collaborators` and `domain-events`.
+- 2026-10-13: **slices B and C implemented** in `985fb68`, including B9. The repo-wide searches are clean
+  (no second test-naming rule, no two-segment names, no `Assert.*` in the integration example, no `this.`
+  outside a constructor in any example or template), `test_scaffold.py`/`test_route_cli.py`/
+  `test_source_layout.py` pass (the `engineering:docs` failure in `test_route_cli.py` is the same
+  pre-existing one reported on main), `sync-generated.ps1 -Check` and `kit:check` pass, and all 8
+  verify.py configurations build and test, including SandboxAzureSample with Terraform validate.
+  Not yet reviewed, PR'd or pushed.
+- 2026-10-13: PR #50 opened from `985fb68`/`22bc92b`; three follow-up commits landed directly on the PR
+  branch (`af2e298` real-SDK Processor dispatch, `3d8276d` the publisher/handler-vs-processor routing
+  split, `b65312d` recording the two decisions below as pending), then the two decisions were made and
+  implemented:
+  - **`this.` versus the build gate (items B5/B7):** Option A — `this.` only where a constructor parameter
+    shadows the field or property it fills. Every non-shadowed `this.` across the contracts and scaffold
+    is fixed (`testing-unit`'s `InventoryTests`, `ApiFixture`'s `container`, two `DapperConnectionFactory`
+    variants' `connectionString`, `dependency-injection`'s `Reserve`/`Charge`/`Dispatch`), and the scaffold's
+    `Directory.Build.props` gains `EnforceCodeStyleInBuild` so `false:error` actually runs at build time.
+  - **E2E assertions (item 10):** both, split by what's being asserted — Playwright `Expect(locator)` for
+    page state, Shouldly for a value read outside the page. `dotnet:testing`'s table and `testing-e2e`'s
+    example both record it, and `dotnet:libraries-selected` gains the Assertions row pointing to
+    `dotnet:testing` so the split is never re-asked.
+  - M003 recorded in `MISTAKES.md`: the first E2E rewrite broke its own contract's fast-forward and
+    assertion rules, because the checklist and the convention procedure both said "every **other**
+    contract". The example is rewritten to fast-forward from seeded fixture state with no browser call in
+    its `Given`, and the procedure wording now says "every contract that applies to it, including the one
+    it sits in".
+  - Negative-path scaffold gates (item 11) added to `verify.py`.
+  - M003 and item 6's own checklist exposed the same gap a layer up: re-checking every snippet this branch
+    touches against its own host contract found testing-e2e's rewrite needed the fast-forward/assertion fix
+    above; unit, integration, naming-collaborators, domain-events, microservice-boundaries and style were
+    already each consistent with their own rules.
+  - Finding, not fixed: IDE0003 ("remove this qualification") does not fire as a build diagnostic in the
+    SDK in use, verified by isolated repro across field/property/method access, `dotnet_diagnostic.IDE0003.severity`,
+    `dotnet format`, and with `Meziantou.Analyzer` added — only IDE0009 ("add this qualification") fires.
+    `verify.py`'s negative-path gate for a stray `this.field` outside a constructor therefore reports this
+    rather than asserting a build failure that the toolchain doesn't produce; "this. only where shadowed"
+    is enforced by review/example today for that direction, not by the build. Left for Tommy to decide an
+    alternative mechanism, or to accept it as a review-only rule.
+  - Repo-wide searches re-run clean: no non-shadowed `this.` anywhere in `.agents/dotnet`, no
+    `TextContentAsync`-then-`ShouldBe` left in the e2e example. `test_scaffold.py`/`test_route_cli.py`
+    (same pre-existing `engineering:docs` failure)/`test_source_layout.py`, `sync-generated.ps1 -Check` and
+    `kit:check` pass, and all 8 verify.py configurations plus the new negative-path gates ran sequentially
+    and passed (0 warnings/0 errors on every config, both Terraform roots validated).
+- 2026-10-13: slice B/C **PR #50 merged** as `4cb90a2`.
+
+- 2026-10-13: **Follow-up fixes** — `Fix/SnippetsCompileUnderScaffold`, from sandbox-dotnet applying #50
+  and finding two defects the review missed: the scaffold template `.editorconfig` had no
+  `dotnet_diagnostic.CA1848.severity = error` though `dotnet:logging` requires it, and the
+  microservice-boundaries Processor snippet awaited without `.ConfigureAwait(false)` and used
+  `await using var scope = …`, which the selected stack's Meziantou MA0004 rejects under
+  `TreatWarningsAsErrors` (M004 in `MISTAKES.md`).
+  - Fixed both instances, then built a snippet compile gate so the class of defect can't recur: a
+    compilable fixture plus a byte-identity unittest per `.agents/dotnet/contract/**/SKILL.md` csharp
+    block, under `.agents/tests/snippets/`. `verify.py` scaffolds the sandbox preset after the positive
+    configurations, adds a temporary Dunet reference for the Infrastructure project's union snippets, copies
+    each fixture into its target project (Infrastructure for production snippets, the matching test project
+    for test-tier snippets), and builds under `TreatWarningsAsErrors`.
+  - A block that is a deliberate counter-example or otherwise can't compile (a prose fragment, a
+    net11.0-only feature, a scope-colliding multi-example fence) gets a dedicated `skip` field with a
+    required, specific reason — a new explicit marker, not the doc's existing `// CORRECT`/`// WRONG`
+    comments, since those mark intent inside a block rather than exempting a whole block from the gate
+    without touching its verbatim text.
+  - The gate found and this PR fixed further genuine snippet defects beyond the two reported: a
+    `Fulfil.Fulfil` CS0542 self-naming bug in `keyed/unions` (the union must be named `Fulfilment`), a
+    missing `Status` property in `domain/events`, missing `.ConfigureAwait(false)` in five further
+    production-tier snippets (`errors/carriers`, `persistence` ×2, `proto`, `seeding`, `style`), and
+    non-functional `ShouldBe`/`ReadAsync` placeholder calls in `testing/integration` replaced with real
+    Shouldly/`System.Net.Http.Json` calls.
+  - 6 new unittests, sync and kit check pass, and the full verify.py (including the new snippet compile
+    gate) runs sequentially and passes.
+  - Tommy: close 2 of the 14 skips, the rest are legitimate. `multitenancy-05-stance-test` closed —
+    decoupled `IReadDbContext`/`IWriteDbContext` from `IDbContext` in the shared stub (they were wrongly
+    extending it; the contract's own repository-capability table treats them as independent rows), made
+    `ReadDbContext` throw on `SaveChanges` per its own "read-only by construction" rule, and added a
+    temporary `Microsoft.EntityFrameworkCore` reference to the gate's UnitTests project only (not the
+    shipped scaffold). `testing-e2e-01-clock` (the M003 example) not yet closed — still needs a temporary
+    E2E project (Reqnroll/Reqnroll.xUnit/Microsoft.Playwright/Shouldly) added to the gate's scaffolded
+    sandbox, an `e2e-tests` manifest project kind, and `ClockFixture`/seed-state stubs. Also pending: the
+    integration-event definition in `domain-events`/`naming-collaborators` (with its own snippet) and the
+    GOAL.md Next Steps notify-target edit (sandbox-dotnet-17 → the Codex owner at
+    `sandbox-dotnet/plans/sandbox/GOAL.md`). Checkpointed here for a Codex handoff.
+
+## Next Steps
+
+1. Item 0: github-actions owns the complete workflow set; Azure supplies only its cloud steps.
+2. Item 0b: one Web API boilerplate shape, unconditional infra/app.json, no cloud switch or workflow output.
+   Tommy decided on 2026-10-13 to add a scaffold-shipped Roslyn source scan for stray `this.` reads.
+3. Slice D waits on the published kit core-dependency mechanism; check legacy install compatibility first.
+4. Complete the separate typed domain-event dispatcher repair using Tommy's decided
+   `ITransactionalDomainEventHandler<TEvent>` marker.
+5. Continue the remaining Terraform/dependency and core repairs in the canonical handoff order.
+
+## Codex pickup - 2026-10-13
+
+The handoff successor verified this branch at `5c52d9e`. The earlier configured-model capacity gate
+is resolved: Tommy authorized whichever available models work for implementation and independent
+review. The bounded implementation remains L4, with one in-session writer and no additional native
+CLI sessions. The canonical handoff remains
+`C:\Users\TommySeery\.claude\plans\tj-agents\HANDOFF_STANDARDS_REMAINING.md`.
+
+- Added a temporary E2ETests project only to the snippet compile gate, with Reqnroll/Reqnroll.xUnit
+  3.3.4, Microsoft.Playwright 1.63.0 and Shouldly 4.3.0. `testing-e2e-01-clock` now has no skip and
+  retains an empty header; fixture seed types and global usings provide its dependencies.
+- Recorded Tommy's integration-event decision in `domain-events`, with the domain record,
+  constructor-assigned pre-commit translator and flat integration record compiled as one verbatim
+  example. `naming-collaborators` links this owner.
+- Validation and delivery evidence follows below; the parent retains review, exact-head CI and delivery.
+
+- Local validation: 7 snippet tests (including byte identity, complete manifest coverage and a real
+  temporary scaffold whose E2E project/package/solution/fixture artifacts are inspected with dotnet
+  calls mocked), 43 scaffold tests and 3 source-layout tests pass. The snippet and host generators run
+  with `python -B`; their freshness checks pass. Pinned kit 1.2.1 conformance and tier/harness validation
+  pass. The shipped source harness now grants the packaged `verify.py` command separately from
+  scaffold `new`/`options`.
+- Full compile/build validation remains pending exact-head CI. Local free disk is approximately
+  253 MB, so no dotnet or Terraform process was launched. `.github/workflows/scaffold.yml` runs the
+  unchanged full verification sequence on Linux and Windows with `AZURE_SCAFFOLD` pointing to its
+  Azure checkout; this branch's `verify.py` edit triggers both jobs. The gate covers all eight positive
+  configurations, the 46 compilable snippets (12 explicit skips), negative paths and both Azure
+  Terraform roots. Parent owns pushing this candidate, independent review and those CI results.
+
+## Domain-event dispatcher repair - 2026-10-13
+
+The sandbox-dotnet review found that `dotnet:domain-events` instructs consumers to resolve the closed
+`IDomainEventHandler<TEvent>` interface for each runtime event type, but supplies neither the typed
+`IDomainEventDispatcher` contract nor the scoped dispatcher and `SaveChangesInterceptor` reference
+implementation that makes it executable. The repair is a bounded L4 implementation: keep reflection
+inside the dispatcher, use `IServiceProvider.GetServices(closedHandlerType)`, invoke `HandleAsync` without
+`dynamic`, and cover runtime dispatch, phase selection, DI registration, and the interceptor's
+clear-before-dispatch behavior with the snippet compile gate.
+
+Concertable provides the implementation evidence: its `IDomainEventDispatcher` has one operation for the
+transaction-bound handler phase and one for the other phase; `DomainEventDispatcher` resolves the closed
+generic interface at runtime; and `DomainEventDispatchInterceptor` delegates from EF Core's save hooks.
+Its marker is `IPreCommitDomainEventHandler<TEvent>`, but that wording is not yet being re-published as the
+generic contract. The alternatives are that existing name, `ITransactionalDomainEventHandler<TEvent>`
+(names the atomicity guarantee), or `IBeforeSaveDomainEventHandler<TEvent>` (names EF Core's hook).
+
+Tommy decided on 2026-10-13: use `ITransactionalDomainEventHandler<TEvent>` as the canonical marker.
+The typed dispatcher and reference implementation remain to be implemented in their separate repair.
+
+## Snippet review repairs - 2026-10-13
+
+The completed independent review is frozen at `9559be3` with changes required. This bounded repair
+addresses SSN-1 (`BUGS.md#B009`), SSN-2 (`BUGS.md#B010`) and SSN-3 (`BUGS.md#B011`), plus the
+full-CI Azure workflow collision already recorded in the primary shared register as `BUGS.md#B008`.
+
+- Moved the complete canonical snippet asset directory beside the scaffold and changed every verifier
+  to resolve `ROOT / "snippets"`. The old authored directory is gone. The authoring generator still
+  extracts exact source contract fences. All three generated host inventories match the canonical
+  assets, and the real authored/Claude/Codex/package scaffold-setup paths copy every fixture.
+- Closed only the false keyed-strategies block 4 skip, corrected block 2's explanation without
+  inventing its missing builder, and kept the other exemptions. Coverage is now 47 compilable fences
+  and 11 explicit skips across 58 blocks.
+- Replaced primary-constructor captures in the checkout, seeder and scoped support wrappers with
+  explicit readonly fields and constructor assignments. The bounded shared-support audit also fixes
+  shadowing out parameters, empty runtime string literals, legacy extension containers, repository
+  dependency initializers, the inherited `base.Set` call and file-scoped namespaces for each
+  emulated library namespace. Every contract snippet region stays exact.
+- Existing `cloud=azure` planning now leaves `ci.yml` for Azure before files are written. The fake
+  provider rejects an occupied handoff path; real primary Azure composition succeeds with all six
+  workflows. This repair does not implement item 0b or the rest of slice E.
+- Verification: 8 snippet tests, 43 scaffold tests, 3 source-layout tests, pinned kit 1.2.1, tier/harness
+  validation and freshness of all 585 generated outputs pass. Local real Azure composition runs only
+  Python generation; no dotnet or Terraform process was launched. Full exact-head CI, fresh independent
+  incremental review and delivery remain with the parent.
+
+## E2E snippet CI repair - 2026-10-13
+
+Independent incremental review of `565a6ed` completed with all five lenses clear and approved. The
+exact-head Scaffold PR run `38437895854` passed the repaired Azure composition and reached the snippet
+compiler, which reported the five E2E diagnostics tracked in `BUGS.md#B012`: MA0002 on the seed
+support dictionary and MA0004 on four awaits in the actual ClockSteps contract example.
+
+The source example now configures all four awaits with `ConfigureAwait(false)`; the support dictionary
+uses `StringComparer.Ordinal`. Both generators refreshed the exact fixture and all host layouts. The
+manifest header stays empty, the fence remains selected for compilation, and analyzer policy is unchanged.
+Eight snippet tests, three source-layout tests, the affected-source/header check and freshness of all 585
+generated outputs pass. No local dotnet or Terraform process ran. Full exact-head compiler validation,
+fresh independent incremental review and delivery remain with the parent.
+
+## Final snippet delivery readiness - 2026-10-13
+
+The final compiler correction is pushed at f04f5e6b9a48c58a220a91102016632dc2dd489b. All applicable independent delta lenses approve; the security carryforward is clear and data migration is inapplicable. Exact-head PR Scaffold run 38439876379 passes on Linux and Windows, covering the existing eight configurations, all 47 complete contract fixtures, negative paths and both Azure Terraform roots. Kit CI run 38439876853 passes on both operating systems and both hosts. One duplicate push Windows job remains pending; parent monitors it before merging. Delivery preflight, continuous review reconciliation, current-head host coverage and PR body checks pass. The complete PR diff is clean against the private employer deny-list.
+
+The pending phase-marker decision applies to the separate typed-dispatcher repair. It does not reserve the current PR merge, and Tommy's explicit order remains snippet delivery, item 0 workflow ownership, item 0b boilerplate, then remaining work.
+## Merged delivery and decisions - 2026-10-13
+
+Dotnet PR #52 merged at 08f9c41275105e6eac01009301cbbb9edfc8acdf from reviewed head
+f04f5e6b9a48c58a220a91102016632dc2dd489b. All independent applicable lenses approved.
+Both full Scaffold runs (38439876379 and 38439867686) and kit CI 38439876853 passed on
+Linux and Windows. Coverage includes eight existing configurations, 47 complete contract fixtures,
+negative paths and both Azure Terraform roots. The employer deny-list scan was clean before every commit
+and on the complete PR diff. The linked worktree is unregistered and its local branch removed.
+
+The primary checkout remains at its older main with another owner's B008 observation intact. Its update
+was rejected by automatic approval review because replacing that observation could lose another owner's
+work. The complete delivery goal was retained before cleanup and restored here without replacing B008.
+Future implementation starts from the merged remote main and carries this retained goal forward.
+
+The exact sandbox-dotnet owner is live, but its supported endpoint disconnected before a send was attempted.
+No notification or acknowledgement is claimed. Resuming a verified live owner is forbidden by the selected
+followup skill, so no replacement session was launched. Notification remains pending a supported endpoint.
+
+Tommy also decided to use a Roslyn source scan in item 0b and named the later IaC package `terraform`.
+The Azure root-writer integration and tflint/Checkov decisions remain separately pending.
