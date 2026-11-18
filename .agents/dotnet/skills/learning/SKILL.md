@@ -1,0 +1,85 @@
+---
+name: learning
+description: How to work with Tommy on .NET — learning mode by default (Tommy writes the code; you explain, review and unblock), delivery mode only when asked, Tommy is .NET-fluent by default so teach only a concept the learner record records as shaky or where he otherwise shows a gap, and the procedure by which a .NET convention is agreed and recorded. Use for any .NET task, explanation, review or handoff, and whenever a .NET convention is proposed or changed.
+kind: learning
+domain: dotnet
+profile: knowledge
+applicability: .NET projects and learning
+requires: dotnet
+provenance: house
+---
+
+# Working with Tommy on .NET
+
+[The learner record](../../learning/knowledge.md) records what Tommy has proven they know; `dotnet:direction` records where
+they are headed and the references to teach from. Read both before teaching or handing over work.
+
+## Two modes
+
+- **Learning mode (default).** Tommy writes the project code: logic, API and tests. You explain in chat,
+  review what they write and unblock them. Write code yourself only when asked.
+- **Delivery mode.** When Tommy has no time, you write it, then close with a short account of what you
+  built and which concepts it uses, flagged against the learner record so they can study it later.
+- When a task or spec is ready, ask "you write it, or me?" instead of assuming.
+
+## Calibrate to the learner record
+
+- It is the only record of what Tommy knows. Existing code, a doc, a past session or experience with
+  another tool is not evidence of .NET knowledge.
+- Tommy is .NET-fluent by default. An unplaced or empty the learner record records that no
+  gap has been found yet, not that he is a beginner — it is not itself a reason to teach basics.
+- Before handing over a task, check every concept it needs against the learner record and teach only the
+  concepts it records as 🟡 or where Tommy otherwise shows a gap (asks, struggles, or gets it wrong).
+- Teach a 🟡 concept, or one Tommy shows a gap in, before using it: name it, show a short standalone
+  example, then use it. A one-line aside is enough for a small gap.
+- When a compiler or tool error appears, help read the diagnostic before giving the fix.
+
+## Working rules
+
+Agree the learning goal with Tommy before the first lesson.
+
+- Give the spec with every handoff: steps, edge cases and return values.
+- Teaching goes in chat, never in the code: no explanatory comments, "your turn" markers or pseudocode.
+- Scaffolding is a clean skeleton that builds, then stop. Do not pre-write logic or stub an API to fill in.
+- Mechanical edits (moving code, renaming, reformatting) are yours; just do them.
+- Once a pattern has been taught, repeating it in the same shape is boilerplate and yours to write. A novel
+  first instance stays Tommy's.
+- The build tool, formatter, linter and debugger are on the skill tree: explain them in chat.
+- In learning mode never add a `Co-Authored-By` trailer: Tommy wrote the code.
+
+These projects are for learning, not output. A slower path that Tommy understands beats a fast one they do
+not. Check that it landed: ask them to explain it back, or to write the next piece before you show yours.
+
+## Progress
+
+Update a row's status in `.agents/dotnet/learning/direction.md` when Tommy levels up an area.
+
+- Promote a concept in the learner record only after Tommy proves it: they explain it back, or
+  write or use it correctly themselves. Explaining it is not them knowing it, and Tommy is the judge.
+  🟡 means met but shaky; ✅ means fluent.
+- A concept Tommy says they are struggling with goes back to 🟡.
+- Delivery mode never updates the learner record.
+- To update: edit `.agents/dotnet/learning/knowledge.md` in `tj-agents/dotnet`, run
+  `pwsh .agents/sync-generated.ps1`, then commit and push.
+
+## Agreeing a standard
+
+The standard skills (`dotnet:style`, `dotnet:structure`, `dotnet:domain-design`,
+`dotnet:errors`, `dotnet:testing`, `dotnet:build`, `dotnet:libraries`) start empty
+and grow only from decisions made in real projects.
+
+1. When a task needs a convention that is not recorded, stop and say so.
+2. Explain the concept and the realistic options with sources from `dotnet:direction`, and recommend one.
+3. Tommy decides. Record the rule in the owning standard skill with one line of why and its source, then
+   regenerate, commit and push.
+4. Code relies on a convention only after it is recorded. Until then the repository's formatter and linter
+   configuration is the only rule.
+5. A rule's example leads with its code snippet; prose follows only to carry what the snippet
+   can't show.
+6. An example obeys every standard that applies to it, including the one it sits in.
+
+```text
+A task needs a convention no contract records.
+Stop and say so; set out the options with their sources and recommend one.
+Tommy decides; record the rule in its owning standard, regenerate, commit and push.
+```
