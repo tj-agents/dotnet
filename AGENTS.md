@@ -1,3 +1,28 @@
+<!-- BEGIN tj-agents:standards -->
+## Repository standards
+
+Before the first edit, read the full standards relevant to your changes
+from the index below. Invoke the skill or read its advertised
+SKILL.md and its canonical definition. A skill listing is not a read.
+Load only the applicable standards and their needed references; reassess when
+the task changes. Report any missing required skill and repair this repo's
+plugin installation before editing the files it governs.
+
+Selected plugins: `agent-store@tj-agents`, `agent@tj-agents`, `base@tj-agents`, `cli@tj-agents`, `docs@tj-agents`, `dotnet@tj-agents`, `engineering@tj-agents`, `github-actions@tj-agents`, `github@tj-agents`, `personal@tj-agents`, `python@tj-agents`, `skill@tj-agents`, `template@tj-agents`, `workflow@tj-agents`.
+
+- .NET projects: `dotnet:build`, `dotnet:domain-design`, `dotnet:errors`, `dotnet:libraries`, `dotnet:structure`, `dotnet:testing`
+- C# projects exposing repository contracts, regardless of persistence library: `dotnet:repositories`
+- C# projects that persist state, regardless of persistence library: `dotnet:unit-of-work`
+- GitHub Actions projects: `github-actions:build`, `github-actions:domain-design`, `github-actions:errors`, `github-actions:explanation`, `github-actions:libraries`, `github-actions:security`, `github-actions:structure`, `github-actions:style`, `github-actions:testing`
+- Python projects: `python:build`, `python:dispatch`, `python:domain-design`, `python:enums`, `python:errors`, `python:explanation`, `python:imports`, `python:libraries`, `python:modules`, `python:structure`, `python:style`, `python:testing`
+- When relevant to this task: `base:agent-files`, `base:machine-agnostic`, `base:project-setup`, `base:solution-assessment`, `docs:diagram`, `docs:layout`, `engineering:branching`, `engineering:committing`, `engineering:docs`, `engineering:failure-provenance`, `engineering:git-auth`, `engineering:merging`, `engineering:plans`, `engineering:remote-validation`, `engineering:review-lifecycle`, `engineering:session`, `workflow:plan-artifacts`, `workflow:session`
+- agent sessions: `agent:lanes`
+- all C# and .NET code: `dotnet:comments`, `dotnet:dtos`, `dotnet:explanation`, `dotnet:fields`, `dotnet:mapping`, `dotnet:naming`, `dotnet:style`
+- material Tommy revises or rehearses: `personal:revision`
+- projects explicitly selecting personal: `personal:rules`
+
+<!-- END tj-agents:standards -->
+
 # dotnet
 
 This repository uses the plugin layout `template:check` documents and enforces
