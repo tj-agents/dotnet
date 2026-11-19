@@ -242,7 +242,7 @@ Azure remains a separate scaffold step, with workflows owned by the github-actio
 1. Finish and merge `Fix/SnippetsCompileUnderScaffold`, then notify the sandbox-dotnet owner (Codex;
    goal at `C:\Users\TommySeery\source\repos\sandbox-dotnet\plans\sandbox\GOAL.md`). Slices B/C
    already merged as tj-agents/dotnet#50; Azure sticky/B001 merged as tj-agents/azure#7 at
-   `881ac901118a953b6d6ef0d5651f483e02823bf8`.
+   `2955b3eeb72067c0e3757336537b88b92789d71d`.
 2. Item 0: move whole workflow ownership to github-actions. Item 0b follows the snippet-gate merge and
    folds slice E into one Web API boilerplate shape; it is outside this branch's scope.
 3. Pending Tommy: enforce "no stray `this.`" with a scaffold-shipped source-scan test, or keep it

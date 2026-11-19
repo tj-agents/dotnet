@@ -12,7 +12,7 @@ engineering:session-guidance grants standing standards-defect diagnosis, impleme
 
 Checkout: C:/Users/TommySeery/source/repos/tj-agents/dotnet/.worktrees/Fix-RouteCapabilityReferences
 Branch: Fix/RouteCapabilityReferences
-Base: origin/main dd937097b7a2e489fc0986119af1ca5320e74fa7
+Base: origin/main bfd6c2200801ccba8ce60c684d0f9662d5a3f3fe
 PR: https://github.com/tj-agents/dotnet/pull/44
 L4: a small testable compatibility fix; the concrete failure identifies retired engineering:docs-and-debt references. Resolve correct current narrow owners from current core source evidence before substituting; do not weaken route resolution tests.
 
@@ -32,8 +32,8 @@ Own only .agents/dotnet/utility/skill-routes source and directly affected tests,
 ## Progress
 
 - 2026-10-12 — Picked up from `C:\Users\TommySeery\source\repos\tj-agents\dotnet\.worktrees\Feature-ScriptedScaffold\plans\scripted-scaffold\route-repair-handoff.md` in the recorded `Fix/RouteCapabilityReferences` checkout. Read repository instructions, lane, plan-execution, bugfix, and problem-record conventions; selected L4 for the specified, focused route repair. Recorded `B001` in root `BUGS.md`.
-- 2026-10-12 — Verified current core `8e7110da37540971be623eabd847618ee32ea04c`: its compatibility map resolves the retired alias to `engineering:docs`, and its `write-debt` convention owns `TECH_DEBT.md`. Replaced the instruction-file route with `engineering:docs` and the debt-file route with `engineering:write-debt`; regenerated projections. Passed `python -B -m unittest discover -s .agents/tests -p "test_*.py"` (16 tests) against that core checkout and `pwsh -NoProfile -File .agents/sync-generated.ps1 -Check` (144 generated outputs current).
-- 2026-10-12 — PR #44 at `bf2013e1610017a32d350b0cd3f03c46b8f0bb7f` passed hosts, Ubuntu, and Windows CI; native review returned no actionable findings. It merged as `bd524c3564895e41a79d3ea2605e63eb7173a1a6`. `B001` is resolved. This record notifies the originating scripted-scaffold owner; its goal remains active and this side workstream made no scaffold, core, consumer, or machine-install changes.
+- 2026-10-12 — Verified current core `ccd97bb88f79a885d9d77fa43faaa7dd6abebb72`: its compatibility map resolves the retired alias to `engineering:docs`, and its `write-debt` convention owns `TECH_DEBT.md`. Replaced the instruction-file route with `engineering:docs` and the debt-file route with `engineering:write-debt`; regenerated projections. Passed `python -B -m unittest discover -s .agents/tests -p "test_*.py"` (16 tests) against that core checkout and `pwsh -NoProfile -File .agents/sync-generated.ps1 -Check` (144 generated outputs current).
+- 2026-10-12 — PR #44 at `7b25dede44a4f84c384726a5538ef31fc0ab17ef` passed hosts, Ubuntu, and Windows CI; native review returned no actionable findings. It merged as `49cabb0eb4b6723f20f2bb0bbb82bfb4fcec59df`. `B001` is resolved. This record notifies the originating scripted-scaffold owner; its goal remains active and this side workstream made no scaffold, core, consumer, or machine-install changes.
 
 ```completion
 {
@@ -43,15 +43,15 @@ Own only .agents/dotnet/utility/skill-routes source and directly affected tests,
       "id": "route-capability-resolution",
       "criterion": "Focused tests and Windows/Ubuntu CI pass for the repaired route references.",
       "evidence": [
-        {"source": "local validation", "result": "16 focused repository tests and generated-file drift check passed against core 8e7110da37540971be623eabd847618ee32ea04c."},
-        {"source": "PR #44", "result": "hosts, Ubuntu, and Windows checks passed before merge commit bd524c3564895e41a79d3ea2605e63eb7173a1a6."}
+        {"source": "local validation", "result": "16 focused repository tests and generated-file drift check passed against core ccd97bb88f79a885d9d77fa43faaa7dd6abebb72."},
+        {"source": "PR #44", "result": "hosts, Ubuntu, and Windows checks passed before merge commit 49cabb0eb4b6723f20f2bb0bbb82bfb4fcec59df."}
       ],
       "owner": "route-capability-references side-workstream",
       "next_action": "None; resolved."
     }
   ],
   "deliveries": [
-    {"repository": "tj-agents/dotnet", "pr": 44, "head": "bf2013e1610017a32d350b0cd3f03c46b8f0bb7f"}
+    {"repository": "tj-agents/dotnet", "pr": 44, "head": "7b25dede44a4f84c384726a5538ef31fc0ab17ef"}
   ],
   "open_tasks": []
 }
